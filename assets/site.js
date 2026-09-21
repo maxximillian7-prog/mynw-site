@@ -1,0 +1,1 @@
+const m=document.querySelector('.menu'),n=document.querySelector('nav');if(m&&n)m.onclick=()=>n.classList.toggle('open');document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copy);b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1400)}catch(e){}});
