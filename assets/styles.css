@@ -96,3 +96,70 @@ nav a:hover{color:var(--text)}
   .product-stage{min-height:390px}.app-card.main{inset:0 0 62px 0}.app-card.finance{width:78%;right:-4px}
   .action-row{grid-template-columns:1fr 1fr}.metric-grid{grid-template-columns:1fr 1fr}.header-row{gap:10px}.brand span{display:none}
 }
+
+/* Website V4: simplified product navigation and concise homepage */
+.hero-wordmark{
+  font-size:clamp(3.1rem,7.5vw,6.4rem);
+  font-weight:950;
+  letter-spacing:-.075em;
+  line-height:.92;
+  margin:0 0 18px;
+}
+.hero-wordmark span{color:#f2c94c}
+.hero-subtitle{margin-bottom:10px}
+.hero h1{font-size:clamp(2.25rem,4.8vw,4.4rem);max-width:760px;margin-top:8px}
+.feature-grid .card{scroll-margin-top:96px}
+.advantage-card{min-height:210px}
+.manual-cta h2{font-size:clamp(1.35rem,2.6vw,2.15rem);max-width:760px}
+.compact-trust{align-items:center}
+.faq-short{grid-template-columns:repeat(3,1fr)}
+
+.nav-drop{position:relative}
+.nav-drop>summary{
+  list-style:none;cursor:pointer;color:#4c5363;font-weight:700;font-size:.93rem;
+  display:flex;align-items:center;gap:5px
+}
+.nav-drop>summary::-webkit-details-marker{display:none}
+.nav-drop>summary:after{content:"▾";font-size:.72rem;transition:transform .15s ease}
+.nav-drop[open]>summary:after{transform:rotate(180deg)}
+.nav-drop-menu{
+  position:absolute;top:calc(100% + 12px);left:-14px;z-index:50;
+  width:270px;padding:10px;background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;box-shadow:var(--shadow);display:grid;gap:2px
+}
+.nav-drop-menu-right{left:auto;right:-14px;width:220px}
+.nav-drop-menu a{padding:10px 11px;border-radius:10px;white-space:normal}
+.nav-drop-menu a:hover{background:var(--surface-2)}
+
+.manual-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:22px;align-items:start}
+.manual-sidebar{position:sticky;top:94px}
+.manual-sidebar-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 6px 24px rgba(31,35,48,.035)}
+.manual-sidebar-card>strong{display:block;font-size:1.05rem;margin-bottom:12px}
+.manual-toc{display:grid;gap:4px}
+.manual-toc a{text-decoration:none;color:#535b6b;font-size:.9rem;padding:7px 9px;border-radius:9px}
+.manual-toc a:hover{background:var(--surface-2);color:var(--text)}
+.manual-card{max-width:none;margin:0}
+.manual-card>h1{display:none}
+.manual-intro{margin-bottom:24px}
+.manual-section{scroll-margin-top:96px;padding-top:6px}
+.manual-section+.manual-section{border-top:1px solid var(--line);margin-top:24px;padding-top:24px}
+.manual-section h2{margin:0 0 10px!important}
+.manual-section ul{margin:0;padding-left:21px}
+.manual-section li+li{margin-top:8px}
+
+@media (max-width:780px){
+  nav .nav-drop{width:100%}
+  nav .nav-drop>summary{padding:8px 2px;justify-content:space-between}
+  .nav-drop-menu,.nav-drop-menu-right{
+    position:static;width:auto;box-shadow:none;border:0;border-left:2px solid var(--line);
+    border-radius:0;margin:4px 0 2px 6px;padding:3px 0 3px 9px
+  }
+  .faq-short{grid-template-columns:1fr}
+  .manual-layout{grid-template-columns:1fr}
+  .manual-sidebar{display:none}
+  .manual-card>h1{display:block}
+}
+@media (max-width:560px){
+  .hero-wordmark{font-size:3.5rem}
+  .hero h1{font-size:2.5rem}
+}
