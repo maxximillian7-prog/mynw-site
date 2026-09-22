@@ -1,1 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#2f6bff"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#g)"/><path d="M19 14h19l9 9v27H19z" fill="white" opacity=".96"/><path d="M38 14v10h9" fill="#dce6ff"/><path d="M28.6 31.4c.5-4 7.2-5 9.2-1.4 2.6 4.8-4.8 5.4-4.8 9" fill="none" stroke="#2f6bff" stroke-width="4" stroke-linecap="round"/><circle cx="33" cy="45" r="2.2" fill="#2f6bff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">NowWhat</title>
+  <desc id="desc">Rounded purple NowWhat mark with a document and question mark.</desc>
+  <rect width="100" height="100" rx="29" fill="#6263A6"/>
+  <path d="M18 15Q18 11 24 11H60L76 27V76Q76 82 69 82H24Q18 82 18 76Z" fill="#FDFDFF"/>
+  <path d="M60 11V25Q60 28 64 28H76Z" fill="#E8E7FA"/>
+  <g stroke="#7778BF" stroke-width="7" stroke-linecap="round">
+    <path d="M28 34H54"/>
+    <path d="M28 47H57"/>
+    <path d="M28 60H46"/>
+  </g>
+  <path d="M62 44C66 35 84 35 84 48C84 58 72 58 72 67" fill="none" stroke="#ABA7F3" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="72" cy="78" r="6.4" fill="#ABA7F3"/>
+  <g stroke="#FDFDFF" stroke-width="6" stroke-linecap="round">
+    <path d="M84 27L88 20"/>
+    <path d="M89 39L96 36"/>
+    <path d="M88 53L95 58"/>
+  </g>
+</svg>
