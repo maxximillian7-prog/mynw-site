@@ -1,1 +1,95 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Support — NowWhat</title><link rel="icon" href="../assets/logo.svg"><link rel="stylesheet" href="../assets/styles.css"></head><body><header class="site-header"><div class="wrap header-row"><a class="brand" href="../index.html"><img src="../assets/logo.svg" alt="NowWhat logo">NowWhat</a><button class="menu" aria-label="Open menu">☰</button><nav><a href="../index.html#features">Features</a><a href="../index.html#privacy">Privacy</a><a href="../support/">Support</a><a href="../delete-account/">Delete account</a><a class="nav-cta" href="../index.html#download">Get NowWhat</a></nav></div></header><main class="legal"><div class="wrap"><article class="legal-card"><h1>Support</h1><p class="meta">Help with NowWhat for Android.</p><div class="contact-box"><strong>Email support</strong><div class="copy-row"><a href="mailto:support@mynw.app?subject=NowWhat%20Support">support@mynw.app</a><button class="copy-btn" data-copy="support@mynw.app">Copy</button></div><span class="small">Include the app version, phone model and a short description. Do not send passwords, API keys or banking credentials.</span></div><h2>Common questions</h2><h3>AI analysis looks incorrect</h3><p>Compare the result with the original document. Important dates, amounts, payment details and consequential information should always be verified before use.</p><h3>A reminder did not appear</h3><p>Check Android notification permission and battery/background restrictions for NowWhat.</p><h3>I cannot sign in</h3><p>Confirm that you are using the same sign-in method and account you originally used. If the issue continues, email support.</p><h3>I want to delete my account</h3><p>Visit the <a href="../delete-account/">Account deletion</a> page.</p><h2>Privacy and legal</h2><p><a href="../privacy/">Privacy Policy</a> · <a href="../terms/">Terms of Use</a></p></article></div></main><footer class="site-footer"><div class="wrap footer-row"><div>© 2026 NowWhat App · Independent developer in Portugal.</div><div class="footer-links"><a href="../privacy/">Privacy</a><a href="../terms/">Terms</a><a href="../support/">Support</a><a href="../delete-account/">Account deletion</a></div></div></footer><script src="../assets/site.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Support — NowWhat</title>
+  <meta name="description" content="Contact NowWhat support directly from the website.">
+  <meta name="theme-color" content="#6263A6">
+  <link rel="canonical" href="https://mynw.app/support/">
+  <link rel="icon" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body data-title-key="support_title">
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="../"><img src="../assets/logo.svg" alt="NowWhat logo"><span>NowWhat</span></a>
+    <button class="menu" aria-label="Open menu">☰</button>
+    <nav>
+      <a href="../#features" data-i18n="nav_features">Features</a>
+      <a href="../#finance" data-i18n="nav_finance">Finance</a>
+      <a href="../privacy/" data-i18n="nav_privacy">Privacy</a>
+      <a href="./" data-i18n="nav_support">Support</a>
+      <a href="../delete-account/" data-i18n="nav_delete">Delete account</a>
+      <a class="nav-cta" href="../#download" data-i18n="nav_get">Get NowWhat</a>
+    </nav>
+    <select id="langSelect" class="lang-select" aria-label="Language"></select>
+  </div>
+</header>
+
+<main class="legal">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-kicker" data-i18n="nav_support">Support</span>
+      <h1 data-i18n="support_h1">How can we help?</h1>
+      <p data-i18n="support_intro">Send a message directly from this page.</p>
+    </div>
+
+    <div class="support-layout">
+      <div class="support-copy">
+        <div class="info-item">
+          <strong data-i18n="support_direct">Prefer email?</strong>
+          <p data-i18n="support_direct_b">You can also write to support@mynw.app.</p>
+          <p><a href="mailto:support@mynw.app">support@mynw.app</a></p>
+        </div>
+        <div class="info-item"><strong data-i18n="support_ai_t">AI result looks wrong</strong><p data-i18n="support_ai_b"></p></div>
+        <div class="info-item"><strong data-i18n="support_reminder_t">A reminder did not appear</strong><p data-i18n="support_reminder_b"></p></div>
+        <div class="info-item"><strong data-i18n="support_signin_t">Cannot sign in</strong><p data-i18n="support_signin_b"></p></div>
+        <div class="info-item"><strong data-i18n="support_delete_t">Delete your account</strong><p data-i18n="support_delete_b"></p><p><a href="../delete-account/" data-i18n="nav_delete">Delete account</a></p></div>
+      </div>
+
+      <form id="feedbackForm" class="support-form" novalidate>
+        <h2 data-i18n="support_form_title">Send a message</h2>
+        <div class="field">
+          <label for="name" data-i18n="support_name">Name</label>
+          <input id="name" name="name" type="text" maxlength="120" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email" data-i18n="support_email">Email for reply</label>
+          <input id="email" name="email" type="email" maxlength="254" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="topic" data-i18n="support_topic">Topic</label>
+          <select id="topic" name="topic">
+            <option value="support" data-i18n="support_topic_support">General support</option>
+            <option value="bug" data-i18n="support_topic_bug">Report a problem</option>
+            <option value="feature" data-i18n="support_topic_feature">Feature request</option>
+            <option value="privacy" data-i18n="support_topic_privacy">Privacy / data</option>
+            <option value="other" data-i18n="support_topic_other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message" data-i18n="support_message">Message</label>
+          <textarea id="message" name="message" maxlength="5000" required></textarea>
+        </div>
+        <div class="hp-field" aria-hidden="true">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <p class="small" data-i18n="support_privacy_note">Do not send passwords, API keys or banking credentials.</p>
+        <button class="btn btn-primary" type="submit" data-i18n="support_send">Send message</button>
+        <div id="formStatus" class="form-status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <div data-i18n="footer_text">© 2026 NowWhat App · Independent developer in Portugal.</div>
+    <div class="footer-links"><a href="../privacy/" data-i18n="nav_privacy">Privacy</a><a href="../terms/" data-i18n="nav_terms">Terms</a><a href="./" data-i18n="nav_support">Support</a><a href="../delete-account/" data-i18n="nav_delete">Delete account</a></div>
+  </div>
+</footer>
+<script src="../assets/site.js"></script>
+</body>
+</html>
