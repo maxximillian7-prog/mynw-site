@@ -53,7 +53,7 @@
       delete_button:'Request account deletion', delete_what:'What is deleted', delete_what_b:'After a valid request is completed, the NowWhat account and associated server-side user data are deleted, except information that must be retained for legitimate legal, security, fraud-prevention or dispute-resolution reasons.',
       delete_local:'Data stored on your device', delete_local_b:'Some notes, protected files or settings may exist locally on the device. Uninstalling the app or clearing its storage may be necessary to remove device-local copies.',
       delete_sub:'Subscriptions', delete_sub_b:'If NowWhat offers a paid Google Play subscription, deleting the NowWhat account may not automatically cancel that Play subscription. Cancel it in Google Play as well.',
-      legal_updated:'Last updated: September 22, 2026'
+      legal_updated:'Last updated: September 22, 2026', notfound_title:'Page not found — NowWhat', notfound_h1:'Page not found', notfound_body:'The page you requested does not exist.', notfound_button:'Go to homepage'
     },
     pt: {
       nav_features:'Funcionalidades', nav_finance:'Finanças', nav_privacy:'Privacidade', nav_terms:'Termos', nav_support:'Suporte', nav_delete:'Eliminar conta', nav_get:'Obter NowWhat',
@@ -103,7 +103,7 @@
       delete_button:'Pedir eliminação da conta', delete_what:'O que é eliminado', delete_what_b:'Após validação, a conta NowWhat e os dados de servidor associados são eliminados, exceto informação que tenha de ser conservada por motivos legais, de segurança, prevenção de fraude ou litígio.',
       delete_local:'Dados guardados no dispositivo', delete_local_b:'Algumas notas, ficheiros protegidos ou definições podem existir localmente. Pode ser necessário desinstalar a aplicação ou limpar o armazenamento para remover cópias locais.',
       delete_sub:'Subscrições', delete_sub_b:'Se existir uma subscrição Google Play paga, eliminar a conta NowWhat pode não cancelar automaticamente essa subscrição. Cancele-a também no Google Play.',
-      legal_updated:'Última atualização: 22 de setembro de 2026'
+      legal_updated:'Última atualização: 22 de setembro de 2026', notfound_title:'Página não encontrada — NowWhat', notfound_h1:'Página não encontrada', notfound_body:'A página pedida não existe.', notfound_button:'Ir para a página inicial'
     },
     ru: {
       nav_features:'Возможности', nav_finance:'Финансы', nav_privacy:'Конфиденциальность', nav_terms:'Условия', nav_support:'Поддержка', nav_delete:'Удалить аккаунт', nav_get:'Получить NowWhat',
@@ -153,7 +153,7 @@
       delete_button:'Запросить удаление аккаунта', delete_what:'Что будет удалено', delete_what_b:'После подтверждённого запроса аккаунт NowWhat и связанные серверные данные удаляются, кроме информации, которую необходимо хранить по законным причинам безопасности, предотвращения мошенничества или разрешения споров.',
       delete_local:'Данные на устройстве', delete_local_b:'Некоторые заметки, защищённые файлы или настройки могут храниться локально. Для удаления локальных копий может понадобиться очистить данные приложения или удалить его.',
       delete_sub:'Подписки', delete_sub_b:'Если появится платная подписка Google Play, удаление аккаунта NowWhat может не отменить её автоматически. Подписку нужно будет отменить и в Google Play.',
-      legal_updated:'Последнее обновление: 22 сентября 2026 г.'
+      legal_updated:'Последнее обновление: 22 сентября 2026 г.', notfound_title:'Страница не найдена — NowWhat', notfound_h1:'Страница не найдена', notfound_body:'Запрошенной страницы не существует.', notfound_button:'На главную'
     },
     fr: {
       nav_features:'Fonctionnalités', nav_finance:'Finances', nav_privacy:'Confidentialité', nav_terms:'Conditions', nav_support:'Assistance', nav_delete:'Supprimer le compte', nav_get:'Obtenir NowWhat',
@@ -203,7 +203,7 @@
       delete_button:'Demander la suppression', delete_what:'Ce qui est supprimé', delete_what_b:'Après validation, le compte NowWhat et les données serveur associées sont supprimés, sauf conservation nécessaire pour des raisons légales, de sécurité, de prévention de fraude ou de litige.',
       delete_local:'Données sur l’appareil', delete_local_b:'Certaines notes, fichiers protégés ou réglages peuvent rester localement. Il peut être nécessaire de désinstaller l’app ou d’effacer son stockage.',
       delete_sub:'Abonnements', delete_sub_b:'Si NowWhat propose un abonnement Google Play payant, supprimer le compte peut ne pas annuler automatiquement cet abonnement. Annulez-le aussi dans Google Play.',
-      legal_updated:'Dernière mise à jour : 22 septembre 2026'
+      legal_updated:'Dernière mise à jour : 22 septembre 2026', notfound_title:'Page introuvable — NowWhat', notfound_h1:'Page introuvable', notfound_body:'La page demandée n’existe pas.', notfound_button:'Retour à l’accueil'
     },
     es: {
       nav_features:'Funciones', nav_finance:'Finanzas', nav_privacy:'Privacidad', nav_terms:'Términos', nav_support:'Soporte', nav_delete:'Eliminar cuenta', nav_get:'Obtener NowWhat',
@@ -253,7 +253,7 @@
       delete_button:'Solicitar eliminación', delete_what:'Qué se elimina', delete_what_b:'Tras una solicitud válida, se eliminan la cuenta NowWhat y los datos de servidor asociados, salvo información que deba conservarse por razones legales, de seguridad, prevención de fraude o resolución de disputas.',
       delete_local:'Datos del dispositivo', delete_local_b:'Algunas notas, archivos protegidos o ajustes pueden quedar localmente. Puede ser necesario desinstalar la app o borrar su almacenamiento.',
       delete_sub:'Suscripciones', delete_sub_b:'Si NowWhat ofrece una suscripción de pago en Google Play, eliminar la cuenta puede no cancelarla automáticamente. Cancélala también en Google Play.',
-      legal_updated:'Última actualización: 22 de septiembre de 2026'
+      legal_updated:'Última actualización: 22 de septiembre de 2026', notfound_title:'Página no encontrada — NowWhat', notfound_h1:'Página no encontrada', notfound_body:'La página solicitada no existe.', notfound_button:'Ir al inicio'
     },
     uk: {
       nav_features:'Можливості', nav_finance:'Фінанси', nav_privacy:'Конфіденційність', nav_terms:'Умови', nav_support:'Підтримка', nav_delete:'Видалити акаунт', nav_get:'Отримати NowWhat',
@@ -303,7 +303,7 @@
       delete_button:'Запросити видалення акаунта', delete_what:'Що буде видалено', delete_what_b:'Після підтвердженого запиту акаунт NowWhat і пов’язані серверні дані видаляються, крім інформації, яку потрібно зберігати з юридичних причин, безпеки, протидії шахрайству або спорів.',
       delete_local:'Дані на пристрої', delete_local_b:'Деякі нотатки, захищені файли або налаштування можуть залишатися локально. Для видалення локальних копій може знадобитися очистити дані застосунку або видалити його.',
       delete_sub:'Підписки', delete_sub_b:'Якщо з’явиться платна підписка Google Play, видалення акаунта NowWhat може не скасувати її автоматично. Скасуйте її також у Google Play.',
-      legal_updated:'Останнє оновлення: 22 вересня 2026 р.'
+      legal_updated:'Останнє оновлення: 22 вересня 2026 р.', notfound_title:'Сторінку не знайдено — NowWhat', notfound_h1:'Сторінку не знайдено', notfound_body:'Запитаної сторінки не існує.', notfound_button:'На головну'
     }
   };
 
