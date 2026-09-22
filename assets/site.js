@@ -6,7 +6,7 @@
 
   const S = {
     en: {
-      nav_features:'Features', nav_finance:'Finance', nav_privacy:'Privacy', nav_support:'Support', nav_delete:'Delete account', nav_get:'Get NowWhat',
+      nav_features:'Features', nav_finance:'Finance', nav_privacy:'Privacy', nav_terms:'Terms', nav_support:'Support', nav_delete:'Delete account', nav_get:'Get NowWhat',
       home_title:'NowWhat — AI assistant for documents, tasks and finances',
       eyebrow:'Your everyday AI assistant', hero_h1:'Understand it. Act on it. Remember what matters.',
       hero_lead:'NowWhat turns documents, screenshots, PDFs, receipts and voice notes into clear answers, reminders, calendar actions, organised folders and useful financial insights.',
@@ -56,7 +56,7 @@
       legal_updated:'Last updated: September 22, 2026'
     },
     pt: {
-      nav_features:'Funcionalidades', nav_finance:'Finanças', nav_privacy:'Privacidade', nav_support:'Suporte', nav_delete:'Eliminar conta', nav_get:'Obter NowWhat',
+      nav_features:'Funcionalidades', nav_finance:'Finanças', nav_privacy:'Privacidade', nav_terms:'Termos', nav_support:'Suporte', nav_delete:'Eliminar conta', nav_get:'Obter NowWhat',
       home_title:'NowWhat — assistente de IA para documentos, tarefas e finanças',
       eyebrow:'O seu assistente de IA do dia a dia', hero_h1:'Perceba. Aja. Lembre-se do que importa.',
       hero_lead:'O NowWhat transforma documentos, capturas de ecrã, PDF, talões e notas de voz em respostas claras, lembretes, eventos de calendário, pastas organizadas e informação financeira útil.',
@@ -106,7 +106,7 @@
       legal_updated:'Última atualização: 22 de setembro de 2026'
     },
     ru: {
-      nav_features:'Возможности', nav_finance:'Финансы', nav_privacy:'Конфиденциальность', nav_support:'Поддержка', nav_delete:'Удалить аккаунт', nav_get:'Получить NowWhat',
+      nav_features:'Возможности', nav_finance:'Финансы', nav_privacy:'Конфиденциальность', nav_terms:'Условия', nav_support:'Поддержка', nav_delete:'Удалить аккаунт', nav_get:'Получить NowWhat',
       home_title:'NowWhat — AI-помощник для документов, дел и финансов',
       eyebrow:'Ваш повседневный AI-помощник', hero_h1:'Понять. Сделать. Не забыть важное.',
       hero_lead:'NowWhat превращает документы, скриншоты, PDF, чеки и голосовые заметки в понятные ответы, напоминания, события календаря, организованные папки и полезную финансовую аналитику.',
@@ -156,7 +156,7 @@
       legal_updated:'Последнее обновление: 22 сентября 2026 г.'
     },
     fr: {
-      nav_features:'Fonctionnalités', nav_finance:'Finances', nav_privacy:'Confidentialité', nav_support:'Assistance', nav_delete:'Supprimer le compte', nav_get:'Obtenir NowWhat',
+      nav_features:'Fonctionnalités', nav_finance:'Finances', nav_privacy:'Confidentialité', nav_terms:'Conditions', nav_support:'Assistance', nav_delete:'Supprimer le compte', nav_get:'Obtenir NowWhat',
       home_title:'NowWhat — assistant IA pour documents, tâches et finances',
       eyebrow:'Votre assistant IA du quotidien', hero_h1:'Comprenez. Agissez. Gardez l’essentiel en tête.',
       hero_lead:'NowWhat transforme documents, captures d’écran, PDF, tickets et notes vocales en réponses claires, rappels, événements, dossiers organisés et informations financières utiles.',
@@ -206,7 +206,7 @@
       legal_updated:'Dernière mise à jour : 22 septembre 2026'
     },
     es: {
-      nav_features:'Funciones', nav_finance:'Finanzas', nav_privacy:'Privacidad', nav_support:'Soporte', nav_delete:'Eliminar cuenta', nav_get:'Obtener NowWhat',
+      nav_features:'Funciones', nav_finance:'Finanzas', nav_privacy:'Privacidad', nav_terms:'Términos', nav_support:'Soporte', nav_delete:'Eliminar cuenta', nav_get:'Obtener NowWhat',
       home_title:'NowWhat — asistente de IA para documentos, tareas y finanzas',
       eyebrow:'Tu asistente de IA diario', hero_h1:'Entiéndelo. Actúa. Recuerda lo importante.',
       hero_lead:'NowWhat convierte documentos, capturas, PDF, recibos y notas de voz en respuestas claras, recordatorios, eventos, carpetas organizadas e información financiera útil.',
@@ -256,7 +256,7 @@
       legal_updated:'Última actualización: 22 de septiembre de 2026'
     },
     uk: {
-      nav_features:'Можливості', nav_finance:'Фінанси', nav_privacy:'Конфіденційність', nav_support:'Підтримка', nav_delete:'Видалити акаунт', nav_get:'Отримати NowWhat',
+      nav_features:'Можливості', nav_finance:'Фінанси', nav_privacy:'Конфіденційність', nav_terms:'Умови', nav_support:'Підтримка', nav_delete:'Видалити акаунт', nav_get:'Отримати NowWhat',
       home_title:'NowWhat — AI-помічник для документів, справ і фінансів',
       eyebrow:'Ваш щоденний AI-помічник', hero_h1:'Зрозуміти. Зробити. Не забути важливе.',
       hero_lead:'NowWhat перетворює документи, скриншоти, PDF, чеки та голосові нотатки на зрозумілі відповіді, нагадування, події календаря, організовані папки й корисну фінансову аналітику.',
@@ -558,6 +558,7 @@
     const intro = document.getElementById('legalIntro');
     const sections = document.getElementById('legalSections');
     if (h1) h1.textContent = data.title;
+    document.title = data.title + ' — NowWhat';
     if (intro) intro.textContent = data.intro;
     if (sections) {
       sections.innerHTML = data.sections.map(([h,b]) => '<section><h2>'+h+'</h2><p>'+linkify(b)+'</p></section>').join('');
