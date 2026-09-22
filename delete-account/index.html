@@ -13,15 +13,31 @@
 <body data-title-key="delete_title">
 <header class="site-header">
   <div class="wrap header-row">
-    <a class="brand" href="../"><img src="../assets/logo.svg" alt="NowWhat logo"><span>NowWhat</span></a>
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="NowWhat logo"><span>NowWhat</span></a>
     <button class="menu" aria-label="Open menu">☰</button>
     <nav>
-      <a href="../#features" data-i18n="nav_features">Features</a>
-      <a href="../#finance" data-i18n="nav_finance">Finance</a>
-      <a href="../privacy/" data-i18n="nav_privacy">Privacy</a>
-      <a href="../support/" data-i18n="nav_support">Support</a>
-      <a href="./" data-i18n="nav_delete">Delete account</a>
-      <a class="nav-cta" href="../#download" data-i18n="nav_get">Get NowWhat</a>
+      <details class="nav-drop">
+        <summary data-i18n="nav_features">Features</summary>
+        <div class="nav-drop-menu">
+          <a href="/#documents" data-i18n="nav_docs">Documents & AI</a>
+          <a href="/#vault" data-i18n="nav_vault">Important Documents</a>
+          <a href="/#saved" data-i18n="nav_saved">Saved & voice</a>
+          <a href="/#finance" data-i18n="nav_finance">Finance</a>
+          <a href="/#calendar" data-i18n="nav_calendar">Calendar & reminders</a>
+          <a href="/#briefing" data-i18n="nav_briefing">Daily Briefing & Auto Rules</a>
+        </div>
+      </details>
+      <a href="/manual/" data-i18n="nav_manual">Manual</a>
+      <a href="/support/" data-i18n="nav_support">Support</a>
+      <details class="nav-drop">
+        <summary data-i18n="nav_legal">Legal</summary>
+        <div class="nav-drop-menu nav-drop-menu-right">
+          <a href="/privacy/" data-i18n="nav_privacy">Privacy</a>
+          <a href="/terms/" data-i18n="nav_terms">Terms</a>
+          <a href="/delete-account/" data-i18n="nav_delete">Delete account</a>
+        </div>
+      </details>
+      <a class="nav-cta" href="/#download" data-i18n="nav_get">Get NowWhat</a>
     </nav>
     <select id="langSelect" class="lang-select" aria-label="Language"></select>
   </div>
@@ -62,8 +78,8 @@
 
 <footer class="site-footer">
   <div class="wrap footer-row">
-    <div data-i18n="footer_text">© 2026 NowWhat App · Independent developer in Portugal.</div>
-    <div class="footer-links"><a href="../privacy/" data-i18n="nav_privacy">Privacy</a><a href="../terms/" data-i18n="nav_terms">Terms</a><a href="../support/" data-i18n="nav_support">Support</a><a href="./" data-i18n="nav_delete">Delete account</a></div>
+    <div data-i18n="footer_text">© 2026 NowWhat App.</div>
+    <div class="footer-links"><a href="/manual/" data-i18n="nav_manual">Manual</a><a href="/privacy/" data-i18n="nav_privacy">Privacy</a><a href="/terms/" data-i18n="nav_terms">Terms</a><a href="/support/" data-i18n="nav_support">Support</a><a href="/delete-account/" data-i18n="nav_delete">Delete account</a></div>
   </div>
 </footer>
 <script src="../assets/site.js"></script>
