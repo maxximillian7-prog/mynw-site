@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Family invitation — NowWhat</title>
+  <meta name="theme-color" content="#6263A6">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    .invite-wrap{max-width:620px;margin:0 auto;padding:56px 18px}
+    .invite-card{background:#fff;border-radius:24px;padding:28px;box-shadow:0 16px 50px rgba(47,47,78,.10)}
+    .invite-brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;color:#34345f}
+    .invite-brand img{width:46px;height:46px}
+    .invite-icon{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:#efefff;font-size:34px;margin:24px 0 16px}
+    .invite-card h1{margin:0 0 10px;font-size:30px}
+    .invite-card p{line-height:1.6;color:#5b5b70}
+    .invite-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .invite-code{margin-top:20px;padding:12px 14px;border-radius:12px;background:#f5f5fb;font-family:monospace;word-break:break-all;color:#555568}
+    .invite-note{font-size:14px}
+    .invite-lang{margin-left:auto}
+    @media(max-width:520px){.invite-card{padding:22px}.invite-card h1{font-size:26px}.invite-actions .btn{width:100%;text-align:center}}
+  </style>
+</head>
+<body>
+  <main class="invite-wrap">
+    <article class="invite-card">
+      <div class="invite-brand">
+        <img src="/assets/logo.svg" alt="NowWhat">
+        <span>NowWhat</span>
+        <select id="lang" class="lang-select invite-lang" aria-label="Language"></select>
+      </div>
+      <div class="invite-icon">👨‍👩‍👧‍👦</div>
+      <h1 id="title">Family Space invitation</h1>
+      <p id="body">You were invited to a shared Family Space in NowWhat.</p>
+      <div class="invite-actions">
+        <a id="openApp" class="btn btn-primary" href="#">Open NowWhat</a>
+        <button id="copyCode" class="btn btn-secondary" type="button">Copy invitation code</button>
+      </div>
+      <div id="code" class="invite-code" hidden></div>
+      <p id="hint" class="invite-note">If the app does not open, open NowWhat manually, choose Family Space → “I have an invitation”, and paste the invitation code.</p>
+      <p id="invalid" class="invite-note" hidden>This invitation link is incomplete. Ask the sender to send it again.</p>
+    </article>
+  </main>
+
+  <script>
+    (() => {
+      const langs = ['en','pt','ru','fr','es','uk'];
+      const names = {en:'English',pt:'Português',ru:'Русский',fr:'Français',es:'Español',uk:'Українська'};
+      const text = {
+        en:{title:'Family Space invitation',body:'You were invited to a shared Family Space in NowWhat.',open:'Open NowWhat',copy:'Copy invitation code',copied:'Invitation code copied',hint:'If the app does not open, open NowWhat manually, choose Family Space → “I have an invitation”, and paste the invitation code.',invalid:'This invitation link is incomplete. Ask the sender to send it again.'},
+        pt:{title:'Convite para o Espaço familiar',body:'Foi convidado para um Espaço familiar partilhado no NowWhat.',open:'Abrir NowWhat',copy:'Copiar código do convite',copied:'Código do convite copiado',hint:'Se a aplicação não abrir, abra o NowWhat manualmente, escolha Espaço familiar → “Tenho um convite” e cole o código.',invalid:'Esta ligação de convite está incompleta. Peça ao remetente para a enviar novamente.'},
+        ru:{title:'Приглашение в Семейное пространство',body:'Вас пригласили в общее Семейное пространство NowWhat.',open:'Открыть NowWhat',copy:'Скопировать код приглашения',copied:'Код приглашения скопирован',hint:'Если приложение не открылось, откройте NowWhat вручную, выберите Семейное пространство → «У меня есть приглашение» и вставьте код.',invalid:'Ссылка приглашения неполная. Попросите отправителя прислать её ещё раз.'},
+        fr:{title:'Invitation à l’espace familial',body:'Vous avez été invité à un espace familial partagé dans NowWhat.',open:'Ouvrir NowWhat',copy:'Copier le code',copied:'Code d’invitation copié',hint:'Si l’application ne s’ouvre pas, ouvrez NowWhat, choisissez Espace familial → « J’ai une invitation » et collez le code.',invalid:'Ce lien d’invitation est incomplet. Demandez à l’expéditeur de le renvoyer.'},
+        es:{title:'Invitación al Espacio familiar',body:'Te han invitado a un Espacio familiar compartido en NowWhat.',open:'Abrir NowWhat',copy:'Copiar código',copied:'Código de invitación copiado',hint:'Si la aplicación no se abre, abre NowWhat, elige Espacio familiar → «Tengo una invitación» y pega el código.',invalid:'Este enlace de invitación está incompleto. Pide al remitente que lo envíe de nuevo.'},
+        uk:{title:'Запрошення до Сімейного простору',body:'Вас запросили до спільного Сімейного простору NowWhat.',open:'Відкрити NowWhat',copy:'Скопіювати код',copied:'Код запрошення скопійовано',hint:'Якщо застосунок не відкрився, відкрийте NowWhat вручну, виберіть Сімейний простір → «У мене є запрошення» та вставте код.',invalid:'Посилання запрошення неповне. Попросіть відправника надіслати його ще раз.'}
+      };
+
+      const params = new URLSearchParams(location.search);
+      const token = (params.get('token') || '').trim();
+      const appUrl = token ? 'nowwhat://family/join?token=' + encodeURIComponent(token) : '#';
+      const select = document.getElementById('lang');
+      select.innerHTML = langs.map(code => '<option value="'+code+'">'+names[code]+'</option>').join('');
+
+      function initialLang(){
+        const saved = localStorage.getItem('nw_lang');
+        if (langs.includes(saved)) return saved;
+        const raw = (navigator.language || 'en').toLowerCase();
+        return langs.find(code => raw.startsWith(code)) || 'en';
+      }
+
+      function apply(lang){
+        const t = text[lang] || text.en;
+        document.documentElement.lang = lang;
+        document.getElementById('title').textContent = t.title;
+        document.getElementById('body').textContent = t.body;
+        document.getElementById('openApp').textContent = t.open;
+        document.getElementById('copyCode').textContent = t.copy;
+        document.getElementById('hint').textContent = t.hint;
+        document.getElementById('invalid').textContent = t.invalid;
+        select.value = lang;
+        localStorage.setItem('nw_lang', lang);
+      }
+
+      let lang = initialLang();
+      apply(lang);
+      select.addEventListener('change', e => { lang = e.target.value; apply(lang); });
+
+      const open = document.getElementById('openApp');
+      const copy = document.getElementById('copyCode');
+      const code = document.getElementById('code');
+      const invalid = document.getElementById('invalid');
+
+      if (!token) {
+        open.setAttribute('aria-disabled','true');
+        open.removeAttribute('href');
+        copy.disabled = true;
+        invalid.hidden = false;
+        return;
+      }
+
+      open.href = appUrl;
+      code.textContent = token;
+      code.hidden = false;
+
+      copy.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(token);
+          copy.textContent = (text[lang] || text.en).copied;
+          setTimeout(() => copy.textContent = (text[lang] || text.en).copy, 1800);
+        } catch (_) {
+          code.hidden = false;
+          code.focus?.();
+        }
+      });
+
+      // The custom scheme is a fallback for browsers that opened the HTTPS
+      // invitation instead of handing it directly to the Android app.
+      setTimeout(() => { location.href = appUrl; }, 250);
+    })();
+  </script>
+</body>
+</html>
