@@ -46,20 +46,28 @@
 
   <script>
     (() => {
-      const langs = ['en','pt','ru','fr','es','uk'];
-      const names = {en:'English',pt:'Português',ru:'Русский',fr:'Français',es:'Español',uk:'Українська'};
+      const langs = ['en','pt','ru','fr','es','uk','de','it'];
+      const names = {en:'English',pt:'Português',ru:'Русский',fr:'Français',es:'Español',uk:'Українська',de:'Deutsch',it:'Italiano'};
       const text = {
         en:{title:'Family Space invitation',body:'You were invited to a shared Family Space in NowWhat.',open:'Open NowWhat',copy:'Copy invitation code',copied:'Invitation code copied',hint:'If the app does not open, open NowWhat manually, choose Family Space → “I have an invitation”, and paste the invitation code.',invalid:'This invitation link is incomplete. Ask the sender to send it again.'},
         pt:{title:'Convite para o Espaço familiar',body:'Foi convidado para um Espaço familiar partilhado no NowWhat.',open:'Abrir NowWhat',copy:'Copiar código do convite',copied:'Código do convite copiado',hint:'Se a aplicação não abrir, abra o NowWhat manualmente, escolha Espaço familiar → “Tenho um convite” e cole o código.',invalid:'Esta ligação de convite está incompleta. Peça ao remetente para a enviar novamente.'},
         ru:{title:'Приглашение в Семейное пространство',body:'Вас пригласили в общее Семейное пространство NowWhat.',open:'Открыть NowWhat',copy:'Скопировать код приглашения',copied:'Код приглашения скопирован',hint:'Если приложение не открылось, откройте NowWhat вручную, выберите Семейное пространство → «У меня есть приглашение» и вставьте код.',invalid:'Ссылка приглашения неполная. Попросите отправителя прислать её ещё раз.'},
         fr:{title:'Invitation à l’espace familial',body:'Vous avez été invité à un espace familial partagé dans NowWhat.',open:'Ouvrir NowWhat',copy:'Copier le code',copied:'Code d’invitation copié',hint:'Si l’application ne s’ouvre pas, ouvrez NowWhat, choisissez Espace familial → « J’ai une invitation » et collez le code.',invalid:'Ce lien d’invitation est incomplet. Demandez à l’expéditeur de le renvoyer.'},
         es:{title:'Invitación al Espacio familiar',body:'Te han invitado a un Espacio familiar compartido en NowWhat.',open:'Abrir NowWhat',copy:'Copiar código',copied:'Código de invitación copiado',hint:'Si la aplicación no se abre, abre NowWhat, elige Espacio familiar → «Tengo una invitación» y pega el código.',invalid:'Este enlace de invitación está incompleto. Pide al remitente que lo envíe de nuevo.'},
-        uk:{title:'Запрошення до Сімейного простору',body:'Вас запросили до спільного Сімейного простору NowWhat.',open:'Відкрити NowWhat',copy:'Скопіювати код',copied:'Код запрошення скопійовано',hint:'Якщо застосунок не відкрився, відкрийте NowWhat вручну, виберіть Сімейний простір → «У мене є запрошення» та вставте код.',invalid:'Посилання запрошення неповне. Попросіть відправника надіслати його ще раз.'}
+        uk:{title:'Запрошення до Сімейного простору',body:'Вас запросили до спільного Сімейного простору NowWhat.',open:'Відкрити NowWhat',copy:'Скопіювати код',copied:'Код запрошення скопійовано',hint:'Якщо застосунок не відкрився, відкрийте NowWhat вручну, виберіть Сімейний простір → «У мене є запрошення» та вставте код.',invalid:'Посилання запрошення неповне. Попросіть відправника надіслати його ще раз.'},
+        de:{title:'Einladung zum Familienbereich',body:'Du wurdest zu einem gemeinsamen Family Space in NowWhat eingeladen.',open:'NowWhat öffnen',copy:'Einladungscode kopieren',copied:'Einladungscode kopiert',hint:'Falls die App nicht geöffnet wird, öffne NowWhat manuell, wähle Family Space → „Ich habe eine Einladung“ und füge den Code ein.',invalid:'Dieser Einladungslink ist unvollständig. Bitte den Absender, ihn erneut zu senden.'},
+        it:{title:'Invito allo spazio famiglia',body:'Sei stato invitato a uno spazio famiglia condiviso in NowWhat.',open:'Apri NowWhat',copy:'Copia codice invito',copied:'Codice invito copiato',hint:'Se l’app non si apre, apri NowWhat manualmente, scegli Family Space → «Ho un invito» e incolla il codice.',invalid:'Questo link di invito è incompleto. Chiedi al mittente di inviarlo di nuovo.'}
       };
 
       const params = new URLSearchParams(location.search);
+      const codeParam = (params.get('code') || '').trim();
       const token = (params.get('token') || '').trim();
-      const appUrl = token ? 'nowwhat://family/join?token=' + encodeURIComponent(token) : '#';
+      const inviteValue = codeParam || token;
+      const appUrl = codeParam
+        ? 'nowwhat://family/join?code=' + encodeURIComponent(codeParam)
+        : token
+          ? 'nowwhat://family/join?token=' + encodeURIComponent(token)
+          : '#';
       const select = document.getElementById('lang');
       select.innerHTML = langs.map(code => '<option value="'+code+'">'+names[code]+'</option>').join('');
 
@@ -92,7 +100,7 @@
       const code = document.getElementById('code');
       const invalid = document.getElementById('invalid');
 
-      if (!token) {
+      if (!inviteValue) {
         open.setAttribute('aria-disabled','true');
         open.removeAttribute('href');
         copy.disabled = true;
@@ -101,12 +109,12 @@
       }
 
       open.href = appUrl;
-      code.textContent = token;
+      code.textContent = codeParam || token;
       code.hidden = false;
 
       copy.addEventListener('click', async () => {
         try {
-          await navigator.clipboard.writeText(token);
+          await navigator.clipboard.writeText(codeParam || token);
           copy.textContent = (text[lang] || text.en).copied;
           setTimeout(() => copy.textContent = (text[lang] || text.en).copy, 1800);
         } catch (_) {
