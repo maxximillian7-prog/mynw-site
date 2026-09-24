@@ -74,6 +74,48 @@
     ]}
   };
 
+
+  M.de = {title:"NowWhat Handbuch",intro:"Praktischer Leitfaden zu den wichtigsten NowWhat-Funktionen. Wähle direkt das benötigte Modul.",sections:[
+    ["Erste Schritte",["Wähle die Sprache der Oberfläche in den Einstellungen.","Nutze den Gastmodus oder verknüpfe E-Mail/Google für Kontowiederherstellung und unterstützte Cloud-Synchronisierung.","Auf der Startseite findest du Dokumenterkennung, Heute & demnächst, Daily Briefing und die wichtigsten Aktionen."]],
+    ["Dokumente & AI",["Füge Foto, Screenshot, PDF, geteilte Datei oder Text hinzu. NowWhat extrahiert Inhalt und erstellt eine strukturierte Zusammenfassung.","Prüfe erkannte Daten, Beträge, Kontakte, Adressen und Zahlungsdaten vor der Nutzung.","Mit „Dokument fragen“ kannst du Folgefragen zum aktuellen Dokument stellen."]],
+    ["Gespeichert, Ordner & Sprache",["Speichere erkannte Inhalte oder erstelle direkt eine Notiz. Organisiere sie mit Ordnern, Farben, Symbolen und Stilen.","Nimm Sprachnotizen auf und transkribiere sie; bestehende Notizen können ergänzt werden.","Suche, Favoriten und Papierkorb halten die Bibliothek übersichtlich."]],
+    ["Wichtige Dokumente",["Nutze den geschützten lokalen Tresor für sensible Dateien mit PIN und optionaler Biometrie.","Speichere Titel, Inhaber, Nummer, Ausgabe-/Ablaufdatum, Erinnerungen und AI-Analyse.","Teilen ist immer deine Entscheidung; geschützte Dateien bleiben lokal verschlüsselt."]],
+    ["Finanzen",["Füge Ausgaben und Einnahmen manuell, per Sprache oder durch Belegscan hinzu. Gemischte Belege können pro Position kategorisiert werden.","Wenn Händler oder Endbetrag nicht sicher lesbar sind, rät NowWhat nicht: das Feld bleibt zur manuellen Eingabe offen.","Nutze Monatsübersichten, Budgets, Rechnungen, Abos, Monatsarchiv und AI-Fragen per Text oder Sprache."]],
+    ["Kalender & Erinnerungen",["Erkannte Daten und Fristen können zu Ereignissen oder Erinnerungen werden.","Tippe auf einen beliebigen Tag oder auf „Heute“, um den Tagesplan als Zeitachse zu öffnen.","Importiere bei Bedarf Ereignisse aus dem Android-Systemkalender."]],
+    ["Daily Briefing & Auto-Regeln",["Daily Briefing zeigt relevante Aufgaben und Ereignisse, bis du es als angesehen markierst.","Auto-Regeln arbeiten nach Bedeutung statt nach starren Regeln wie „Schule → Ordner“ und können Ablage, Erinnerungen, Kalenderaktionen und Antwortentwürfe vorbereiten.","Wichtige Aktionen bleiben vor der Bestätigung unter deiner Kontrolle."]],
+    ["Family Space",["Teile Notizen, Dokumente, Aufgaben, Einkaufslisten, Kalender und Finanzen mit deiner Familie.","Lade Personen per einmaligem Code oder QR ein; neue Inhalte werden pro Bereich als ungelesen markiert.","Notizen, Aufgaben, Einkäufe, Ereignisse und Finanzeinträge können per Sprache hinzugefügt werden."]],
+    ["Konto & Synchronisierung",["Gastmodus funktioniert ohne verknüpfte Identität.","E-Mail oder Google ermöglichen Kontowiederherstellung und unterstützte Cloud-Synchronisierung.","Lokale geschützte Dateien und gerätespezifische Daten bleiben lokal."]],
+    ["Einstellungen & Darstellung",["Wähle Hell/Dunkel, Akzent und einen globalen App-Stil: Minimal, Streng, Weich, Modern oder Verspielt.","Die Stile verändern Karten, Schaltflächen, Felder, Dialoge, Navigation und weitere UI-Elemente deutlich.","Datenbereinigung lässt sich nach Kategorien wie Finanzen und Wichtige Dokumente getrennt ausführen."]],
+    ["Sicherheit & Prüfung",["AI kann unvollständig oder falsch sein. Prüfe wichtige Daten immer am Original.","NowWhat führt keine Bankzahlungen aus und ersetzt keine medizinische, rechtliche, steuerliche oder finanzielle Fachberatung.","Support: mynw.app/support/."]]
+  };
+  M.it = {title:"Manuale NowWhat",intro:"Guida pratica alle principali funzioni di NowWhat. Vai direttamente al modulo che ti serve.",sections:[
+    ["Primi passi",["Scegli la lingua dell'interfaccia nelle Impostazioni.","Usa la modalità ospite oppure collega e-mail/Google per recupero account e sincronizzazione cloud supportata.","La schermata principale tiene a portata di mano riconoscimento documenti, Oggi e prossimi, Daily Briefing e azioni principali."]],
+    ["Documenti & AI",["Aggiungi foto, screenshot, PDF, file condiviso o testo. NowWhat estrae il contenuto e prepara un riepilogo strutturato.","Controlla date, importi, contatti, indirizzi e dati di pagamento riconosciuti prima di usarli.","Usa «Chiedi al documento» per domande successive sul documento corrente."]],
+    ["Salvati, cartelle & voce",["Salva contenuti riconosciuti o crea direttamente una nota. Organizza con cartelle, colori, icone e stili.","Registra note vocali e trascrivile; puoi continuare una nota esistente senza perdere il testo precedente.","Ricerca, preferiti e cestino mantengono ordinata la libreria."]],
+    ["Documenti importanti",["Usa l'archivio locale protetto per file sensibili con PIN e biometria facoltativa.","Salva titolo, titolare, numero, date di emissione/scadenza, promemoria e analisi AI.","La condivisione è sempre una tua scelta; i file protetti restano cifrati localmente."]],
+    ["Finanze",["Aggiungi spese ed entrate manualmente, con la voce o scansionando scontrini. Gli scontrini misti possono avere una categoria per ogni riga.","Se negozio o totale finale non sono leggibili con sicurezza, NowWhat non indovina: il campo resta da compilare manualmente.","Usa riepiloghi mensili, budget, fatture, abbonamenti, archivio mensile e domande AI con testo o voce."]],
+    ["Calendario & promemoria",["Date e scadenze riconosciute possono diventare eventi o promemoria.","Tocca un giorno o «Oggi» per aprire l'agenda del giorno come linea temporale.","Se vuoi, importa eventi dal calendario di sistema Android."]],
+    ["Daily Briefing & regole automatiche",["Daily Briefing mostra attività ed eventi rilevanti finché non lo segni come visto.","Le regole automatiche lavorano per significato invece di regole rigide come «scuola → cartella» e possono preparare organizzazione, promemoria, calendario e bozze di risposta.","Le azioni importanti restano sotto il tuo controllo prima della conferma."]],
+    ["Family Space",["Condividi note, documenti, attività, liste della spesa, calendario e finanze con la famiglia.","Invita con codice monouso o QR; i nuovi contenuti sono segnati come non letti per sezione.","Note, attività, acquisti, eventi e movimenti finanziari possono essere aggiunti con la voce."]],
+    ["Account & sincronizzazione",["La modalità ospite funziona senza identità collegata.","E-mail o Google permettono recupero account e sincronizzazione cloud supportata.","File locali protetti e dati specifici del dispositivo restano locali."]],
+    ["Impostazioni & aspetto",["Scegli chiaro/scuro, colore principale e uno stile globale: Minimal, Rigoroso, Morbido, Moderno o Vivace.","Gli stili cambiano in modo evidente schede, pulsanti, campi, finestre, navigazione e altri elementi.","La pulizia dei dati può essere eseguita separatamente per categorie come Finanze e Documenti importanti."]],
+    ["Sicurezza & verifica",["L'AI può essere incompleta o sbagliata. Controlla sempre i dati importanti con l'originale.","NowWhat non esegue pagamenti bancari e non sostituisce professionisti medici, legali, fiscali o finanziari.","Supporto: mynw.app/support/."]]
+  };
+
+  const familyExtra = {
+    en:["Family Space",["Share notes, documents, tasks, shopping lists, calendar events and finance data with your family.","Invite with a one-time code or QR; new items are marked unread by section.","Family notes, tasks, shopping, calendar and finance entries support voice input."]],
+    pt:["Espaço familiar",["Partilhe notas, documentos, tarefas, listas de compras, eventos e finanças com a família.","Convide por código único ou QR; novos itens ficam marcados por secção.","Notas, tarefas, compras, calendário e finanças familiares aceitam voz."]],
+    ru:["Семейное пространство",["Делитесь заметками, документами, задачами, покупками, календарём и финансами с семьёй.","Приглашайте одноразовым кодом или QR; новые объекты отмечаются по разделам.","Семейные заметки, задачи, покупки, календарь и финансы поддерживают голосовой ввод."]],
+    fr:["Espace familial",["Partagez notes, documents, tâches, listes de courses, calendrier et finances avec la famille.","Invitez par code unique ou QR ; les nouveaux éléments sont signalés par section.","Les notes, tâches, courses, calendrier et finances familiales acceptent la saisie vocale."]],
+    es:["Espacio familiar",["Comparte notas, documentos, tareas, listas de compra, calendario y finanzas con la familia.","Invita mediante código de un solo uso o QR; los elementos nuevos se marcan por sección.","Notas, tareas, compras, calendario y finanzas familiares admiten entrada por voz."]],
+    uk:["Сімейний простір",["Діліться нотатками, документами, завданнями, покупками, календарем і фінансами з родиною.","Запрошуйте одноразовим кодом або QR; нові об’єкти позначаються за розділами.","Сімейні нотатки, завдання, покупки, календар і фінанси підтримують голосове введення."]]
+  };
+  for (const code of Object.keys(familyExtra)) {
+    if (!M[code].sections.some(s => /Family|fam|Сем|Сім|Espace|Espacio/i.test(s[0]))) {
+      M[code].sections.splice(7,0,familyExtra[code]);
+    }
+  }
+
   function currentLang(){
     const saved=localStorage.getItem('nw_lang');
     if(M[saved]) return saved;
@@ -83,6 +125,8 @@
     if(raw.startsWith('fr')) return 'fr';
     if(raw.startsWith('es')) return 'es';
     if(raw.startsWith('uk')) return 'uk';
+    if(raw.startsWith('de')) return 'de';
+    if(raw.startsWith('it')) return 'it';
     return 'en';
   }
 
