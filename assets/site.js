@@ -845,10 +845,30 @@
     });
   }
 
+  async function loadHeroImage() {
+    const img = document.getElementById('heroMainImage');
+    if (!img) return;
+    try {
+      const response = await fetch('/assets/hero/nowwhat-hero-main.b64?v=20260924-6', {
+        cache: 'force-cache'
+      });
+      if (!response.ok) throw new Error('hero');
+      const payload = (await response.text()).trim();
+      if (!payload.startsWith('UklGR') || payload.length < 80000) {
+        throw new Error('hero');
+      }
+      img.addEventListener('load', () => img.classList.add('is-loaded'), { once:true });
+      img.src = 'data:image/webp;base64,' + payload;
+    } catch (_) {
+      img.classList.add('hero-image-error');
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     setupHeader();
     applyText();
     renderLegal();
     setupFeedbackForm();
+    loadHeroImage();
   });
 })();
