@@ -632,6 +632,84 @@
     }
   };
 
+
+  LEGAL.privacy.de = {
+    title:"Datenschutzrichtlinie",
+    intro:"Diese Richtlinie erklärt, wie NowWhat Informationen verarbeitet, wenn du die Android-App, diese Website, Kontofunktionen, AI-Dokumentanalyse, Sprachtranskription, Finanzen, Erinnerungen, Kalenderaktionen und Support nutzt.",
+    sections:[
+      ["1. Verantwortlicher","NowWhat App wird von Maksym Smyrnov in Portugal entwickelt. Website: https://mynw.app/. Support und Datenschutz: support@mynw.app."],
+      ["2. Von dir bereitgestellte Informationen","Je nach Funktion kannst du Kontoidentifikatoren und E-Mail, Dokumente, Fotos, Screenshots, PDFs, Text, Links, Sprachaufnahmen, Notizen, Finanzeinträge, Belegpositionen, Fragen, Feedback und Löschanfragen bereitstellen."],
+      ["3. Für Funktionen verarbeitete Informationen","NowWhat kann extrahierten Text, Daten, Beträge, Kontakte, Adressen, Zahlungsreferenzen, Zusammenfassungen, Erinnerungsdaten, Kalenderinformationen, Belegpositionen und Kategorien, Budgets, Rechnungen und Abos verarbeiten, wenn dies für die gewählte Funktion nötig ist."],
+      ["4. AI-Verarbeitung","Für AI-Funktionen ausgewählte Inhalte werden verschlüsselt an das NowWhat-Backend und an die OpenAI API für die angeforderte Analyse oder Transkription übertragen. AI-Ergebnisse können unvollständig oder falsch sein und sollten mit der Originalquelle geprüft werden."],
+      ["5. Lokaler Speicher und geschützte Dokumente","Einige Informationen bleiben auf deinem Gerät. Wichtige Dokumente sind als geschützter lokaler Tresor konzipiert. Lokale Benachrichtigungskennungen und Audiopfade sind gerätespezifisch."],
+      ["6. Cloud-Synchronisierung","Bei verknüpften nicht anonymen Konten können unterstützte Bibliotheksdaten wie Notizen, Ordner, Aufgaben und ausgewählte Einstellungen über Supabase synchronisiert werden, damit sie auf einem anderen Gerät wiederhergestellt werden können. Im Gastmodus bleiben Daten möglicherweise überwiegend lokal."],
+      ["7. Finanzdaten","Finanzeinträge, Belegpositionen, Kategorien, Monatsübersichten und AI-Fragen werden nur zur Bereitstellung der von dir verwendeten Finanzfunktionen verarbeitet. NowWhat ist keine Bank und kein Zahlungsdienst und führt keine Zahlungen aus."],
+      ["8. Dienstanbieter","Zu den wichtigsten Anbietern können Supabase für Authentifizierung, Datenbank und Backend-Infrastruktur; OpenAI API für angeforderte AI-Analyse und Transkription; Google für optionale Anmeldung und Android-Dienste sowie Resend für Service-/Support-E-Mails gehören."],
+      ["9. Zwecke und Rechtsgrundlagen","Wir verarbeiten Informationen, um angeforderte Funktionen bereitzustellen, Konten zu verwalten, unterstützte Daten zu synchronisieren, Support zu leisten, den Dienst zu schützen und rechtliche Pflichten zu erfüllen. Für besondere Kategorien kann erforderlichenfalls eine ausdrückliche Einwilligung angefordert werden."],
+      ["10. Aufbewahrung und Löschung","Daten werden nur so lange aufbewahrt, wie dies für Dienst, Sicherheit, Support, rechtliche Pflichten oder Streitigkeiten angemessen erforderlich ist. Verlauf oder Konto können in der App gelöscht werden. Externe Löschung: https://mynw.app/delete-account/."],
+      ["11. Deine Rechte","Je nach geltendem Recht kannst du Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Übertragbarkeit, Widerspruch und Widerruf der Einwilligung haben. In Portugal können Beschwerden bei der CNPD eingereicht werden. Kontakt: support@mynw.app."],
+      ["12. Website und Supportformular","mynw.app verwendet keine Werbetracker. Nachrichten über das Supportformular werden im privaten NowWhat-Supportpostfach gespeichert und können per E-Mail weitergeleitet werden, damit wir antworten können. Für das öffentliche Formular wird eine grundlegende Missbrauchsbegrenzung eingesetzt."],
+      ["13. Kinder","Die aktuelle Version von NowWhat ist für Personen ab 18 Jahren bestimmt."],
+      ["14. Änderungen","Wir können diese Richtlinie aktualisieren, wenn sich NowWhat ändert. Die aktuelle Version wird stets unter https://mynw.app/privacy/ veröffentlicht."]
+    ]
+  };
+  LEGAL.privacy.it = {
+    title:"Informativa sulla privacy",
+    intro:"Questa informativa spiega come NowWhat tratta le informazioni quando usi l'app Android, questo sito, le funzioni account, l'analisi AI dei documenti, la trascrizione vocale, Finanze, promemoria, calendario e supporto.",
+    sections:[
+      ["1. Titolare","NowWhat App è sviluppata da Maksym Smyrnov in Portogallo. Sito: https://mynw.app/. Supporto e privacy: support@mynw.app."],
+      ["2. Informazioni fornite","A seconda della funzione puoi fornire identificativi account ed e-mail, documenti, foto, screenshot, PDF, testo, link, registrazioni vocali, note, movimenti finanziari, voci di scontrino, domande, feedback e richieste di eliminazione."],
+      ["3. Informazioni trattate per le funzioni","NowWhat può trattare testo estratto, date, importi, contatti, indirizzi, riferimenti di pagamento, riepiloghi, dati dei promemoria, informazioni del calendario, voci/categorie degli scontrini, budget, fatture e abbonamenti quando necessario per la funzione richiesta."],
+      ["4. Trattamento AI","I contenuti selezionati per funzioni AI vengono inviati tramite connessione cifrata al backend NowWhat e all'API OpenAI per l'analisi o la trascrizione richiesta. I risultati AI possono essere incompleti o errati e vanno verificati con la fonte originale."],
+      ["5. Archiviazione locale e documenti protetti","Alcune informazioni restano sul dispositivo. Documenti importanti è progettato come archivio locale protetto. Identificativi locali delle notifiche e percorsi audio sono specifici del dispositivo."],
+      ["6. Sincronizzazione cloud","Per account collegati non anonimi, dati supportati della libreria come note, cartelle, attività e impostazioni selezionate possono sincronizzarsi tramite Supabase per essere ripristinati su un altro dispositivo. In modalità ospite i dati possono rimanere soprattutto locali."],
+      ["7. Dati finanziari","Movimenti finanziari, voci di scontrino, categorie, riepiloghi mensili e domande AI vengono trattati solo per fornire le funzioni Finanze utilizzate. NowWhat non è una banca o un servizio di pagamento e non esegue pagamenti."],
+      ["8. Fornitori","I principali fornitori possono includere Supabase per autenticazione, database e backend; API OpenAI per analisi AI e trascrizione richieste; Google per accesso facoltativo e servizi Android; Resend per e-mail di servizio/supporto."],
+      ["9. Finalità e basi giuridiche","Trattiamo informazioni per fornire le funzioni richieste, gestire gli account, sincronizzare dati supportati, rispondere al supporto, proteggere il servizio e adempiere agli obblighi di legge. Per categorie particolari può essere richiesto consenso esplicito quando necessario."],
+      ["10. Conservazione ed eliminazione","I dati sono conservati solo per il tempo ragionevolmente necessario al servizio, sicurezza, supporto, obblighi legali o controversie. Puoi eliminare cronologia o account nell'app. Eliminazione esterna: https://mynw.app/delete-account/."],
+      ["11. I tuoi diritti","A seconda della legge applicabile puoi avere diritti di accesso, rettifica, cancellazione, limitazione, portabilità, opposizione e revoca del consenso. In Portogallo puoi presentare reclamo alla CNPD. Contatto: support@mynw.app."],
+      ["12. Sito e modulo di supporto","mynw.app non usa tracker pubblicitari. I messaggi inviati dal modulo sono salvati nella casella privata del supporto NowWhat e possono essere inoltrati via e-mail per consentirci di rispondere. È presente una limitazione di base anti-abuso."],
+      ["13. Minori","La versione attuale di NowWhat è destinata a utenti di almeno 18 anni."],
+      ["14. Modifiche","Possiamo aggiornare questa informativa quando NowWhat cambia. La versione attuale è sempre pubblicata su https://mynw.app/privacy/."]
+    ]
+  };
+  LEGAL.terms.de = {
+    title:"Nutzungsbedingungen",
+    intro:"Diese Bedingungen regeln die Nutzung von NowWhat und seinen optionalen AI-, Konto-, Finanz-, Erinnerungs-, Kalender- und Dokumentverwaltungsfunktionen.",
+    sections:[
+      ["1. Berechtigung","Du musst mindestens 18 Jahre alt sein, um die aktuelle Version von NowWhat zu verwenden."],
+      ["2. Deine Inhalte","Du bist für die eingereichten Inhalte und dafür verantwortlich, dass du sie rechtmäßig verarbeiten darfst. Reiche keine vertraulichen Daten anderer Personen ohne Rechtsgrundlage ein."],
+      ["3. Grenzen der AI","Erkennung, Transkription, Zusammenfassungen und Antworten werden automatisch erzeugt und können ungenau, unvollständig oder fehlinterpretiert sein. Prüfe folgenreiche Angaben immer mit dem Original."],
+      ["4. Medizinische, rechtliche und finanzielle Inhalte","NowWhat ist ein unterstützendes Produktivitätswerkzeug und ersetzt keine professionelle medizinische, rechtliche, steuerliche oder finanzielle Beratung."],
+      ["5. Zahlungen","NowWhat ist keine Bank und kein Zahlungsanbieter. Zahlungsdaten, QR-Codes, IBAN, Entity, Reference, Beträge und Empfänger müssen geprüft werden, bevor du etwas in einer externen Banking-App bestätigst."],
+      ["6. Finanzfunktionen","Berechnungen und AI-Antworten basieren auf den in der App gespeicherten Daten und können von der Kategorisierung von Belegen und Buchungen abhängen. Prüfe die zugrunde liegenden Einträge."],
+      ["7. Konten und Synchronisierung","Ein Konto ist optional. Wenn du E-Mail oder Google verknüpfst, können unterstützte gespeicherte Daten über Cloud-Dienste synchronisiert werden. Du bist dafür verantwortlich, Zugriff auf deine Anmeldemethode und dein Gerät zu behalten."],
+      ["8. Dienste Dritter","Einige Funktionen hängen von Diensten und APIs Dritter ab und können deren Bedingungen, Richtlinien, Verfügbarkeit und technischen Grenzen unterliegen."],
+      ["9. Verfügbarkeit und Änderungen","Funktionen können geändert, hinzugefügt oder entfernt werden. Der Dienst kann wegen Wartung, Sicherheit oder technischen Gründen vorübergehend nicht verfügbar sein."],
+      ["10. Zukünftige kostenpflichtige Funktionen","NowWhat kann optionale kostenpflichtige Funktionen oder Abos anbieten. Preis, Abrechnungszeitraum, Verlängerung und Kündigung werden vor dem Kauf angezeigt."],
+      ["11. Beendigung und Löschung","Du kannst NowWhat jederzeit nicht mehr nutzen und die Kontolöschung in der App oder unter https://mynw.app/delete-account/ beantragen."],
+      ["12. Kontakt","Fragen zu diesen Bedingungen: support@mynw.app."]
+    ]
+  };
+  LEGAL.terms.it = {
+    title:"Termini di utilizzo",
+    intro:"Questi Termini regolano l'uso di NowWhat e delle funzioni opzionali AI, account, Finanze, promemoria, calendario e gestione documenti.",
+    sections:[
+      ["1. Idoneità","Devi avere almeno 18 anni per usare la versione attuale di NowWhat."],
+      ["2. I tuoi contenuti","Sei responsabile dei contenuti che invii e del diritto di trattarli. Non inviare dati riservati di altre persone senza una base giuridica."],
+      ["3. Limiti dell'AI","Riconoscimento, trascrizione, riepiloghi e risposte sono generati automaticamente e possono essere imprecisi, incompleti o interpretare male la fonte. Verifica sempre i dettagli importanti con l'originale."],
+      ["4. Materiale medico, legale e finanziario","NowWhat è uno strumento di produttività di supporto e non sostituisce consulenza professionale medica, legale, fiscale o finanziaria."],
+      ["5. Pagamenti","NowWhat non è una banca né un fornitore di pagamenti. Dati di pagamento, QR, IBAN, Entity, Reference, importi e destinatari devono essere controllati prima di confermare qualsiasi cosa in un'app bancaria esterna."],
+      ["6. Funzioni Finanze","Calcoli e risposte AI si basano sui dati salvati nell'app e possono dipendere da come scontrini e movimenti sono stati categorizzati. Controlla le voci di origine prima di fare affidamento sui risultati."],
+      ["7. Account e sincronizzazione","L'account è facoltativo. Collegando e-mail o Google, i dati supportati possono sincronizzarsi tramite servizi cloud. Sei responsabile di mantenere accesso al metodo di login e al dispositivo."],
+      ["8. Servizi di terze parti","Alcune funzioni dipendono da servizi e API di terzi e possono essere soggette ai loro termini, politiche, disponibilità e limiti tecnici."],
+      ["9. Disponibilità e modifiche","Le funzioni possono cambiare, essere aggiunte o rimosse. Il servizio può essere temporaneamente non disponibile per manutenzione, sicurezza o motivi tecnici."],
+      ["10. Future funzioni a pagamento","NowWhat può offrire funzioni o abbonamenti a pagamento facoltativi. Prezzo, periodo, rinnovo e cancellazione saranno mostrati prima dell'acquisto."],
+      ["11. Cessazione ed eliminazione","Puoi smettere di usare NowWhat in qualsiasi momento e richiedere l'eliminazione dell'account nell'app o su https://mynw.app/delete-account/."],
+      ["12. Contatti","Domande su questi Termini: support@mynw.app."]
+    ]
+  };
+
   function getLang() {
     const saved = localStorage.getItem('nw_lang');
     if (SUPPORTED.includes(saved)) return saved;
