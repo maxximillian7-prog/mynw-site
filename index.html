@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#6263A6">
   <link rel="canonical" href="https://mynw.app/">
   <link rel="icon" href="/assets/logo.svg">
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css?v=20260924-2">
 </head>
 <body data-title-key="home_title">
 <header class="site-header">
@@ -31,7 +31,7 @@
           <a href="#briefing" data-i18n="nav_briefing">Daily Briefing & Auto Rules</a>
         </div>
       </details>
-      <a href="/manual/" data-i18n="nav_manual">Manual</a>
+      <a class="manual-nav-link" href="/manual/" data-i18n="nav_manual">Manual</a>
       <a href="/support/" data-i18n="nav_support">Support</a>
       <details class="nav-drop">
         <summary data-i18n="nav_legal">Legal</summary>
@@ -93,6 +93,34 @@
   </div>
 </section>
 
+<section class="section product-showcase" id="screens">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-kicker" data-i18n="screens_kicker">App preview</span>
+      <h2 data-i18n="screens_title">See NowWhat in action.</h2>
+      <p data-i18n="screens_lead">Real interface examples from the app.</p>
+    </div>
+    <div class="showcase-grid" aria-label="NowWhat app screenshots">
+      <figure class="showcase-shot showcase-overview">
+        <img src="/assets/screens/overview.webp?v=20260924-2" alt="NowWhat overview: documents, smart actions, notes and finance" loading="lazy" decoding="async">
+      </figure>
+      <figure class="showcase-shot showcase-plan">
+        <img src="/assets/screens/text-to-plan.webp?v=20260924-2" alt="NowWhat turns plain text into calendar events and smart to-do lists" loading="lazy" decoding="async">
+      </figure>
+      <figure class="showcase-shot showcase-saved">
+        <img src="/assets/screens/saved-folders.webp?v=20260924-2" alt="NowWhat Saved area with colorful folders for notes and documents" loading="lazy" decoding="async">
+      </figure>
+    </div>
+    <div class="showcase-manual">
+      <div>
+        <strong data-i18n="manual_cta_t">Need the details?</strong>
+        <span data-i18n="manual_cta_b">Open the full NowWhat guide with step-by-step instructions for every major feature.</span>
+      </div>
+      <a class="btn btn-primary" href="/manual/" data-i18n="manual_cta_btn">Open manual</a>
+    </div>
+  </div>
+</section>
+
 <section class="section compact-top" id="features">
   <div class="wrap">
     <div class="section-head">
@@ -109,17 +137,7 @@
       <article class="card" id="briefing"><div class="icon">✨</div><h3 data-i18n="f8_title">Daily Briefing & Auto Rules</h3><p data-i18n="f8_body"></p></article>
     </div>
 
-    <div class="showcase-grid" aria-label="NowWhat app screenshots">
-      <figure class="showcase-shot showcase-overview">
-        <img src="/assets/screens/overview.webp" alt="NowWhat overview: documents, smart actions, notes and finance" loading="lazy" decoding="async">
-      </figure>
-      <figure class="showcase-shot showcase-plan">
-        <img src="/assets/screens/text-to-plan.webp" alt="NowWhat turns plain text into calendar events and smart to-do lists" loading="lazy" decoding="async">
-      </figure>
-      <figure class="showcase-shot showcase-saved">
-        <img src="/assets/screens/saved-folders.webp" alt="NowWhat Saved area with colorful folders for notes and documents" loading="lazy" decoding="async">
-      </figure>
-    </div>
+
   </div>
 </section>
 
@@ -195,6 +213,6 @@
     <div class="footer-links"><a href="/manual/" data-i18n="nav_manual">Manual</a><a href="/privacy/" data-i18n="nav_privacy">Privacy</a><a href="/terms/" data-i18n="nav_terms">Terms</a><a href="/support/" data-i18n="nav_support">Support</a><a href="/delete-account/" data-i18n="nav_delete">Delete account</a></div>
   </div>
 </footer>
-<script src="/assets/site.js"></script>
+<script src="/assets/site.js?v=20260924-2"></script>
 </body>
 </html>
