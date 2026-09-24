@@ -344,3 +344,11 @@ nav a:hover{color:var(--text)}
 }
 .hero-visual-image.is-loaded{opacity:1}
 .hero-visual-image.hero-image-error{display:none}
+
+/* Direct verified WebP hero */
+.hero-visual-image{
+  opacity:1!important;
+  aspect-ratio:900/506;
+  background:transparent!important;
+}
+.hero-visual-image.hero-image-error{display:block}
