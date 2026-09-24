@@ -1,6 +1,6 @@
 (() => {
-  const SUPPORTED = ['en','pt','ru','fr','es','uk'];
-  const LANGUAGE_LABELS = {en:'English',pt:'Português',ru:'Русский',fr:'Français',es:'Español',uk:'Українська'};
+  const SUPPORTED = ['en','pt','ru','fr','es','uk','de','it'];
+  const LANGUAGE_LABELS = {en:'English',pt:'Português',ru:'Русский',fr:'Français',es:'Español',uk:'Українська',de:'Deutsch',it:'Italiano'};
   const FEEDBACK_ENDPOINT = 'https://utauewtqtmqgmguxtmvn.supabase.co/functions/v1/website-feedback';
   const PUBLIC_KEY = 'sb_publishable_8_Cy9BSMphZDoRYe3ejifQ_iYqmF2Fy';
 
@@ -10,7 +10,7 @@
       home_title:'NowWhat — AI assistant for documents, tasks and finances',
       eyebrow:'Your everyday AI assistant', hero_h1:'Everything important — under control.',
       hero_lead:'NowWhat understands documents and everyday information, helps you act on it, and keeps the result organised in one place.',
-      cta_features:'Explore features', cta_support:'Contact support', proof_android:'Android first', proof_adult:'18+', proof_lang:'6 languages', proof_privacy:'Privacy controls',
+      cta_features:'Explore features', cta_support:'Contact support', proof_android:'Android first', proof_adult:'18+', proof_lang:'8 languages', proof_privacy:'Privacy controls',
       preview_doc:'Document understood', preview_summary:'School meeting Thursday at 18:30. Bring the signed form.', preview_calendar:'Calendar', preview_reminder:'Reminder', preview_ask:'Ask AI',
       preview_finance:'Finance', preview_spent:'Spent', preview_income:'Income', preview_balance:'Balance',
       section_features_kicker:'Core features', section_features_title:'From information to action — without the routine.', section_features_lead:'Documents, notes, money, dates and tasks work together instead of living in separate apps.', advantages_kicker:'Why NowWhat', advantages_title:'Less routine. More clarity.', adv1_t:'From document to action', adv1_b:'Recognise the content, understand what matters and immediately create the next useful action.', adv2_t:'Your data becomes searchable', adv2_b:'Ask AI about a document, a month of spending or saved information instead of searching manually.', adv3_t:'Important things stay organised', adv3_b:'Folders, protected documents, reminders and Daily Briefing keep deadlines and tasks visible.', adv4_t:'Control stays with you', adv4_b:'Protected local document storage, explicit AI actions, clear data controls and account deletion.', manual_cta_t:'Need the details?', manual_cta_b:'Open the full NowWhat guide with step-by-step instructions for every major feature.', manual_cta_btn:'Open manual',
@@ -36,7 +36,7 @@
       faq1_q:'Do I need an account?', faq1_a:'No. Guest mode works without a linked identity. Email or Google can be linked later for account recovery and cloud synchronisation of supported saved data.',
       faq2_q:'Does NowWhat replace professional advice?', faq2_a:'No. AI can be incomplete or wrong. Verify consequential details and use qualified professional advice where appropriate.',
       faq3_q:'Can I delete my account?', faq3_a:'Yes. You can delete it inside the app or start an external deletion request from this website.',
-      faq4_q:'Which languages are supported?', faq4_a:'The current interface supports English, Portuguese, Russian, French, Spanish and Ukrainian.',
+      faq4_q:'Which languages are supported?', faq4_a:'The current interface supports English, Portuguese, Russian, French, Spanish, Ukrainian, German and Italian.',
       launch_kicker:'Android · Version 1.0', launch_title:'Preparing for Google Play.', launch_body:'The production Play Store link will appear here when the listing is live.', launch_store:'Google Play · Coming soon',
       footer_text:'© 2026 NowWhat App.',
       support_title:'Support — NowWhat', support_h1:'How can we help?', support_intro:'Send a message directly from this page. It is stored in the private NowWhat support inbox and forwarded to support@mynw.app.',
@@ -60,7 +60,7 @@
       home_title:'NowWhat — assistente de IA para documentos, tarefas e finanças',
       eyebrow:'O seu assistente de IA do dia a dia', hero_h1:'Tudo o que importa — sob controlo.',
       hero_lead:'O NowWhat compreende documentos e informação do dia a dia, ajuda a agir e mantém o resultado organizado num só lugar.',
-      cta_features:'Ver funcionalidades', cta_support:'Contactar suporte', proof_android:'Android primeiro', proof_adult:'18+', proof_lang:'6 idiomas', proof_privacy:'Controlos de privacidade',
+      cta_features:'Ver funcionalidades', cta_support:'Contactar suporte', proof_android:'Android primeiro', proof_adult:'18+', proof_lang:'8 idiomas', proof_privacy:'Controlos de privacidade',
       preview_doc:'Documento compreendido', preview_summary:'Reunião da escola quinta-feira às 18:30. Levar o formulário assinado.', preview_calendar:'Calendário', preview_reminder:'Lembrete', preview_ask:'Perguntar à IA',
       preview_finance:'Finanças', preview_spent:'Despesas', preview_income:'Rendimento', preview_balance:'Saldo',
       section_features_kicker:'Funcionalidades principais', section_features_title:'Da informação à ação — sem rotina desnecessária.', section_features_lead:'Documentos, notas, dinheiro, datas e tarefas funcionam em conjunto em vez de ficarem espalhados por várias aplicações.', advantages_kicker:'Porquê NowWhat', advantages_title:'Menos rotina. Mais clareza.', adv1_t:'Do documento à ação', adv1_b:'Reconheça o conteúdo, perceba o essencial e crie imediatamente a próxima ação útil.', adv2_t:'Os seus dados tornam-se pesquisáveis', adv2_b:'Pergunte à IA sobre um documento, um mês de despesas ou informação guardada em vez de procurar manualmente.', adv3_t:'O importante fica organizado', adv3_b:'Pastas, documentos protegidos, lembretes e Daily Briefing mantêm prazos e tarefas visíveis.', adv4_t:'O controlo continua consigo', adv4_b:'Armazenamento local protegido, ações de IA explícitas, controlos claros de dados e eliminação da conta.', manual_cta_t:'Quer todos os detalhes?', manual_cta_b:'Abra o guia completo do NowWhat com instruções passo a passo para as principais funções.', manual_cta_btn:'Abrir guia',
@@ -86,7 +86,7 @@
       faq1_q:'Preciso de uma conta?', faq1_a:'Não. O modo convidado funciona sem identidade associada. Pode ligar e-mail ou Google mais tarde para recuperação da conta e sincronização cloud dos dados compatíveis.',
       faq2_q:'O NowWhat substitui aconselhamento profissional?', faq2_a:'Não. A IA pode estar incompleta ou errada. Confirme informação importante e procure um profissional qualificado quando necessário.',
       faq3_q:'Posso eliminar a conta?', faq3_a:'Sim. Pode eliminá-la na aplicação ou iniciar um pedido externo neste site.',
-      faq4_q:'Que idiomas são suportados?', faq4_a:'A interface atual suporta inglês, português, russo, francês, espanhol e ucraniano.',
+      faq4_q:'Que idiomas são suportados?', faq4_a:'A interface atual suporta inglês, português, russo, francês, espanhol, ucraniano, alemão e italiano.',
       launch_kicker:'Android · Versão 1.0', launch_title:'A preparar o Google Play.', launch_body:'O link oficial da Play Store aparecerá aqui quando a publicação estiver ativa.', launch_store:'Google Play · Em breve',
       footer_text:'© 2026 NowWhat App.',
       support_title:'Suporte — NowWhat', support_h1:'Como podemos ajudar?', support_intro:'Envie uma mensagem diretamente nesta página. Fica guardada na caixa privada do NowWhat e é encaminhada para support@mynw.app.',
@@ -110,7 +110,7 @@
       home_title:'NowWhat — AI-помощник для документов, дел и финансов',
       eyebrow:'Ваш повседневный AI-помощник', hero_h1:'Всё важное — под контролем.',
       hero_lead:'NowWhat понимает документы и повседневную информацию, помогает сразу действовать и сохраняет результат в понятном порядке.',
-      cta_features:'Посмотреть возможности', cta_support:'Связаться с поддержкой', proof_android:'Сначала Android', proof_adult:'18+', proof_lang:'6 языков', proof_privacy:'Контроль конфиденциальности',
+      cta_features:'Посмотреть возможности', cta_support:'Связаться с поддержкой', proof_android:'Сначала Android', proof_adult:'18+', proof_lang:'8 языков', proof_privacy:'Контроль конфиденциальности',
       preview_doc:'Документ понят', preview_summary:'Родительское собрание в четверг в 18:30. Принести подписанную форму.', preview_calendar:'Календарь', preview_reminder:'Напоминание', preview_ask:'Спросить AI',
       preview_finance:'Финансы', preview_spent:'Расходы', preview_income:'Доход', preview_balance:'Баланс',
       section_features_kicker:'Основные возможности', section_features_title:'От информации к действию — без лишней рутины.', section_features_lead:'Документы, заметки, деньги, даты и задачи работают вместе, а не разбросаны по разным приложениям.', advantages_kicker:'Почему NowWhat', advantages_title:'Меньше рутины. Больше ясности.', adv1_t:'От документа к действию', adv1_b:'Распознайте содержимое, поймите главное и сразу создайте нужное действие.', adv2_t:'Ваши данные становятся доступными для вопросов', adv2_b:'Спросите AI о документе, расходах за месяц или сохранённой информации вместо ручного поиска.', adv3_t:'Важное остаётся организованным', adv3_b:'Папки, защищённые документы, напоминания и Daily Briefing помогают не упускать сроки и задачи.', adv4_t:'Контроль остаётся у вас', adv4_b:'Защищённое локальное хранение документов, явные AI-действия, очистка данных и удаление аккаунта.', manual_cta_t:'Нужны подробности?', manual_cta_b:'Откройте полное руководство NowWhat с пошаговым описанием основных функций.', manual_cta_btn:'Открыть руководство',
@@ -136,7 +136,7 @@
       faq1_q:'Нужен ли аккаунт?', faq1_a:'Нет. Можно пользоваться гостевым режимом. E-mail или Google можно привязать позже для восстановления аккаунта и облачной синхронизации поддерживаемых данных.',
       faq2_q:'NowWhat заменяет специалиста?', faq2_a:'Нет. AI может ошибаться или давать неполный ответ. Проверяйте значимые данные и при необходимости обращайтесь к профильному специалисту.',
       faq3_q:'Можно удалить аккаунт?', faq3_a:'Да. Аккаунт удаляется в приложении либо через внешний запрос на этом сайте.',
-      faq4_q:'Какие языки поддерживаются?', faq4_a:'Сейчас интерфейс поддерживает английский, португальский, русский, французский, испанский и украинский.',
+      faq4_q:'Какие языки поддерживаются?', faq4_a:'Сейчас интерфейс поддерживает английский, португальский, русский, французский, испанский, украинский, немецкий и итальянский.',
       launch_kicker:'Android · Версия 1.0', launch_title:'Готовимся к Google Play.', launch_body:'Официальная ссылка на Play Store появится здесь после публикации.', launch_store:'Google Play · Скоро',
       footer_text:'© 2026 NowWhat App.',
       support_title:'Поддержка — NowWhat', support_h1:'Чем можем помочь?', support_intro:'Отправьте сообщение прямо с этой страницы. Оно сохраняется в приватном ящике NowWhat и автоматически пересылается на support@mynw.app.',
@@ -160,7 +160,7 @@
       home_title:'NowWhat — assistant IA pour documents, tâches et finances',
       eyebrow:'Votre assistant IA du quotidien', hero_h1:'Tout ce qui compte — sous contrôle.',
       hero_lead:'NowWhat comprend vos documents et informations du quotidien, vous aide à agir et garde le résultat organisé au même endroit.',
-      cta_features:'Voir les fonctionnalités', cta_support:'Contacter l’assistance', proof_android:'Android d’abord', proof_adult:'18+', proof_lang:'6 langues', proof_privacy:'Contrôles de confidentialité',
+      cta_features:'Voir les fonctionnalités', cta_support:'Contacter l’assistance', proof_android:'Android d’abord', proof_adult:'18+', proof_lang:'8 langues', proof_privacy:'Contrôles de confidentialité',
       preview_doc:'Document compris', preview_summary:'Réunion scolaire jeudi à 18 h 30. Apporter le formulaire signé.', preview_calendar:'Calendrier', preview_reminder:'Rappel', preview_ask:'Demander à l’IA',
       preview_finance:'Finances', preview_spent:'Dépenses', preview_income:'Revenus', preview_balance:'Solde',
       section_features_kicker:'Fonctions principales', section_features_title:'De l’information à l’action — sans routine inutile.', section_features_lead:'Documents, notes, argent, dates et tâches fonctionnent ensemble au lieu d’être dispersés entre plusieurs apps.', advantages_kicker:'Pourquoi NowWhat', advantages_title:'Moins de routine. Plus de clarté.', adv1_t:'Du document à l’action', adv1_b:'Reconnaissez le contenu, comprenez l’essentiel et créez immédiatement l’action utile.', adv2_t:'Vos données deviennent interrogeables', adv2_b:'Interrogez l’IA sur un document, un mois de dépenses ou des informations enregistrées au lieu de chercher manuellement.', adv3_t:'L’essentiel reste organisé', adv3_b:'Dossiers, documents protégés, rappels et Daily Briefing gardent tâches et échéances visibles.', adv4_t:'Vous gardez le contrôle', adv4_b:'Stockage local protégé, actions IA explicites, contrôle des données et suppression du compte.', manual_cta_t:'Besoin de détails ?', manual_cta_b:'Ouvrez le guide complet NowWhat avec des instructions étape par étape pour les principales fonctions.', manual_cta_btn:'Ouvrir le guide',
@@ -186,7 +186,7 @@
       faq1_q:'Un compte est-il obligatoire ?', faq1_a:'Non. Le mode invité fonctionne sans identité liée. Vous pouvez associer e-mail ou Google plus tard pour récupérer le compte et synchroniser les données compatibles.',
       faq2_q:'NowWhat remplace-t-il un professionnel ?', faq2_a:'Non. L’IA peut être incomplète ou erronée. Vérifiez les informations importantes et consultez un professionnel qualifié si nécessaire.',
       faq3_q:'Puis-je supprimer mon compte ?', faq3_a:'Oui. Vous pouvez le supprimer dans l’app ou commencer une demande externe depuis ce site.',
-      faq4_q:'Quelles langues sont disponibles ?', faq4_a:'L’interface prend en charge l’anglais, le portugais, le russe, le français, l’espagnol et l’ukrainien.',
+      faq4_q:'Quelles langues sont disponibles ?', faq4_a:'L’interface prend en charge l’anglais, le portugais, le russe, le français, l’espagnol, l’ukrainien, l’allemand et l’italien.',
       launch_kicker:'Android · Version 1.0', launch_title:'Préparation pour Google Play.', launch_body:'Le lien officiel Play Store apparaîtra ici dès la mise en ligne.', launch_store:'Google Play · Bientôt',
       footer_text:'© 2026 NowWhat App.',
       support_title:'Assistance — NowWhat', support_h1:'Comment pouvons-nous aider ?', support_intro:'Envoyez un message directement depuis cette page. Il est stocké dans la boîte privée NowWhat et transmis à support@mynw.app.',
@@ -210,7 +210,7 @@
       home_title:'NowWhat — asistente de IA para documentos, tareas y finanzas',
       eyebrow:'Tu asistente de IA diario', hero_h1:'Todo lo importante — bajo control.',
       hero_lead:'NowWhat entiende documentos e información cotidiana, te ayuda a actuar y mantiene el resultado organizado en un solo lugar.',
-      cta_features:'Ver funciones', cta_support:'Contactar soporte', proof_android:'Android primero', proof_adult:'18+', proof_lang:'6 idiomas', proof_privacy:'Controles de privacidad',
+      cta_features:'Ver funciones', cta_support:'Contactar soporte', proof_android:'Android primero', proof_adult:'18+', proof_lang:'8 idiomas', proof_privacy:'Controles de privacidad',
       preview_doc:'Documento entendido', preview_summary:'Reunión escolar el jueves a las 18:30. Llevar el formulario firmado.', preview_calendar:'Calendario', preview_reminder:'Recordatorio', preview_ask:'Preguntar a la IA',
       preview_finance:'Finanzas', preview_spent:'Gastos', preview_income:'Ingresos', preview_balance:'Balance',
       section_features_kicker:'Funciones principales', section_features_title:'De la información a la acción — sin rutina innecesaria.', section_features_lead:'Documentos, notas, dinero, fechas y tareas funcionan juntos en vez de quedar dispersos en varias apps.', advantages_kicker:'Por qué NowWhat', advantages_title:'Menos rutina. Más claridad.', adv1_t:'Del documento a la acción', adv1_b:'Reconoce el contenido, entiende lo esencial y crea enseguida la siguiente acción útil.', adv2_t:'Tus datos se pueden consultar', adv2_b:'Pregunta a la IA por un documento, un mes de gastos o información guardada en lugar de buscar manualmente.', adv3_t:'Lo importante queda organizado', adv3_b:'Carpetas, documentos protegidos, recordatorios y Daily Briefing mantienen visibles tareas y plazos.', adv4_t:'Tú mantienes el control', adv4_b:'Almacenamiento local protegido, acciones de IA explícitas, controles de datos y eliminación de cuenta.', manual_cta_t:'¿Necesitas más detalles?', manual_cta_b:'Abre la guía completa de NowWhat con instrucciones paso a paso para las funciones principales.', manual_cta_btn:'Abrir guía',
@@ -236,7 +236,7 @@
       faq1_q:'¿Necesito una cuenta?', faq1_a:'No. El modo invitado funciona sin identidad vinculada. Puedes asociar e-mail o Google más tarde para recuperar la cuenta y sincronizar datos compatibles.',
       faq2_q:'¿NowWhat sustituye a un profesional?', faq2_a:'No. La IA puede ser incompleta o incorrecta. Verifica la información importante y consulta a un profesional cuando corresponda.',
       faq3_q:'¿Puedo eliminar mi cuenta?', faq3_a:'Sí. Puedes eliminarla dentro de la app o iniciar una solicitud externa desde este sitio.',
-      faq4_q:'¿Qué idiomas están disponibles?', faq4_a:'La interfaz admite inglés, portugués, ruso, francés, español y ucraniano.',
+      faq4_q:'¿Qué idiomas están disponibles?', faq4_a:'La interfaz admite inglés, portugués, ruso, francés, español, ucraniano, alemán e italiano.',
       launch_kicker:'Android · Versión 1.0', launch_title:'Preparando Google Play.', launch_body:'El enlace oficial de Play Store aparecerá aquí cuando la publicación esté activa.', launch_store:'Google Play · Próximamente',
       footer_text:'© 2026 NowWhat App.',
       support_title:'Soporte — NowWhat', support_h1:'¿Cómo podemos ayudarte?', support_intro:'Envía un mensaje directamente desde esta página. Se guarda en el buzón privado de NowWhat y se reenvía a support@mynw.app.',
@@ -260,7 +260,7 @@
       home_title:'NowWhat — AI-помічник для документів, справ і фінансів',
       eyebrow:'Ваш щоденний AI-помічник', hero_h1:'Усе важливе — під контролем.',
       hero_lead:'NowWhat розуміє документи й щоденну інформацію, допомагає одразу діяти та зберігає результат у зрозумілому порядку.',
-      cta_features:'Переглянути можливості', cta_support:'Зв’язатися з підтримкою', proof_android:'Спочатку Android', proof_adult:'18+', proof_lang:'6 мов', proof_privacy:'Контроль конфіденційності',
+      cta_features:'Переглянути можливості', cta_support:'Зв’язатися з підтримкою', proof_android:'Спочатку Android', proof_adult:'18+', proof_lang:'8 мов', proof_privacy:'Контроль конфіденційності',
       preview_doc:'Документ зрозумілий', preview_summary:'Батьківські збори у четвер о 18:30. Принести підписану форму.', preview_calendar:'Календар', preview_reminder:'Нагадування', preview_ask:'Запитати AI',
       preview_finance:'Фінанси', preview_spent:'Витрати', preview_income:'Дохід', preview_balance:'Баланс',
       section_features_kicker:'Основні можливості', section_features_title:'Від інформації до дії — без зайвої рутини.', section_features_lead:'Документи, нотатки, гроші, дати й завдання працюють разом, а не розкидані між різними застосунками.', advantages_kicker:'Чому NowWhat', advantages_title:'Менше рутини. Більше ясності.', adv1_t:'Від документа до дії', adv1_b:'Розпізнайте вміст, зрозумійте головне й одразу створіть потрібну дію.', adv2_t:'Ваші дані стають доступними для запитань', adv2_b:'Запитайте AI про документ, витрати за місяць або збережену інформацію замість ручного пошуку.', adv3_t:'Важливе залишається організованим', adv3_b:'Папки, захищені документи, нагадування та Daily Briefing допомагають не пропускати строки й завдання.', adv4_t:'Контроль залишається у вас', adv4_b:'Захищене локальне зберігання, явні AI-дії, очищення даних і видалення акаунта.', manual_cta_t:'Потрібні подробиці?', manual_cta_b:'Відкрийте повний посібник NowWhat із покроковим описом основних функцій.', manual_cta_btn:'Відкрити посібник',
@@ -286,7 +286,7 @@
       faq1_q:'Чи потрібен акаунт?', faq1_a:'Ні. Гостьовий режим працює без прив’язаної особи. E-mail або Google можна додати пізніше для відновлення акаунта та хмарної синхронізації підтримуваних даних.',
       faq2_q:'NowWhat замінює фахівця?', faq2_a:'Ні. AI може помилятися або бути неповним. Перевіряйте важливі дані та за потреби звертайтеся до фахівця.',
       faq3_q:'Чи можна видалити акаунт?', faq3_a:'Так. Це можна зробити в застосунку або через зовнішній запит на сайті.',
-      faq4_q:'Які мови підтримуються?', faq4_a:'Інтерфейс підтримує англійську, португальську, російську, французьку, іспанську та українську.',
+      faq4_q:'Які мови підтримуються?', faq4_a:'Інтерфейс підтримує англійську, португальську, російську, французьку, іспанську, українську, німецьку та італійську.',
       launch_kicker:'Android · Версія 1.0', launch_title:'Готуємося до Google Play.', launch_body:'Офіційне посилання Play Store з’явиться тут після публікації.', launch_store:'Google Play · Незабаром',
       footer_text:'© 2026 NowWhat App.',
       support_title:'Підтримка — NowWhat', support_h1:'Чим можемо допомогти?', support_intro:'Надішліть повідомлення прямо з цієї сторінки. Воно зберігається у приватній скриньці NowWhat і пересилається на support@mynw.app.',
@@ -319,7 +319,7 @@
           ['5. Local storage and protected documents','Some information stays on your device. Important Documents are designed as a protected local vault. Device-local notification identifiers and local audio paths are device-specific.'],
           ['6. Cloud synchronisation','For linked non-anonymous accounts, supported saved-library state such as notes, folders, tasks and selected settings may synchronise through Supabase so it can be restored on another device. Guest-mode data may remain mainly local until an account is linked.'],
           ['7. Finance data','Finance entries, receipt items, categories, monthly summaries and AI questions are processed only to provide the Finance features you use. NowWhat is not a bank or payment service and does not execute payments.'],
-          ['8. Service providers','Main providers may include Supabase for authentication, database and backend infrastructure; OpenAI API and/or Google Gemini API for requested AI analysis and transcription; Google for optional sign-in and Android services; and Resend for service/support email delivery.'],
+          ['8. Service providers','Main providers may include Supabase for authentication, database and backend infrastructure; OpenAI API for requested AI analysis and transcription; Google for optional sign-in and Android services; and Resend for service/support email delivery.'],
           ['9. Purposes and legal bases','We process information to provide requested functionality, manage accounts, synchronise supported data, respond to support, protect the service and meet legal obligations. Where special-category data is involved, explicit consent may be requested where required.'],
           ['10. Retention and deletion','Data is retained only as reasonably necessary for the service, security, support, legal obligations or disputes. You can delete history or your account in the app. External deletion: https://mynw.app/delete-account/.'],
           ['11. Your rights','Depending on applicable law, you may have rights of access, correction, deletion, restriction, portability, objection and withdrawal of consent. In Portugal, complaints may be made to the CNPD. Contact support@mynw.app.'],
@@ -338,7 +338,7 @@
           ['5. Armazenamento local e documentos protegidos','Alguma informação permanece no dispositivo. Documentos importantes foram concebidos como arquivo local protegido. Identificadores de notificações e caminhos locais de áudio são específicos do dispositivo.'],
           ['6. Sincronização cloud','Em contas associadas e não anónimas, dados compatíveis da biblioteca, como notas, pastas, tarefas e definições, podem sincronizar via Supabase para restauro noutro dispositivo. No modo convidado, os dados podem permanecer sobretudo locais.'],
           ['7. Dados financeiros','Movimentos, itens de talão, categorias, resumos mensais e perguntas à IA são tratados apenas para fornecer as funções de Finanças utilizadas. O NowWhat não é banco nem serviço de pagamentos e não executa pagamentos.'],
-          ['8. Prestadores','Os principais prestadores podem incluir Supabase, OpenAI API e Google Gemini API para processamento de IA; Google para login opcional/serviços Android e Resend para entrega de e-mails de serviço e suporte.'],
+          ['8. Prestadores','Os principais prestadores podem incluir Supabase, OpenAI API para processamento de IA; Google para login opcional/serviços Android e Resend para entrega de e-mails de serviço e suporte.'],
           ['9. Finalidades e bases legais','Tratamos dados para prestar funcionalidades, gerir contas, sincronizar dados compatíveis, responder ao suporte, proteger o serviço e cumprir obrigações legais. Para categorias especiais pode ser solicitado consentimento explícito quando exigido.'],
           ['10. Conservação e eliminação','Os dados são conservados apenas pelo tempo razoavelmente necessário. Pode eliminar histórico ou conta na aplicação. Eliminação externa: https://mynw.app/delete-account/.'],
           ['11. Direitos','Pode ter direitos de acesso, correção, apagamento, limitação, portabilidade, oposição e retirada do consentimento. Em Portugal pode reclamar junto da CNPD. Contacto: support@mynw.app.'],
@@ -357,7 +357,7 @@
           ['5. Локальное хранение и защищённые документы','Часть данных остаётся на устройстве. Важные документы предназначены для защищённого локального архива. Локальные идентификаторы уведомлений и пути к аудиофайлам зависят от конкретного устройства.'],
           ['6. Облачная синхронизация','Для привязанных неанонимных аккаунтов поддерживаемые данные библиотеки — заметки, папки, задачи и некоторые настройки — могут синхронизироваться через Supabase. В гостевом режиме данные могут оставаться преимущественно локальными.'],
           ['7. Финансовые данные','Операции, позиции чеков, категории, месячные сводки и AI-вопросы обрабатываются только для предоставления функций раздела Финансы. NowWhat не является банком или платёжным сервисом и не выполняет платежи.'],
-          ['8. Поставщики','Основные поставщики могут включать Supabase, OpenAI API и Google Gemini API для AI-обработки; Google для опционального входа и Android-сервисов, а также Resend для служебной и поддерживающей электронной почты.'],
+          ['8. Поставщики','Основные поставщики могут включать Supabase, OpenAI API для AI-обработки; Google для опционального входа и Android-сервисов, а также Resend для служебной и поддерживающей электронной почты.'],
           ['9. Цели и правовые основания','Данные обрабатываются для работы функций, управления аккаунтом, синхронизации поддерживаемых данных, поддержки, безопасности и выполнения юридических обязанностей. Для специальных категорий данных при необходимости запрашивается явное согласие.'],
           ['10. Хранение и удаление','Данные хранятся только разумно необходимое время. Историю и аккаунт можно удалить в приложении. Внешнее удаление: https://mynw.app/delete-account/.'],
           ['11. Ваши права','В зависимости от закона вы можете иметь права на доступ, исправление, удаление, ограничение, переносимость, возражение и отзыв согласия. В Португалии надзорный орган — CNPD. Контакт: support@mynw.app.'],
@@ -376,7 +376,7 @@
           ['5. Stockage local et documents protégés','Certaines informations restent sur l’appareil. Les Documents importants sont conçus comme un coffre local protégé. Les identifiants de notifications et chemins audio locaux dépendent de l’appareil.'],
           ['6. Synchronisation cloud','Pour les comptes liés non anonymes, certaines données enregistrées — notes, dossiers, tâches et réglages — peuvent être synchronisées via Supabase. En mode invité, elles peuvent rester principalement locales.'],
           ['7. Données financières','Opérations, articles de ticket, catégories, résumés mensuels et questions IA sont traités uniquement pour les fonctions Finances. NowWhat n’est ni une banque ni un service de paiement et n’exécute aucun paiement.'],
-          ['8. Prestataires','Les principaux prestataires peuvent inclure Supabase, OpenAI API et Google Gemini API pour le traitement IA ; Google pour la connexion facultative/services Android et Resend pour les e-mails de service et d’assistance.'],
+          ['8. Prestataires','Les principaux prestataires peuvent inclure Supabase, OpenAI API pour le traitement IA ; Google pour la connexion facultative/services Android et Resend pour les e-mails de service et d’assistance.'],
           ['9. Finalités et bases légales','Les données servent à fournir les fonctions, gérer les comptes, synchroniser les données compatibles, répondre à l’assistance, protéger le service et respecter les obligations légales. Un consentement explicite peut être demandé pour certaines catégories.'],
           ['10. Conservation et suppression','Les données ne sont conservées que le temps raisonnablement nécessaire. L’historique et le compte peuvent être supprimés dans l’app. Suppression externe : https://mynw.app/delete-account/.'],
           ['11. Vos droits','Selon la loi, vous pouvez disposer de droits d’accès, rectification, effacement, limitation, portabilité, opposition et retrait du consentement. Au Portugal, l’autorité est la CNPD. Contact : support@mynw.app.'],
@@ -395,7 +395,7 @@
           ['5. Almacenamiento local y documentos protegidos','Parte de la información permanece en el dispositivo. Documentos importantes está diseñado como un archivo local protegido. Los identificadores de notificaciones y rutas de audio son específicos del dispositivo.'],
           ['6. Sincronización cloud','En cuentas vinculadas no anónimas, datos compatibles como notas, carpetas, tareas y ajustes pueden sincronizarse mediante Supabase. En modo invitado, los datos pueden permanecer principalmente locales.'],
           ['7. Datos financieros','Operaciones, artículos de recibos, categorías, resúmenes mensuales y preguntas IA se tratan solo para ofrecer las funciones de Finanzas. NowWhat no es un banco ni un servicio de pagos y no ejecuta pagos.'],
-          ['8. Proveedores','Los proveedores principales pueden incluir Supabase, OpenAI API y Google Gemini API para el procesamiento de IA; Google para inicio de sesión opcional/servicios Android y Resend para correo de servicio y soporte.'],
+          ['8. Proveedores','Los proveedores principales pueden incluir Supabase, OpenAI API para el procesamiento de IA; Google para inicio de sesión opcional/servicios Android y Resend para correo de servicio y soporte.'],
           ['9. Finalidades y bases legales','Tratamos datos para ofrecer funciones, gestionar cuentas, sincronizar datos compatibles, atender soporte, proteger el servicio y cumplir obligaciones legales. Puede solicitarse consentimiento explícito para categorías especiales.'],
           ['10. Conservación y eliminación','Los datos se conservan solo durante el tiempo razonablemente necesario. Puedes eliminar historial o cuenta en la app. Eliminación externa: https://mynw.app/delete-account/.'],
           ['11. Tus derechos','Según la ley aplicable, puedes tener derechos de acceso, rectificación, supresión, limitación, portabilidad, oposición y retirada del consentimiento. En Portugal la autoridad es la CNPD. Contacto: support@mynw.app.'],
@@ -414,7 +414,7 @@
           ['5. Локальне зберігання та захищені документи','Частина даних залишається на пристрої. Важливі документи створені як захищений локальний архів. Локальні ідентифікатори сповіщень і шляхи до аудіофайлів залежать від пристрою.'],
           ['6. Хмарна синхронізація','Для прив’язаних неанонімних акаунтів підтримувані дані бібліотеки — нотатки, папки, завдання й налаштування — можуть синхронізуватися через Supabase. У гостьовому режимі дані можуть залишатися переважно локальними.'],
           ['7. Фінансові дані','Операції, позиції чеків, категорії, місячні підсумки й AI-запитання обробляються лише для функцій Фінансів. NowWhat не є банком або платіжним сервісом і не виконує платежі.'],
-          ['8. Постачальники','Основні постачальники можуть включати Supabase, OpenAI API і Google Gemini API для AI-обробки; Google для опційного входу/Android-сервісів і Resend для службової та підтримуючої пошти.'],
+          ['8. Постачальники','Основні постачальники можуть включати Supabase, OpenAI API для AI-обробки; Google для опційного входу/Android-сервісів і Resend для службової та підтримуючої пошти.'],
           ['9. Цілі та правові підстави','Дані обробляються для роботи функцій, керування акаунтом, синхронізації, підтримки, безпеки та виконання юридичних обов’язків. Для спеціальних категорій за потреби запитується явна згода.'],
           ['10. Зберігання та видалення','Дані зберігаються лише розумно необхідний час. Історію та акаунт можна видалити в застосунку. Зовнішнє видалення: https://mynw.app/delete-account/.'],
           ['11. Ваші права','Залежно від закону ви можете мати права на доступ, виправлення, видалення, обмеження, переносимість, заперечення та відкликання згоди. У Португалії наглядовий орган — CNPD. Контакт: support@mynw.app.'],
@@ -521,6 +521,8 @@
     if (raw.startsWith('fr')) return 'fr';
     if (raw.startsWith('es')) return 'es';
     if (raw.startsWith('uk')) return 'uk';
+    if (raw.startsWith('de')) return 'de';
+    if (raw.startsWith('it')) return 'it';
     return 'en';
   }
 
