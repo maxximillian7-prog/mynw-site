@@ -329,3 +329,18 @@ nav a:hover{color:var(--text)}
   .hero-visual{margin-top:10px}
   .hero-visual-image{border-radius:18px;box-shadow:0 16px 44px rgba(35,31,96,.14)}
 }
+
+
+/* Verified single hero banner loading state */
+.hero-visual{
+  min-height:0!important;
+  background:transparent!important;
+}
+.hero-visual-image{
+  aspect-ratio:900/506;
+  background:transparent!important;
+  opacity:0;
+  transition:opacity .18s ease;
+}
+.hero-visual-image.is-loaded{opacity:1}
+.hero-visual-image.hero-image-error{display:none}
