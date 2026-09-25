@@ -53,7 +53,7 @@
       delete_button:'Request account deletion', delete_what:'What is deleted', delete_what_b:'After a valid request is completed, the NowWhat account and associated server-side user data are deleted, except information that must be retained for legitimate legal, security, fraud-prevention or dispute-resolution reasons.',
       delete_local:'Data stored on your device', delete_local_b:'Some notes, protected files or settings may exist locally on the device. Uninstalling the app or clearing its storage may be necessary to remove device-local copies.',
       delete_sub:'Subscriptions', delete_sub_b:'If NowWhat offers a paid Google Play subscription, deleting the NowWhat account may not automatically cancel that Play subscription. Cancel it in Google Play as well.',
-      legal_updated:'Last updated: September 22, 2026', notfound_title:'Page not found — NowWhat', notfound_h1:'Page not found', notfound_body:'The page you requested does not exist.', notfound_button:'Go to homepage'
+      legal_updated:'Last updated: September 25, 2026', notfound_title:'Page not found — NowWhat', notfound_h1:'Page not found', notfound_body:'The page you requested does not exist.', notfound_button:'Go to homepage'
     },
     pt: {
       nav_features:'Funcionalidades', nav_manual:'Guia', nav_legal:'Informação legal', nav_docs:'Documentos e IA', nav_vault:'Documentos importantes', nav_saved:'Guardado e voz', nav_finance:'Finanças', nav_calendar:'Calendário e lembretes', nav_briefing:'Daily Briefing e Regras automáticas', nav_privacy:'Privacidade', nav_terms:'Termos', nav_support:'Suporte', nav_delete:'Eliminar conta', nav_get:'Obter NowWhat',
@@ -103,7 +103,7 @@
       delete_button:'Pedir eliminação da conta', delete_what:'O que é eliminado', delete_what_b:'Após validação, a conta NowWhat e os dados de servidor associados são eliminados, exceto informação que tenha de ser conservada por motivos legais, de segurança, prevenção de fraude ou litígio.',
       delete_local:'Dados guardados no dispositivo', delete_local_b:'Algumas notas, ficheiros protegidos ou definições podem existir localmente. Pode ser necessário desinstalar a aplicação ou limpar o armazenamento para remover cópias locais.',
       delete_sub:'Subscrições', delete_sub_b:'Se existir uma subscrição Google Play paga, eliminar a conta NowWhat pode não cancelar automaticamente essa subscrição. Cancele-a também no Google Play.',
-      legal_updated:'Última atualização: 22 de setembro de 2026', notfound_title:'Página não encontrada — NowWhat', notfound_h1:'Página não encontrada', notfound_body:'A página pedida não existe.', notfound_button:'Ir para a página inicial'
+      legal_updated:'Última atualização: 25 de setembro de 2026', notfound_title:'Página não encontrada — NowWhat', notfound_h1:'Página não encontrada', notfound_body:'A página pedida não existe.', notfound_button:'Ir para a página inicial'
     },
     ru: {
       nav_features:'Возможности', nav_manual:'Руководство', nav_legal:'Правовая информация', nav_docs:'Документы и AI', nav_vault:'Важные документы', nav_saved:'Сохранённое и голос', nav_finance:'Финансы', nav_calendar:'Календарь и напоминания', nav_briefing:'Daily Briefing и Автоправила', nav_privacy:'Конфиденциальность', nav_terms:'Условия', nav_support:'Поддержка', nav_delete:'Удалить аккаунт', nav_get:'Получить NowWhat',
@@ -153,7 +153,7 @@
       delete_button:'Запросить удаление аккаунта', delete_what:'Что будет удалено', delete_what_b:'После подтверждённого запроса аккаунт NowWhat и связанные серверные данные удаляются, кроме информации, которую необходимо хранить по законным причинам безопасности, предотвращения мошенничества или разрешения споров.',
       delete_local:'Данные на устройстве', delete_local_b:'Некоторые заметки, защищённые файлы или настройки могут храниться локально. Для удаления локальных копий может понадобиться очистить данные приложения или удалить его.',
       delete_sub:'Подписки', delete_sub_b:'Если появится платная подписка Google Play, удаление аккаунта NowWhat может не отменить её автоматически. Подписку нужно будет отменить и в Google Play.',
-      legal_updated:'Последнее обновление: 22 сентября 2026 г.', notfound_title:'Страница не найдена — NowWhat', notfound_h1:'Страница не найдена', notfound_body:'Запрошенной страницы не существует.', notfound_button:'На главную'
+      legal_updated:'Последнее обновление: 25 сентября 2026 г.', notfound_title:'Страница не найдена — NowWhat', notfound_h1:'Страница не найдена', notfound_body:'Запрошенной страницы не существует.', notfound_button:'На главную'
     },
     fr: {
       nav_features:'Fonctionnalités', nav_manual:'Guide', nav_legal:'Informations légales', nav_docs:'Documents et IA', nav_vault:'Documents importants', nav_saved:'Enregistré et voix', nav_finance:'Finances', nav_calendar:'Calendrier et rappels', nav_briefing:'Daily Briefing et règles automatiques', nav_privacy:'Confidentialité', nav_terms:'Conditions', nav_support:'Assistance', nav_delete:'Supprimer le compte', nav_get:'Obtenir NowWhat',
@@ -203,7 +203,7 @@
       delete_button:'Demander la suppression', delete_what:'Ce qui est supprimé', delete_what_b:'Après validation, le compte NowWhat et les données serveur associées sont supprimés, sauf conservation nécessaire pour des raisons légales, de sécurité, de prévention de fraude ou de litige.',
       delete_local:'Données sur l’appareil', delete_local_b:'Certaines notes, fichiers protégés ou réglages peuvent rester localement. Il peut être nécessaire de désinstaller l’app ou d’effacer son stockage.',
       delete_sub:'Abonnements', delete_sub_b:'Si NowWhat propose un abonnement Google Play payant, supprimer le compte peut ne pas annuler automatiquement cet abonnement. Annulez-le aussi dans Google Play.',
-      legal_updated:'Dernière mise à jour : 22 septembre 2026', notfound_title:'Page introuvable — NowWhat', notfound_h1:'Page introuvable', notfound_body:'La page demandée n’existe pas.', notfound_button:'Retour à l’accueil'
+      legal_updated:'Dernière mise à jour : 25 septembre 2026', notfound_title:'Page introuvable — NowWhat', notfound_h1:'Page introuvable', notfound_body:'La page demandée n’existe pas.', notfound_button:'Retour à l’accueil'
     },
     es: {
       nav_features:'Funciones', nav_manual:'Guía', nav_legal:'Información legal', nav_docs:'Documentos e IA', nav_vault:'Documentos importantes', nav_saved:'Guardado y voz', nav_finance:'Finanzas', nav_calendar:'Calendario y recordatorios', nav_briefing:'Daily Briefing y reglas automáticas', nav_privacy:'Privacidad', nav_terms:'Términos', nav_support:'Soporte', nav_delete:'Eliminar cuenta', nav_get:'Obtener NowWhat',
@@ -253,7 +253,7 @@
       delete_button:'Solicitar eliminación', delete_what:'Qué se elimina', delete_what_b:'Tras una solicitud válida, se eliminan la cuenta NowWhat y los datos de servidor asociados, salvo información que deba conservarse por razones legales, de seguridad, prevención de fraude o resolución de disputas.',
       delete_local:'Datos del dispositivo', delete_local_b:'Algunas notas, archivos protegidos o ajustes pueden quedar localmente. Puede ser necesario desinstalar la app o borrar su almacenamiento.',
       delete_sub:'Suscripciones', delete_sub_b:'Si NowWhat ofrece una suscripción de pago en Google Play, eliminar la cuenta puede no cancelarla automáticamente. Cancélala también en Google Play.',
-      legal_updated:'Última actualización: 22 de septiembre de 2026', notfound_title:'Página no encontrada — NowWhat', notfound_h1:'Página no encontrada', notfound_body:'La página solicitada no existe.', notfound_button:'Ir al inicio'
+      legal_updated:'Última actualización: 25 de septiembre de 2026', notfound_title:'Página no encontrada — NowWhat', notfound_h1:'Página no encontrada', notfound_body:'La página solicitada no existe.', notfound_button:'Ir al inicio'
     },
     uk: {
       nav_features:'Можливості', nav_manual:'Посібник', nav_legal:'Правова інформація', nav_docs:'Документи та AI', nav_vault:'Важливі документи', nav_saved:'Збережене та голос', nav_finance:'Фінанси', nav_calendar:'Календар і нагадування', nav_briefing:'Daily Briefing та Автоправила', nav_privacy:'Конфіденційність', nav_terms:'Умови', nav_support:'Підтримка', nav_delete:'Видалити акаунт', nav_get:'Отримати NowWhat',
@@ -303,7 +303,7 @@
       delete_button:'Запросити видалення акаунта', delete_what:'Що буде видалено', delete_what_b:'Після підтвердженого запиту акаунт NowWhat і пов’язані серверні дані видаляються, крім інформації, яку потрібно зберігати з юридичних причин, безпеки, протидії шахрайству або спорів.',
       delete_local:'Дані на пристрої', delete_local_b:'Деякі нотатки, захищені файли або налаштування можуть залишатися локально. Для видалення локальних копій може знадобитися очистити дані застосунку або видалити його.',
       delete_sub:'Підписки', delete_sub_b:'Якщо з’явиться платна підписка Google Play, видалення акаунта NowWhat може не скасувати її автоматично. Скасуйте її також у Google Play.',
-      legal_updated:'Останнє оновлення: 22 вересня 2026 р.', notfound_title:'Сторінку не знайдено — NowWhat', notfound_h1:'Сторінку не знайдено', notfound_body:'Запитаної сторінки не існує.', notfound_button:'На головну'
+      legal_updated:'Останнє оновлення: 25 вересня 2026 р.', notfound_title:'Сторінку не знайдено — NowWhat', notfound_h1:'Сторінку не знайдено', notfound_body:'Запитаної сторінки не існує.', notfound_button:'На головну'
     }
   };
 
@@ -364,7 +364,7 @@
     delete_button:"Kontolöschung anfragen", delete_what:"Was gelöscht wird", delete_what_b:"Nach Abschluss einer gültigen Anfrage werden das NowWhat-Konto und zugehörige Serverdaten gelöscht, außer Daten, die aus legitimen rechtlichen, Sicherheits-, Betrugspräventions- oder Streitbeilegungsgründen aufbewahrt werden müssen.",
     delete_local:"Daten auf deinem Gerät", delete_local_b:"Einige Notizen, geschützte Dateien oder Einstellungen können lokal auf dem Gerät liegen. Zur Entfernung lokaler Kopien kann Deinstallation oder Löschen des App-Speichers nötig sein.",
     delete_sub:"Abonnements", delete_sub_b:"Falls NowWhat ein kostenpflichtiges Google-Play-Abo anbietet, beendet die Kontolöschung dieses möglicherweise nicht automatisch. Kündige es zusätzlich in Google Play.",
-    legal_updated:"Zuletzt aktualisiert: 24. September 2026", notfound_title:"Seite nicht gefunden — NowWhat", notfound_h1:"Seite nicht gefunden", notfound_body:"Die angeforderte Seite existiert nicht.", notfound_button:"Zur Startseite"
+    legal_updated:"Zuletzt aktualisiert: 25. September 2026", notfound_title:"Seite nicht gefunden — NowWhat", notfound_h1:"Seite nicht gefunden", notfound_body:"Die angeforderte Seite existiert nicht.", notfound_button:"Zur Startseite"
   };
 
 
@@ -424,7 +424,7 @@
     delete_button:"Richiedi eliminazione account", delete_what:"Cosa viene eliminato", delete_what_b:"Dopo il completamento di una richiesta valida, l'account NowWhat e i dati utente lato server associati vengono eliminati, salvo informazioni da conservare per motivi legali, di sicurezza, prevenzione frodi o controversie.",
     delete_local:"Dati salvati sul dispositivo", delete_local_b:"Alcune note, file protetti o impostazioni possono esistere localmente. Per rimuovere copie locali potrebbe essere necessario disinstallare l'app o cancellarne i dati.",
     delete_sub:"Abbonamenti", delete_sub_b:"Se NowWhat offrirà un abbonamento Google Play a pagamento, eliminare l'account potrebbe non annullarlo automaticamente. Annullalo anche in Google Play.",
-    legal_updated:"Ultimo aggiornamento: 24 settembre 2026", notfound_title:"Pagina non trovata — NowWhat", notfound_h1:"Pagina non trovata", notfound_body:"La pagina richiesta non esiste.", notfound_button:"Vai alla home"
+    legal_updated:"Ultimo aggiornamento: 25 settembre 2026", notfound_title:"Pagina non trovata — NowWhat", notfound_h1:"Pagina non trovata", notfound_body:"La pagina richiesta non esiste.", notfound_button:"Vai alla home"
   };
 
   const LEGAL = {
@@ -709,6 +709,71 @@
       ["12. Contatti","Domande su questi Termini: support@mynw.app."]
     ]
   };
+
+  // Baseline 3 legal addendum: Family Space, optional push, calendar import
+  // and privacy-preserving AI reliability telemetry.
+  const BASELINE3_LEGAL = {
+    en: {
+      privacy: [
+        ["15. Family Space and push notifications","Content you place in Family Space is stored in Supabase and is visible to invited members of that Family Space. Member profiles may include a display name and chosen photo/avatar. Reporting and blocking controls are available; reports are stored separately for review and are not shown to other members. Family push notifications are off by default. If you enable them, Firebase Cloud Messaging is initialized and an FCM device token, platform, locale and last-seen time are stored to deliver requested notifications."],
+        ["16. Calendar import and technical telemetry","Calendar import runs only when you request it and grant Android permission. Imported events may be stored in the NowWhat library and synchronized for a linked account. AI reliability telemetry stores technical fields such as function, provider/model, success, latency, token counts and a short error code, but not prompts, document text, filenames, email addresses or user IDs."]
+      ],
+      terms: ["13. Family user-generated content","Family Space is for sharing content between invited adult users. Do not post illegal, threatening, abusive, fraudulent or spam content, material that violates another person's rights or privacy, or content you are not entitled to share. Use the built-in Report and Block controls if another member violates these rules. NowWhat may restrict or remove content or access where reasonably necessary for safety, legal compliance or enforcement of these Terms."]
+    },
+    pt: {
+      privacy: [
+        ["15. Espaço familiar e notificações push","O conteúdo colocado no Espaço familiar é guardado no Supabase e fica visível aos membros convidados desse espaço. Os perfis podem incluir nome apresentado e fotografia/avatar escolhido. Existem controlos de denúncia e bloqueio; as denúncias são guardadas separadamente para análise e não são mostradas aos outros membros. As notificações push da Família estão desativadas por defeito. Se as ativar, o Firebase Cloud Messaging é inicializado e são guardados token FCM, plataforma, idioma e hora da última atualização para entregar as notificações pedidas."],
+        ["16. Importação de calendário e telemetria técnica","A importação do calendário só é executada quando a solicita e concede permissão Android. Os eventos importados podem ser guardados na biblioteca NowWhat e sincronizados numa conta associada. A telemetria de fiabilidade da IA guarda função, fornecedor/modelo, sucesso, latência, contagens de tokens e código curto de erro, mas não prompts, texto de documentos, nomes de ficheiros, e-mail nem ID de utilizador."]
+      ],
+      terms: ["13. Conteúdo criado por utilizadores na Família","O Espaço familiar destina-se à partilha de conteúdo entre utilizadores adultos convidados. Não publique conteúdo ilegal, ameaçador, abusivo, fraudulento ou spam, conteúdo que viole direitos ou privacidade de terceiros, nem material que não tenha direito de partilhar. Utilize os controlos Denunciar e Bloquear se outro membro violar estas regras. O NowWhat pode restringir ou remover conteúdo ou acesso quando razoavelmente necessário para segurança, cumprimento legal ou aplicação destes Termos."]
+    },
+    ru: {
+      privacy: [
+        ["15. Семейное пространство и push-уведомления","Контент, который вы помещаете в Family Space, хранится в Supabase и виден приглашённым участникам этого пространства. Профиль может содержать отображаемое имя и выбранное фото/аватар. Доступны жалобы и блокировка; жалобы хранятся отдельно для проверки и не показываются другим участникам. Семейные push-уведомления выключены по умолчанию. Если вы их включаете, инициализируется Firebase Cloud Messaging и сохраняются FCM-токен устройства, платформа, язык и время последнего обновления для доставки уведомлений."],
+        ["16. Импорт календаря и техническая телеметрия","Импорт календаря запускается только по вашему запросу и после разрешения Android. Импортированные события могут храниться в библиотеке NowWhat и синхронизироваться для привязанного аккаунта. Телеметрия надёжности AI хранит функцию, поставщика/модель, успешность, задержку, количество токенов и краткий код ошибки, но не prompt, текст документа, имя файла, e-mail или user ID."]
+      ],
+      terms: ["13. Семейный пользовательский контент","Family Space предназначен для обмена контентом между приглашёнными взрослыми пользователями. Нельзя публиковать незаконный, угрожающий, оскорбительный, мошеннический или спам-контент, материалы, нарушающие чужие права или конфиденциальность, либо контент, которым вы не вправе делиться. Используйте встроенные функции «Пожаловаться» и «Заблокировать». NowWhat может ограничить или удалить контент или доступ, когда это разумно необходимо для безопасности, соблюдения закона или этих Условий."]
+    },
+    fr: {
+      privacy: [
+        ["15. Espace familial et notifications push","Le contenu placé dans l’Espace familial est stocké dans Supabase et visible par les membres invités. Les profils peuvent inclure un nom affiché et une photo/un avatar choisi. Des contrôles de signalement et de blocage sont disponibles ; les signalements sont conservés séparément pour examen. Les notifications push Famille sont désactivées par défaut. Si vous les activez, Firebase Cloud Messaging est initialisé et un jeton FCM, la plateforme, la langue et l’heure de dernière mise à jour sont stockés pour livrer les notifications demandées."],
+        ["16. Importation du calendrier et télémétrie technique","L’importation du calendrier ne s’exécute que sur votre demande et après autorisation Android. Les événements importés peuvent être stockés dans la bibliothèque NowWhat et synchronisés pour un compte lié. La télémétrie de fiabilité IA conserve fonction, fournisseur/modèle, succès, latence, nombre de jetons et code d’erreur court, mais pas les prompts, le texte des documents, noms de fichiers, e-mails ou identifiants utilisateur."]
+      ],
+      terms: ["13. Contenu familial créé par les utilisateurs","L’Espace familial sert au partage entre utilisateurs adultes invités. Ne publiez pas de contenu illégal, menaçant, abusif, frauduleux ou indésirable, ni de contenu portant atteinte aux droits ou à la vie privée d’autrui ou que vous n’avez pas le droit de partager. Utilisez Signaler et Bloquer en cas de violation. NowWhat peut restreindre ou supprimer du contenu ou l’accès lorsque cela est raisonnablement nécessaire pour la sécurité, la loi ou l’application de ces Conditions."]
+    },
+    es: {
+      privacy: [
+        ["15. Espacio familiar y notificaciones push","El contenido que colocas en el Espacio familiar se guarda en Supabase y es visible para los miembros invitados. Los perfiles pueden incluir nombre visible y foto/avatar elegido. Hay controles de denuncia y bloqueo; las denuncias se guardan por separado para revisión. Las notificaciones push de Familia están desactivadas por defecto. Si las activas, se inicializa Firebase Cloud Messaging y se guarda un token FCM, plataforma, idioma y hora de última actualización para entregar las notificaciones solicitadas."],
+        ["16. Importación de calendario y telemetría técnica","La importación del calendario solo se ejecuta cuando la solicitas y con permiso Android. Los eventos importados pueden guardarse en la biblioteca NowWhat y sincronizarse para una cuenta vinculada. La telemetría de fiabilidad de IA guarda función, proveedor/modelo, éxito, latencia, recuentos de tokens y un código de error breve, pero no prompts, texto de documentos, nombres de archivo, e-mail ni ID de usuario."]
+      ],
+      terms: ["13. Contenido familiar generado por usuarios","El Espacio familiar permite compartir contenido entre usuarios adultos invitados. No publiques contenido ilegal, amenazante, abusivo, fraudulento o spam, material que vulnere derechos o privacidad de terceros, ni contenido que no tengas derecho a compartir. Usa Denunciar y Bloquear si otro miembro incumple estas reglas. NowWhat puede restringir o eliminar contenido o acceso cuando sea razonablemente necesario por seguridad, cumplimiento legal o aplicación de estos Términos."]
+    },
+    uk: {
+      privacy: [
+        ["15. Сімейний простір і push-сповіщення","Контент, який ви додаєте до Сімейного простору, зберігається в Supabase і видимий запрошеним учасникам. Профіль може містити відображуване ім’я та вибране фото/аватар. Доступні скарги й блокування; скарги зберігаються окремо для перевірки. Сімейні push-сповіщення вимкнені за замовчуванням. Якщо ви їх увімкнете, ініціалізується Firebase Cloud Messaging і зберігаються FCM-токен, платформа, мова та час останнього оновлення для доставки сповіщень."],
+        ["16. Імпорт календаря і технічна телеметрія","Імпорт календаря запускається лише на ваш запит і після дозволу Android. Імпортовані події можуть зберігатися в бібліотеці NowWhat і синхронізуватися для прив’язаного акаунта. Телеметрія надійності AI зберігає функцію, постачальника/модель, успішність, затримку, кількість токенів і короткий код помилки, але не prompts, текст документів, назви файлів, e-mail або ID користувача."]
+      ],
+      terms: ["13. Сімейний користувацький контент","Сімейний простір призначений для обміну контентом між запрошеними повнолітніми користувачами. Заборонено незаконний, погрозливий, образливий, шахрайський або спам-контент, матеріали, що порушують права чи приватність інших, або контент, яким ви не маєте права ділитися. Використовуйте «Поскаржитися» та «Заблокувати». NowWhat може обмежити або видалити контент чи доступ, коли це обґрунтовано потрібно для безпеки, дотримання закону або цих Умов."]
+    },
+    de: {
+      privacy: [
+        ["15. Familienbereich und Push-Benachrichtigungen","Inhalte im Familienbereich werden in Supabase gespeichert und sind für eingeladene Mitglieder sichtbar. Profile können Anzeigename und ausgewähltes Foto/Avatar enthalten. Melde- und Blockierfunktionen stehen zur Verfügung; Meldungen werden getrennt zur Prüfung gespeichert. Familien-Push ist standardmäßig deaktiviert. Nach Aktivierung wird Firebase Cloud Messaging initialisiert und FCM-Token, Plattform, Sprache und letzter Aktualisierungszeitpunkt werden zur Zustellung gespeichert."],
+        ["16. Kalenderimport und technische Telemetrie","Der Kalenderimport läuft nur auf deine Anfrage und nach Android-Berechtigung. Importierte Termine können in der NowWhat-Bibliothek gespeichert und bei einem verknüpften Konto synchronisiert werden. AI-Zuverlässigkeitstelemetrie speichert Funktion, Anbieter/Modell, Erfolg, Latenz, Tokenzahlen und kurzen Fehlercode, jedoch keine Prompts, Dokumenttexte, Dateinamen, E-Mail-Adressen oder Benutzer-IDs."]
+      ],
+      terms: ["13. Nutzergenerierte Inhalte im Familienbereich","Der Familienbereich dient dem Austausch zwischen eingeladenen erwachsenen Nutzern. Veröffentliche keine illegalen, bedrohlichen, beleidigenden, betrügerischen oder Spam-Inhalte, keine Inhalte, die Rechte oder Privatsphäre anderer verletzen, und nichts, das du nicht teilen darfst. Nutze Melden und Blockieren bei Verstößen. NowWhat kann Inhalte oder Zugriff einschränken oder entfernen, wenn dies für Sicherheit, Rechtsbefolgung oder Durchsetzung dieser Bedingungen angemessen erforderlich ist."]
+    },
+    it: {
+      privacy: [
+        ["15. Spazio famiglia e notifiche push","I contenuti inseriti nello Spazio famiglia sono archiviati in Supabase e visibili ai membri invitati. I profili possono includere nome visualizzato e foto/avatar scelto. Sono disponibili segnalazione e blocco; le segnalazioni sono conservate separatamente per la revisione. Le notifiche push Famiglia sono disattivate per impostazione predefinita. Se le attivi, viene inizializzato Firebase Cloud Messaging e vengono salvati token FCM, piattaforma, lingua e ultimo aggiornamento per consegnare le notifiche richieste."],
+        ["16. Importazione calendario e telemetria tecnica","L’importazione del calendario viene eseguita solo su tua richiesta e dopo il permesso Android. Gli eventi importati possono essere salvati nella libreria NowWhat e sincronizzati per un account collegato. La telemetria di affidabilità AI salva funzione, fornitore/modello, successo, latenza, conteggi token e breve codice errore, ma non prompt, testo dei documenti, nomi file, e-mail o ID utente."]
+      ],
+      terms: ["13. Contenuti familiari generati dagli utenti","Lo Spazio famiglia consente la condivisione tra utenti adulti invitati. Non pubblicare contenuti illegali, minacciosi, offensivi, fraudolenti o spam, materiale che violi diritti o privacy altrui o contenuti che non hai diritto di condividere. Usa Segnala e Blocca in caso di violazione. NowWhat può limitare o rimuovere contenuti o accesso quando ragionevolmente necessario per sicurezza, conformità legale o applicazione dei Termini."]
+    }
+  };
+  Object.entries(BASELINE3_LEGAL).forEach(([code, addendum]) => {
+    if (LEGAL.privacy[code]) LEGAL.privacy[code].sections.push(...addendum.privacy);
+    if (LEGAL.terms[code]) LEGAL.terms[code].sections.push(addendum.terms);
+  });
 
   function getLang() {
     const saved = localStorage.getItem('nw_lang');
