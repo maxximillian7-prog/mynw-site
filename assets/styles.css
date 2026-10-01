@@ -357,9 +357,9 @@ nav a:hover{color:var(--text)}
 /* NowCook website brand logo: matches the logo used on the app home screen. */
 body[data-nc-page] .brand::before{
   content:"";
-  width:42px;
-  height:42px;
-  flex:0 0 42px;
+  width:84px;
+  height:84px;
+  flex:0 0 84px;
   display:block;
   background:url("/assets/nowcook-home-logo.webp") center/contain no-repeat;
 }
