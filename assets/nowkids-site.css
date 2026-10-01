@@ -4,8 +4,15 @@ body.nk-site{
 }
 body.nk-site .site-header{background:rgba(248,245,238,.91)}
 body.nk-site .brand-badge{
-  width:40px;height:40px;border-radius:14px;display:grid;place-items:center;
-  background:#fff1a8;border:1px solid #eadb85;font-weight:950;color:#2f4f73
+  width:58px;
+  height:58px;
+  flex:0 0 58px;
+  display:block;
+  overflow:hidden;
+  text-indent:-9999px;
+  border:0;
+  border-radius:0;
+  background:transparent url("/assets/nowkids-home-logo.png") center/contain no-repeat;
 }
 body.nk-site .legal{padding-top:44px}
 .nk-hero{max-width:920px;margin:0 auto 28px}
