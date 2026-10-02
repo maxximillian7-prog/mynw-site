@@ -180,7 +180,7 @@
           {
             "h": "Câmara e fotografias",
             "p": [
-              "Usadas quando o utilizador escolhe digitalizar material escolar, anexar imagem, definir avatar ou outra função de imagem. Não existe acesso contínuo à câmara."
+              "Usadas apenas para digitalização, imagem, avatar ou outra função de imagem escolhida pelo utilizador; não existe acesso contínuo à câmara."
             ]
           },
           {
@@ -192,7 +192,7 @@
           {
             "h": "Notificações",
             "p": [
-              "Usadas para lembretes, tarefas, eventos, preparação de estudo e outros alertas configurados. No Android, a entrega push funcional usa Firebase Cloud Messaging; o Firebase pode tratar um token de instalação/push e dados técnicos necessários à entrega."
+              "Usadas para lembretes, tarefas, eventos, preparação de estudo e outros alertas configurados. No Android, a entrega de notificações funcionais usa o Firebase Cloud Messaging; o Firebase pode tratar um token de instalação/notificação e os dados técnicos necessários à entrega."
             ]
           },
           {
@@ -216,19 +216,19 @@
           {
             "h": "Localização e ID de publicidade",
             "p": [
-              "A versão atual não necessita de localização precisa para as funções principais e não usa o ID de publicidade Android para perfilar crianças ou publicidade direcionada."
+              "A versão atual não requer localização precisa para as funções principais e não usa o identificador de publicidade do Android (AAID) para perfilar crianças ou publicidade direcionada."
             ]
           },
           {
             "h": "Compras e subscrições",
             "p": [
-              "Quando são usadas funcionalidades pagas, Google Play e RevenueCat tratam informação de compra, App User ID, produto/transação e estado de entitlement. O Family Plus fica associado a um adulto responsável pela faturação e é partilhado no Family Space; verificações no servidor ajudam a evitar uma segunda compra do mesmo plano familiar ativo. O NowKids não recebe os dados completos do cartão."
+              "Quando são usadas funcionalidades pagas, o Google Play e o RevenueCat tratam informação de compra, o identificador do utilizador da aplicação, dados de produto/transação e o estado de acesso. O Family Plus fica associado a um adulto responsável pela faturação e é partilhado no espaço familiar; verificações no servidor ajudam a evitar uma segunda compra do mesmo plano familiar ativo. O NowKids não recebe os dados completos do cartão."
             ]
           },
           {
-            "h": "Declaração Data Safety",
+            "h": "Declaração de segurança dos dados",
             "p": [
-              "As respostas na Play Console devem corresponder ao build de produção e SDKs efetivos. Esta página não substitui a declaração da Play Console."
+              "As respostas de segurança dos dados na Play Console têm de corresponder à versão de produção e às bibliotecas efetivamente usadas. Esta página explica o tratamento de dados ao utilizador, mas não substitui a declaração da Play Console."
             ]
           }
         ]
@@ -298,7 +298,7 @@
           {
             "h": "Камера и фотографии",
             "p": [
-              "Используются, когда пользователь сам выбирает сканирование школьного материала, добавление изображения, аватар или другую функцию с изображением. Постоянного доступа к камере нет."
+              "Используются только для явно выбранного сканирования, изображения, аватара или другой функции с изображением; постоянного доступа к камере нет."
             ]
           },
           {
@@ -310,7 +310,7 @@
           {
             "h": "Уведомления",
             "p": [
-              "Используются для напоминаний, задач, событий, подготовки к учёбе и других настроенных уведомлений. На Android функциональная push-доставка использует Firebase Cloud Messaging; Firebase может обрабатывать токен установки/push и технические данные, необходимые для доставки."
+              "Используются для напоминаний, задач, событий, подготовки к учёбе и других настроенных уведомлений. На Android доставка функциональных уведомлений использует Firebase Cloud Messaging; Firebase может обрабатывать токен установки/уведомлений и технические данные, необходимые для доставки."
             ]
           },
           {
@@ -334,19 +334,19 @@
           {
             "h": "Геолокация и рекламный ID",
             "p": [
-              "Текущая версия не требует точной геолокации для основных функций и не использует Android Advertising ID для профилирования детей или таргетированной рекламы."
+              "Текущая версия не требует точной геолокации для основных функций и не использует рекламный идентификатор Android (AAID) для профилирования детей или таргетированной рекламы."
             ]
           },
           {
             "h": "Покупки и подписки",
             "p": [
-              "При использовании платных функций Google Play и RevenueCat обрабатывают информацию о покупке, App User ID, продукт/транзакцию и статус entitlement. Family Plus привязана к одному взрослому владельцу оплаты и распространяется через Family Space; серверная проверка помогает не предлагать другому взрослому повторную покупку уже активного семейного тарифа. NowKids не получает полные данные банковской карты."
+              "При использовании платных функций Google Play и RevenueCat обрабатывают информацию о покупке, идентификатор пользователя приложения, данные продукта/транзакции и статус доступа. Family Plus привязана к одному взрослому владельцу оплаты и распространяется на семейное пространство; серверная проверка помогает не предлагать другому взрослому повторную покупку уже активного семейного тарифа. NowKids не получает полные данные банковской карты."
             ]
           },
           {
-            "h": "Data Safety",
+            "h": "Безопасность данных",
             "p": [
-              "Ответы в Play Console должны соответствовать фактической production-сборке и используемым SDK. Эта страница объясняет данные пользователю, но не заменяет декларацию Play Console."
+              "Ответы раздела «Безопасность данных» в Play Console должны соответствовать фактической сборке для публикации и используемым библиотекам. Эта страница объясняет обработку данных пользователю, но не заменяет декларацию Play Console."
             ]
           }
         ]
@@ -416,7 +416,7 @@
           {
             "h": "Камера й фото",
             "p": [
-              "Для обраного користувачем сканування, зображення, аватара чи іншої функції. Постійного доступу немає."
+              "Використовуються лише для явно обраного сканування, зображення, аватара або іншої функції із зображенням; постійного доступу до камери немає."
             ]
           },
           {
@@ -428,7 +428,7 @@
           {
             "h": "Сповіщення",
             "p": [
-              "Використовуються для нагадувань, завдань, подій, підготовки до навчання та інших налаштованих сповіщень. На Android функціональна push-доставка використовує Firebase Cloud Messaging; Firebase може обробляти токен установки/push і технічні дані для доставки."
+              "Використовуються для нагадувань, завдань, подій, підготовки до навчання та інших налаштованих сповіщень. На Android доставку функціональних сповіщень забезпечує Firebase Cloud Messaging; Firebase може обробляти токен установки/сповіщень і технічні дані, потрібні для доставки."
             ]
           },
           {
@@ -452,19 +452,19 @@
           {
             "h": "Локація та рекламний ID",
             "p": [
-              "Поточна версія не потребує точної локації та не використовує Android advertising ID для профілювання дітей чи таргетованої реклами."
+              "Поточна версія не потребує точної геолокації для основних функцій і не використовує рекламний ідентифікатор Android (AAID) для профілювання дітей чи таргетованої реклами."
             ]
           },
           {
             "h": "Покупки та підписки",
             "p": [
-              "Під час використання платних функцій Google Play і RevenueCat обробляють інформацію про покупку, App User ID, продукт/транзакцію та статус entitlement. Family Plus пов’язаний з одним дорослим власником оплати й поширюється через Family Space; серверна перевірка допомагає уникнути повторної покупки активного сімейного плану іншим дорослим. NowKids не отримує повні дані картки."
+              "Під час використання платних функцій Google Play і RevenueCat обробляють інформацію про покупку, ідентифікатор користувача застосунку, дані продукту/транзакції та статус доступу. Family Plus пов’язаний з одним дорослим власником оплати й поширюється на сімейний простір; серверна перевірка допомагає уникнути повторної покупки активного сімейного плану іншим дорослим. NowKids не отримує повні дані картки."
             ]
           },
           {
-            "h": "Data Safety",
+            "h": "Безпека даних",
             "p": [
-              "Декларація Play Console має відповідати фактичному production build та SDK."
+              "Відповіді розділу «Безпека даних» у Play Console мають відповідати фактичній версії для публікації та використаним бібліотекам. Ця сторінка пояснює обробку даних користувачу, але не замінює декларацію Play Console."
             ]
           }
         ]
@@ -534,7 +534,7 @@
           {
             "h": "Kamera & Fotos",
             "p": [
-              "Für ausdrücklich gewählte Scan-, Bild-, Avatar- oder ähnliche Funktionen; kein dauerhafter Kamerazugriff."
+              "Für ausdrücklich gewählte Digitalisierungs-, Bild-, Avatar- oder ähnliche Funktionen; kein dauerhafter Kamerazugriff."
             ]
           },
           {
@@ -546,7 +546,7 @@
           {
             "h": "Benachrichtigungen",
             "p": [
-              "Für Erinnerungen, Aufgaben, Ereignisse, Lernvorbereitung und andere konfigurierte Hinweise. Unter Android nutzt die funktionale Push-Zustellung Firebase Cloud Messaging; Firebase kann dafür Installations-/Push-Token und notwendige technische Gerätedaten verarbeiten."
+              "Für Erinnerungen, Aufgaben, Ereignisse, Lernvorbereitung und andere konfigurierte Hinweise. Unter Android nutzt die funktionale Benachrichtigungszustellung Firebase Cloud Messaging; Firebase kann dafür Installations-/Benachrichtigungstoken und notwendige technische Gerätedaten verarbeiten."
             ]
           },
           {
@@ -570,19 +570,19 @@
           {
             "h": "Standort & Werbe-ID",
             "p": [
-              "Aktuell kein präziser Standort für Kernfunktionen und keine Android-Werbe-ID zur Kinderprofilierung oder zielgerichteten Werbung."
+              "Die aktuelle Version benötigt für die Kernfunktionen keinen genauen Standort und verwendet die Android-Werbekennung (AAID) nicht zur Profilbildung von Kindern oder für zielgerichtete Werbung."
             ]
           },
           {
             "h": "Käufe & Abonnements",
             "p": [
-              "Bei kostenpflichtigen Funktionen verarbeiten Google Play und RevenueCat Kaufdaten, App User ID, Produkt-/Transaktionsdaten und Entitlement-Status. Family Plus ist einem erwachsenen Abrechnungsinhaber zugeordnet und wird über den Family Space geteilt; serverseitige Prüfungen helfen, einen zweiten Kauf desselben aktiven Familienplans zu verhindern. NowKids erhält keine vollständigen Kartendaten."
+              "Bei kostenpflichtigen Funktionen verarbeiten Google Play und RevenueCat Kaufdaten, die App-Benutzerkennung, Produkt-/Transaktionsdaten und den Zugriffsstatus. Family Plus ist einem erwachsenen Abrechnungsinhaber zugeordnet und gilt für den Familienbereich; serverseitige Prüfungen helfen, einen zweiten Kauf desselben aktiven Familienplans zu verhindern. NowKids erhält keine vollständigen Kartendaten."
             ]
           },
           {
-            "h": "Data Safety",
+            "h": "Datensicherheit",
             "p": [
-              "Play-Console-Angaben müssen dem tatsächlichen Production-Build und seinen SDKs entsprechen."
+              "Die Angaben zur Datensicherheit in der Play Console müssen der tatsächlichen veröffentlichten Version und den eingebundenen Bibliotheken entsprechen. Diese Seite erläutert die Datenverarbeitung, ersetzt aber nicht die Erklärung in der Play Console."
             ]
           }
         ]
@@ -652,7 +652,7 @@
           {
             "h": "Fotocamera e foto",
             "p": [
-              "Per scansioni, immagini, avatar o funzioni scelte; nessun accesso continuo."
+              "Usate solo per digitalizzazione, immagine, avatar o altra funzione visiva scelta dall’utente; non c’è accesso continuo alla fotocamera."
             ]
           },
           {
@@ -664,7 +664,7 @@
           {
             "h": "Notifiche",
             "p": [
-              "Usate per promemoria, attività, eventi, preparazione allo studio e altri avvisi configurati. Su Android la consegna push funzionale usa Firebase Cloud Messaging; Firebase può trattare un token di installazione/push e dati tecnici necessari."
+              "Usate per promemoria, attività, eventi, preparazione allo studio e altri avvisi configurati. Su Android, la consegna delle notifiche funzionali usa Firebase Cloud Messaging; Firebase può trattare un token di installazione/notifica e i dati tecnici necessari."
             ]
           },
           {
@@ -688,19 +688,19 @@
           {
             "h": "Posizione e ID pubblicitario",
             "p": [
-              "La versione attuale non richiede posizione precisa né usa Android advertising ID per profilare minori o pubblicità mirata."
+              "La versione attuale non richiede la posizione precisa per le funzioni principali e non usa l’identificatore pubblicitario Android (AAID) per profilare minori o per pubblicità mirata."
             ]
           },
           {
             "h": "Acquisti e abbonamenti",
             "p": [
-              "Per le funzioni a pagamento Google Play e RevenueCat trattano dati di acquisto, App User ID, prodotto/transazione e stato entitlement. Family Plus è associato a un adulto titolare della fatturazione e condiviso nel Family Space; i controlli server aiutano a evitare un secondo acquisto dello stesso piano familiare attivo. NowKids non riceve i dati completi della carta."
+              "Per le funzioni a pagamento, Google Play e RevenueCat trattano dati di acquisto, l’identificatore utente dell’applicazione, dati di prodotto/transazione e lo stato di accesso. Family Plus è associato a un adulto titolare della fatturazione e si applica allo spazio familiare; i controlli sul server aiutano a evitare un secondo acquisto dello stesso piano familiare attivo. NowKids non riceve i dati completi della carta."
             ]
           },
           {
-            "h": "Data Safety",
+            "h": "Sicurezza dei dati",
             "p": [
-              "La dichiarazione Play Console deve corrispondere al build di produzione e agli SDK effettivi."
+              "Le risposte sulla sicurezza dei dati nella Play Console devono corrispondere alla versione di produzione e alle librerie effettivamente usate. Questa pagina spiega il trattamento dei dati all’utente, ma non sostituisce la dichiarazione della Play Console."
             ]
           }
         ]
@@ -770,7 +770,7 @@
           {
             "h": "Caméra et photos",
             "p": [
-              "Pour scan, image, avatar ou autre fonction choisie ; aucun accès continu."
+              "Utilisées uniquement pour une numérisation, une image, un avatar ou une autre fonction visuelle choisie par l’utilisateur ; aucun accès continu à l’appareil photo."
             ]
           },
           {
@@ -782,7 +782,7 @@
           {
             "h": "Notifications",
             "p": [
-              "Utilisées pour rappels, tâches, événements, préparation d’étude et autres alertes configurées. Sur Android, la livraison push fonctionnelle utilise Firebase Cloud Messaging; Firebase peut traiter un jeton d’installation/push et les données techniques nécessaires."
+              "Utilisées pour les rappels, tâches, événements, préparation des études et autres alertes configurées. Sur Android, la livraison des notifications fonctionnelles utilise Firebase Cloud Messaging ; Firebase peut traiter un jeton d’installation/de notification et les données techniques nécessaires."
             ]
           },
           {
@@ -806,19 +806,19 @@
           {
             "h": "Localisation et identifiant publicitaire",
             "p": [
-              "La version actuelle n’exige pas de localisation précise et n’utilise pas l’identifiant publicitaire Android pour profiler les enfants ou la publicité ciblée."
+              "La version actuelle n’exige pas de localisation précise pour les fonctions principales et n’utilise pas l’identifiant publicitaire Android (AAID) pour profiler les enfants ou pour la publicité ciblée."
             ]
           },
           {
             "h": "Achats et abonnements",
             "p": [
-              "Pour les fonctions payantes, Google Play et RevenueCat traitent les informations d’achat, App User ID, produit/transaction et statut d’entitlement. Family Plus est associé à un adulte responsable de la facturation et partagé dans le Family Space; des vérifications serveur aident à éviter un second achat du même plan familial actif. NowKids ne reçoit pas les données complètes de carte."
+              "Pour les fonctions payantes, Google Play et RevenueCat traitent les informations d’achat, l’identifiant utilisateur de l’application, les données de produit/transaction et le statut d’accès. Family Plus est associé à un adulte responsable de la facturation et s’applique à l’espace familial ; des vérifications côté serveur aident à éviter un second achat du même forfait familial actif. NowKids ne reçoit pas les données complètes de carte."
             ]
           },
           {
-            "h": "Data Safety",
+            "h": "Sécurité des données",
             "p": [
-              "La déclaration Play Console doit correspondre au build de production et aux SDK réellement utilisés."
+              "Les réponses relatives à la sécurité des données dans la Play Console doivent correspondre à la version de production et aux bibliothèques réellement utilisées. Cette page explique le traitement des données à l’utilisateur, mais ne remplace pas la déclaration de la Play Console."
             ]
           }
         ]
@@ -888,7 +888,7 @@
           {
             "h": "Cámara y fotos",
             "p": [
-              "Para escaneo, imágenes, avatar u otra función elegida; sin acceso continuo."
+              "Se usan solo para escanear, añadir una imagen, establecer un avatar u otra función visual elegida por el usuario; no hay acceso continuo a la cámara."
             ]
           },
           {
@@ -900,7 +900,7 @@
           {
             "h": "Notificaciones",
             "p": [
-              "Se usan para recordatorios, tareas, eventos, preparación de estudio y otras alertas configuradas. En Android, la entrega push funcional usa Firebase Cloud Messaging; Firebase puede tratar un token de instalación/push y datos técnicos necesarios."
+              "Se usan para recordatorios, tareas, eventos, preparación de estudio y otras alertas configuradas. En Android, la entrega de notificaciones funcionales usa Firebase Cloud Messaging; Firebase puede tratar un token de instalación/notificación y los datos técnicos necesarios."
             ]
           },
           {
@@ -924,19 +924,19 @@
           {
             "h": "Ubicación e ID publicitario",
             "p": [
-              "La versión actual no necesita ubicación precisa ni usa Android advertising ID para perfilar menores o publicidad dirigida."
+              "La versión actual no necesita ubicación precisa para las funciones principales y no usa el identificador publicitario de Android (AAID) para perfilar menores ni para publicidad dirigida."
             ]
           },
           {
             "h": "Compras y suscripciones",
             "p": [
-              "Para las funciones de pago, Google Play y RevenueCat tratan información de compra, App User ID, producto/transacción y estado de entitlement. Family Plus se asocia a un adulto responsable de facturación y se comparte en Family Space; las comprobaciones del servidor ayudan a evitar una segunda compra del mismo plan familiar activo. NowKids no recibe los datos completos de la tarjeta."
+              "Para las funciones de pago, Google Play y RevenueCat tratan información de compra, el identificador de usuario de la aplicación, datos de producto/transacción y el estado de acceso. Family Plus se asocia a un adulto responsable de facturación y se aplica al espacio familiar; las comprobaciones del servidor ayudan a evitar una segunda compra del mismo plan familiar activo. NowKids no recibe los datos completos de la tarjeta."
             ]
           },
           {
-            "h": "Data Safety",
+            "h": "Seguridad de los datos",
             "p": [
-              "La declaración de Play Console debe coincidir con el build de producción y sus SDK reales."
+              "Las respuestas de seguridad de los datos en Play Console deben coincidir con la versión de producción y las bibliotecas realmente utilizadas. Esta página explica el tratamiento de datos al usuario, pero no sustituye la declaración de Play Console."
             ]
           }
         ]
