@@ -92,7 +92,7 @@
         {
           "h": "7. Publicidad y ubicación",
           "p": [
-            "La versión actual no usa SDK publicitarios, publicidad dirigida ni ubicación precisa para funciones principales. No usa el identificador publicitario Android para perfilar menores."
+            "La versión actual de NowKids no usa SDK publicitarios, datos personales para publicidad dirigida ni ubicación precisa para sus funciones principales. NowKids no solicita, accede ni transmite el Android Advertising ID (AAID) ni identificadores publicitarios de Android AdServices."
           ]
         },
         {
