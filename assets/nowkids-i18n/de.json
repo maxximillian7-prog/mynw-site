@@ -85,7 +85,8 @@
             "OpenAI — KI-Verarbeitung für NowStudy und zugehörige Funktionen.",
             "Google — Google-Anmeldung, wenn ausgewählt, Android-/Google-Play-Vertrieb, Abrechnung kostenpflichtiger Funktionen über Google Play und vom Nutzer ausgewählte Plattformdienste.",
             "RevenueCat — Prüfung von Abonnements und Käufen, Benutzerkennung der Anwendung, Kaufinformationen und Zugriffsstatus zum Freischalten kostenpflichtiger Funktionen.",
-            "Firebase Cloud Messaging — Zustellung funktionaler Android-Benachrichtigungen über eine technische Installationskennung."
+            "Firebase Cloud Messaging — Zustellung funktionaler Android-Benachrichtigungen über eine technische Installationskennung.",
+            "Open Library und, sofern eingerichtet, Google Books — vom Nutzer gestartete Buchsuchen nach Titel, Autor oder ISBN. Die Kataloganfrage enthält weder die NowKids-Konto-ID noch E-Mail-Adresse, Familien-ID oder Kinderprofildaten."
           ]
         },
         {
