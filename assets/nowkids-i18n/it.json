@@ -569,19 +569,19 @@
         {
           "h": "Famiglia e account bambino",
           "p": [
-            "Gli adulti gestiscono il spazio familiare. L’accesso del bambino è collegato a un profilo autorizzato. Il bambino non vede i controlli di eliminazione account/dati."
+            "Gli adulti gestiscono lo spazio familiare. L’accesso del bambino è collegato a un profilo autorizzato. Il bambino non vede i controlli di eliminazione account/dati."
           ]
         },
         {
           "h": "NowStudy e scansioni",
           "p": [
-            "Una scansione scolastica viene analizzata una volta quando possibile. Le domande successive riusano l’estrazione salvata. Piani, scheda di studio e brevi test possono essere riaperti."
+            "Una scansione scolastica viene analizzata una volta quando possibile. Le domande successive riusano l’estrazione salvata. Piani, schede di studio e brevi test possono essere riaperti."
           ]
         },
         {
           "h": "Materiali salvati",
           "p": [
-            "Piani, brevi test, scheda di studio e sessioni concluse sono salvati per materia. Un errore in una categoria non deve nascondere le altre."
+            "Piani, brevi test, schede di studio e sessioni concluse sono salvati per materia. Un errore in una categoria non deve nascondere le altre."
           ]
         },
         {
@@ -593,13 +593,13 @@
         {
           "h": "Family Plus",
           "p": [
-            "Un adulto è titolare della fatturazione. Family Plus attivo vale per il spazio familiare; i bambini non acquistano."
+            "Un adulto è titolare della fatturazione. Family Plus attivo vale per lo spazio familiare; i bambini non acquistano."
           ]
         },
         {
           "h": "Privacy e IA",
           "p": [
-            "NowKids registra dati tecnici IA per costi, affidabilità e cache senza salvare i richieste del bambino in registro tecnico."
+            "NowKids registra dati tecnici IA per costi, affidabilità e cache senza salvare le richieste del bambino nel registro tecnico."
           ]
         },
         {
