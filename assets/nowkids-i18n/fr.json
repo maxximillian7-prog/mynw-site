@@ -197,7 +197,7 @@
         {
           "h": "8. Paiement",
           "p": [
-            "Les fonctions payantes NowKids sont achetées via Google Play. Family Plus est prévu pour un seul adulte responsable de la facturation et l’droit d’accès actif s’applique au espace familial; les comptes enfants n’achètent ni ne gèrent l’abonnement. Avant l’achat, NowKids vérifie le droit familial côté serveur en plus de l’état du client RevenueCat afin de réduire les achats familiaux en double. Prix, période, essai et renouvellement automatique sont affichés avant l’achat. Supprimer le compte ou l’application n’annule pas automatiquement l’abonnement Google Play."
+            "Les fonctions payantes NowKids sont achetées via Google Play. Family Plus est prévu pour un seul adulte responsable de la facturation et le droit d’accès actif s’applique à l’espace familial ; les comptes enfants n’achètent ni ne gèrent l’abonnement. Avant l’achat, NowKids vérifie le droit familial côté serveur en plus de l’état du client RevenueCat afin de réduire les achats familiaux en double. Prix, période, essai et renouvellement automatique sont affichés avant l’achat. Supprimer le compte ou l’application n’annule pas automatiquement l’abonnement Google Play."
           ]
         },
         {
@@ -289,7 +289,7 @@
         {
           "h": "10. Facturation Family Plus",
           "p": [
-            "Family Plus est acheté par un seul adulte responsable de la facturation et partagé avec le espace familial actif. Les comptes enfants n’achètent ni ne gèrent l’abonnement. Les autres adultes voient qui gère le plan au lieu d’être invités à acheter à nouveau. Le droit familial est aussi vérifié côté serveur."
+            "Family Plus est acheté par un seul adulte responsable de la facturation et partagé avec l’espace familial actif. Les comptes enfants n’achètent ni ne gèrent l’abonnement. Les autres adultes voient qui gère le plan au lieu d’être invités à acheter à nouveau. Le droit familial est aussi vérifié côté serveur."
           ]
         },
         {
@@ -357,7 +357,7 @@
         {
           "h": "8. Réutiliser plutôt que régénérer",
           "p": [
-            "Lorsque possible, NowStudy réutilise l’extraction enregistrée d’un numérisation au lieu de renvoyer la même image à chaque question. Plans, cartes et mini-tests sont enregistrés et peuvent être rouverts; demander explicitement une nouvelle version peut déclencher un nouvel appel IA."
+            "Lorsque possible, NowStudy réutilise l’extraction enregistrée d’une numérisation au lieu de renvoyer la même image à chaque question. Plans, cartes et mini-tests sont enregistrés et peuvent être rouverts; demander explicitement une nouvelle version peut déclencher un nouvel appel IA."
           ]
         }
       ]
