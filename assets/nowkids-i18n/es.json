@@ -52,7 +52,7 @@
             "Contexto IA: solicitud, materia/tema, historial y datos relevantes del menor como nombre, edad derivada, escuela, curso y lengua; imagen solo si se selecciona esa función.",
             "Datos operativos: contadores, modelo/tokens IA, registros de error/seguridad e información técnica.",
             "Permisos opcionales: notificaciones, calendario, cámara/fotos, micrófono, autenticación local y ajustes.",
-            "Datos de suscripción y compra: identificadores de producto, estado de compra/renovación, estado de entitlement, metadatos de transacción/recibo y un App User ID usado para validar el acceso. NowKids no recibe los datos completos de la tarjeta de pago de Google Play o RevenueCat."
+            "Datos de suscripción y compra: identificadores de producto, estado de compra/renovación, estado de derecho de acceso, metadatos de transacción/recibo y un identificador de usuario de la aplicación usado para validar el acceso. NowKids no recibe los datos completos de la tarjeta de pago de Google Play o RevenueCat."
           ]
         },
         {
@@ -62,7 +62,8 @@
             "Planificación escolar, recordatorios, tareas, calendario, documentos y colaboración.",
             "NowStudy: explicaciones, aprendizaje guiado, pruebas, tarjetas, revisión, preparación y resúmenes.",
             "Seguridad, prevención de abuso, diagnóstico y soporte.",
-            "Validar compras, restaurar el acceso y determinar el entitlement a funciones de pago de NowKids."
+            "Responder a solicitudes de soporte, privacidad, seguridad infantil y denuncias de contenido.",
+            "Validar compras, restaurar el acceso y determinar el derecho de acceso a funciones de pago de NowKids."
           ]
         },
         {
@@ -80,11 +81,11 @@
         {
           "h": "6. Proveedores",
           "items": [
-            "Supabase — autenticación, base de datos, almacenamiento, realtime y funciones servidor.",
-            "OpenAI — inferencia IA.",
+            "Supabase — autenticación, base de datos, almacenamiento, sincronización en tiempo real y funciones del servidor.",
+            "OpenAI — procesamiento mediante IA para NowStudy y funciones relacionadas.",
             "Google — inicio de sesión con Google cuando se elige, distribución mediante Android/Google Play, facturación de las funciones de pago a través de Google Play y servicios de plataforma seleccionados por el usuario.",
-            "RevenueCat — validación de suscripciones/compras, App User ID, CustomerInfo y estado de entitlements usados para desbloquear funciones de pago.",
-            "Firebase Cloud Messaging — entrega de notificaciones push funcionales de Android mediante el token de instalación/push de la app."
+            "RevenueCat — validación de suscripciones y compras, identificador de usuario de la aplicación, información de compra y estado de acceso para desbloquear funciones de pago.",
+            "Firebase Cloud Messaging — entrega de notificaciones funcionales de Android mediante un identificador técnico de instalación."
           ]
         },
         {
@@ -126,20 +127,20 @@
         {
           "h": "13. Suscripciones y RevenueCat",
           "p": [
-            "Las funciones de pago de NowKids se compran a través de Google Play. RevenueCat actúa como proveedor de gestión de suscripciones y procesa el App User ID autenticado de NowKids (un UUID de Supabase), información del producto y la transacción, estado de compra/renovación/reembolso, token de compra o metadatos del recibo y estado del entitlement para validar y restaurar el acceso.",
-            "NowKids no envía a RevenueCat el nombre, correo electrónico ni número de teléfono como atributos del cliente. NowKids no solicita ni transmite a RevenueCat el Android Advertising ID (AAID) y no activa integraciones de RevenueCat para atribución publicitaria. Los datos completos de la tarjeta son procesados por Google Play y NowKids no los recibe."
+            "Las funciones de pago de NowKids se compran a través de Google Play. RevenueCat actúa como proveedor de gestión de suscripciones y procesa el identificador de usuario de la aplicación autenticado de NowKids (un UUID de Supabase), información del producto y la transacción, estado de compra/renovación/reembolso, token de compra o metadatos del recibo y estado del derecho de acceso para validar y restaurar el acceso.",
+            "NowKids no envía a RevenueCat el nombre, correo electrónico ni número de teléfono como atributos del cliente. NowKids no solicita ni transmite a RevenueCat el identificador publicitario de Android (AAID) y no activa integraciones de RevenueCat para atribución publicitaria. Los datos completos de la tarjeta son procesados por Google Play y NowKids no los recibe."
           ]
         },
         {
           "h": "14. Notificaciones funcionales y Firebase",
           "p": [
-            "Cuando las notificaciones de Android están activadas, NowKids usa Firebase Cloud Messaging para notificaciones funcionales de familia, tareas, estudio y recordatorios. Firebase puede tratar un token de instalación/push y datos técnicos del dispositivo necesarios para la entrega. NowKids no usa estos identificadores para publicidad ni atribución publicitaria."
+            "Cuando las notificaciones de Android están activadas, NowKids usa Firebase Cloud Messaging para notificaciones funcionales de familia, tareas, estudio y recordatorios. Firebase puede tratar un identificador técnico de instalación y entrega y datos técnicos del dispositivo necesarios para la entrega. NowKids no usa estos identificadores para publicidad ni atribución publicitaria."
           ]
         },
         {
           "h": "15. Reutilización de IA, caché y datos técnicos",
           "p": [
-            "Para reducir procesamiento IA repetido, NowKids puede conservar temporalmente una extracción o resultado generado asociado a la familia/menor. El mismo escaneo escolar se reconoce una vez cuando es posible; la extracción puede mantenerse hasta 30 días y otros resultados IA hasta 14 días. Los planes, tarjetas y mini-tests guardados permanecen hasta su eliminación. ai_usage contiene campos técnicos y no el contenido de los solicitudes del menor."
+            "Para reducir procesamiento IA repetido, NowKids puede conservar temporalmente una extracción o resultado generado asociado a la familia/menor. El mismo escaneo escolar se reconoce una vez cuando es posible; la extracción puede mantenerse hasta 30 días y otros resultados IA hasta 14 días. Los planes, tarjetas y mini-tests guardados permanecen hasta su eliminación. registro técnico contiene campos técnicos y no el contenido de los solicitudes del menor."
           ]
         }
       ]
@@ -196,7 +197,7 @@
         {
           "h": "8. Funciones de pago",
           "p": [
-            "Las funciones de pago de NowKids se compran mediante Google Play. Family Plus está pensado para un solo adulto responsable de facturación y el entitlement activo se aplica al espacio familiar; las cuentas infantiles no compran ni gestionan la suscripción. Antes de comprar, NowKids comprueba el entitlement familiar en el servidor además del estado del cliente RevenueCat para reducir compras duplicadas accidentales. Precio, periodo, prueba y renovación automática se muestran antes de la compra. Eliminar la cuenta o desinstalar la app no cancela por sí solo la suscripción de Google Play."
+            "Las funciones de pago de NowKids se compran mediante Google Play. Family Plus está pensado para un solo adulto responsable de facturación y el derecho de acceso activo se aplica al espacio familiar; las cuentas infantiles no compran ni gestionan la suscripción. Antes de comprar, NowKids comprueba el derecho de acceso familiar en el servidor además del estado del cliente RevenueCat para reducir compras duplicadas accidentales. Precio, periodo, prueba y renovación automática se muestran antes de la compra. Eliminar la cuenta o desinstalar la app no cancela por sí solo la suscripción de Google Play."
           ]
         },
         {
@@ -288,7 +289,7 @@
         {
           "h": "10. Facturación de Family Plus",
           "p": [
-            "Family Plus está pensado para que lo compre un solo adulto responsable de facturación y se comparta con el espacio familiar activo. Las cuentas infantiles no compran ni gestionan la suscripción. Otros adultos deben ver quién gestiona el plan en lugar de recibir una segunda invitación de compra. El entitlement familiar también se verifica en el servidor."
+            "Family Plus está pensado para que lo compre un solo adulto responsable de facturación y se comparta con el espacio familiar activo. Las cuentas infantiles no compran ni gestionan la suscripción. Otros adultos deben ver quién gestiona el plan en lugar de recibir una segunda invitación de compra. El derecho de acceso familiar también se verifica en el servidor."
           ]
         },
         {
@@ -338,7 +339,7 @@
         {
           "h": "5. Denuncia",
           "p": [
-            "Reporte una salida insegura con el control in-app cuando esté disponible y/o support@mynw.app."
+            "Reporte una salida insegura con el control integrado en la aplicación cuando esté disponible y/o support@mynw.app."
           ]
         },
         {
@@ -392,7 +393,7 @@
         {
           "h": "4. Denuncia",
           "p": [
-            "Use el reporte in-app cuando esté disponible o support@mynw.app."
+            "Use el reporte integrado en la aplicación cuando esté disponible o support@mynw.app."
           ]
         },
         {
@@ -532,13 +533,13 @@
         {
           "h": "IA",
           "p": [
-            "Salida insegura: reporte in-app cuando esté disponible y e-mail."
+            "Salida insegura: reporte integrado en la aplicación cuando esté disponible y e-mail."
           ]
         },
         {
           "h": "Comunidad",
           "p": [
-            "Contenido inadecuado: reporte in-app o e-mail."
+            "Contenido inadecuado: reporte integrado en la aplicación o e-mail."
           ]
         },
         {
@@ -598,7 +599,7 @@
         {
           "h": "Privacidad y IA",
           "p": [
-            "NowKids registra datos técnicos IA para costes, fiabilidad y caché sin guardar los solicitudes del menor en ai_usage."
+            "NowKids registra datos técnicos IA para costes, fiabilidad y caché sin guardar los solicitudes del menor en registro técnico."
           ]
         },
         {
