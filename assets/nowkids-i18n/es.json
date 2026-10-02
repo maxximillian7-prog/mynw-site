@@ -85,7 +85,8 @@
             "OpenAI — procesamiento mediante IA para NowStudy y funciones relacionadas.",
             "Google — inicio de sesión con Google cuando se elige, distribución mediante Android/Google Play, facturación de las funciones de pago a través de Google Play y servicios de plataforma seleccionados por el usuario.",
             "RevenueCat — validación de suscripciones y compras, identificador de usuario de la aplicación, información de compra y estado de acceso para desbloquear funciones de pago.",
-            "Firebase Cloud Messaging — entrega de notificaciones funcionales de Android mediante un identificador técnico de instalación."
+            "Firebase Cloud Messaging — entrega de notificaciones funcionales de Android mediante un identificador técnico de instalación.",
+            "Open Library y, si está configurado, Google Books — búsquedas de libros iniciadas por el usuario por título, autor o ISBN. La solicitud al catálogo no incluye el identificador de la cuenta NowKids, el correo electrónico, el identificador familiar ni los datos del perfil del menor."
           ]
         },
         {
@@ -141,6 +142,12 @@
           "h": "15. Reutilización de IA, caché y datos técnicos",
           "p": [
             "Para reducir procesamiento IA repetido, NowKids puede conservar temporalmente una extracción o resultado generado asociado a la familia/menor. El mismo escaneo escolar se reconoce una vez cuando es posible; la extracción puede mantenerse hasta 30 días y otros resultados IA hasta 14 días. Los planes, tarjetas y mini-pruebas guardados permanecen hasta su eliminación. El registro técnico contiene campos técnicos y no el contenido de las solicitudes del menor."
+          ]
+        },
+        {
+          "h": "16. Búsquedas en el catálogo de libros",
+          "p": [
+            "Cuando el usuario inicia una búsqueda de libros, NowKids puede enviar el título, el autor, el ISBN y el idioma de catálogo introducidos a Open Library y, si está configurado, a Google Books. La solicitud pasa por una función de servidor protegida. NowKids no incluye el identificador de la cuenta, el correo electrónico, el identificador familiar, los datos del perfil del menor ni el token de autenticación en las consultas a los catálogos, y la función de catálogo no guarda los parámetros de búsqueda en la base de datos de NowKids."
           ]
         }
       ]
@@ -582,6 +589,12 @@
           "h": "Materiales guardados",
           "p": [
             "Planes, mini-pruebas, tarjetas y sesiones completadas se guardan por asignatura. Un error de una categoría no debe ocultar las demás."
+          ]
+        },
+        {
+          "h": "Libros y búsqueda en el catálogo",
+          "p": [
+            "Los libros pueden añadirse manualmente o buscarse por título, autor e ISBN. Las consultas pasan por una función de servidor protegida de NowKids y pueden usar Open Library y, si está configurado, Google Books."
           ]
         },
         {
