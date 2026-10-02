@@ -48,11 +48,11 @@
             "Eltern-/Sorgeberechtigtenkonto: Konto-ID, E-Mail, Anzeigename, Login-Anbieter, Sprache, Zeitzone und Einstellungen.",
             "Familie/Kind: Name, Familienrolle, Beziehungsbezeichnung, Geburtsdatum/Alter, Avatar, Schule, Klasse und Lernsprache.",
             "Schul- und Familiendaten: Fächer, Stundenplan, Hausaufgaben, Testvorbereitung, Lernpläne, Aktivitäten, Bücher, Termine, Erinnerungen, Packlisten, Aufgaben und Notizen.",
-            "Vom Nutzer bereitgestellte Dokumente, Fotos, Scans, Texte, Sprache/Audio, Transkripte und Dateien.",
+            "Vom Nutzer bereitgestellte Dokumente, Fotos, Digitalisierungen, Texte, Sprache/Audio, Transkripte und Dateien.",
             "KI-Kontext: Anfrage, Fach/Thema, Verlauf und relevante Profildaten des Kindes wie Name, berechnetes Alter, Schule, Klasse und Lernsprache; Bilder nur bei gewählter Bildfunktion.",
             "Betriebsdaten: Nutzungszähler, KI-Modell-/Token-Nutzung, Fehler-/Sicherheitsprotokolle und technische Daten.",
             "Optionale Berechtigungen: Benachrichtigungen, Kalender, Kamera/Fotos, Mikrofon, lokale Authentifizierung und lokale Einstellungen.",
-            "Abonnement- und Kaufdaten: Produktkennungen, Kauf-/Verlängerungsstatus, Entitlement-Status, Transaktions-/Belegmetadaten und eine App User ID zur Zugriffsprüfung. NowKids erhält keine vollständigen Zahlungskartendaten von Google Play oder RevenueCat."
+            "Abonnement- und Kaufdaten: Produktkennungen, Kauf-/Verlängerungsstatus, Zugriffsrecht-Status, Transaktions-/Belegmetadaten und eine Benutzerkennung der Anwendung zur Zugriffsprüfung. NowKids erhält keine vollständigen Zahlungskartendaten von Google Play oder RevenueCat."
           ]
         },
         {
@@ -62,6 +62,7 @@
             "Schulplanung, Erinnerungen, Aufgaben, Kalender, Dokumente und Familienzusammenarbeit.",
             "NowStudy-Erklärungen, geführtes Lernen, Tests, Karteikarten, Prüfung von Arbeiten, Testvorbereitung und Elternzusammenfassungen.",
             "Sicherheit, Missbrauchsprävention, Fehlerbehebung und Support.",
+            "Auf Anfragen zu Support, Datenschutz, Kindersicherheit und Inhaltsmeldungen reagieren.",
             "Käufe prüfen, Zugriff wiederherstellen und Berechtigungen für kostenpflichtige NowKids-Funktionen bestimmen."
           ]
         },
@@ -80,11 +81,11 @@
         {
           "h": "6. Dienstleister",
           "items": [
-            "Supabase — Authentifizierung, Datenbank, Storage, Realtime und Serverfunktionen.",
-            "OpenAI — KI-Inferenz.",
+            "Supabase — Authentifizierung, Datenbank, Speicher, Echtzeitsynchronisierung und Serverfunktionen.",
+            "OpenAI — KI-Verarbeitung für NowStudy und zugehörige Funktionen.",
             "Google — Google-Anmeldung, wenn ausgewählt, Android-/Google-Play-Vertrieb, Abrechnung kostenpflichtiger Funktionen über Google Play und vom Nutzer ausgewählte Plattformdienste.",
-            "RevenueCat — Prüfung von Abonnements/Käufen, App User ID, CustomerInfo und Entitlement-Status zum Freischalten kostenpflichtiger Funktionen.",
-            "Firebase Cloud Messaging — funktionale Android-Push-Zustellung mit Installations-/Push-Token der App."
+            "RevenueCat — Prüfung von Abonnements und Käufen, Benutzerkennung der Anwendung, Kaufinformationen und Zugriffsstatus zum Freischalten kostenpflichtiger Funktionen.",
+            "Firebase Cloud Messaging — Zustellung funktionaler Android-Benachrichtigungen über eine technische Installationskennung."
           ]
         },
         {
@@ -126,20 +127,20 @@
         {
           "h": "13. Abonnements und RevenueCat",
           "p": [
-            "Kostenpflichtige NowKids-Funktionen werden über Google Play gekauft. RevenueCat dient als Dienstleister für die Abonnementverwaltung und verarbeitet die authentifizierte NowKids App User ID (eine Supabase-UUID), Produkt- und Transaktionsinformationen, Kauf-/Verlängerungs-/Erstattungsstatus, Kauf-Token bzw. Belegmetadaten und den Entitlement-Status, damit der Zugriff validiert und wiederhergestellt werden kann.",
+            "Kostenpflichtige NowKids-Funktionen werden über Google Play gekauft. RevenueCat dient als Dienstleister für die Abonnementverwaltung und verarbeitet die authentifizierte NowKids Benutzerkennung der Anwendung (eine Supabase-UUID), Produkt- und Transaktionsinformationen, Kauf-/Verlängerungs-/Erstattungsstatus, Kauf-Token bzw. Belegmetadaten und den Zugriffsrecht-Status, damit der Zugriff validiert und wiederhergestellt werden kann.",
             "NowKids übermittelt RevenueCat weder Name noch E-Mail-Adresse oder Telefonnummer als Kundenattribute. NowKids fordert die Android Advertising ID (AAID) nicht an, übermittelt sie nicht an RevenueCat und aktiviert keine RevenueCat-Integrationen für Werbe-Attribution. Vollständige Zahlungskartendaten werden von Google Play verarbeitet und von NowKids nicht empfangen."
           ]
         },
         {
           "h": "14. Funktionale Benachrichtigungen und Firebase",
           "p": [
-            "Wenn Android-Benachrichtigungen aktiviert sind, nutzt NowKids Firebase Cloud Messaging für funktionale Familien-, Aufgaben-, Lern- und Erinnerungsbenachrichtigungen. Firebase kann ein Installations-/Push-Token und technische Gerätedaten verarbeiten, die für die Zustellung nötig sind. NowKids nutzt diese Kennungen nicht für Werbung oder Werbe-Attribution."
+            "Wenn Android-Benachrichtigungen aktiviert sind, nutzt NowKids Firebase Cloud Messaging für funktionale Familien-, Aufgaben-, Lern- und Erinnerungsbenachrichtigungen. Firebase kann ein Installations- und Zustellkennung und technische Gerätedaten verarbeiten, die für die Zustellung nötig sind. NowKids nutzt diese Kennungen nicht für Werbung oder Werbe-Attribution."
           ]
         },
         {
           "h": "15. KI-Wiederverwendung, Cache und technische Nutzungsdaten",
           "p": [
-            "Um wiederholte KI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe SchulsScan wird nach Möglichkeit einmal erkannt; Scan-Extraktionen können bis zu 30 Tage, andere KI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Eingaben."
+            "Um wiederholte KI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe SchulsScan wird nach Möglichkeit einmal erkannt; Extraktionen aus Digitalisierungen können bis zu 30 Tage, andere KI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Eingaben."
           ]
         }
       ]
@@ -240,7 +241,7 @@
           "items": [
             "Name, Geburtsdatum/Alter, Avatar, Schule, Klasse, Lernsprache.",
             "Stundenplan, Hausaufgaben, Tests, Fortschritt, Aktivitäten, Bücher, Aufgaben und Erinnerungen.",
-            "Dokumente, Fotos, Scans, Sprache und KI-Inhalte bei Nutzung."
+            "Dokumente, Fotos, Digitalisierungen, Sprache und KI-Inhalte bei Nutzung."
           ]
         },
         {
@@ -294,7 +295,7 @@
         {
           "h": "11. Familienbenachrichtigungen",
           "p": [
-            "Eltern können Benachrichtigungskategorien einzeln steuern. Unter Android kann NowKids Firebase Cloud Messaging für funktionale Push-Benachrichtigungen im Hintergrund oder bei geschlossener App verwenden."
+            "Eltern können Benachrichtigungskategorien einzeln steuern. Unter Android kann NowKids Firebase Cloud Messaging für funktionale serverseitig zugestellte Benachrichtigungen im Hintergrund oder bei geschlossener App verwenden."
           ]
         }
       ]
@@ -338,7 +339,7 @@
         {
           "h": "5. Melden",
           "p": [
-            "Unsichere Ausgabe über In-App-Report/Feedback, sobald verfügbar, und/oder support@mynw.app melden."
+            "Unsichere Ausgabe über integrierte Meldung/Rückmeldung, sobald verfügbar, und/oder support@mynw.app melden."
           ]
         },
         {
@@ -356,7 +357,7 @@
         {
           "h": "8. Wiederverwenden statt neu generieren",
           "p": [
-            "NowStudy verwendet nach Möglichkeit eine gespeicherte Scan-Extraktion, statt dasselbe Bild bei jeder Folgefrage erneut zu senden. Lernpläne, Karteikarten und Mini-Tests werden gespeichert und wieder geöffnet; eine ausdrückliche neue Version kann einen neuen KI-Aufruf auslösen."
+            "NowStudy verwendet nach Möglichkeit eine gespeicherte Extraktion aus der Digitalisierung, statt dasselbe Bild bei jeder Folgefrage erneut zu senden. Lernpläne, Karteikarten und Mini-Tests werden gespeichert und wieder geöffnet; eine ausdrückliche neue Version kann einen neuen KI-Aufruf auslösen."
           ]
         }
       ]
@@ -392,7 +393,7 @@
         {
           "h": "4. Meldung",
           "p": [
-            "In-App-Meldung nutzen, wenn verfügbar, oder support@mynw.app."
+            "integrierte Meldung nutzen, wenn verfügbar, oder support@mynw.app."
           ]
         },
         {
@@ -532,13 +533,13 @@
         {
           "h": "KI-Sicherheit",
           "p": [
-            "Unsichere Antwort per In-App-Report, wenn verfügbar, und E-Mail melden."
+            "Unsichere Antwort per integrierte Meldung, wenn verfügbar, und E-Mail melden."
           ]
         },
         {
           "h": "Community",
           "p": [
-            "Unzulässige Sticker/Inhalte per In-App-Report oder E-Mail melden."
+            "Unzulässige Sticker/Inhalte per integrierte Meldung oder E-Mail melden."
           ]
         },
         {
@@ -572,7 +573,7 @@
           ]
         },
         {
-          "h": "NowStudy & Scans",
+          "h": "NowStudy & Digitalisierungen",
           "p": [
             "Ein SchulsScan wird nach Möglichkeit einmal analysiert. Folgefragen nutzen die gespeicherte Extraktion. Pläne, Karteikarten und Mini-Tests können erneut geöffnet werden."
           ]
@@ -586,7 +587,7 @@
         {
           "h": "Benachrichtigungen",
           "p": [
-            "Benachrichtigungskategorien lassen sich getrennt steuern. Unter Android nutzen lokale und Push-Benachrichtigungen das NowKids-Systemsymbol, hohe Priorität und können ohne Vollbild-Intent auf dem Sperrbildschirm erscheinen. Ton und Vibration folgen den Android-Kanaleinstellungen. Erweiterte Benachrichtigungen können das NowKids-Logo oder ein thematisches Bild zeigen; bei einem Bildfehler funktioniert die normale Benachrichtigung mit Symbol weiter. Geplante Erinnerungen werden nach einem Neustart wiederhergestellt."
+            "Benachrichtigungskategorien lassen sich getrennt steuern. Unter Android nutzen lokale und serverseitig zugestellte Benachrichtigungen das NowKids-Systemsymbol, hohe Priorität und können ohne Vollbild-Intent auf dem Sperrbildschirm erscheinen. Ton und Vibration folgen den Android-Kanaleinstellungen. Erweiterte Benachrichtigungen können das NowKids-Logo oder ein thematisches Bild zeigen; bei einem Bildfehler funktioniert die normale Benachrichtigung mit Symbol weiter. Geplante Erinnerungen werden nach einem Neustart wiederhergestellt."
           ]
         },
         {
