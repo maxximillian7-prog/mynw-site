@@ -575,7 +575,7 @@
         {
           "h": "NowStudy e digitalizações",
           "p": [
-            "Um digitalização escolar é analisado uma vez sempre que possível. Perguntas seguintes reutilizam a extração guardada em vez de reenviar a imagem. Planos, cartões de estudo e mini-testes guardados podem ser reabertos."
+            "Uma digitalização escolar é analisada uma vez sempre que possível. Perguntas seguintes reutilizam a extração guardada em vez de reenviar a imagem. Planos, cartões de estudo e mini-testes guardados podem ser reabertos."
           ]
         },
         {
@@ -599,7 +599,7 @@
         {
           "h": "Privacidade e uso de IA",
           "p": [
-            "O NowKids regista dados técnicos de uso IA para custos, fiabilidade e cache, sem guardar o texto dos pedidos da criança no registo ai_usage. O cache temporário é limitado à família/criança."
+            "O NowKids regista dados técnicos sobre a utilização de IA para custos, fiabilidade e cache, sem guardar o texto dos pedidos da criança no registo técnico. A cache temporária é limitada à família/criança."
           ]
         },
         {
