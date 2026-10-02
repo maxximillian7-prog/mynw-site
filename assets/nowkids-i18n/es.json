@@ -83,7 +83,8 @@
             "Supabase — autenticación, base de datos, almacenamiento, realtime y funciones servidor.",
             "OpenAI — inferencia IA.",
             "Google — Google Sign-In, Android/Google Play y servicios de plataforma seleccionados.",
-            "RevenueCat — validación de suscripciones/compras, App User ID, CustomerInfo y estado de entitlements usados para desbloquear funciones de pago."
+            "RevenueCat — validación de suscripciones/compras, App User ID, CustomerInfo y estado de entitlements usados para desbloquear funciones de pago.",
+            "Firebase Cloud Messaging — entrega de notificaciones push funcionales de Android mediante el token de instalación/push de la app."
           ]
         },
         {
@@ -195,7 +196,7 @@
         {
           "h": "8. Funciones de pago",
           "p": [
-            "Las funciones de pago de NowKids por suscripción se compran a través de Google Play. Antes de la compra se muestran el precio, periodo de facturación, prueba (si se ofrece) y condiciones de renovación automática. RevenueCat se utiliza para validar el estado de compra/suscripción y desbloquear entitlements. La facturación, cancelación y reembolsos también están sujetos a las condiciones de Google Play. Eliminar la cuenta NowKids o desinstalar la aplicación no cancela automáticamente una suscripción de Google Play."
+            "Las funciones de pago de NowKids se compran mediante Google Play. Family Plus está pensado para un solo adulto responsable de facturación y el entitlement activo se aplica al Family Space; las cuentas infantiles no compran ni gestionan la suscripción. Antes de comprar, NowKids comprueba el entitlement familiar en el servidor además del estado del cliente RevenueCat para reducir compras duplicadas accidentales. Precio, periodo, prueba y renovación automática se muestran antes de la compra. Eliminar la cuenta o desinstalar la app no cancela por sí solo la suscripción de Google Play."
           ]
         },
         {
