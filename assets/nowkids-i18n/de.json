@@ -82,7 +82,7 @@
           "items": [
             "Supabase — Authentifizierung, Datenbank, Storage, Realtime und Serverfunktionen.",
             "OpenAI — KI-Inferenz.",
-            "Google — Google-Login, Android/Google Play und ausgewählte Plattformdienste.",
+            "Google — Google-Anmeldung, wenn ausgewählt, Android-/Google-Play-Vertrieb, Abrechnung kostenpflichtiger Funktionen über Google Play und vom Nutzer ausgewählte Plattformdienste.",
             "RevenueCat — Prüfung von Abonnements/Käufen, App User ID, CustomerInfo und Entitlement-Status zum Freischalten kostenpflichtiger Funktionen.",
             "Firebase Cloud Messaging — funktionale Android-Push-Zustellung mit Installations-/Push-Token der App."
           ]
@@ -137,9 +137,9 @@
           ]
         },
         {
-          "h": "15. AI-Wiederverwendung, Cache und technische Nutzungsdaten",
+          "h": "15. KI-Wiederverwendung, Cache und technische Nutzungsdaten",
           "p": [
-            "Um wiederholte AI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe SchulsScan wird nach Möglichkeit einmal erkannt; Scan-Extraktionen können bis zu 30 Tage, andere AI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Prompts."
+            "Um wiederholte KI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe SchulsScan wird nach Möglichkeit einmal erkannt; Scan-Extraktionen können bis zu 30 Tage, andere KI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Eingaben."
           ]
         }
       ]
@@ -196,7 +196,7 @@
         {
           "h": "8. Bezahlfunktionen",
           "p": [
-            "Kostenpflichtige NowKids-Funktionen werden über Google Play gekauft. Family Plus ist für einen erwachsenen Abrechnungsinhaber vorgesehen; der aktive Anspruch gilt für den Family Space. Kinderkonten kaufen oder verwalten das Abonnement nicht. Vor dem Kauf prüft NowKids den Familienanspruch serverseitig zusätzlich zum RevenueCat-Clientstatus, um versehentliche doppelte Familienkäufe zu reduzieren. Preis, Abrechnungszeitraum, Testphase und automatische Verlängerung werden vor dem Kauf angezeigt. Das Löschen des Kontos oder der App beendet ein Google-Play-Abo nicht automatisch."
+            "Kostenpflichtige NowKids-Funktionen werden über Google Play gekauft. Family Plus ist für einen erwachsenen Abrechnungsinhaber vorgesehen; der aktive Anspruch gilt für den Familienbereich. Kinderkonten kaufen oder verwalten das Abonnement nicht. Vor dem Kauf prüft NowKids den Familienanspruch serverseitig zusätzlich zum RevenueCat-Clientstatus, um versehentliche doppelte Familienkäufe zu reduzieren. Preis, Abrechnungszeitraum, Testphase und automatische Verlängerung werden vor dem Kauf angezeigt. Das Löschen des Kontos oder der App beendet ein Google-Play-Abo nicht automatisch."
           ]
         },
         {
@@ -288,7 +288,7 @@
         {
           "h": "10. Family-Plus-Abrechnung",
           "p": [
-            "Family Plus wird von einem erwachsenen Abrechnungsinhaber gekauft und für den aktiven Family Space geteilt. Kinderkonten kaufen oder verwalten keine Abonnements. Andere Erwachsene sollen sehen, wer den Plan verwaltet, statt erneut zum Kauf aufgefordert zu werden. Der Familienanspruch wird zusätzlich serverseitig geprüft."
+            "Family Plus wird von einem erwachsenen Abrechnungsinhaber gekauft und für den aktiven Familienbereich geteilt. Kinderkonten kaufen oder verwalten keine Abonnements. Andere Erwachsene sollen sehen, wer den Plan verwaltet, statt erneut zum Kauf aufgefordert zu werden. Der Familienanspruch wird zusätzlich serverseitig geprüft."
           ]
         },
         {
@@ -356,7 +356,7 @@
         {
           "h": "8. Wiederverwenden statt neu generieren",
           "p": [
-            "NowStudy verwendet nach Möglichkeit eine gespeicherte Scan-Extraktion, statt dasselbe Bild bei jeder Folgefrage erneut zu senden. Lernpläne, Karteikarten und Mini-Tests werden gespeichert und wieder geöffnet; eine ausdrückliche neue Version kann einen neuen AI-Aufruf auslösen."
+            "NowStudy verwendet nach Möglichkeit eine gespeicherte Scan-Extraktion, statt dasselbe Bild bei jeder Folgefrage erneut zu senden. Lernpläne, Karteikarten und Mini-Tests werden gespeichert und wieder geöffnet; eine ausdrückliche neue Version kann einen neuen KI-Aufruf auslösen."
           ]
         }
       ]
@@ -560,9 +560,15 @@
       "intro": "Praktische Anleitung zu den wichtigsten NowKids-Funktionen für Erwachsene und Kinder.",
       "sections": [
         {
+          "h": "App-Sprache",
+          "p": [
+            "Bei der ersten Nutzung übernimmt NowKids die Systemsprache des Geräts. Eine in den Einstellungen manuell gewählte Sprache wird gespeichert und hat auf diesem Gerät Vorrang."
+          ]
+        },
+        {
           "h": "Familie & Kinderkonten",
           "p": [
-            "Erwachsene verwalten den Family Space. Kinderzugriff ist mit einem elternautorisierten Profil verknüpft. Kinder sehen keine Konto-/Datenlöschung."
+            "Erwachsene verwalten den Familienbereich. Kinderzugriff ist mit einem elternautorisierten Profil verknüpft. Kinder sehen keine Konto-/Datenlöschung."
           ]
         },
         {
@@ -586,19 +592,19 @@
         {
           "h": "Family Plus",
           "p": [
-            "Ein Erwachsener ist Abrechnungsinhaber. Ein aktiver Family-Plus-Anspruch gilt für den Family Space; Kinder kaufen nicht."
+            "Ein Erwachsener ist Abrechnungsinhaber. Ein aktiver Family-Plus-Anspruch gilt für den Familienbereich; Kinder kaufen nicht."
           ]
         },
         {
-          "h": "Datenschutz & AI",
+          "h": "Datenschutz & KI",
           "p": [
-            "NowKids protokolliert technische AI-Nutzungsdaten für Kosten, Zuverlässigkeit und Cache, ohne Kinder-Prompttexte in ai_usage zu speichern."
+            "NowKids protokolliert technische KI-Nutzungsdaten für Kosten, Zuverlässigkeit und Cache, ohne Kinder-Prompttexte in ai_usage zu speichern."
           ]
         },
         {
           "h": "Sicherheit & Löschung",
           "p": [
-            "AI-Antworten und Inhalte können gemeldet werden. Erwachsene verwalten Kinderzugriff und Löschung. support@mynw.app."
+            "KI-Antworten und Inhalte können gemeldet werden. Erwachsene verwalten Kinderzugriff und Löschung. support@mynw.app."
           ]
         }
       ]
