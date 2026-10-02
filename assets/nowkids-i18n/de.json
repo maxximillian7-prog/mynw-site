@@ -49,7 +49,7 @@
             "Familie/Kind: Name, Familienrolle, Beziehungsbezeichnung, Geburtsdatum/Alter, Avatar, Schule, Klasse und Lernsprache.",
             "Schul- und Familiendaten: Fächer, Stundenplan, Hausaufgaben, Testvorbereitung, Lernpläne, Aktivitäten, Bücher, Termine, Erinnerungen, Packlisten, Aufgaben und Notizen.",
             "Vom Nutzer bereitgestellte Dokumente, Fotos, Digitalisierungen, Texte, Sprache/Audio, Transkripte und Dateien.",
-            "KI-Kontext: Anfrage, Fach/Thema, Verlauf und relevante Profildaten des Kindes wie Name, berechnetes Alter, Schule, Klasse und Lernsprache; Bilder nur bei gewählter Bildfunktion.",
+            "KI-Kontext: Anfrage, Fach/Thema, jüngerer Lernverlauf und nur die Profildaten, die zur Anpassung der Schwierigkeit nötig sind: berechnetes Alter, Klasse/Jahrgang, Lernsprache und Altersmodus. Name des Kindes und Schulname werden von NowStudy nicht an OpenAI gesendet. Bilder werden nur bei ausdrücklich gewählter Bildfunktion einbezogen.",
             "Betriebsdaten: Nutzungszähler, KI-Modell-/Token-Nutzung, Fehler-/Sicherheitsprotokolle und technische Daten.",
             "Optionale Berechtigungen: Benachrichtigungen, Kalender, Kamera/Fotos, Mikrofon, lokale Authentifizierung und lokale Einstellungen.",
             "Abonnement- und Kaufdaten: Produktkennungen, Kauf-/Verlängerungsstatus, Zugriffsrecht-Status, Transaktions-/Belegmetadaten und eine Benutzerkennung der Anwendung zur Zugriffsprüfung. NowKids erhält keine vollständigen Zahlungskartendaten von Google Play oder RevenueCat."
@@ -254,7 +254,7 @@
         {
           "h": "3. KI-Kontext",
           "p": [
-            "NowStudy kann Name, Alter, Schule, Klasse, Lernsprache, Thema, Verlauf und bereitgestellten Text/Bild verarbeiten. Unnötige sensible Angaben vermeiden."
+            "Zur Anpassung von Erklärungen kann NowStudy berechnetes Alter, Klasse/Jahrgang, Lernsprache, Altersmodus, Fach/Thema, jüngeren Lernverlauf sowie vom Nutzer bereitgestellten Text oder Bilder senden. Name des Kindes und Schulname werden von NowStudy nicht an OpenAI gesendet. Unnötige sensible Angaben sollten in Anfragen oder Bildern vermieden werden."
           ]
         },
         {
@@ -324,7 +324,7 @@
         {
           "h": "2. KI-Daten",
           "p": [
-            "Profilkontext, Thema, Verlauf, aktuelle Anfrage und ggf. Bild können über die Serverfunktion verarbeitet werden."
+            "Eine KI-Anfrage kann berechnetes Alter, Klasse/Jahrgang, Lernsprache, Altersmodus, Fach/Thema, jüngeren Lernverlauf, die aktuelle Anfrage und ein zur Analyse bereitgestelltes Bild enthalten. NowStudy sendet weder den Namen des Kindes noch den Schulnamen an OpenAI. Die Anfrage läuft über die Serverfunktion; der Schlüssel des KI-Anbieters wird in der App nicht offengelegt."
           ]
         },
         {

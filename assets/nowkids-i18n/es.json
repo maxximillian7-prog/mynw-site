@@ -49,7 +49,7 @@
             "Familia/menor: nombre, rol, etiqueta de relación, fecha de nacimiento/edad, avatar, escuela, curso y lengua de estudio.",
             "Datos escolares/familiares: materias, horario, deberes, preparación de pruebas, planes, actividades, libros, eventos, recordatorios, listas y notas.",
             "Documentos, fotos, escaneos, texto, voz/audio, transcripciones y archivos proporcionados.",
-            "Contexto IA: solicitud, materia/tema, historial y datos relevantes del menor como nombre, edad derivada, escuela, curso y lengua; imagen solo si se selecciona esa función.",
+            "Contexto de IA: solicitud, materia/tema, historial de aprendizaje reciente y solo los datos de perfil necesarios para adaptar la dificultad: edad derivada, curso/clase, lengua de estudio y modo de edad. NowStudy no envía a OpenAI el nombre del menor ni el nombre de la escuela. Las imágenes solo se incluyen cuando el usuario elige una función de IA basada en imágenes.",
             "Datos operativos: contadores, modelo/tokens IA, registros de error/seguridad e información técnica.",
             "Permisos opcionales: notificaciones, calendario, cámara/fotos, micrófono, autenticación local y ajustes.",
             "Datos de suscripción y compra: identificadores de producto, estado de compra/renovación, estado de derecho de acceso, metadatos de transacción/recibo y un identificador de usuario de la aplicación usado para validar el acceso. NowKids no recibe los datos completos de la tarjeta de pago de Google Play o RevenueCat."
@@ -254,7 +254,7 @@
         {
           "h": "3. Contexto IA",
           "p": [
-            "NowStudy puede tratar nombre, edad, escuela, curso, lengua, tema, historial y texto/imagen proporcionados. Evite datos sensibles innecesarios."
+            "Para adaptar las explicaciones, NowStudy puede enviar edad derivada, curso/clase, lengua de estudio, modo de edad, materia/tema, historial de aprendizaje reciente y texto o imagen proporcionados por el usuario. NowStudy no envía a OpenAI el nombre del menor ni el nombre de la escuela. Evite datos sensibles innecesarios en las solicitudes o imágenes."
           ]
         },
         {
@@ -324,7 +324,7 @@
         {
           "h": "2. Datos IA",
           "p": [
-            "Contexto de perfil, tema, historial, solicitud e imagen pueden procesarse mediante función servidor."
+            "Una solicitud de IA puede incluir edad derivada, curso/clase, lengua de estudio, modo de edad, materia/tema, historial de aprendizaje reciente, la solicitud actual y una imagen proporcionada para análisis. NowStudy no envía a OpenAI el nombre del menor ni el nombre de la escuela. La solicitud pasa por la función del servidor; la clave del proveedor de IA no se expone en la aplicación."
           ]
         },
         {
