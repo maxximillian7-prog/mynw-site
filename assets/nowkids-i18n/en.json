@@ -594,6 +594,7 @@
         {
           "h": "Books, covers & recommendations",
           "p": [
+            "The add button offers three paths: Scan ISBN, Find a book, or Add manually. Catalog search accepts title, author or ISBN and shows real catalog matches before you save one.",
             "Books are shown as covers. Tap a cover to open the book page with its title, author, available catalog details and a short catalog description. Long-press a cover to mark the book read/unread, add or change a photo, restore a catalog cover when available, or delete the book.",
             "NowKids looks up real book metadata through a protected server function. Open Library is the primary catalog and Google Books is used as a fallback when configured. If no remote cover is available, NowKids shows a local fallback cover with a book icon, title and author.",
             "Previously loaded book rows, metadata and remote cover images are cached on the device when available so the library can remain useful offline. Custom book photos are stored privately in NowKids storage.",
