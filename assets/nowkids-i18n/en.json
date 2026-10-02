@@ -581,7 +581,7 @@
         {
           "h": "Notifications",
           "p": [
-            "Notification categories can be controlled separately. Android functional push notifications use Firebase Cloud Messaging and also respect the system notification settings."
+            "Notification categories can be controlled separately. On Android, local and push notifications use the NowKids system icon with high priority and can appear on the lock screen without full-screen intent. Sound and vibration follow Android channel settings. Expanded notifications can show the NowKids logo or a supplied thematic picture; if the picture fails, the normal icon-only notification still works. Scheduled reminders are restored after device reboot."
           ]
         },
         {
