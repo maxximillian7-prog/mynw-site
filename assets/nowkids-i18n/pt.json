@@ -196,7 +196,7 @@
         {
           "h": "8. Funções pagas",
           "p": [
-            "As funcionalidades pagas por subscrição do NowKids são adquiridas através do Google Play. O preço, período de faturação, período experimental (quando oferecido) e renovação automática são apresentados antes da compra. A RevenueCat é usada para validar o estado da compra/subscrição e desbloquear entitlements. A faturação, cancelamento e reembolsos também estão sujeitos às condições do Google Play. Eliminar a conta NowKids ou desinstalar a app, por si só, não cancela uma subscrição do Google Play."
+            "As funcionalidades pagas do NowKids são compradas através do Google Play. O Family Plus foi concebido para ter um único adulto responsável pela faturação e o entitlement ativo é partilhado com o Family Space; contas infantis não compram nem gerem a subscrição. Antes da compra, o NowKids verifica o entitlement familiar no servidor além do estado do cliente RevenueCat para reduzir compras duplicadas acidentais. Preço, período, teste (se existir) e renovação automática são mostrados antes da compra. Eliminar a conta ou desinstalar a app não cancela por si só a subscrição Google Play."
           ]
         },
         {
