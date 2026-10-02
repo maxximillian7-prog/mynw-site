@@ -92,7 +92,7 @@
         {
           "h": "7. Publicité et localisation",
           "p": [
-            "La version actuelle n’utilise pas de SDK publicitaire, de publicité ciblée ni de localisation précise pour ses fonctions principales."
+            "La version actuelle de NowKids n’utilise pas de SDK publicitaire, n’utilise pas de données personnelles pour la publicité ciblée et n’a pas besoin de localisation précise pour ses fonctions principales. NowKids ne demande, n’accède ni ne transmet l’Android Advertising ID (AAID) ni les identifiants publicitaires Android AdServices."
           ]
         },
         {

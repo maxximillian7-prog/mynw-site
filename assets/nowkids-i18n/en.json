@@ -92,7 +92,7 @@
         {
           "h": "7. Advertising and location",
           "p": [
-            "The current NowKids app does not use advertising SDKs, does not use personal data for targeted advertising and does not need precise location for its core features. It does not use the Android advertising identifier for child profiling."
+            "The current NowKids app does not use advertising SDKs, does not use personal data for targeted advertising and does not need precise location for its core features. NowKids does not request, access or transmit the Android Advertising ID (AAID) or Android AdServices advertising identifiers."
           ]
         },
         {

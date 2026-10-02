@@ -92,7 +92,7 @@
         {
           "h": "7. Werbung & Standort",
           "p": [
-            "Die aktuelle Version nutzt keine Werbe-SDKs, keine zielgerichtete Werbung und benötigt keinen präzisen Standort für Kernfunktionen. Die Android-Werbe-ID wird nicht zur Profilbildung von Kindern verwendet."
+            "Die aktuelle NowKids-Version nutzt keine Werbe-SDKs, keine personenbezogenen Daten für zielgerichtete Werbung und benötigt keinen präzisen Standort für Kernfunktionen. NowKids fordert die Android Advertising ID (AAID) oder Android-AdServices-Werbe-IDs weder an noch greift es darauf zu oder überträgt sie."
           ]
         },
         {
