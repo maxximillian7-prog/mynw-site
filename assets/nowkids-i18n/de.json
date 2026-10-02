@@ -140,7 +140,7 @@
         {
           "h": "15. KI-Wiederverwendung, Zwischenspeicher und technische Nutzungsdaten",
           "p": [
-            "Um wiederholte KI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe SchulsScan wird nach Möglichkeit einmal erkannt; Extraktionen aus Digitalisierungen können bis zu 30 Tage, andere KI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Eingaben."
+            "Um wiederholte KI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe Schulscan wird nach Möglichkeit einmal erkannt; Extraktionen aus Digitalisierungen können bis zu 30 Tage, andere KI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Eingaben."
           ]
         }
       ]
