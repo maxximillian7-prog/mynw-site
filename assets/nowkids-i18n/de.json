@@ -147,7 +147,7 @@
         {
           "h": "16. Buchkatalog-Abfragen",
           "p": [
-            "Wenn ein Nutzer eine Buchsuche startet, kann NowKids den eingegebenen Titel, Autor, ISBN und die gewünschte Katalogsprache an Open Library und, sofern eingerichtet, an Google Books senden. Die Anfrage läuft über eine geschützte Serverfunktion. NowKids übermittelt dabei keine Konto-ID, E-Mail-Adresse, Familien-ID, Kinderprofildaten oder Authentifizierungstoken, und die Katalogfunktion speichert die Suchparameter nicht in der NowKids-Datenbank."
+            "Bei einer Buchsuche kann NowKids Titel, Autor, ISBN und gewünschte Katalogsprache über eine geschützte Serverfunktion an Open Library und, falls konfiguriert, Google Books senden. Anbieteranfragen enthalten weder NowKids-Konto-ID noch E-Mail-Adresse, Familien-ID, Daten des Kinderprofils oder Authentifizierungstoken. Der rohe Suchtext wird nicht im gemeinsamen Katalogcache gespeichert; öffentliche Katalogantworten können mit einem gehashten Anfrageschlüssel und Ablaufzeit zwischengespeichert werden."
           ]
         }
       ]
@@ -592,12 +592,6 @@
           ]
         },
         {
-          "h": "Bücher und Katalogsuche",
-          "p": [
-            "Bücher können manuell hinzugefügt oder nach Titel, Autor und ISBN gesucht werden. Katalogabfragen laufen über eine geschützte NowKids-Serverfunktion und können Open Library sowie, sofern eingerichtet, Google Books verwenden."
-          ]
-        },
-        {
           "h": "Benachrichtigungen",
           "p": [
             "Benachrichtigungskategorien lassen sich getrennt steuern. Unter Android nutzen lokale und serverseitig zugestellte Benachrichtigungen das NowKids-Systemsymbol, hohe Priorität und können ohne Vollbild-Intent auf dem Sperrbildschirm erscheinen. Ton und Vibration folgen den Android-Kanaleinstellungen. Erweiterte Benachrichtigungen können das NowKids-Logo oder ein thematisches Bild zeigen; bei einem Bildfehler funktioniert die normale Benachrichtigung mit Symbol weiter. Geplante Erinnerungen werden nach einem Neustart wiederhergestellt."
@@ -619,6 +613,16 @@
           "h": "Sicherheit & Löschung",
           "p": [
             "KI-Antworten und Inhalte können gemeldet werden. Erwachsene verwalten Kinderzugriff und Löschung. support@mynw.app."
+          ]
+        },
+        {
+          "h": "Bücher, Cover und Empfehlungen",
+          "p": [
+            "Die Hinzufügen-Schaltfläche bietet drei Wege: ISBN scannen, Buch suchen oder manuell hinzufügen. Die Suche akzeptiert Titel, Autor oder ISBN und zeigt echte Katalogtreffer vor dem Speichern.",
+            "Bücher werden als Cover angezeigt. Ein Tippen öffnet die Buchseite mit Titel, Autor, verfügbaren Katalogdaten und einer kurzen Katalogbeschreibung. Langes Drücken ermöglicht das Markieren als gelesen/ungelesen, das Hinzufügen oder Ändern eines Fotos, das Wiederherstellen eines Katalogcovers oder das Löschen.",
+            "NowKids ruft echte Buchmetadaten über eine geschützte Serverfunktion ab. Open Library ist die primäre Quelle; Google Books dient als Fallback, wenn es konfiguriert ist. Ist kein externes Cover verfügbar, zeigt NowKids ein lokales Ersatzcover mit Buchsymbol, Titel und Autor.",
+            "Bereits geladene Bücher, Metadaten und entfernte Coverbilder werden nach Möglichkeit auf dem Gerät zwischengespeichert, damit die Bibliothek auch offline nutzbar bleibt. Eigene Buchfotos werden privat im NowKids-Speicher abgelegt.",
+            "Das Wunschfeld für KI-Empfehlungen ist optional. Bleibt es leer, werden Alter, Klasse/Jahrgang und Lese-/Lernsprache berücksichtigt. Es kann auch Genre, Sprache oder Thema enthalten. KI-Kandidaten werden vor der Anzeige gegen den Buchkatalog geprüft; nicht bestätigte Titel werden verworfen."
           ]
         }
       ]
