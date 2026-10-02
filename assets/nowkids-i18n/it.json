@@ -85,7 +85,8 @@
             "OpenAI — elaborazione tramite IA per NowStudy e funzioni correlate.",
             "Google — accesso con Google quando scelto, distribuzione Android/Google Play, fatturazione delle funzioni a pagamento tramite Google Play e servizi della piattaforma selezionati dall’utente.",
             "RevenueCat — verifica di abbonamenti e acquisti, identificatore utente dell’applicazione, informazioni sull’acquisto e stato di accesso per sbloccare funzioni a pagamento.",
-            "Firebase Cloud Messaging — consegna di notifiche funzionali Android tramite un identificatore tecnico di installazione."
+            "Firebase Cloud Messaging — consegna di notifiche funzionali Android tramite un identificatore tecnico di installazione.",
+            "Open Library e, se configurato, Google Books — ricerche di libri avviate dall’utente per titolo, autore o ISBN. La richiesta al catalogo non include l’identificatore dell’account NowKids, l’indirizzo e-mail, l’identificatore della famiglia o i dati del profilo del bambino."
           ]
         },
         {
@@ -141,6 +142,12 @@
           "h": "15. Riutilizzo IA, cache e dati tecnici di utilizzo",
           "p": [
             "Per ridurre elaborazioni IA ripetute, NowKids può conservare temporaneamente estrazioni o risultati generati associati a famiglia/bambino. La stessa scansione scolastica viene riconosciuta una volta quando possibile; le estrazioni possono restare in cache fino a 30 giorni e altri risultati IA fino a 14 giorni. Piani, scheda di studio e brevi test salvati restano finché non vengono eliminati. registro tecnico contiene campi tecnici e non il contenuto dei richieste del bambino."
+          ]
+        },
+        {
+          "h": "16. Ricerche nel catalogo dei libri",
+          "p": [
+            "Quando l’utente avvia una ricerca di libri, NowKids può inviare a Open Library e, se configurato, a Google Books il titolo, l’autore, l’ISBN e la lingua del catalogo indicati. La richiesta passa attraverso una funzione server protetta. NowKids non include nelle richieste l’identificatore dell’account, l’indirizzo e-mail, l’identificatore della famiglia, i dati del profilo del bambino o il token di autenticazione, e la funzione catalogo non salva i parametri di ricerca nel database NowKids."
           ]
         }
       ]
@@ -582,6 +589,12 @@
           "h": "Materiali salvati",
           "p": [
             "Piani, brevi test, schede di studio e sessioni concluse sono salvati per materia. Un errore in una categoria non deve nascondere le altre."
+          ]
+        },
+        {
+          "h": "Libri e ricerca nel catalogo",
+          "p": [
+            "I libri possono essere aggiunti manualmente o cercati per titolo, autore e ISBN. Le ricerche passano attraverso una funzione server protetta di NowKids e possono usare Open Library e, se configurato, Google Books."
           ]
         },
         {
