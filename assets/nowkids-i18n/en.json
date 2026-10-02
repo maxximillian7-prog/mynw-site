@@ -1,1 +1,607 @@
-{"common":{"language":"English","home":"Documentation","privacy":"Privacy","terms":"Terms","parents":"Parents & children","ai":"AI & safety","community":"Community rules","rights":"Data rights","deletion":"Delete account","support":"Support","updated":"Last updated: October 1, 2026","back":"All NowKids documents","footer":"© 2026 NowKids / NowApps.","developer":"Developer and data controller","contact":"Privacy & support contact","status":"Current documentation for NowKids.","title":"NowKids — Legal, privacy & support","intro":"Official NowKids documentation for families: privacy, children’s data, AI safety, community content, data rights, account deletion and support.","cards":{"privacy":"What data NowKids processes, why, with whom and for how long.","terms":"Rules for using NowKids, family accounts, school features and responsibilities.","parents":"A clear notice for parents and guardians about child accounts and parental authorization.","ai":"How NowStudy AI works, its limits, safeguards and reporting of unsafe output.","community":"Rules for shared stickers and other content that may be visible to other users.","rights":"How to access, correct, export, restrict or delete personal data.","deletion":"How to delete an account and associated server-side data.","support":"How to contact us about bugs, privacy, child safety or content."}},"pages":{"privacy":{"title":"Privacy Policy","intro":"This policy explains how NowKids processes personal data for family organisation, learning and AI-assisted features. NowKids is designed for family use and includes parent/guardian and child experiences.","sections":[{"h":"1. Who is responsible for the data","p":["NowKids / NowApps is developed by Maksym Smyrnov in Portugal. For privacy questions or requests, contact support@mynw.app."]},{"h":"2. Data we may process","items":["Parent/guardian account data: account ID, email address, display name, sign-in provider, language, timezone and account settings.","Family and child profile data: name, family role, relationship label, birth date or age information, avatar, school name, class/grade and study language.","School and family data: subjects, timetable, homework, test preparation, study plans, activities, books, events, reminders, packing lists, family tasks and notes.","Content you choose to provide: documents, photos, scans, text, voice input or audio, transcriptions and other files used by a feature.","AI context: the request, selected subject/topic, recent conversation context and relevant child profile information such as name, derived age, school, class and study language. Images are included only when the user chooses an image-based AI feature.","Operational data: feature usage counters, AI model/token usage, error and security logs, device/app technical information needed to operate and secure the service.","Device permissions and local data: notifications, calendar access, camera/photos, microphone, local authentication and local settings when the user enables the corresponding feature.","Subscription and purchase data: product identifiers, purchase/renewal status, entitlement status, transaction/receipt metadata and an App User ID used to validate access. NowKids does not receive full payment card details from Google Play or RevenueCat."]},{"h":"3. Why we use data","items":["To create and manage family and child spaces and synchronize them across authorized devices.","To provide school planning, reminders, tasks, calendar, documents and family collaboration.","To provide NowStudy explanations, guided learning, tests, flashcards, work checking, test preparation and parent summaries.","To secure accounts, prevent abuse, troubleshoot failures and maintain service reliability.","To respond to support, privacy, child-safety and content reports.","Validate purchases, restore access and determine entitlement to paid NowKids features."]},{"h":"4. Children and parental authorization","p":["A parent or guardian should create or authorize a child’s use of NowKids and is responsible for the family space. Where applicable law requires parental authorization for processing a child’s data, the parent/guardian must provide that authorization. The age of digital consent can differ by country."]},{"h":"5. AI processing","p":["NowStudy currently uses server-side OpenAI services through a protected Supabase Edge Function. Relevant text, images and learning context may be sent to OpenAI to generate a response. AI models may change as the service develops. AI output can be incorrect and should not be treated as a guaranteed factual, medical, legal or safety decision."]},{"h":"6. Service providers","items":["Supabase — authentication, database, storage, realtime synchronization and server-side functions.","OpenAI — AI inference for NowStudy and related AI features.","Google — Google sign-in where selected, Android/Google Play distribution, billing if paid features are introduced, and platform services selected by the user.","RevenueCat — subscription/purchase validation, App User ID, CustomerInfo and entitlement status used to unlock paid features."]},{"h":"7. Advertising and location","p":["The current NowKids app does not use advertising SDKs, does not use personal data for targeted advertising and does not need precise location for its core features. It does not use the Android advertising identifier for child profiling."]},{"h":"8. Legal bases and family control","p":["Depending on the feature and jurisdiction, processing may be necessary to provide the service requested by the account holder, based on legitimate interests in security and service operation, or based on consent/parental authorization where required. Optional permissions can be refused or withdrawn in device settings, although the related feature may then stop working."]},{"h":"9. Retention and deletion","p":["Account and synchronized family data are retained while needed to provide the service and until deleted by the user or account holder. Users can delete individual content in the app and can request account deletion at https://mynw.app/nowkids/delete-account/. Limited records may be retained where required for legal obligations, security, fraud prevention or dispute resolution."]},{"h":"10. Security and international processing","p":["Network traffic uses encrypted HTTPS connections. Access to family data is protected by authentication, row-level access controls and server-side authorization. Some service providers may process data outside the EEA; where required, appropriate transfer safeguards are used by those providers."]},{"h":"11. Your rights","p":["Depending on your location you may have rights to access, correct, delete, restrict, object to processing, receive a portable copy, withdraw consent and complain to a data protection authority. See https://mynw.app/nowkids/data-rights/."]},{"h":"12. Changes","p":["We may update this policy when NowKids features, providers or legal requirements change. Material changes will be reflected on this page with a new update date."]},{"h":"13. Subscriptions and RevenueCat","p":["Paid NowKids features are purchased through Google Play. RevenueCat acts as a subscription-management service provider and processes the authenticated NowKids App User ID (a Supabase UUID), product and transaction information, purchase/renewal/refund status, purchase token/receipt metadata and entitlement status so the app can validate and restore access.","NowKids does not send RevenueCat a user's name, email address or phone number as customer attributes. NowKids does not request or transmit the Android Advertising ID (AAID) to RevenueCat and does not enable RevenueCat advertising-attribution integrations. Full payment-card details are handled by Google Play and are not received by NowKids."]}]},"terms":{"title":"Terms of Use","intro":"These Terms govern use of NowKids. By creating a family account or authorizing a child to use the service, the account holder agrees to these Terms and applicable law.","sections":[{"h":"1. Family account responsibility","p":["The person creating or administering a family space should be an adult parent, guardian or other person legally permitted to manage the child’s use. The account holder is responsible for invitations, permissions, family members and the accuracy of information entered about children."]},{"h":"2. Child accounts","p":["A child may use a linked child experience only when authorized by a parent/guardian or other permitted family administrator. Children may have fewer editing and account-management capabilities than adults."]},{"h":"3. Educational purpose","p":["NowKids and NowStudy support organisation and learning. They do not replace teachers, schools or professional educational assessment. AI may make mistakes. Users should verify important school instructions and deadlines with the original source."]},{"h":"4. Acceptable use","items":["Do not use NowKids to harm, exploit, groom, bully or endanger a child.","Do not upload illegal content, sexual content involving minors, hateful content, malware, stolen credentials or content that violates another person’s rights.","Do not attempt to bypass access controls, inspect another family’s data, abuse invitations, scrape the service or interfere with security.","Do not use AI features to cheat, impersonate others, create dangerous instructions or evade school rules."]},{"h":"5. AI features","p":["AI responses are generated automatically and may be incomplete or wrong. NowStudy is designed to guide learning rather than guarantee answers. Do not rely on AI for emergency, medical, legal, financial or other high-stakes decisions."]},{"h":"6. Community content","p":["If a feature lets users share stickers or other content with the community, the Community Rules apply. We may reject, hide or remove content and restrict sharing when needed for safety, legality or policy compliance."]},{"h":"7. Availability and changes","p":["We may improve, replace, suspend or discontinue features. We aim to keep family data safe but do not guarantee uninterrupted availability. Users should keep copies of important school documents when appropriate."]},{"h":"8. Paid features","p":["NowKids paid subscription features are purchased through Google Play. Price, billing period, trial (if offered) and auto-renewal terms are shown before purchase. RevenueCat is used to validate purchase/subscription status and unlock entitlements. Billing, cancellation and refunds are also subject to Google Play terms. Deleting the NowKids account or uninstalling the app does not by itself cancel a Google Play subscription."]},{"h":"9. Intellectual property","p":["NowKids software, branding and original service content are protected by applicable rights. Users retain rights in content they upload. For content intentionally shared with the NowKids community, the user grants a limited license needed to host, display, moderate and distribute that content within the feature."]},{"h":"10. Suspension and termination","p":["We may restrict or terminate access where reasonably necessary for child safety, abuse prevention, legal compliance or serious violation of these Terms. Account holders may stop using the service and request deletion at any time."]},{"h":"11. Liability and mandatory rights","p":["To the maximum extent permitted by law, NowKids is provided without a guarantee that every result or reminder is error-free. Nothing in these Terms limits consumer, child-protection or data-protection rights that cannot legally be excluded."]},{"h":"12. Contact","p":["Questions about these Terms: support@mynw.app."]}]},"parents":{"title":"Parent & Guardian Notice","intro":"This notice summarizes the information most relevant to parents and guardians when a child uses NowKids.","sections":[{"h":"1. Parent-led setup","p":["A parent/guardian should create the family space, add the child profile and decide who can join. A linked child account should be created only after parental authorization."]},{"h":"2. What child information may be stored","items":["Name, birth date or age, avatar, school, class/grade and study language.","Timetable, homework, tests, study progress, activities, books, tasks, reminders and family notes.","Documents, photos, scans, voice input and AI conversation content when those features are used."]},{"h":"3. AI context for a child","p":["To adapt explanations, NowStudy may send the child’s name, derived age, school name, class/grade, study language, selected subject/topic, recent tutoring history and user-submitted text or image to the AI provider. Parents should avoid entering unnecessary sensitive information."]},{"h":"4. Parent controls","p":["Parents can manage family members, invitations and child information, and can delete content. The product is designed so a child has more limited authority over parent-created notes and family administration."]},{"h":"5. Permissions","p":["Camera/photos, microphone, notifications, calendar and local authentication are used only for the corresponding feature. A parent should review device permissions and disable any feature the child should not use."]},{"h":"6. No targeted advertising","p":["The current NowKids release does not use advertising SDKs or personalized advertising."]},{"h":"7. Parental consent and age","p":["Under GDPR Article 8, when processing relies on consent for an information-society service offered directly to a child, national law can set the relevant age between 13 and 16. NowKids therefore expects parental authorization whenever the child is not legally able to consent independently in the relevant country."]},{"h":"8. Review, correction and deletion","p":["A parent/guardian can request a copy, correction or deletion of the child’s data by contacting support@mynw.app. Account deletion is described at https://mynw.app/nowkids/delete-account/."]},{"h":"9. Safety concerns","p":["If you believe a child is at risk, or content may involve exploitation or abuse of a child, stop using the relevant feature and contact appropriate emergency or child-protection services. You can also report the content to support@mynw.app."]}]},"ai":{"title":"AI & Safety Notice","intro":"NowKids uses generative AI in NowStudy and related learning features. This page explains what AI does, what it should not do and how unsafe output should be handled.","sections":[{"h":"1. What AI is used for","items":["Explain school concepts in age-appropriate language.","Guide problem solving step by step instead of immediately giving an answer.","Create mini-tests and flashcards, check work and build test-preparation plans.","Analyze a user-submitted school image when the user explicitly chooses that feature.","Prepare parent-facing learning summaries from available study history."]},{"h":"2. Data sent to AI","p":["An AI request can include the child’s profile context, selected subject/topic, recent tutoring history, the latest prompt and an image supplied for analysis. NowKids sends the request through its server-side function rather than exposing the AI provider key in the app."]},{"h":"3. Safety principles","items":["Age-appropriate explanations and non-shaming feedback.","No sexual exploitation or abuse content involving children.","No dangerous, illegal, hateful or deceptive instructions.","No intentional assistance with cheating or impersonation.","Ask for clarification rather than inventing unreadable image content."]},{"h":"4. AI can be wrong","p":["Generative AI can hallucinate facts, misread an image, misunderstand context or give an unsuitable explanation. School-critical information should be checked against the teacher, textbook or original school communication."]},{"h":"5. Reporting unsafe output","p":["If an AI response is offensive, unsafe, inappropriate for a child or clearly incorrect, use the in-app feedback/report control available in the released version and/or contact support@mynw.app with enough context to investigate. Do not include passwords or unrelated sensitive information."]},{"h":"6. Parent supervision","p":["Parents should periodically review how younger children use AI features, especially image/voice input and open-ended prompts."]},{"h":"7. No professional advice","p":["AI output is not medical, legal, psychological, financial or emergency advice. In an emergency, contact qualified local services."]}]},"community":{"title":"Community Content Rules","intro":"These rules apply to shared stickers and any other NowKids feature where user-created content can become visible to other users.","sections":[{"h":"1. Keep content child-appropriate","p":["Shared content must be suitable for a family and school-age audience."]},{"h":"2. Prohibited content","items":["Sexual content involving minors, grooming, exploitation or abuse.","Pornographic or explicitly sexual content.","Bullying, threats, harassment, hate or degrading attacks.","Graphic violence, self-harm encouragement or dangerous challenges.","Illegal goods, instructions for serious wrongdoing, malware or credential theft.","Personal data of a child or another person that should not be public.","Copyright-infringing or impersonating content."]},{"h":"3. Moderation","p":["Shared content may be reviewed automatically or manually. We may reject, remove, limit or disable content or sharing access where necessary for safety, law or platform policy."]},{"h":"4. Reporting","p":["Report objectionable community content using the in-app reporting option available in the released version or email support@mynw.app with the item details. Urgent child-safety concerns should also be reported to the appropriate local authority."]},{"h":"5. Your rights in your content","p":["You keep ownership of content you create. When you intentionally share it with the community, you grant NowKids a limited, non-exclusive license to store, display, moderate and distribute it inside the service until it is removed, subject to legal retention needs."]},{"h":"6. Enforcement","p":["Serious or repeated violations can lead to removal of content, loss of sharing functions or account restrictions."]}]},"rights":{"title":"Data Rights & Requests","intro":"This page explains how to exercise privacy rights regarding a NowKids account or a child profile.","sections":[{"h":"1. Requests we can handle","items":["Access: obtain information about personal data associated with the account.","Correction: update inaccurate account, family or child information.","Deletion: delete specific content, a child profile where permitted, or the account and associated data.","Portability/export: request a practical copy of data you provided where applicable.","Restriction or objection: ask us to limit or review certain processing where the law provides that right.","Withdraw consent: withdraw optional consent or parental authorization where processing relies on it."]},{"h":"2. How to submit a request","p":["Email support@mynw.app from the account email where possible. State the NowKids account email, the type of request, whether it concerns the parent account or a child profile, and enough information to identify the relevant family. Do not send passwords."]},{"h":"3. Verification","p":["To protect children and family data, we may request reasonable verification that the requester controls the account or has parental/guardian authority before disclosing or deleting data."]},{"h":"4. Response and legal limits","p":["We respond in accordance with applicable law. A request may be limited where necessary to protect another person’s rights, comply with law or preserve security/fraud-prevention records."]},{"h":"5. Complaints","p":["Users in the EEA can complain to the data protection authority in their country. In Portugal, the supervisory authority is the Comissão Nacional de Proteção de Dados (CNPD)."]},{"h":"6. Account deletion","p":["For the dedicated deletion process, see https://mynw.app/nowkids/delete-account/."]}]},"deletion":{"title":"Delete Your NowKids Account & Data","intro":"NowKids provides an in-app deletion path and this external web process for users who cannot access the app.","sections":[{"h":"1. In the app","p":["Open the account/menu area, go to the account/data controls and choose the account deletion option. The app may require confirmation to prevent accidental deletion."]},{"h":"2. External deletion request","items":["Email support@mynw.app from the email associated with the NowKids account.","Use the subject “Delete my NowKids account”.","State the account email and, if relevant, the family or child profile concerned.","We may verify account ownership or parental/guardian authority before completing the request."]},{"h":"3. What is deleted","p":["After a valid account-deletion request is completed, the account and associated server-side NowKids data are deleted or anonymized as applicable, including family/child profile data and synchronized content controlled by that account, subject to family ownership rules and legal retention requirements."]},{"h":"4. Child profile deletion","p":["A parent/guardian may request deletion of a child profile without necessarily deleting the parent account, where supported by the current app and family ownership rules."]},{"h":"5. Local device data","p":["Some cached files, settings or downloaded content may remain on a device after cloud deletion. Uninstalling the app or clearing its storage removes local app data from that device but does not by itself guarantee deletion of cloud data."]},{"h":"6. Legal/security retention","p":["Limited records may be kept for the period required by law or reasonably necessary for security, abuse prevention, dispute handling or accounting. They are not kept for advertising."]},{"h":"7. Subscriptions","p":["Deleting the NowKids account or uninstalling the app does not automatically cancel a Google Play subscription. Cancel the subscription separately in Google Play Subscriptions. Access may continue until the end of the paid period according to Google Play terms."]}]},"support":{"title":"NowKids Support & Safety Contact","intro":"Contact support@mynw.app for product support, privacy requests, child-safety concerns or content reports.","sections":[{"h":"General support","p":["For sign-in, synchronization, calendar, school, family, document, notification or other technical problems, include the device model, Android version, app version and a short description of what happened."]},{"h":"Privacy & data","p":["For access, correction, export or deletion requests, use support@mynw.app and identify the relevant account/family without sending passwords."]},{"h":"AI safety","p":["For an inappropriate or unsafe AI answer, use the in-app reporting/feedback control where available and include the feature, prompt context and approximate time."]},{"h":"Community content","p":["For an objectionable shared sticker or other community item, use the in-app report option where available or email the item details."]},{"h":"Child safety","p":["For urgent risk to a child, contact the appropriate local emergency or child-protection authority first. You may also notify us at support@mynw.app so we can review relevant account/content controls."]},{"h":"Security","p":["If you believe you found a security issue, email support@mynw.app with a concise reproduction description. Do not publicly disclose personal data or exploit the issue beyond what is necessary to demonstrate it."]}]}}}
+{
+  "common": {
+    "language": "English",
+    "home": "Documentation",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "parents": "Parents & children",
+    "ai": "AI & safety",
+    "community": "Community rules",
+    "rights": "Data rights",
+    "deletion": "Delete account",
+    "support": "Support",
+    "updated": "Last updated: October 2, 2026",
+    "back": "All NowKids documents",
+    "footer": "© 2026 NowKids / NowApps.",
+    "developer": "Developer and data controller",
+    "contact": "Privacy & support contact",
+    "status": "Current documentation for NowKids.",
+    "title": "NowKids — Legal, privacy & support",
+    "intro": "Official NowKids documentation for families: privacy, children’s data, AI safety, community content, data rights, account deletion and support.",
+    "cards": {
+      "privacy": "What data NowKids processes, why, with whom and for how long.",
+      "terms": "Rules for using NowKids, family accounts, school features and responsibilities.",
+      "parents": "A clear notice for parents and guardians about child accounts and parental authorization.",
+      "ai": "How NowStudy AI works, its limits, safeguards and reporting of unsafe output.",
+      "community": "Rules for shared stickers and other content that may be visible to other users.",
+      "rights": "How to access, correct, export, restrict or delete personal data.",
+      "deletion": "How to delete an account and associated server-side data.",
+      "support": "How to contact us about bugs, privacy, child safety or content.",
+      "manual": "How to use family, study, notifications, subscriptions and safety features."
+    },
+    "manual": "User guide"
+  },
+  "pages": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This policy explains how NowKids processes personal data for family organisation, learning and AI-assisted features. NowKids is designed for family use and includes parent/guardian and child experiences.",
+      "sections": [
+        {
+          "h": "1. Who is responsible for the data",
+          "p": [
+            "NowKids / NowApps is developed by Maksym Smyrnov in Portugal. For privacy questions or requests, contact support@mynw.app."
+          ]
+        },
+        {
+          "h": "2. Data we may process",
+          "items": [
+            "Parent/guardian account data: account ID, email address, display name, sign-in provider, language, timezone and account settings.",
+            "Family and child profile data: name, family role, relationship label, birth date or age information, avatar, school name, class/grade and study language.",
+            "School and family data: subjects, timetable, homework, test preparation, study plans, activities, books, events, reminders, packing lists, family tasks and notes.",
+            "Content you choose to provide: documents, photos, scans, text, voice input or audio, transcriptions and other files used by a feature.",
+            "AI context: the request, selected subject/topic, recent conversation context and relevant child profile information such as name, derived age, school, class and study language. Images are included only when the user chooses an image-based AI feature.",
+            "Operational data: feature usage counters, AI model/token usage, error and security logs, device/app technical information needed to operate and secure the service.",
+            "Device permissions and local data: notifications, calendar access, camera/photos, microphone, local authentication and local settings when the user enables the corresponding feature.",
+            "Subscription and purchase data: product identifiers, purchase/renewal status, entitlement status, transaction/receipt metadata and an App User ID used to validate access. NowKids does not receive full payment card details from Google Play or RevenueCat."
+          ]
+        },
+        {
+          "h": "3. Why we use data",
+          "items": [
+            "To create and manage family and child spaces and synchronize them across authorized devices.",
+            "To provide school planning, reminders, tasks, calendar, documents and family collaboration.",
+            "To provide NowStudy explanations, guided learning, tests, flashcards, work checking, test preparation and parent summaries.",
+            "To secure accounts, prevent abuse, troubleshoot failures and maintain service reliability.",
+            "To respond to support, privacy, child-safety and content reports.",
+            "Validate purchases, restore access and determine entitlement to paid NowKids features."
+          ]
+        },
+        {
+          "h": "4. Children and parental authorization",
+          "p": [
+            "A parent or guardian should create or authorize a child’s use of NowKids and is responsible for the family space. Where applicable law requires parental authorization for processing a child’s data, the parent/guardian must provide that authorization. The age of digital consent can differ by country."
+          ]
+        },
+        {
+          "h": "5. AI processing",
+          "p": [
+            "NowStudy currently uses server-side OpenAI services through a protected Supabase Edge Function. Relevant text, images and learning context may be sent to OpenAI to generate a response. AI models may change as the service develops. AI output can be incorrect and should not be treated as a guaranteed factual, medical, legal or safety decision."
+          ]
+        },
+        {
+          "h": "6. Service providers",
+          "items": [
+            "Supabase — authentication, database, storage, realtime synchronization and server-side functions.",
+            "OpenAI — AI inference for NowStudy and related AI features.",
+            "Google — Google sign-in where selected, Android/Google Play distribution, billing if paid features are introduced, and platform services selected by the user.",
+            "RevenueCat — subscription/purchase validation, App User ID, CustomerInfo and entitlement status used to unlock paid features."
+          ]
+        },
+        {
+          "h": "7. Advertising and location",
+          "p": [
+            "The current NowKids app does not use advertising SDKs, does not use personal data for targeted advertising and does not need precise location for its core features. It does not use the Android advertising identifier for child profiling."
+          ]
+        },
+        {
+          "h": "8. Legal bases and family control",
+          "p": [
+            "Depending on the feature and jurisdiction, processing may be necessary to provide the service requested by the account holder, based on legitimate interests in security and service operation, or based on consent/parental authorization where required. Optional permissions can be refused or withdrawn in device settings, although the related feature may then stop working."
+          ]
+        },
+        {
+          "h": "9. Retention and deletion",
+          "p": [
+            "Account and synchronized family data are retained while needed to provide the service and until deleted by the user or account holder. Users can delete individual content in the app and can request account deletion at https://mynw.app/nowkids/delete-account/. Limited records may be retained where required for legal obligations, security, fraud prevention or dispute resolution."
+          ]
+        },
+        {
+          "h": "10. Security and international processing",
+          "p": [
+            "Network traffic uses encrypted HTTPS connections. Access to family data is protected by authentication, row-level access controls and server-side authorization. Some service providers may process data outside the EEA; where required, appropriate transfer safeguards are used by those providers."
+          ]
+        },
+        {
+          "h": "11. Your rights",
+          "p": [
+            "Depending on your location you may have rights to access, correct, delete, restrict, object to processing, receive a portable copy, withdraw consent and complain to a data protection authority. See https://mynw.app/nowkids/data-rights/."
+          ]
+        },
+        {
+          "h": "12. Changes",
+          "p": [
+            "We may update this policy when NowKids features, providers or legal requirements change. Material changes will be reflected on this page with a new update date."
+          ]
+        },
+        {
+          "h": "13. Subscriptions and RevenueCat",
+          "p": [
+            "Paid NowKids features are purchased through Google Play. RevenueCat acts as a subscription-management service provider and processes the authenticated NowKids App User ID (a Supabase UUID), product and transaction information, purchase/renewal/refund status, purchase token/receipt metadata and entitlement status so the app can validate and restore access.",
+            "NowKids does not send RevenueCat a user's name, email address or phone number as customer attributes. NowKids does not request or transmit the Android Advertising ID (AAID) to RevenueCat and does not enable RevenueCat advertising-attribution integrations. Full payment-card details are handled by Google Play and are not received by NowKids."
+          ]
+        },
+        {
+          "h": "14. Functional notifications and Firebase",
+          "p": [
+            "When Android notifications are enabled, NowKids uses Firebase Cloud Messaging to deliver functional family, task, study and reminder notifications. Firebase may process an app installation/push token and technical device information needed for delivery. These identifiers are not used by NowKids for advertising or ad attribution."
+          ]
+        },
+        {
+          "h": "15. AI reuse, cache and technical usage records",
+          "p": [
+            "To reduce repeated AI processing, NowKids may keep a temporary family/child-scoped extraction or generated-result cache. The same school scan can be recognized once and reused for follow-up study; cached scan extraction may be retained for up to 30 days and generated AI cache entries for up to 14 days. Saved study plans, flashcards and mini-tests remain in the account until deleted under the normal data-retention rules. AI usage records contain technical fields such as model, token counts, audio duration, estimated cost, cache hit, routing tier, attempt number, latency, success/error status and pricing version. The content of a child’s prompts is not stored in the ai_usage ledger."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "intro": "These Terms govern use of NowKids. By creating a family account or authorizing a child to use the service, the account holder agrees to these Terms and applicable law.",
+      "sections": [
+        {
+          "h": "1. Family account responsibility",
+          "p": [
+            "The person creating or administering a family space should be an adult parent, guardian or other person legally permitted to manage the child’s use. The account holder is responsible for invitations, permissions, family members and the accuracy of information entered about children."
+          ]
+        },
+        {
+          "h": "2. Child accounts",
+          "p": [
+            "A child may use a linked child experience only when authorized by a parent/guardian or other permitted family administrator. Children may have fewer editing and account-management capabilities than adults."
+          ]
+        },
+        {
+          "h": "3. Educational purpose",
+          "p": [
+            "NowKids and NowStudy support organisation and learning. They do not replace teachers, schools or professional educational assessment. AI may make mistakes. Users should verify important school instructions and deadlines with the original source."
+          ]
+        },
+        {
+          "h": "4. Acceptable use",
+          "items": [
+            "Do not use NowKids to harm, exploit, groom, bully or endanger a child.",
+            "Do not upload illegal content, sexual content involving minors, hateful content, malware, stolen credentials or content that violates another person’s rights.",
+            "Do not attempt to bypass access controls, inspect another family’s data, abuse invitations, scrape the service or interfere with security.",
+            "Do not use AI features to cheat, impersonate others, create dangerous instructions or evade school rules."
+          ]
+        },
+        {
+          "h": "5. AI features",
+          "p": [
+            "AI responses are generated automatically and may be incomplete or wrong. NowStudy is designed to guide learning rather than guarantee answers. Do not rely on AI for emergency, medical, legal, financial or other high-stakes decisions."
+          ]
+        },
+        {
+          "h": "6. Community content",
+          "p": [
+            "If a feature lets users share stickers or other content with the community, the Community Rules apply. We may reject, hide or remove content and restrict sharing when needed for safety, legality or policy compliance."
+          ]
+        },
+        {
+          "h": "7. Availability and changes",
+          "p": [
+            "We may improve, replace, suspend or discontinue features. We aim to keep family data safe but do not guarantee uninterrupted availability. Users should keep copies of important school documents when appropriate."
+          ]
+        },
+        {
+          "h": "8. Paid features",
+          "p": [
+            "NowKids paid subscription features are purchased through Google Play. Price, billing period, trial (if offered) and auto-renewal terms are shown before purchase. RevenueCat is used to validate purchase/subscription status and unlock entitlements. Billing, cancellation and refunds are also subject to Google Play terms. Deleting the NowKids account or uninstalling the app does not by itself cancel a Google Play subscription."
+          ]
+        },
+        {
+          "h": "9. Intellectual property",
+          "p": [
+            "NowKids software, branding and original service content are protected by applicable rights. Users retain rights in content they upload. For content intentionally shared with the NowKids community, the user grants a limited license needed to host, display, moderate and distribute that content within the feature."
+          ]
+        },
+        {
+          "h": "10. Suspension and termination",
+          "p": [
+            "We may restrict or terminate access where reasonably necessary for child safety, abuse prevention, legal compliance or serious violation of these Terms. Account holders may stop using the service and request deletion at any time."
+          ]
+        },
+        {
+          "h": "11. Liability and mandatory rights",
+          "p": [
+            "To the maximum extent permitted by law, NowKids is provided without a guarantee that every result or reminder is error-free. Nothing in these Terms limits consumer, child-protection or data-protection rights that cannot legally be excluded."
+          ]
+        },
+        {
+          "h": "12. Contact",
+          "p": [
+            "Questions about these Terms: support@mynw.app."
+          ]
+        }
+      ]
+    },
+    "parents": {
+      "title": "Parent & Guardian Notice",
+      "intro": "This notice summarizes the information most relevant to parents and guardians when a child uses NowKids.",
+      "sections": [
+        {
+          "h": "1. Parent-led setup",
+          "p": [
+            "A parent/guardian should create the family space, add the child profile and decide who can join. A linked child account should be created only after parental authorization."
+          ]
+        },
+        {
+          "h": "2. What child information may be stored",
+          "items": [
+            "Name, birth date or age, avatar, school, class/grade and study language.",
+            "Timetable, homework, tests, study progress, activities, books, tasks, reminders and family notes.",
+            "Documents, photos, scans, voice input and AI conversation content when those features are used."
+          ]
+        },
+        {
+          "h": "3. AI context for a child",
+          "p": [
+            "To adapt explanations, NowStudy may send the child’s name, derived age, school name, class/grade, study language, selected subject/topic, recent tutoring history and user-submitted text or image to the AI provider. Parents should avoid entering unnecessary sensitive information."
+          ]
+        },
+        {
+          "h": "4. Parent controls",
+          "p": [
+            "Parents can manage family members, invitations and child information, and can delete content. The product is designed so a child has more limited authority over parent-created notes and family administration."
+          ]
+        },
+        {
+          "h": "5. Permissions",
+          "p": [
+            "Camera/photos, microphone, notifications, calendar and local authentication are used only for the corresponding feature. A parent should review device permissions and disable any feature the child should not use."
+          ]
+        },
+        {
+          "h": "6. No targeted advertising",
+          "p": [
+            "The current NowKids release does not use advertising SDKs or personalized advertising."
+          ]
+        },
+        {
+          "h": "7. Parental consent and age",
+          "p": [
+            "Under GDPR Article 8, when processing relies on consent for an information-society service offered directly to a child, national law can set the relevant age between 13 and 16. NowKids therefore expects parental authorization whenever the child is not legally able to consent independently in the relevant country."
+          ]
+        },
+        {
+          "h": "8. Review, correction and deletion",
+          "p": [
+            "A parent/guardian can request a copy, correction or deletion of the child’s data by contacting support@mynw.app. Account deletion is described at https://mynw.app/nowkids/delete-account/."
+          ]
+        },
+        {
+          "h": "9. Safety concerns",
+          "p": [
+            "If you believe a child is at risk, or content may involve exploitation or abuse of a child, stop using the relevant feature and contact appropriate emergency or child-protection services. You can also report the content to support@mynw.app."
+          ]
+        },
+        {
+          "h": "10. Family Plus billing",
+          "p": [
+            "Family Plus is intended to be purchased by one adult billing owner and then shared with the active Family Space. Child accounts do not purchase or manage the subscription. Other adult family members should see that the plan is managed by the billing owner rather than being prompted to buy again. Server-side family entitlement checks are used in addition to Google Play and RevenueCat client status."
+          ]
+        },
+        {
+          "h": "11. Family notifications",
+          "p": [
+            "Parents can control notification categories. On Android, NowKids can use Firebase Cloud Messaging for functional notifications when the app is in the background or closed, subject to the device’s notification settings."
+          ]
+        }
+      ]
+    },
+    "ai": {
+      "title": "AI & Safety Notice",
+      "intro": "NowKids uses generative AI in NowStudy and related learning features. This page explains what AI does, what it should not do and how unsafe output should be handled.",
+      "sections": [
+        {
+          "h": "1. What AI is used for",
+          "items": [
+            "Explain school concepts in age-appropriate language.",
+            "Guide problem solving step by step instead of immediately giving an answer.",
+            "Create mini-tests and flashcards, check work and build test-preparation plans.",
+            "Analyze a user-submitted school image when the user explicitly chooses that feature.",
+            "Prepare parent-facing learning summaries from available study history."
+          ]
+        },
+        {
+          "h": "2. Data sent to AI",
+          "p": [
+            "An AI request can include the child’s profile context, selected subject/topic, recent tutoring history, the latest prompt and an image supplied for analysis. NowKids sends the request through its server-side function rather than exposing the AI provider key in the app."
+          ]
+        },
+        {
+          "h": "3. Safety principles",
+          "items": [
+            "Age-appropriate explanations and non-shaming feedback.",
+            "No sexual exploitation or abuse content involving children.",
+            "No dangerous, illegal, hateful or deceptive instructions.",
+            "No intentional assistance with cheating or impersonation.",
+            "Ask for clarification rather than inventing unreadable image content."
+          ]
+        },
+        {
+          "h": "4. AI can be wrong",
+          "p": [
+            "Generative AI can hallucinate facts, misread an image, misunderstand context or give an unsuitable explanation. School-critical information should be checked against the teacher, textbook or original school communication."
+          ]
+        },
+        {
+          "h": "5. Reporting unsafe output",
+          "p": [
+            "If an AI response is offensive, unsafe, inappropriate for a child or clearly incorrect, use the in-app feedback/report control available in the released version and/or contact support@mynw.app with enough context to investigate. Do not include passwords or unrelated sensitive information."
+          ]
+        },
+        {
+          "h": "6. Parent supervision",
+          "p": [
+            "Parents should periodically review how younger children use AI features, especially image/voice input and open-ended prompts."
+          ]
+        },
+        {
+          "h": "7. No professional advice",
+          "p": [
+            "AI output is not medical, legal, psychological, financial or emergency advice. In an emergency, contact qualified local services."
+          ]
+        },
+        {
+          "h": "8. Reuse instead of repeated generation",
+          "p": [
+            "When possible, NowStudy reuses a saved scan extraction rather than sending the same image for every follow-up. Preparation plans, flashcards and mini-tests are saved and can be reopened; an explicit request to create a new version may trigger a new AI call. Technical caching is scoped to the relevant family/child."
+          ]
+        }
+      ]
+    },
+    "community": {
+      "title": "Community Content Rules",
+      "intro": "These rules apply to shared stickers and any other NowKids feature where user-created content can become visible to other users.",
+      "sections": [
+        {
+          "h": "1. Keep content child-appropriate",
+          "p": [
+            "Shared content must be suitable for a family and school-age audience."
+          ]
+        },
+        {
+          "h": "2. Prohibited content",
+          "items": [
+            "Sexual content involving minors, grooming, exploitation or abuse.",
+            "Pornographic or explicitly sexual content.",
+            "Bullying, threats, harassment, hate or degrading attacks.",
+            "Graphic violence, self-harm encouragement or dangerous challenges.",
+            "Illegal goods, instructions for serious wrongdoing, malware or credential theft.",
+            "Personal data of a child or another person that should not be public.",
+            "Copyright-infringing or impersonating content."
+          ]
+        },
+        {
+          "h": "3. Moderation",
+          "p": [
+            "Shared content may be reviewed automatically or manually. We may reject, remove, limit or disable content or sharing access where necessary for safety, law or platform policy."
+          ]
+        },
+        {
+          "h": "4. Reporting",
+          "p": [
+            "Report objectionable community content using the in-app reporting option available in the released version or email support@mynw.app with the item details. Urgent child-safety concerns should also be reported to the appropriate local authority."
+          ]
+        },
+        {
+          "h": "5. Your rights in your content",
+          "p": [
+            "You keep ownership of content you create. When you intentionally share it with the community, you grant NowKids a limited, non-exclusive license to store, display, moderate and distribute it inside the service until it is removed, subject to legal retention needs."
+          ]
+        },
+        {
+          "h": "6. Enforcement",
+          "p": [
+            "Serious or repeated violations can lead to removal of content, loss of sharing functions or account restrictions."
+          ]
+        }
+      ]
+    },
+    "rights": {
+      "title": "Data Rights & Requests",
+      "intro": "This page explains how to exercise privacy rights regarding a NowKids account or a child profile.",
+      "sections": [
+        {
+          "h": "1. Requests we can handle",
+          "items": [
+            "Access: obtain information about personal data associated with the account.",
+            "Correction: update inaccurate account, family or child information.",
+            "Deletion: delete specific content, a child profile where permitted, or the account and associated data.",
+            "Portability/export: request a practical copy of data you provided where applicable.",
+            "Restriction or objection: ask us to limit or review certain processing where the law provides that right.",
+            "Withdraw consent: withdraw optional consent or parental authorization where processing relies on it."
+          ]
+        },
+        {
+          "h": "2. How to submit a request",
+          "p": [
+            "Email support@mynw.app from the account email where possible. State the NowKids account email, the type of request, whether it concerns the parent account or a child profile, and enough information to identify the relevant family. Do not send passwords."
+          ]
+        },
+        {
+          "h": "3. Verification",
+          "p": [
+            "To protect children and family data, we may request reasonable verification that the requester controls the account or has parental/guardian authority before disclosing or deleting data."
+          ]
+        },
+        {
+          "h": "4. Response and legal limits",
+          "p": [
+            "We respond in accordance with applicable law. A request may be limited where necessary to protect another person’s rights, comply with law or preserve security/fraud-prevention records."
+          ]
+        },
+        {
+          "h": "5. Complaints",
+          "p": [
+            "Users in the EEA can complain to the data protection authority in their country. In Portugal, the supervisory authority is the Comissão Nacional de Proteção de Dados (CNPD)."
+          ]
+        },
+        {
+          "h": "6. Account deletion",
+          "p": [
+            "For the dedicated deletion process, see https://mynw.app/nowkids/delete-account/."
+          ]
+        }
+      ]
+    },
+    "deletion": {
+      "title": "Delete Your NowKids Account & Data",
+      "intro": "NowKids provides an in-app deletion path and this external web process for users who cannot access the app.",
+      "sections": [
+        {
+          "h": "1. In the app",
+          "p": [
+            "Open the account/menu area, go to the account/data controls and choose the account deletion option. The app may require confirmation to prevent accidental deletion."
+          ]
+        },
+        {
+          "h": "2. External deletion request",
+          "items": [
+            "Email support@mynw.app from the email associated with the NowKids account.",
+            "Use the subject “Delete my NowKids account”.",
+            "State the account email and, if relevant, the family or child profile concerned.",
+            "We may verify account ownership or parental/guardian authority before completing the request."
+          ]
+        },
+        {
+          "h": "3. What is deleted",
+          "p": [
+            "After a valid account-deletion request is completed, the account and associated server-side NowKids data are deleted or anonymized as applicable, including family/child profile data and synchronized content controlled by that account, subject to family ownership rules and legal retention requirements."
+          ]
+        },
+        {
+          "h": "4. Child profile deletion",
+          "p": [
+            "A parent/guardian may request deletion of a child profile without necessarily deleting the parent account, where supported by the current app and family ownership rules."
+          ]
+        },
+        {
+          "h": "5. Local device data",
+          "p": [
+            "Some cached files, settings or downloaded content may remain on a device after cloud deletion. Uninstalling the app or clearing its storage removes local app data from that device but does not by itself guarantee deletion of cloud data."
+          ]
+        },
+        {
+          "h": "6. Legal/security retention",
+          "p": [
+            "Limited records may be kept for the period required by law or reasonably necessary for security, abuse prevention, dispute handling or accounting. They are not kept for advertising."
+          ]
+        },
+        {
+          "h": "7. Subscriptions",
+          "p": [
+            "Deleting the NowKids account or uninstalling the app does not automatically cancel a Google Play subscription. Cancel the subscription separately in Google Play Subscriptions. Access may continue until the end of the paid period according to Google Play terms."
+          ]
+        },
+        {
+          "h": "8. Linked child accounts",
+          "p": [
+            "The destructive account/data controls are not shown inside a linked child account. A parent or guardian manages deletion of the child profile/data or can submit an external deletion request when appropriate."
+          ]
+        }
+      ]
+    },
+    "support": {
+      "title": "NowKids Support & Safety Contact",
+      "intro": "Contact support@mynw.app for product support, privacy requests, child-safety concerns or content reports.",
+      "sections": [
+        {
+          "h": "General support",
+          "p": [
+            "For sign-in, synchronization, calendar, school, family, document, notification or other technical problems, include the device model, Android version, app version and a short description of what happened."
+          ]
+        },
+        {
+          "h": "Privacy & data",
+          "p": [
+            "For access, correction, export or deletion requests, use support@mynw.app and identify the relevant account/family without sending passwords."
+          ]
+        },
+        {
+          "h": "AI safety",
+          "p": [
+            "For an inappropriate or unsafe AI answer, use the in-app reporting/feedback control where available and include the feature, prompt context and approximate time."
+          ]
+        },
+        {
+          "h": "Community content",
+          "p": [
+            "For an objectionable shared sticker or other community item, use the in-app report option where available or email the item details."
+          ]
+        },
+        {
+          "h": "Child safety",
+          "p": [
+            "For urgent risk to a child, contact the appropriate local emergency or child-protection authority first. You may also notify us at support@mynw.app so we can review relevant account/content controls."
+          ]
+        },
+        {
+          "h": "Security",
+          "p": [
+            "If you believe you found a security issue, email support@mynw.app with a concise reproduction description. Do not publicly disclose personal data or exploit the issue beyond what is necessary to demonstrate it."
+          ]
+        }
+      ]
+    },
+    "manual": {
+      "title": "NowKids User Guide",
+      "intro": "A practical guide to the main NowKids features for adults and children.",
+      "sections": [
+        {
+          "h": "Family & child accounts",
+          "p": [
+            "Adults create and manage the Family Space. Child access is linked to a parent-authorized child profile. Child mode does not expose account/data deletion controls."
+          ]
+        },
+        {
+          "h": "NowStudy & scans",
+          "p": [
+            "A school scan is analyzed once when possible. Follow-up questions reuse the saved extraction instead of resending the image. Saved plans, flashcards and mini-tests can be reopened."
+          ]
+        },
+        {
+          "h": "Saved study materials",
+          "p": [
+            "Preparation plans, mini-tests, flashcards and completed study sessions are stored by subject. Opening one saved type should not hide the others if a separate category cannot load."
+          ]
+        },
+        {
+          "h": "Notifications",
+          "p": [
+            "Notification categories can be controlled separately. Android functional push notifications use Firebase Cloud Messaging and also respect the system notification settings."
+          ]
+        },
+        {
+          "h": "Family Plus",
+          "p": [
+            "One adult is the billing owner. An active Family Plus entitlement applies to the Family Space; children do not buy subscriptions and another adult should see who manages the active plan."
+          ]
+        },
+        {
+          "h": "Privacy & AI usage",
+          "p": [
+            "NowKids records technical AI usage information for cost, reliability and cache measurement without writing the child’s prompt text into the ai_usage ledger. Temporary AI caches are scoped to the family/child."
+          ]
+        },
+        {
+          "h": "Safety & deletion",
+          "p": [
+            "AI answers and user content can be reported. Adults manage child access and deletion. For privacy or deletion requests use support@mynw.app."
+          ]
+        }
+      ]
+    }
+  }
+}
