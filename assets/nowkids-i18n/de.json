@@ -23,7 +23,7 @@
       "terms": "Regeln für NowKids, Familienkonten, Schulfunktionen und Verantwortlichkeiten.",
       "parents": "Klare Informationen für Eltern und Sorgeberechtigte zu Kinderkonten und elterlicher Zustimmung.",
       "ai": "Wie die NowStudy-KI funktioniert, ihre Grenzen, Schutzmaßnahmen und Meldung unsicherer Ausgaben.",
-      "community": "Regeln für geteilte Sticker und andere Inhalte, die andere Nutzer sehen können.",
+      "community": "Regeln für geteilte Aufkleber und andere Inhalte, die andere Nutzer sehen können.",
       "rights": "So können personenbezogene Daten eingesehen, berichtigt, exportiert, eingeschränkt oder gelöscht werden.",
       "deletion": "So werden Konto und zugehörige Serverdaten gelöscht.",
       "support": "Kontakt bei Fehlern, Datenschutz, Kindersicherheit oder Inhalten.",
@@ -138,7 +138,7 @@
           ]
         },
         {
-          "h": "15. KI-Wiederverwendung, Cache und technische Nutzungsdaten",
+          "h": "15. KI-Wiederverwendung, Zwischenspeicher und technische Nutzungsdaten",
           "p": [
             "Um wiederholte KI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe SchulsScan wird nach Möglichkeit einmal erkannt; Extraktionen aus Digitalisierungen können bis zu 30 Tage, andere KI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Eingaben."
           ]
@@ -364,7 +364,7 @@
     },
     "community": {
       "title": "Community-Inhaltsregeln",
-      "intro": "Für geteilte Sticker und andere sichtbare Nutzerinhalte.",
+      "intro": "Für geteilte Aufkleber und andere sichtbare Nutzerinhalte.",
       "sections": [
         {
           "h": "1. Kindgerecht",
@@ -471,7 +471,7 @@
           "h": "2. Externer Antrag",
           "items": [
             "E-Mail von der Konto-Adresse an support@mynw.app.",
-            "Betreff „Delete my NowKids account“.",
+            "Betreff „Mein NowKids-Konto löschen“.",
             "Konto und ggf. Familie/Kinderprofil nennen.",
             "Eigentum/Sorgeberechtigung kann geprüft werden."
           ]
@@ -491,7 +491,7 @@
         {
           "h": "5. Lokale Daten",
           "p": [
-            "Cache kann auf Geräten verbleiben; Deinstallation allein löscht nicht zwingend Cloud-Daten."
+            "Zwischengespeicherte Daten können auf Geräten verbleiben; eine Deinstallation allein löscht nicht zwingend serverseitige Daten."
           ]
         },
         {
@@ -539,7 +539,7 @@
         {
           "h": "Community",
           "p": [
-            "Unzulässige Sticker/Inhalte per integrierte Meldung oder E-Mail melden."
+            "Unzulässige Aufkleber oder Inhalte über die integrierte Meldung oder per E-Mail melden."
           ]
         },
         {
@@ -599,7 +599,7 @@
         {
           "h": "Datenschutz & KI",
           "p": [
-            "NowKids protokolliert technische KI-Nutzungsdaten für Kosten, Zuverlässigkeit und Cache, ohne Kinder-Prompttexte in ai_usage zu speichern."
+            "NowKids protokolliert technische KI-Nutzungsdaten für Kosten, Zuverlässigkeit und Zwischenspeicherung, ohne die Texteingaben des Kindes im technischen Nutzungsprotokoll zu speichern."
           ]
         },
         {
