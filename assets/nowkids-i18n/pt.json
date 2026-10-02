@@ -580,7 +580,7 @@
         {
           "h": "Notificações",
           "p": [
-            "As categorias podem ser controladas separadamente. As notificações push funcionais Android usam Firebase Cloud Messaging e respeitam as definições do sistema."
+            "As categorias de notificações podem ser controladas separadamente. No Android, notificações locais e push usam o ícone de sistema NowKids com prioridade alta e podem aparecer no ecrã bloqueado sem modo de ecrã inteiro. Som e vibração seguem as definições do canal Android. Notificações expandidas podem mostrar o logótipo NowKids ou uma imagem temática; se falhar, a notificação normal com ícone continua a funcionar. Lembretes agendados são restaurados após reiniciar o dispositivo."
           ]
         },
         {
