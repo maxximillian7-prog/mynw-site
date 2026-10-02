@@ -147,7 +147,7 @@
         {
           "h": "16. Book catalog lookups",
           "p": [
-            "When a user starts a book search, NowKids may send the entered title, author, ISBN and requested catalog language to Open Library and, when configured, Google Books. These requests are proxied through a protected server function. NowKids does not include the account ID, email address, family ID, child-profile data or authentication token in catalog-provider requests, and the catalog function does not write the lookup parameters to the NowKids database."
+            "When a user starts a book lookup, NowKids may send the entered title, author, ISBN and requested catalog language to Open Library and, when configured, Google Books through a protected server function. Provider requests do not include the NowKids account ID, email address, family ID, child-profile data or authentication token. Raw lookup text is not stored in the shared catalog cache; public catalog responses may be cached with a hashed request key and expiry time to reduce repeated provider requests."
           ]
         }
       ]
@@ -592,9 +592,13 @@
           ]
         },
         {
-          "h": "Books & catalog search",
+          "h": "Books, covers & recommendations",
           "p": [
-            "Books can be added manually or searched by title, author and ISBN. Catalog lookups run through a protected NowKids server function and may query Open Library and, when configured, Google Books."
+            "The add button offers three paths: Scan ISBN, Find a book, or Add manually. Catalog search accepts title, author or ISBN and shows real catalog matches before you save one.",
+            "Books are shown as covers. Tap a cover to open the book page with its title, author, available catalog details and a short catalog description. Long-press a cover to mark the book read/unread, add or change a photo, restore a catalog cover when available, or delete the book.",
+            "NowKids looks up real book metadata through a protected server function. Open Library is the primary catalog and Google Books is used as a fallback when configured. If no remote cover is available, NowKids shows a local fallback cover with a book icon, title and author.",
+            "Previously loaded book rows, metadata and remote cover images are cached on the device when available so the library can remain useful offline. Custom book photos are stored privately in NowKids storage.",
+            "The AI recommendation field is optional. If left empty, suggestions use the child’s age, class/grade and reading/study language. If filled in, it can include preferences such as genre, language or topic. AI candidates are verified against the book catalog before they are shown as real books; unverified titles are discarded."
           ]
         },
         {
