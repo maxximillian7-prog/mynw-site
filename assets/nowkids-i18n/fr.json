@@ -569,13 +569,13 @@
         {
           "h": "Famille et comptes enfants",
           "p": [
-            "Les adultes gèrent le espace familial. L’accès enfant est lié à un profil autorisé par le parent. Le mode enfant n’affiche pas la suppression du compte/des données."
+            "Les adultes gèrent l’espace familial. L’accès enfant est lié à un profil autorisé par le parent. Le mode enfant n’affiche pas la suppression du compte/des données."
           ]
         },
         {
           "h": "NowStudy et numérisations",
           "p": [
-            "Un numérisation scolaire est analysé une fois lorsque possible. Les questions suivantes réutilisent l’extraction enregistrée. Plans, cartes et mini-tests peuvent être rouverts."
+            "Une numérisation scolaire est analysée une fois lorsque possible. Les questions suivantes réutilisent l’extraction enregistrée. Plans, cartes et mini-tests peuvent être rouverts."
           ]
         },
         {
@@ -593,13 +593,13 @@
         {
           "h": "Family Plus",
           "p": [
-            "Un adulte est responsable de la facturation. Un Family Plus actif s’applique au espace familial; les enfants n’achètent pas."
+            "Un adulte est responsable de la facturation. Un Family Plus actif s’applique à l’espace familial; les enfants n’achètent pas."
           ]
         },
         {
           "h": "Confidentialité et IA",
           "p": [
-            "NowKids journalise des données techniques IA pour coûts, fiabilité et cache sans enregistrer les requêtes de l’enfant dans journal technique."
+            "NowKids journalise des données techniques IA pour les coûts, la fiabilité et le cache sans enregistrer les requêtes de l’enfant dans le journal technique."
           ]
         },
         {
