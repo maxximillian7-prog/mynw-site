@@ -49,7 +49,7 @@
             "Famille/enfant : nom, rôle, libellé de relation, date de naissance/âge, avatar, école, classe et langue d’étude.",
             "Données scolaires/familiales : matières, emploi du temps, devoirs, préparation aux tests, plans, activités, livres, événements, rappels, listes et notes.",
             "Documents, photos, numérisations, texte, voix/audio, transcriptions et fichiers fournis.",
-            "Contexte IA : demande, matière/sujet, historique et données pertinentes de l’enfant comme nom, âge calculé, école, classe et langue ; image seulement si la fonction est choisie.",
+            "Contexte IA : la demande, la matière/le sujet sélectionné, le contexte récent de la conversation et uniquement les données minimales du profil d’apprentissage nécessaires pour adapter la réponse — âge calculé, classe/niveau, langue d’étude et mode d’âge. Le nom de l’enfant et le nom de l’école ne sont pas inclus dans le contexte IA de NowStudy. Les images ne sont incluses que lorsque l’utilisateur choisit une fonction IA basée sur une image.",
             "Données opérationnelles : compteurs, modèle/tokens IA, journaux d’erreur/sécurité et informations techniques.",
             "Autorisations optionnelles : notifications, calendrier, appareil photo/photos, microphone, authentification locale et réglages.",
             "Données d’abonnement et d’achat : identifiants de produit, état achat/renouvellement, état des droits (droits d’accès), métadonnées de transaction/reçu et identifiant utilisateur de l’application utilisé pour valider l’accès. NowKids ne reçoit pas les données complètes de carte bancaire de Google Play ou RevenueCat."
@@ -324,7 +324,7 @@
         {
           "h": "2. Données IA",
           "p": [
-            "Contexte profil, sujet, historique, demande et image peuvent être traités via la fonction serveur."
+            "Une demande peut inclure l’âge calculé de l’enfant, sa classe/son niveau, sa langue d’étude et son mode d’âge, la matière/le sujet sélectionné, l’historique récent du tutorat, la demande actuelle et une image fournie pour analyse. NowStudy n’inclut ni le nom de l’enfant ni le nom de l’école dans le contexte IA. La demande est envoyée via une fonction côté serveur ; la clé du fournisseur d’IA n’est pas exposée dans l’application."
           ]
         },
         {
@@ -334,7 +334,8 @@
             "Aucune exploitation sexuelle d’enfants.",
             "Pas d’instructions dangereuses, illégales, haineuses ou trompeuses.",
             "Pas d’aide intentionnelle à la fraude.",
-            "Demander une clarification plutôt qu’inventer un contenu illisible."
+            "Demander une clarification plutôt qu’inventer un contenu illisible.",
+            "NowStudy vérifie les textes/images envoyés et les réponses générées au moyen d’une modération de sécurité automatisée. Si la vérification de sécurité est bloquée ou indisponible, la demande échoue de manière sûre au lieu de contourner la couche de protection."
           ]
         },
         {

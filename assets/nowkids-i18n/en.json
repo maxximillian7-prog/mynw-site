@@ -49,7 +49,7 @@
             "Family and child profile data: name, family role, relationship label, birth date or age information, avatar, school name, class/grade and study language.",
             "School and family data: subjects, timetable, homework, test preparation, study plans, activities, books, events, reminders, packing lists, family tasks and notes.",
             "Content you choose to provide: documents, photos, scans, text, voice input or audio, transcriptions and other files used by a feature.",
-            "AI context: the request, selected subject/topic, recent conversation context and relevant child profile information such as name, derived age, school, class and study language. Images are included only when the user chooses an image-based AI feature.",
+            "AI context: the request, selected subject/topic, recent conversation context and the minimum learning-profile data needed to adapt the response — derived age, class/grade, study language and age-mode. The child’s name and school name are not included in the NowStudy AI context. Images are included only when the user chooses an image-based AI feature.",
             "Operational data: feature usage counters, AI model/token usage, error and security logs, device/app technical information needed to operate and secure the service.",
             "Device permissions and local data: notifications, calendar access, camera/photos, microphone, local authentication and local settings when the user enables the corresponding feature.",
             "Subscription and purchase data: product identifiers, purchase/renewal status, entitlement status, transaction/receipt metadata and an App User ID used to validate access. NowKids does not receive full payment card details from Google Play or RevenueCat."
@@ -324,7 +324,7 @@
         {
           "h": "2. Data sent to AI",
           "p": [
-            "An AI request can include the child’s profile context, selected subject/topic, recent tutoring history, the latest prompt and an image supplied for analysis. NowKids sends the request through its server-side function rather than exposing the AI provider key in the app."
+            "A request can include the child’s derived age, class/grade, study language and age-mode, selected subject/topic, recent tutoring history, the current prompt and an image supplied for analysis. NowStudy does not include the child’s name or school name in the AI context. The request is sent through a server-side function; the AI provider key is not exposed in the app."
           ]
         },
         {
@@ -334,7 +334,8 @@
             "No sexual exploitation or abuse content involving children.",
             "No dangerous, illegal, hateful or deceptive instructions.",
             "No intentional assistance with cheating or impersonation.",
-            "Ask for clarification rather than inventing unreadable image content."
+            "Ask for clarification rather than inventing unreadable image content.",
+            "NowStudy checks submitted text/images and generated responses with automated safety moderation. If the safety check is blocked or unavailable, the request fails closed rather than bypassing the safety layer."
           ]
         },
         {

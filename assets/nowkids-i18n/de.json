@@ -49,7 +49,7 @@
             "Familie/Kind: Name, Familienrolle, Beziehungsbezeichnung, Geburtsdatum/Alter, Avatar, Schule, Klasse und Lernsprache.",
             "Schul- und Familiendaten: Fächer, Stundenplan, Hausaufgaben, Testvorbereitung, Lernpläne, Aktivitäten, Bücher, Termine, Erinnerungen, Packlisten, Aufgaben und Notizen.",
             "Vom Nutzer bereitgestellte Dokumente, Fotos, Digitalisierungen, Texte, Sprache/Audio, Transkripte und Dateien.",
-            "KI-Kontext: Anfrage, Fach/Thema, Verlauf und relevante Profildaten des Kindes wie Name, berechnetes Alter, Schule, Klasse und Lernsprache; Bilder nur bei gewählter Bildfunktion.",
+            "KI-Kontext: Anfrage, ausgewähltes Fach/Thema, jüngerer Gesprächskontext und nur die für die Anpassung der Antwort erforderlichen minimalen Lernprofildaten — abgeleitetes Alter, Klasse/Jahrgang, Unterrichtssprache und Altersmodus. Name des Kindes und Schulname werden nicht in den NowStudy-KI-Kontext aufgenommen. Bilder werden nur einbezogen, wenn eine bildbasierte KI-Funktion ausgewählt wird.",
             "Betriebsdaten: Nutzungszähler, KI-Modell-/Token-Nutzung, Fehler-/Sicherheitsprotokolle und technische Daten.",
             "Optionale Berechtigungen: Benachrichtigungen, Kalender, Kamera/Fotos, Mikrofon, lokale Authentifizierung und lokale Einstellungen.",
             "Abonnement- und Kaufdaten: Produktkennungen, Kauf-/Verlängerungsstatus, Zugriffsrecht-Status, Transaktions-/Belegmetadaten und eine Benutzerkennung der Anwendung zur Zugriffsprüfung. NowKids erhält keine vollständigen Zahlungskartendaten von Google Play oder RevenueCat."
@@ -324,7 +324,7 @@
         {
           "h": "2. KI-Daten",
           "p": [
-            "Profilkontext, Thema, Verlauf, aktuelle Anfrage und ggf. Bild können über die Serverfunktion verarbeitet werden."
+            "Eine Anfrage kann das abgeleitete Alter des Kindes, Klasse/Jahrgang, Unterrichtssprache und Altersmodus, das ausgewählte Fach/Thema, den jüngeren Lernverlauf, die aktuelle Anfrage und ein zur Analyse bereitgestelltes Bild enthalten. NowStudy nimmt weder den Namen des Kindes noch den Schulnamen in den KI-Kontext auf. Die Anfrage wird über eine serverseitige Funktion gesendet; der Schlüssel des KI-Anbieters wird nicht in der App offengelegt."
           ]
         },
         {
@@ -334,7 +334,8 @@
             "Keine sexuelle Ausbeutung von Kindern.",
             "Keine gefährlichen, illegalen, hasserfüllten oder täuschenden Anweisungen.",
             "Keine absichtliche Betrugshilfe.",
-            "Bei unleserlichen Bildern nachfragen statt erfinden."
+            "Bei unleserlichen Bildern nachfragen statt erfinden.",
+            "NowStudy prüft übermittelte Texte/Bilder und generierte Antworten mit automatisierter Sicherheitsmoderation. Ist die Sicherheitsprüfung blockiert oder nicht verfügbar, wird die Anfrage sicher abgebrochen, anstatt die Schutzschicht zu umgehen."
           ]
         },
         {

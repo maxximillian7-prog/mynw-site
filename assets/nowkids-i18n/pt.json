@@ -49,7 +49,7 @@
             "Dados da família e da criança: nome, função familiar, identificação da relação, data de nascimento ou idade, avatar, escola, turma/ano e idioma de estudo.",
             "Dados escolares e familiares: disciplinas, horário, trabalhos de casa, preparação para testes, planos de estudo, atividades, livros, eventos, lembretes, listas, tarefas e notas familiares.",
             "Conteúdo fornecido pelo utilizador: documentos, fotografias, digitalizações, texto, voz/áudio, transcrições e outros ficheiros.",
-            "Contexto de IA: pedido, disciplina/tópico, contexto recente e dados relevantes do perfil da criança, incluindo nome, idade derivada, escola, turma e idioma de estudo. Imagens só são incluídas quando o utilizador escolhe uma função de IA com imagem.",
+            "Contexto de IA: o pedido, disciplina/tópico, contexto recente e apenas os dados mínimos do perfil de aprendizagem necessários para adaptar a resposta — idade derivada, turma/ano, idioma de estudo e modo etário. O nome da criança e o nome da escola não são incluídos no contexto de IA do NowStudy. Imagens só são incluídas quando o utilizador escolhe uma função de IA com imagem.",
             "Dados operacionais: contadores de utilização, uso de modelos/tokens de IA, registos de erro/segurança e informação técnica necessária ao serviço.",
             "Permissões e dados locais: notificações, calendário, câmara/fotos, microfone, autenticação local e definições quando a função correspondente é usada.",
             "Dados de subscrição e compra: identificadores de produto, estado da compra/renovação, estado de direito de acesso/acesso, metadados de transação/recibo e um identificador do utilizador da aplicação usado para validar o acesso. O NowKids não recebe os dados completos do cartão de pagamento do Google Play ou da RevenueCat."
@@ -324,7 +324,7 @@
         {
           "h": "2. Dados enviados",
           "p": [
-            "Um pedido pode incluir contexto do perfil da criança, disciplina/tópico, histórico recente, pedido atual e imagem fornecida. O pedido passa por função de servidor; a chave do fornecedor de IA não é exposta na aplicação."
+            "Um pedido pode incluir a idade derivada da criança, turma/ano, idioma de estudo e modo etário, disciplina/tópico, histórico recente de tutoria, pedido atual e uma imagem fornecida para análise. O NowStudy não inclui o nome da criança nem o nome da escola no contexto de IA. O pedido é enviado através de uma função no servidor; a chave do fornecedor de IA não é exposta na aplicação."
           ]
         },
         {
@@ -334,7 +334,8 @@
             "Sem conteúdo de exploração ou abuso sexual infantil.",
             "Sem instruções perigosas, ilegais, odiosas ou enganosas.",
             "Sem apoio intencional à fraude académica ou personificação.",
-            "Pedir esclarecimento em vez de inventar conteúdo ilegível."
+            "Pedir esclarecimento em vez de inventar conteúdo ilegível.",
+            "O NowStudy verifica texto/imagens enviados e respostas geradas através de moderação automática de segurança. Se a verificação de segurança for bloqueada ou estiver indisponível, o pedido falha de forma fechada em vez de contornar a camada de segurança."
           ]
         },
         {

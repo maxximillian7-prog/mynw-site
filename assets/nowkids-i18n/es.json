@@ -49,7 +49,7 @@
             "Familia/menor: nombre, rol, etiqueta de relación, fecha de nacimiento/edad, avatar, escuela, curso y lengua de estudio.",
             "Datos escolares/familiares: materias, horario, deberes, preparación de pruebas, planes, actividades, libros, eventos, recordatorios, listas y notas.",
             "Documentos, fotos, escaneos, texto, voz/audio, transcripciones y archivos proporcionados.",
-            "Contexto IA: solicitud, materia/tema, historial y datos relevantes del menor como nombre, edad derivada, escuela, curso y lengua; imagen solo si se selecciona esa función.",
+            "Contexto de IA: la solicitud, la asignatura/el tema seleccionado, el contexto reciente de la conversación y solo los datos mínimos del perfil de aprendizaje necesarios para adaptar la respuesta — edad calculada, curso, idioma de estudio y modo de edad. El nombre del menor y el nombre del centro escolar no se incluyen en el contexto de IA de NowStudy. Las imágenes solo se incluyen cuando el usuario elige una función de IA basada en imágenes.",
             "Datos operativos: contadores, modelo/tokens IA, registros de error/seguridad e información técnica.",
             "Permisos opcionales: notificaciones, calendario, cámara/fotos, micrófono, autenticación local y ajustes.",
             "Datos de suscripción y compra: identificadores de producto, estado de compra/renovación, estado de derecho de acceso, metadatos de transacción/recibo y un identificador de usuario de la aplicación usado para validar el acceso. NowKids no recibe los datos completos de la tarjeta de pago de Google Play o RevenueCat."
@@ -324,7 +324,7 @@
         {
           "h": "2. Datos IA",
           "p": [
-            "Contexto de perfil, tema, historial, solicitud e imagen pueden procesarse mediante función servidor."
+            "Una solicitud puede incluir la edad calculada del menor, curso, idioma de estudio y modo de edad, la asignatura/el tema seleccionado, el historial reciente de tutoría, la solicitud actual y una imagen proporcionada para su análisis. NowStudy no incluye el nombre del menor ni el nombre del centro escolar en el contexto de IA. La solicitud se envía mediante una función del servidor; la clave del proveedor de IA no se expone en la aplicación."
           ]
         },
         {
@@ -334,7 +334,8 @@
             "Nada de explotación sexual infantil.",
             "Nada de instrucciones peligrosas, ilegales, de odio o engañosas.",
             "No ayuda intencional al fraude.",
-            "Pedir aclaración en vez de inventar contenido ilegible."
+            "Pedir aclaración en vez de inventar contenido ilegible.",
+            "NowStudy comprueba el texto/las imágenes enviados y las respuestas generadas mediante moderación automática de seguridad. Si la comprobación de seguridad está bloqueada o no está disponible, la solicitud falla de forma segura en lugar de omitir la capa de protección."
           ]
         },
         {
