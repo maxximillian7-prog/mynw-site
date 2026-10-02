@@ -142,6 +142,12 @@
           "p": [
             "Um wiederholte KI-Verarbeitung zu reduzieren, kann NowKids temporär familien-/kindbezogene Extraktionen oder generierte Ergebnisse zwischenspeichern. Derselbe Schulscan wird nach Möglichkeit einmal erkannt; Extraktionen aus Digitalisierungen können bis zu 30 Tage, andere KI-Cacheeinträge bis zu 14 Tage gespeichert werden. Gespeicherte Lernpläne, Karteikarten und Mini-Tests bleiben bis zur Löschung erhalten. ai_usage enthält technische Felder, nicht den Inhalt der Kinder-Eingaben."
           ]
+        },
+        {
+          "h": "16. Buchkatalog-Abfragen",
+          "p": [
+            "Wenn ein Nutzer eine Buchsuche startet, kann NowKids den eingegebenen Titel, Autor, ISBN und die gewünschte Katalogsprache an Open Library und, sofern eingerichtet, an Google Books senden. Die Anfrage läuft über eine geschützte Serverfunktion. NowKids übermittelt dabei keine Konto-ID, E-Mail-Adresse, Familien-ID, Kinderprofildaten oder Authentifizierungstoken, und die Katalogfunktion speichert die Suchparameter nicht in der NowKids-Datenbank."
+          ]
         }
       ]
     },
@@ -582,6 +588,12 @@
           "h": "Gespeicherte Lernmaterialien",
           "p": [
             "Pläne, Mini-Tests, Karteikarten und abgeschlossene Sitzungen werden je Fach gespeichert. Ein Fehler in einer Kategorie soll die anderen nicht ausblenden."
+          ]
+        },
+        {
+          "h": "Bücher und Katalogsuche",
+          "p": [
+            "Bücher können manuell hinzugefügt oder nach Titel, Autor und ISBN gesucht werden. Katalogabfragen laufen über eine geschützte NowKids-Serverfunktion und können Open Library sowie, sofern eingerichtet, Google Books verwenden."
           ]
         },
         {
