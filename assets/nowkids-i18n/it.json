@@ -580,7 +580,7 @@
         {
           "h": "Notifiche",
           "p": [
-            "Le categorie sono indipendenti. Le push funzionali Android usano Firebase Cloud Messaging."
+            "Le categorie di notifica si controllano separatamente. Su Android, notifiche locali e push usano l’icona di sistema NowKids, priorità alta e possono apparire nella schermata di blocco senza intent a schermo intero. Suono e vibrazione seguono le impostazioni del canale Android. Le notifiche espanse possono mostrare il logo NowKids o un’immagine tematica; se l’immagine non si carica, la notifica normale con icona continua a funzionare. I promemoria programmati vengono ripristinati dopo il riavvio."
           ]
         },
         {
