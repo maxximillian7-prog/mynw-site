@@ -83,7 +83,7 @@
           "items": [
             "Supabase — authentication, database, storage, realtime synchronization and server-side functions.",
             "OpenAI — AI inference for NowStudy and related AI features.",
-            "Google — Google sign-in where selected, Android/Google Play distribution, billing if paid features are introduced, and platform services selected by the user.",
+            "Google — Google sign-in where selected, Android/Google Play distribution, Google Play billing for paid features, and platform services selected by the user.",
             "RevenueCat — subscription/purchase validation, App User ID, CustomerInfo and entitlement status used to unlock paid features.",
             "Firebase Cloud Messaging — functional Android push-notification delivery using app installation/push tokens."
           ]
@@ -560,6 +560,12 @@
       "title": "NowKids User Guide",
       "intro": "A practical guide to the main NowKids features for adults and children.",
       "sections": [
+        {
+          "h": "App language",
+          "p": [
+            "On first use, NowKids follows the device system language. A language chosen manually in Settings is saved and takes priority on that device."
+          ]
+        },
         {
           "h": "Family & child accounts",
           "p": [
