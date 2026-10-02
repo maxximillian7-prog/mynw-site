@@ -84,7 +84,8 @@
             "Supabase — authentication, database, storage, realtime synchronization and server-side functions.",
             "OpenAI — AI inference for NowStudy and related AI features.",
             "Google — Google sign-in where selected, Android/Google Play distribution, billing if paid features are introduced, and platform services selected by the user.",
-            "RevenueCat — subscription/purchase validation, App User ID, CustomerInfo and entitlement status used to unlock paid features."
+            "RevenueCat — subscription/purchase validation, App User ID, CustomerInfo and entitlement status used to unlock paid features.",
+            "Firebase Cloud Messaging — functional Android push-notification delivery using app installation/push tokens."
           ]
         },
         {
@@ -196,7 +197,7 @@
         {
           "h": "8. Paid features",
           "p": [
-            "NowKids paid subscription features are purchased through Google Play. Price, billing period, trial (if offered) and auto-renewal terms are shown before purchase. RevenueCat is used to validate purchase/subscription status and unlock entitlements. Billing, cancellation and refunds are also subject to Google Play terms. Deleting the NowKids account or uninstalling the app does not by itself cancel a Google Play subscription."
+            "NowKids paid subscription features are purchased through Google Play. Family Plus is intended to have one adult billing owner and an active entitlement is shared with the Family Space; child accounts do not purchase or manage the subscription. Before purchase, NowKids performs a server-side family entitlement check in addition to the RevenueCat client status to reduce accidental duplicate family purchases. Price, billing period, trial (if offered) and auto-renewal terms are shown before purchase. RevenueCat is used to validate and restore subscription status. Deleting the NowKids account or uninstalling the app does not by itself cancel a Google Play subscription."
           ]
         },
         {
