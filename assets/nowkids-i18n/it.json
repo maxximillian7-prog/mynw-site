@@ -594,6 +594,7 @@
         {
           "h": "Libri, copertine e suggerimenti",
           "p": [
+            "Il pulsante di aggiunta offre tre modalità: Scansiona ISBN, Trova un libro o Aggiungi manualmente. La ricerca accetta titolo, autore o ISBN e mostra risultati reali del catalogo prima del salvataggio.",
             "I libri sono mostrati come copertine. Un tocco apre la pagina del libro con titolo, autore, dati disponibili del catalogo e una breve descrizione. Una pressione prolungata permette di segnare letto/non letto, aggiungere o cambiare una foto, ripristinare la copertina del catalogo quando disponibile o eliminare il libro.",
             "NowKids cerca metadati reali tramite una funzione server protetta. Open Library è la fonte principale e Google Books viene usato come alternativa quando configurato. Se non è disponibile una copertina remota, NowKids mostra una copertina locale con icona del libro, titolo e autore.",
             "Libri, metadati e copertine remote già caricati vengono memorizzati nella cache del dispositivo quando possibile, così la libreria resta utile offline. Le foto personalizzate dei libri sono conservate privatamente nello storage NowKids.",
