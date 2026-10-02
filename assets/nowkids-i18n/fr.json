@@ -23,7 +23,7 @@
       "terms": "Règles d’utilisation de NowKids, comptes familiaux, fonctions scolaires et responsabilités.",
       "parents": "Information claire pour les parents et responsables sur les comptes enfants et l’autorisation parentale.",
       "ai": "Fonctionnement de l’IA NowStudy, limites, protections et signalement d’un résultat dangereux.",
-      "community": "Règles pour les stickers partagés et autres contenus visibles par d’autres utilisateurs.",
+      "community": "Règles pour les autocollants partagés et autres contenus visibles par d’autres utilisateurs.",
       "rights": "Comment accéder, corriger, exporter, limiter ou supprimer les données personnelles.",
       "deletion": "Comment supprimer un compte et les données serveur associées.",
       "support": "Comment nous contacter au sujet de bugs, confidentialité, sécurité des enfants ou contenu.",
@@ -48,7 +48,7 @@
             "Compte parent/responsable : ID, e-mail, nom affiché, fournisseur de connexion, langue, fuseau horaire et réglages.",
             "Famille/enfant : nom, rôle, libellé de relation, date de naissance/âge, avatar, école, classe et langue d’étude.",
             "Données scolaires/familiales : matières, emploi du temps, devoirs, préparation aux tests, plans, activités, livres, événements, rappels, listes et notes.",
-            "Documents, photos, scans, texte, voix/audio, transcriptions et fichiers fournis.",
+            "Documents, photos, numérisations, texte, voix/audio, transcriptions et fichiers fournis.",
             "Contexte IA : demande, matière/sujet, historique et données pertinentes de l’enfant comme nom, âge calculé, école, classe et langue ; image seulement si la fonction est choisie.",
             "Données opérationnelles : compteurs, modèle/tokens IA, journaux d’erreur/sécurité et informations techniques.",
             "Autorisations optionnelles : notifications, calendrier, appareil photo/photos, microphone, authentification locale et réglages.",
@@ -82,7 +82,7 @@
           "items": [
             "Supabase — authentification, base, stockage, realtime et fonctions serveur.",
             "OpenAI — inférence IA.",
-            "Google — Google Sign-In, Android/Google Play et services de plateforme choisis.",
+            "Google — connexion avec Google lorsque choisie, distribution Android/Google Play, facturation des fonctions payantes via Google Play et services de plateforme sélectionnés par l’utilisateur.",
             "RevenueCat — validation des abonnements/achats, App User ID, CustomerInfo et état des entitlements utilisés pour débloquer les fonctions payantes.",
             "Firebase Cloud Messaging — livraison de notifications push fonctionnelles Android à l’aide d’un jeton d’installation/push de l’application."
           ]
@@ -137,9 +137,9 @@
           ]
         },
         {
-          "h": "15. Réutilisation AI, cache et données techniques",
+          "h": "15. Réutilisation IA, cache et données techniques",
           "p": [
-            "Pour réduire les traitements AI répétés, NowKids peut conserver temporairement une extraction ou un résultat généré lié à la famille/l’enfant. Le même scan scolaire est reconnu une seule fois lorsque possible; les extractions peuvent rester en cache jusqu’à 30 jours et d’autres résultats AI jusqu’à 14 jours. Les plans, cartes et mini-tests enregistrés restent jusqu’à suppression. ai_usage contient des champs techniques et non le contenu des prompts de l’enfant."
+            "Pour réduire les traitements IA répétés, NowKids peut conserver temporairement une extraction ou un résultat généré lié à la famille/l’enfant. Le même numérisation scolaire est reconnu une seule fois lorsque possible; les extractions peuvent rester en cache jusqu’à 30 jours et d’autres résultats IA jusqu’à 14 jours. Les plans, cartes et mini-tests enregistrés restent jusqu’à suppression. ai_usage contient des champs techniques et non le contenu des requêtes de l’enfant."
           ]
         }
       ]
@@ -196,7 +196,7 @@
         {
           "h": "8. Paiement",
           "p": [
-            "Les fonctions payantes NowKids sont achetées via Google Play. Family Plus est prévu pour un seul adulte responsable de la facturation et l’entitlement actif s’applique au Family Space; les comptes enfants n’achètent ni ne gèrent l’abonnement. Avant l’achat, NowKids vérifie le droit familial côté serveur en plus de l’état du client RevenueCat afin de réduire les achats familiaux en double. Prix, période, essai et renouvellement automatique sont affichés avant l’achat. Supprimer le compte ou l’application n’annule pas automatiquement l’abonnement Google Play."
+            "Les fonctions payantes NowKids sont achetées via Google Play. Family Plus est prévu pour un seul adulte responsable de la facturation et l’entitlement actif s’applique au espace familial; les comptes enfants n’achètent ni ne gèrent l’abonnement. Avant l’achat, NowKids vérifie le droit familial côté serveur en plus de l’état du client RevenueCat afin de réduire les achats familiaux en double. Prix, période, essai et renouvellement automatique sont affichés avant l’achat. Supprimer le compte ou l’application n’annule pas automatiquement l’abonnement Google Play."
           ]
         },
         {
@@ -240,7 +240,7 @@
           "items": [
             "Nom, naissance/âge, avatar, école, classe et langue.",
             "Emploi du temps, devoirs, tests, progrès, activités, livres, tâches et rappels.",
-            "Documents, photos, scans, voix et contenu IA lorsque utilisés."
+            "Documents, photos, numérisations, voix et contenu IA lorsque utilisés."
           ]
         },
         {
@@ -288,7 +288,7 @@
         {
           "h": "10. Facturation Family Plus",
           "p": [
-            "Family Plus est acheté par un seul adulte responsable de la facturation et partagé avec le Family Space actif. Les comptes enfants n’achètent ni ne gèrent l’abonnement. Les autres adultes voient qui gère le plan au lieu d’être invités à acheter à nouveau. Le droit familial est aussi vérifié côté serveur."
+            "Family Plus est acheté par un seul adulte responsable de la facturation et partagé avec le espace familial actif. Les comptes enfants n’achètent ni ne gèrent l’abonnement. Les autres adultes voient qui gère le plan au lieu d’être invités à acheter à nouveau. Le droit familial est aussi vérifié côté serveur."
           ]
         },
         {
@@ -356,14 +356,14 @@
         {
           "h": "8. Réutiliser plutôt que régénérer",
           "p": [
-            "Lorsque possible, NowStudy réutilise l’extraction enregistrée d’un scan au lieu de renvoyer la même image à chaque question. Plans, cartes et mini-tests sont enregistrés et peuvent être rouverts; demander explicitement une nouvelle version peut déclencher un nouvel appel AI."
+            "Lorsque possible, NowStudy réutilise l’extraction enregistrée d’un numérisation au lieu de renvoyer la même image à chaque question. Plans, cartes et mini-tests sont enregistrés et peuvent être rouverts; demander explicitement une nouvelle version peut déclencher un nouvel appel IA."
           ]
         }
       ]
     },
     "community": {
       "title": "Règles du Contenu Communautaire",
-      "intro": "Pour stickers partagés et autres contenus visibles par d’autres.",
+      "intro": "Pour autocollants partagés et autres contenus visibles par d’autres.",
       "sections": [
         {
           "h": "1. Adapté aux enfants",
@@ -560,15 +560,21 @@
       "intro": "Guide pratique des principales fonctions NowKids pour adultes et enfants.",
       "sections": [
         {
-          "h": "Famille et comptes enfants",
+          "h": "Langue de l’application",
           "p": [
-            "Les adultes gèrent le Family Space. L’accès enfant est lié à un profil autorisé par le parent. Le mode enfant n’affiche pas la suppression du compte/des données."
+            "Lors de la première utilisation, NowKids suit la langue système de l’appareil. Une langue choisie manuellement dans les réglages est enregistrée et devient prioritaire sur cet appareil."
           ]
         },
         {
-          "h": "NowStudy et scans",
+          "h": "Famille et comptes enfants",
           "p": [
-            "Un scan scolaire est analysé une fois lorsque possible. Les questions suivantes réutilisent l’extraction enregistrée. Plans, cartes et mini-tests peuvent être rouverts."
+            "Les adultes gèrent le espace familial. L’accès enfant est lié à un profil autorisé par le parent. Le mode enfant n’affiche pas la suppression du compte/des données."
+          ]
+        },
+        {
+          "h": "NowStudy et numérisations",
+          "p": [
+            "Un numérisation scolaire est analysé une fois lorsque possible. Les questions suivantes réutilisent l’extraction enregistrée. Plans, cartes et mini-tests peuvent être rouverts."
           ]
         },
         {
@@ -586,19 +592,19 @@
         {
           "h": "Family Plus",
           "p": [
-            "Un adulte est responsable de la facturation. Un Family Plus actif s’applique au Family Space; les enfants n’achètent pas."
+            "Un adulte est responsable de la facturation. Un Family Plus actif s’applique au espace familial; les enfants n’achètent pas."
           ]
         },
         {
-          "h": "Confidentialité et AI",
+          "h": "Confidentialité et IA",
           "p": [
-            "NowKids journalise des données techniques AI pour coûts, fiabilité et cache sans enregistrer les prompts de l’enfant dans ai_usage."
+            "NowKids journalise des données techniques IA pour coûts, fiabilité et cache sans enregistrer les requêtes de l’enfant dans ai_usage."
           ]
         },
         {
           "h": "Sécurité et suppression",
           "p": [
-            "Les réponses AI et contenus peuvent être signalés. Les adultes gèrent l’accès enfant et la suppression. support@mynw.app."
+            "Les réponses IA et contenus peuvent être signalés. Les adultes gèrent l’accès enfant et la suppression. support@mynw.app."
           ]
         }
       ]
