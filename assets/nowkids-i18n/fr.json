@@ -141,7 +141,7 @@
         {
           "h": "15. Réutilisation IA, cache et données techniques",
           "p": [
-            "Pour réduire les traitements IA répétés, NowKids peut conserver temporairement une extraction ou un résultat généré lié à la famille/l’enfant. Le même numérisation scolaire est reconnu une seule fois lorsque possible; les extractions peuvent rester en cache jusqu’à 30 jours et d’autres résultats IA jusqu’à 14 jours. Les plans, cartes et mini-tests enregistrés restent jusqu’à suppression. journal technique contient des champs techniques et non le contenu des requêtes de l’enfant."
+            "Pour réduire les traitements IA répétés, NowKids peut conserver temporairement une extraction ou un résultat généré lié à la famille/l’enfant. La même numérisation scolaire est reconnue une seule fois lorsque possible ; les extractions peuvent rester en cache jusqu’à 30 jours et d’autres résultats IA jusqu’à 14 jours. Les plans, cartes et mini-tests enregistrés restent jusqu’à suppression. Le journal technique contient des champs techniques et non le contenu des requêtes de l’enfant."
           ]
         },
         {
