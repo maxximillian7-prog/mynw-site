@@ -85,7 +85,8 @@
             "OpenAI — AI inference for NowStudy and related AI features.",
             "Google — Google sign-in where selected, Android/Google Play distribution, Google Play billing for paid features, and platform services selected by the user.",
             "RevenueCat — subscription/purchase validation, App User ID, CustomerInfo and entitlement status used to unlock paid features.",
-            "Firebase Cloud Messaging — functional Android push-notification delivery using app installation/push tokens."
+            "Firebase Cloud Messaging — functional Android push-notification delivery using app installation/push tokens.",
+            "Open Library and, when configured, Google Books — user-initiated book catalog searches by title, author or ISBN. The catalog request does not include the NowKids account ID, email address, family ID or child-profile data."
           ]
         },
         {
@@ -141,6 +142,12 @@
           "h": "15. AI reuse, cache and technical usage records",
           "p": [
             "To reduce repeated AI processing, NowKids may keep a temporary family/child-scoped extraction or generated-result cache. The same school scan can be recognized once and reused for follow-up study; cached scan extraction may be retained for up to 30 days and generated AI cache entries for up to 14 days. Saved study plans, flashcards and mini-tests remain in the account until deleted under the normal data-retention rules. AI usage records contain technical fields such as model, token counts, audio duration, estimated cost, cache hit, routing tier, attempt number, latency, success/error status and pricing version. The content of a child’s prompts is not stored in the ai_usage ledger."
+          ]
+        },
+        {
+          "h": "16. Book catalog lookups",
+          "p": [
+            "When a user starts a book search, NowKids may send the entered title, author, ISBN and requested catalog language to Open Library and, when configured, Google Books. These requests are proxied through a protected server function. NowKids does not include the account ID, email address, family ID, child-profile data or authentication token in catalog-provider requests, and the catalog function does not write the lookup parameters to the NowKids database."
           ]
         }
       ]
@@ -582,6 +589,12 @@
           "h": "Saved study materials",
           "p": [
             "Preparation plans, mini-tests, flashcards and completed study sessions are stored by subject. Opening one saved type should not hide the others if a separate category cannot load."
+          ]
+        },
+        {
+          "h": "Books & catalog search",
+          "p": [
+            "Books can be added manually or searched by title, author and ISBN. Catalog lookups run through a protected NowKids server function and may query Open Library and, when configured, Google Books."
           ]
         },
         {
