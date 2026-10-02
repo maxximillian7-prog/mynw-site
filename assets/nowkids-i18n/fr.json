@@ -147,7 +147,7 @@
         {
           "h": "16. Recherches dans le catalogue de livres",
           "p": [
-            "Lorsqu’un utilisateur lance une recherche de livre, NowKids peut envoyer le titre, l’auteur, l’ISBN et la langue de catalogue saisis à Open Library et, s’il est configuré, à Google Books. La requête passe par une fonction serveur protégée. NowKids n’inclut pas l’identifiant du compte, l’adresse e-mail, l’identifiant familial, les données du profil enfant ou le jeton d’authentification dans les requêtes aux catalogues, et la fonction de catalogue n’enregistre pas les paramètres de recherche dans la base de données NowKids."
+            "Lors d’une recherche de livre, NowKids peut envoyer le titre, l’auteur, l’ISBN et la langue demandée à Open Library et, lorsqu’il est configuré, à Google Books via une fonction serveur protégée. Les requêtes aux fournisseurs n’incluent pas l’ID du compte NowKids, l’adresse e-mail, l’ID de la famille, les données du profil enfant ni le jeton d’authentification. Le texte brut de la recherche n’est pas stocké dans le cache partagé ; les réponses publiques du catalogue peuvent être mises en cache avec une clé de requête hachée et une durée d’expiration."
           ]
         }
       ]
@@ -592,9 +592,12 @@
           ]
         },
         {
-          "h": "Livres et recherche dans le catalogue",
+          "h": "Livres, couvertures et recommandations",
           "p": [
-            "Les livres peuvent être ajoutés manuellement ou recherchés par titre, auteur et ISBN. Les recherches passent par une fonction serveur protégée de NowKids et peuvent utiliser Open Library et, s’il est configuré, Google Books."
+            "Les livres sont affichés sous forme de couvertures. Un appui ouvre la page du livre avec le titre, l’auteur, les données disponibles du catalogue et un court résumé. Un appui long permet de marquer lu/non lu, d’ajouter ou modifier une photo, de restaurer la couverture du catalogue lorsqu’elle existe ou de supprimer le livre.",
+            "NowKids recherche des métadonnées réelles via une fonction serveur protégée. Open Library est la source principale et Google Books sert de solution de repli lorsqu’il est configuré. Si aucune couverture distante n’est disponible, NowKids affiche une couverture locale avec une icône de livre, le titre et l’auteur.",
+            "Les livres, métadonnées et couvertures distantes déjà chargés sont mis en cache sur l’appareil lorsque possible afin que la bibliothèque reste utile hors connexion. Les photos personnalisées des livres sont stockées de manière privée dans le stockage NowKids.",
+            "Le champ de préférences pour les recommandations IA est facultatif. S’il est vide, les suggestions utilisent l’âge, la classe et la langue de lecture/étude de l’enfant. Il peut aussi préciser un genre, une langue ou un thème. Les candidats IA sont vérifiés dans le catalogue avant affichage ; les titres non vérifiés sont écartés."
           ]
         },
         {
