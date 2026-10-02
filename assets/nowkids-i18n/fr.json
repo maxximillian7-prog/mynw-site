@@ -83,7 +83,8 @@
             "Supabase — authentification, base, stockage, realtime et fonctions serveur.",
             "OpenAI — inférence IA.",
             "Google — Google Sign-In, Android/Google Play et services de plateforme choisis.",
-            "RevenueCat — validation des abonnements/achats, App User ID, CustomerInfo et état des entitlements utilisés pour débloquer les fonctions payantes."
+            "RevenueCat — validation des abonnements/achats, App User ID, CustomerInfo et état des entitlements utilisés pour débloquer les fonctions payantes.",
+            "Firebase Cloud Messaging — livraison de notifications push fonctionnelles Android à l’aide d’un jeton d’installation/push de l’application."
           ]
         },
         {
@@ -195,7 +196,7 @@
         {
           "h": "8. Paiement",
           "p": [
-            "Les fonctions NowKids payantes par abonnement sont achetées via Google Play. Le prix, la période de facturation, l’essai (s’il est proposé) et le renouvellement automatique sont affichés avant l’achat. RevenueCat est utilisé pour valider l’état de l’achat/abonnement et débloquer les entitlements. Facturation, annulation et remboursements sont également soumis aux conditions de Google Play. Supprimer le compte NowKids ou désinstaller l’application n’annule pas automatiquement un abonnement Google Play."
+            "Les fonctions payantes NowKids sont achetées via Google Play. Family Plus est prévu pour un seul adulte responsable de la facturation et l’entitlement actif s’applique au Family Space; les comptes enfants n’achètent ni ne gèrent l’abonnement. Avant l’achat, NowKids vérifie le droit familial côté serveur en plus de l’état du client RevenueCat afin de réduire les achats familiaux en double. Prix, période, essai et renouvellement automatique sont affichés avant l’achat. Supprimer le compte ou l’application n’annule pas automatiquement l’abonnement Google Play."
           ]
         },
         {
