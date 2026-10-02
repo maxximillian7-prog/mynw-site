@@ -471,7 +471,7 @@
           "h": "2. Pedido externo",
           "items": [
             "Envie e-mail para support@mynw.app a partir do e-mail da conta.",
-            "Assunto: “Delete my NowKids account”.",
+            "Assunto: “Eliminar a minha conta NowKids”.",
             "Indique o e-mail da conta e, se necessário, família/perfil da criança.",
             "Podemos verificar a titularidade ou autoridade parental."
           ]
@@ -491,7 +491,7 @@
         {
           "h": "5. Dados locais",
           "p": [
-            "Cache, definições ou ficheiros descarregados podem permanecer no dispositivo. Desinstalar remove dados locais desse dispositivo, mas não garante por si só eliminação na cloud."
+            "Dados temporários, definições ou ficheiros descarregados podem permanecer no dispositivo. Desinstalar remove dados locais desse dispositivo, mas não garante por si só a eliminação dos dados remotos."
           ]
         },
         {
