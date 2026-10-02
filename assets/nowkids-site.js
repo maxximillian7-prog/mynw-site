@@ -75,7 +75,10 @@
 
   function specialAction(key){
     if(key==='deletion'){
-      return '<p class="nk-action"><a class="btn btn-primary" href="mailto:support@mynw.app?subject=Delete%20my%20NowKids%20account&body=Please%20delete%20my%20NowKids%20account%20and%20associated%20data.%0A%0AAccount%20email%3A%20">support@mynw.app</a></p>';
+      // The localized deletion page already explains what to include. Keep the
+      // mail action language-neutral so an English prefilled subject/body does
+      // not leak into non-English pages.
+      return '<p class="nk-action"><a class="btn btn-primary" href="mailto:support@mynw.app">support@mynw.app</a></p>';
     }
     if(key==='support'||key==='childSafety'){
       return '<p class="nk-action"><a class="btn btn-primary" href="mailto:support@mynw.app">support@mynw.app</a></p>';
