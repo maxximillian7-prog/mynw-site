@@ -23,7 +23,7 @@
       "terms": "Reglas de uso de NowKids, cuentas familiares, funciones escolares y responsabilidades.",
       "parents": "Información clara para padres y tutores sobre cuentas de menores y autorización parental.",
       "ai": "Cómo funciona la IA NowStudy, sus límites, protecciones y denuncia de resultados inseguros.",
-      "community": "Reglas para pegatinas compartidos y otros contenidos visibles para otros usuarios.",
+      "community": "Reglas para pegatinas compartidas y otros contenidos visibles para otros usuarios.",
       "rights": "Cómo acceder, corregir, exportar, limitar o eliminar datos personales.",
       "deletion": "Cómo eliminar una cuenta y sus datos del servidor.",
       "support": "Cómo contactarnos por errores, privacidad, seguridad infantil o contenido.",
@@ -364,14 +364,14 @@
         {
           "h": "8. Reutilizar en lugar de volver a generar",
           "p": [
-            "Cuando es posible, NowStudy reutiliza la extracción guardada de un escaneo en lugar de reenviar la misma imagen en cada pregunta. Planes, tarjetas y mini-tests se guardan y pueden reabrirse; pedir explícitamente una nueva versión puede iniciar otra llamada IA."
+            "Cuando es posible, NowStudy reutiliza la extracción guardada de un escaneo en lugar de reenviar la misma imagen en cada pregunta. Planes, tarjetas y mini-pruebas se guardan y pueden reabrirse; pedir explícitamente una nueva versión puede iniciar otra llamada de IA."
           ]
         }
       ]
     },
     "community": {
       "title": "Reglas de Contenido de la Comunidad",
-      "intro": "Para pegatinas compartidos y otros contenidos visibles por terceros.",
+      "intro": "Para pegatinas compartidas y otros contenidos visibles por terceros.",
       "sections": [
         {
           "h": "1. Apto para menores",
