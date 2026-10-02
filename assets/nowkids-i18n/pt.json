@@ -587,7 +587,7 @@
         {
           "h": "Notificações",
           "p": [
-            "As categorias de notificações podem ser controladas separadamente. No Android, notificações locais e push usam o ícone de sistema NowKids com prioridade alta e podem aparecer no ecrã bloqueado sem modo de ecrã inteiro. Som e vibração seguem as definições do canal Android. Notificações expandidas podem mostrar o logótipo NowKids ou uma imagem temática; se falhar, a notificação normal com ícone continua a funcionar. Lembretes agendados são restaurados após reiniciar o dispositivo."
+            "As categorias de notificações podem ser controladas separadamente. No Android, notificações locais e remotas usam o ícone de sistema NowKids com prioridade alta e podem aparecer no ecrã bloqueado sem modo de ecrã inteiro. Som e vibração seguem as definições do canal Android. Notificações expandidas podem mostrar o logótipo NowKids ou uma imagem temática; se falhar, a notificação normal com ícone continua a funcionar. Lembretes agendados são restaurados após reiniciar o dispositivo."
           ]
         },
         {
