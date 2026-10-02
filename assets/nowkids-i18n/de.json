@@ -128,7 +128,7 @@
           "h": "13. Abonnements und RevenueCat",
           "p": [
             "Kostenpflichtige NowKids-Funktionen werden über Google Play gekauft. RevenueCat dient als Dienstleister für die Abonnementverwaltung und verarbeitet die authentifizierte NowKids Benutzerkennung der Anwendung (eine Supabase-UUID), Produkt- und Transaktionsinformationen, Kauf-/Verlängerungs-/Erstattungsstatus, Kauf-Token bzw. Belegmetadaten und den Zugriffsrecht-Status, damit der Zugriff validiert und wiederhergestellt werden kann.",
-            "NowKids übermittelt RevenueCat weder Name noch E-Mail-Adresse oder Telefonnummer als Kundenattribute. NowKids fordert die Android Advertising ID (AAID) nicht an, übermittelt sie nicht an RevenueCat und aktiviert keine RevenueCat-Integrationen für Werbe-Attribution. Vollständige Zahlungskartendaten werden von Google Play verarbeitet und von NowKids nicht empfangen."
+            "NowKids übermittelt RevenueCat weder Name noch E-Mail-Adresse oder Telefonnummer als Kundenattribute. NowKids fordert die Android-Werbekennung (AAID) nicht an, übermittelt sie nicht an RevenueCat und aktiviert keine RevenueCat-Integrationen für Werbe-Attribution. Vollständige Zahlungskartendaten werden von Google Play verarbeitet und von NowKids nicht empfangen."
           ]
         },
         {
