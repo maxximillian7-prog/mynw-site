@@ -580,7 +580,7 @@
         {
           "h": "Benachrichtigungen",
           "p": [
-            "Kategorien sind getrennt steuerbar. Funktionale Android-Pushs nutzen Firebase Cloud Messaging."
+            "Benachrichtigungskategorien lassen sich getrennt steuern. Unter Android nutzen lokale und Push-Benachrichtigungen das NowKids-Systemsymbol, hohe Priorität und können ohne Vollbild-Intent auf dem Sperrbildschirm erscheinen. Ton und Vibration folgen den Android-Kanaleinstellungen. Erweiterte Benachrichtigungen können das NowKids-Logo oder ein thematisches Bild zeigen; bei einem Bildfehler funktioniert die normale Benachrichtigung mit Symbol weiter. Geplante Erinnerungen werden nach einem Neustart wiederhergestellt."
           ]
         },
         {
