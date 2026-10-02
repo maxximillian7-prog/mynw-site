@@ -147,7 +147,7 @@
         {
           "h": "16. Búsquedas en el catálogo de libros",
           "p": [
-            "Cuando el usuario inicia una búsqueda de libros, NowKids puede enviar título, autor, ISBN e idioma solicitado a Open Library y, si está configurado, a Google Books mediante una función de servidor protegida. Las solicitudes a los proveedores no incluyen el ID de la cuenta NowKids, correo electrónico, ID de la familia, datos del perfil del niño ni token de autenticación. El texto original de la búsqueda no se guarda en la caché compartida; las respuestas públicas del catálogo pueden almacenarse con una clave de solicitud con hash y una fecha de caducidad."
+            "Cuando el usuario inicia una búsqueda de libros, NowKids puede enviar título, autor, ISBN e idioma solicitado a Open Library y, si está configurado, a Google Books mediante una función de servidor protegida. Las solicitudes a los proveedores no incluyen el ID de la cuenta NowKids, correo electrónico, ID de la familia, datos del perfil del niño ni token de autenticación. El texto original de la búsqueda no se guarda en la caché compartida; las respuestas públicas del catálogo pueden almacenarse con una clave de solicitud con hash y una fecha de caducidad. Para la búsqueda inteligente contextual, la frase de búsqueda original también puede enviarse a OpenAI únicamente cuando Zero Data Retention (ZDR) se haya activado explícitamente, solo para identificar título/autor/tema/idioma; no se incluyen identificadores de la cuenta NowKids, la familia ni el menor. Si ZDR no está confirmado, NowKids omite el analizador de OpenAI y utiliza la búsqueda normal del catálogo."
           ]
         }
       ]

@@ -147,7 +147,7 @@
         {
           "h": "16. Book catalog lookups",
           "p": [
-            "When a user starts a book lookup, NowKids may send the entered title, author, ISBN and requested catalog language to Open Library and, when configured, Google Books through a protected server function. Provider requests do not include the NowKids account ID, email address, family ID, child-profile data or authentication token. Raw lookup text is not stored in the shared catalog cache; public catalog responses may be cached with a hashed request key and expiry time to reduce repeated provider requests."
+            "When a user starts a book lookup, NowKids may send the entered title, author, ISBN and requested catalog language to Open Library and, when configured, Google Books through a protected server function. Provider requests do not include the NowKids account ID, email address, family ID, child-profile data or authentication token. Raw lookup text is not stored in the shared catalog cache; public catalog responses may be cached with a hashed request key and expiry time to reduce repeated provider requests. For contextual smart search, the raw search phrase may also be sent to OpenAI only when Zero Data Retention has been explicitly enabled, solely to identify title/author/subject/language; no NowKids account, family or child identifiers are included. If ZDR is not confirmed, NowKids skips the OpenAI parser and uses the regular catalog lookup."
           ]
         }
       ]

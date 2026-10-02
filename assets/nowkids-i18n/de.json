@@ -147,7 +147,7 @@
         {
           "h": "16. Buchkatalog-Abfragen",
           "p": [
-            "Bei einer Buchsuche kann NowKids Titel, Autor, ISBN und gewünschte Katalogsprache über eine geschützte Serverfunktion an Open Library und, falls konfiguriert, Google Books senden. Anbieteranfragen enthalten weder NowKids-Konto-ID noch E-Mail-Adresse, Familien-ID, Daten des Kinderprofils oder Authentifizierungstoken. Der rohe Suchtext wird nicht im gemeinsamen Katalogcache gespeichert; öffentliche Katalogantworten können mit einem gehashten Anfrageschlüssel und Ablaufzeit zwischengespeichert werden."
+            "Bei einer Buchsuche kann NowKids Titel, Autor, ISBN und gewünschte Katalogsprache über eine geschützte Serverfunktion an Open Library und, falls konfiguriert, Google Books senden. Anbieteranfragen enthalten weder NowKids-Konto-ID noch E-Mail-Adresse, Familien-ID, Daten des Kinderprofils oder Authentifizierungstoken. Der rohe Suchtext wird nicht im gemeinsamen Katalogcache gespeichert; öffentliche Katalogantworten können mit einem gehashten Anfrageschlüssel und Ablaufzeit zwischengespeichert werden. Bei der kontextbezogenen intelligenten Suche kann die ursprüngliche Suchphrase zusätzlich nur dann an OpenAI gesendet werden, wenn Zero Data Retention (ZDR) ausdrücklich aktiviert wurde, und ausschließlich zur Erkennung von Titel/Autor/Thema/Sprache; Kennungen des NowKids-Kontos, der Familie oder des Kindes werden nicht mitgesendet. Ist ZDR nicht bestätigt, überspringt NowKids den OpenAI-Parser und verwendet die normale Katalogsuche."
           ]
         }
       ]
