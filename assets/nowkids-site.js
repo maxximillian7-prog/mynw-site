@@ -133,6 +133,7 @@
   const browser=(navigator.language||'en').slice(0,2).toLowerCase();
   const initial=SUPPORTED.includes(saved)?saved:(SUPPORTED.includes(browser)?browser:'en');
   loadLanguage(initial).catch(()=>loadLanguage('en')).catch(()=>{
-    $('#nkContent').innerHTML='<article class="legal-card"><h1>NowKids</h1><p>Documentation could not be loaded. Contact <a href="mailto:support@mynw.app">support@mynw.app</a>.</p></article>';
+    // Last-resort fallback is deliberately language-neutral.
+    $('#nkContent').innerHTML='<article class="legal-card"><h1>NowKids</h1><p><a href="mailto:support@mynw.app">support@mynw.app</a></p></article>';
   });
 })();
