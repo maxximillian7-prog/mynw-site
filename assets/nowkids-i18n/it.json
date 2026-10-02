@@ -147,7 +147,7 @@
         {
           "h": "16. Ricerche nel catalogo dei libri",
           "p": [
-            "Quando l’utente avvia una ricerca di libri, NowKids può inviare a Open Library e, se configurato, a Google Books il titolo, l’autore, l’ISBN e la lingua del catalogo indicati. La richiesta passa attraverso una funzione server protetta. NowKids non include nelle richieste l’identificatore dell’account, l’indirizzo e-mail, l’identificatore della famiglia, i dati del profilo del bambino o il token di autenticazione, e la funzione catalogo non salva i parametri di ricerca nel database NowKids."
+            "Quando l’utente avvia una ricerca di libri, NowKids può inviare titolo, autore, ISBN e lingua richiesta a Open Library e, se configurato, Google Books tramite una funzione server protetta. Le richieste ai fornitori non includono ID dell’account NowKids, e-mail, ID della famiglia, dati del profilo del bambino o token di autenticazione. Il testo grezzo della ricerca non viene salvato nella cache condivisa; le risposte pubbliche del catalogo possono essere memorizzate con una chiave di richiesta hash e una scadenza."
           ]
         }
       ]
@@ -592,9 +592,13 @@
           ]
         },
         {
-          "h": "Libri e ricerca nel catalogo",
+          "h": "Libri, copertine e suggerimenti",
           "p": [
-            "I libri possono essere aggiunti manualmente o cercati per titolo, autore e ISBN. Le ricerche passano attraverso una funzione server protetta di NowKids e possono usare Open Library e, se configurato, Google Books."
+            "Il pulsante di aggiunta offre tre modalità: Scansiona ISBN, Trova un libro o Aggiungi manualmente. La ricerca accetta titolo, autore o ISBN e mostra risultati reali del catalogo prima del salvataggio.",
+            "I libri sono mostrati come copertine. Un tocco apre la pagina del libro con titolo, autore, dati disponibili del catalogo e una breve descrizione. Una pressione prolungata permette di segnare letto/non letto, aggiungere o cambiare una foto, ripristinare la copertina del catalogo quando disponibile o eliminare il libro.",
+            "NowKids cerca metadati reali tramite una funzione server protetta. Open Library è la fonte principale e Google Books viene usato come alternativa quando configurato. Se non è disponibile una copertina remota, NowKids mostra una copertina locale con icona del libro, titolo e autore.",
+            "Libri, metadati e copertine remote già caricati vengono memorizzati nella cache del dispositivo quando possibile, così la libreria resta utile offline. Le foto personalizzate dei libri sono conservate privatamente nello storage NowKids.",
+            "Il campo per le preferenze dei suggerimenti IA è facoltativo. Se vuoto, usa età, classe e lingua di lettura/studio del bambino. Se compilato, può indicare genere, lingua o tema. I candidati proposti dall’IA vengono verificati nel catalogo prima di essere mostrati; i titoli non verificati vengono scartati."
           ]
         },
         {
