@@ -11,10 +11,11 @@
     deletion:'delete-account',
     support:'support',
     childSafety:'child-safety',
-    permissions:'permissions'
+    permissions:'permissions',
+    manual:'manual'
   };
-  const ICONS={privacy:'🛡️',terms:'📜',parents:'👨‍👩‍👧',ai:'✨',community:'🧩',rights:'📥',deletion:'🗑️',support:'💬',childSafety:'🧒',permissions:'🔐'};
-  const ORDER=['privacy','terms','parents','childSafety','ai','permissions','community','rights','deletion','support'];
+  const ICONS={privacy:'🛡️',terms:'📜',parents:'👨‍👩‍👧',ai:'✨',community:'🧩',rights:'📥',deletion:'🗑️',support:'💬',childSafety:'🧒',permissions:'🔐',manual:'📘'};
+  const ORDER=['manual','privacy','terms','parents','childSafety','ai','permissions','community','rights','deletion','support'];
   const page=document.body.dataset.nkPage||'home';
   const $=s=>document.querySelector(s);
   const esc=(v='')=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
