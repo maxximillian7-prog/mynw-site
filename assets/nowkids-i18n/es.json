@@ -140,7 +140,7 @@
         {
           "h": "15. Reutilización de IA, caché y datos técnicos",
           "p": [
-            "Para reducir procesamiento IA repetido, NowKids puede conservar temporalmente una extracción o resultado generado asociado a la familia/menor. El mismo escaneo escolar se reconoce una vez cuando es posible; la extracción puede mantenerse hasta 30 días y otros resultados IA hasta 14 días. Los planes, tarjetas y mini-tests guardados permanecen hasta su eliminación. registro técnico contiene campos técnicos y no el contenido de los solicitudes del menor."
+            "Para reducir procesamiento IA repetido, NowKids puede conservar temporalmente una extracción o resultado generado asociado a la familia/menor. El mismo escaneo escolar se reconoce una vez cuando es posible; la extracción puede mantenerse hasta 30 días y otros resultados IA hasta 14 días. Los planes, tarjetas y mini-pruebas guardados permanecen hasta su eliminación. El registro técnico contiene campos técnicos y no el contenido de las solicitudes del menor."
           ]
         }
       ]
