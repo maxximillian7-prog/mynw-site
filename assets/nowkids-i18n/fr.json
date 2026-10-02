@@ -594,6 +594,7 @@
         {
           "h": "Livres, couvertures et recommandations",
           "p": [
+            "Le bouton d’ajout propose trois choix : scanner l’ISBN, rechercher un livre ou ajouter manuellement. La recherche accepte le titre, l’auteur ou l’ISBN et affiche de vrais résultats du catalogue avant l’enregistrement.",
             "Les livres sont affichés sous forme de couvertures. Un appui ouvre la page du livre avec le titre, l’auteur, les données disponibles du catalogue et un court résumé. Un appui long permet de marquer lu/non lu, d’ajouter ou modifier une photo, de restaurer la couverture du catalogue lorsqu’elle existe ou de supprimer le livre.",
             "NowKids recherche des métadonnées réelles via une fonction serveur protégée. Open Library est la source principale et Google Books sert de solution de repli lorsqu’il est configuré. Si aucune couverture distante n’est disponible, NowKids affiche une couverture locale avec une icône de livre, le titre et l’auteur.",
             "Les livres, métadonnées et couvertures distantes déjà chargés sont mis en cache sur l’appareil lorsque possible afin que la bibliothèque reste utile hors connexion. Les photos personnalisées des livres sont stockées de manière privée dans le stockage NowKids.",
