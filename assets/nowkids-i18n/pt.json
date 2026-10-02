@@ -594,6 +594,7 @@
         {
           "h": "Livros, capas e recomendações",
           "p": [
+            "O botão de adicionar oferece três opções: Digitalizar ISBN, Procurar livro ou Introduzir manualmente. A pesquisa aceita título, autor ou ISBN e mostra resultados reais do catálogo antes de guardar.",
             "Os livros são mostrados como capas. Um toque abre a página do livro com título, autor, dados disponíveis do catálogo e uma descrição breve do catálogo. Um toque prolongado permite marcar como lido/não lido, adicionar ou alterar uma fotografia, restaurar a capa do catálogo quando disponível ou eliminar o livro.",
             "O NowKids procura metadados reais através de uma função protegida no servidor. O Open Library é o catálogo principal e o Google Books é usado como alternativa quando configurado. Se não existir capa remota, o NowKids mostra uma capa local com ícone de livro, título e autor.",
             "Os livros, metadados e capas remotas já carregados são guardados em cache no dispositivo quando possível, para que a biblioteca continue útil sem ligação. Fotografias personalizadas dos livros são guardadas de forma privada no armazenamento NowKids.",
