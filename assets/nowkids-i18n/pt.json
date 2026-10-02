@@ -83,7 +83,7 @@
           "items": [
             "Supabase — autenticação, base de dados, armazenamento, sincronização realtime e funções de servidor.",
             "OpenAI — inferência de IA para NowStudy e funções relacionadas.",
-            "Google — início de sessão Google quando escolhido, Android/Google Play e serviços de plataforma selecionados pelo utilizador.",
+            "Google — início de sessão com Google quando escolhido, distribuição Android/Google Play, faturação de funcionalidades pagas através do Google Play e serviços da plataforma selecionados pelo utilizador.",
             "RevenueCat — validação de subscrições/compras, App User ID, CustomerInfo e estado de entitlements usados para desbloquear funcionalidades pagas."
           ]
         },
@@ -137,9 +137,9 @@
           ]
         },
         {
-          "h": "15. Reutilização de AI, cache e registos técnicos",
+          "h": "15. Reutilização de IA, cache e registos técnicos",
           "p": [
-            "Para reduzir processamento repetido de AI, o NowKids pode manter temporariamente, por família/criança, uma extração ou resultado gerado em cache. O mesmo scan escolar pode ser reconhecido uma vez e reutilizado no seguimento; a extração de um scan em cache pode ser mantida até 30 dias e outros resultados AI em cache até 14 dias. Planos de estudo, flashcards e mini-testes guardados permanecem na conta até serem eliminados segundo as regras normais. O registo ai_usage contém apenas dados técnicos como modelo, tokens, duração de áudio, custo estimado, cache hit, routing tier, tentativa, latência, sucesso/erro e versão de preços; não guarda o conteúdo dos prompts da criança."
+            "Para reduzir processamento repetido de IA, o NowKids pode manter temporariamente, por família/criança, uma extração ou resultado gerado em cache. O mesmo digitalização escolar pode ser reconhecido uma vez e reutilizado no seguimento; a extração de um digitalização em cache pode ser mantida até 30 dias e outros resultados IA em cache até 14 dias. Planos de estudo, flashcards e mini-testes guardados permanecem na conta até serem eliminados segundo as regras normais. O registo ai_usage contém apenas dados técnicos como modelo, tokens, duração de áudio, custo estimado, acerto de cache, nível de encaminhamento, tentativa, latência, sucesso/erro e versão de preços; não guarda o conteúdo dos pedidos da criança."
           ]
         }
       ]
@@ -196,7 +196,7 @@
         {
           "h": "8. Funções pagas",
           "p": [
-            "As funcionalidades pagas do NowKids são compradas através do Google Play. O Family Plus foi concebido para ter um único adulto responsável pela faturação e o entitlement ativo é partilhado com o Family Space; contas infantis não compram nem gerem a subscrição. Antes da compra, o NowKids verifica o entitlement familiar no servidor além do estado do cliente RevenueCat para reduzir compras duplicadas acidentais. Preço, período, teste (se existir) e renovação automática são mostrados antes da compra. Eliminar a conta ou desinstalar a app não cancela por si só a subscrição Google Play."
+            "As funcionalidades pagas do NowKids são compradas através do Google Play. O Family Plus foi concebido para ter um único adulto responsável pela faturação e o entitlement ativo é partilhado com o espaço familiar; contas infantis não compram nem gerem a subscrição. Antes da compra, o NowKids verifica o entitlement familiar no servidor além do estado do cliente RevenueCat para reduzir compras duplicadas acidentais. Preço, período, teste (se existir) e renovação automática são mostrados antes da compra. Eliminar a conta ou desinstalar a app não cancela por si só a subscrição Google Play."
           ]
         },
         {
@@ -288,7 +288,7 @@
         {
           "h": "10. Faturação Family Plus",
           "p": [
-            "O Family Plus foi concebido para ser comprado por um único adulto responsável pela faturação e partilhado com o Family Space ativo. Contas infantis não compram nem gerem a subscrição. Outros adultos da família devem ver quem gere o plano em vez de serem incentivados a comprar novamente. O estado familiar é verificado também no servidor, além do Google Play e RevenueCat no cliente."
+            "O Family Plus foi concebido para ser comprado por um único adulto responsável pela faturação e partilhado com o espaço familiar ativo. Contas infantis não compram nem gerem a subscrição. Outros adultos da família devem ver quem gere o plano em vez de serem incentivados a comprar novamente. O estado familiar é verificado também no servidor, além do Google Play e RevenueCat no cliente."
           ]
         },
         {
@@ -356,7 +356,7 @@
         {
           "h": "8. Reutilizar em vez de gerar novamente",
           "p": [
-            "Sempre que possível, o NowStudy reutiliza uma extração guardada do scan em vez de enviar a mesma imagem em cada pergunta seguinte. Planos de preparação, flashcards e mini-testes são guardados e podem ser reabertos; pedir explicitamente uma nova versão pode iniciar uma nova chamada AI. O cache técnico é limitado à família/criança relevante."
+            "Sempre que possível, o NowStudy reutiliza uma extração guardada do digitalização em vez de enviar a mesma imagem em cada pergunta seguinte. Planos de preparação, flashcards e mini-testes são guardados e podem ser reabertos; pedir explicitamente uma nova versão pode iniciar uma nova chamada IA. O cache técnico é limitado à família/criança relevante."
           ]
         }
       ]
@@ -560,15 +560,21 @@
       "intro": "Guia prático das principais funções do NowKids para adultos e crianças.",
       "sections": [
         {
-          "h": "Família e contas infantis",
+          "h": "Idioma da aplicação",
           "p": [
-            "Os adultos criam e gerem o Family Space. O acesso da criança está ligado a um perfil autorizado pelo adulto. O modo infantil não mostra controlos de eliminação da conta/dados."
+            "Na primeira utilização, o NowKids usa o idioma do sistema do dispositivo. Um idioma escolhido manualmente nas definições fica guardado e tem prioridade nesse dispositivo."
           ]
         },
         {
-          "h": "NowStudy e scans",
+          "h": "Família e contas infantis",
           "p": [
-            "Um scan escolar é analisado uma vez sempre que possível. Perguntas seguintes reutilizam a extração guardada em vez de reenviar a imagem. Planos, flashcards e mini-testes guardados podem ser reabertos."
+            "Os adultos criam e gerem o espaço familiar. O acesso da criança está ligado a um perfil autorizado pelo adulto. O modo infantil não mostra controlos de eliminação da conta/dados."
+          ]
+        },
+        {
+          "h": "NowStudy e digitalizações",
+          "p": [
+            "Um digitalização escolar é analisado uma vez sempre que possível. Perguntas seguintes reutilizam a extração guardada em vez de reenviar a imagem. Planos, flashcards e mini-testes guardados podem ser reabertos."
           ]
         },
         {
@@ -586,19 +592,19 @@
         {
           "h": "Family Plus",
           "p": [
-            "Um adulto é o responsável pela faturação. Um entitlement Family Plus ativo aplica-se ao Family Space; crianças não compram e outro adulto vê quem gere o plano."
+            "Um adulto é o responsável pela faturação. Um entitlement Family Plus ativo aplica-se ao espaço familiar; crianças não compram e outro adulto vê quem gere o plano."
           ]
         },
         {
-          "h": "Privacidade e uso de AI",
+          "h": "Privacidade e uso de IA",
           "p": [
-            "O NowKids regista dados técnicos de uso AI para custos, fiabilidade e cache, sem guardar o texto dos prompts da criança no registo ai_usage. O cache temporário é limitado à família/criança."
+            "O NowKids regista dados técnicos de uso IA para custos, fiabilidade e cache, sem guardar o texto dos pedidos da criança no registo ai_usage. O cache temporário é limitado à família/criança."
           ]
         },
         {
           "h": "Segurança e eliminação",
           "p": [
-            "Respostas AI e conteúdo do utilizador podem ser denunciados. Adultos gerem acesso infantil e eliminação. Pedidos de privacidade: support@mynw.app."
+            "Respostas IA e conteúdo do utilizador podem ser denunciados. Adultos gerem acesso infantil e eliminação. Pedidos de privacidade: support@mynw.app."
           ]
         }
       ]
