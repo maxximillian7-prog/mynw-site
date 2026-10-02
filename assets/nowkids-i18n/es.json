@@ -569,19 +569,19 @@
         {
           "h": "Familia y cuentas infantiles",
           "p": [
-            "Los adultos gestionan espacio familiar. El acceso infantil está vinculado a un perfil autorizado. El modo infantil no muestra controles de eliminación de cuenta/datos."
+            "Los adultos gestionan el espacio familiar. El acceso infantil está vinculado a un perfil autorizado. El modo infantil no muestra controles de eliminación de cuenta/datos."
           ]
         },
         {
           "h": "NowStudy y escaneos",
           "p": [
-            "Un escaneo escolar se analiza una vez cuando es posible. Las preguntas posteriores reutilizan la extracción guardada. Planes, tarjetas y mini-tests pueden reabrirse."
+            "Un escaneo escolar se analiza una vez cuando es posible. Las preguntas posteriores reutilizan la extracción guardada. Planes, tarjetas y mini-pruebas pueden reabrirse."
           ]
         },
         {
           "h": "Materiales guardados",
           "p": [
-            "Planes, mini-tests, tarjetas y sesiones completadas se guardan por asignatura. Un error de una categoría no debe ocultar las demás."
+            "Planes, mini-pruebas, tarjetas y sesiones completadas se guardan por asignatura. Un error de una categoría no debe ocultar las demás."
           ]
         },
         {
@@ -599,7 +599,7 @@
         {
           "h": "Privacidad y IA",
           "p": [
-            "NowKids registra datos técnicos IA para costes, fiabilidad y caché sin guardar los solicitudes del menor en registro técnico."
+            "NowKids registra datos técnicos de IA para costes, fiabilidad y caché sin guardar las solicitudes del menor en el registro técnico."
           ]
         },
         {
