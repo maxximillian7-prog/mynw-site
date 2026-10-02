@@ -147,7 +147,7 @@
         {
           "h": "16. Búsquedas en el catálogo de libros",
           "p": [
-            "Cuando el usuario inicia una búsqueda de libros, NowKids puede enviar el título, el autor, el ISBN y el idioma de catálogo introducidos a Open Library y, si está configurado, a Google Books. La solicitud pasa por una función de servidor protegida. NowKids no incluye el identificador de la cuenta, el correo electrónico, el identificador familiar, los datos del perfil del menor ni el token de autenticación en las consultas a los catálogos, y la función de catálogo no guarda los parámetros de búsqueda en la base de datos de NowKids."
+            "Cuando el usuario inicia una búsqueda de libros, NowKids puede enviar título, autor, ISBN e idioma solicitado a Open Library y, si está configurado, a Google Books mediante una función de servidor protegida. Las solicitudes a los proveedores no incluyen el ID de la cuenta NowKids, correo electrónico, ID de la familia, datos del perfil del niño ni token de autenticación. El texto original de la búsqueda no se guarda en la caché compartida; las respuestas públicas del catálogo pueden almacenarse con una clave de solicitud con hash y una fecha de caducidad."
           ]
         }
       ]
@@ -592,9 +592,13 @@
           ]
         },
         {
-          "h": "Libros y búsqueda en el catálogo",
+          "h": "Libros, portadas y recomendaciones",
           "p": [
-            "Los libros pueden añadirse manualmente o buscarse por título, autor e ISBN. Las consultas pasan por una función de servidor protegida de NowKids y pueden usar Open Library y, si está configurado, Google Books."
+            "El botón de añadir ofrece tres opciones: Escanear ISBN, Buscar un libro o Añadir manualmente. La búsqueda acepta título, autor o ISBN y muestra resultados reales del catálogo antes de guardar.",
+            "Los libros se muestran como portadas. Un toque abre la página del libro con título, autor, datos disponibles del catálogo y una breve descripción. Una pulsación larga permite marcar como leído/no leído, añadir o cambiar una foto, restaurar la portada del catálogo cuando exista o eliminar el libro.",
+            "NowKids busca metadatos reales mediante una función de servidor protegida. Open Library es la fuente principal y Google Books se usa como alternativa cuando está configurado. Si no hay portada remota, NowKids muestra una portada local con icono de libro, título y autor.",
+            "Los libros, metadatos y portadas remotas ya cargados se guardan en caché en el dispositivo cuando es posible para que la biblioteca siga siendo útil sin conexión. Las fotos personalizadas de libros se almacenan de forma privada en el almacenamiento de NowKids.",
+            "El campo de preferencias para recomendaciones de IA es opcional. Si está vacío, se usan la edad, el curso y el idioma de lectura/estudio del niño. Si se completa, puede indicar género, idioma o tema. Los candidatos de IA se verifican en el catálogo antes de mostrarse; los títulos no verificados se descartan."
           ]
         },
         {
