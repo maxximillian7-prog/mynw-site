@@ -85,7 +85,8 @@
             "OpenAI — processamento por IA para NowStudy e funções relacionadas.",
             "Google — início de sessão com Google quando escolhido, distribuição Android/Google Play, faturação de funcionalidades pagas através do Google Play e serviços da plataforma selecionados pelo utilizador.",
             "RevenueCat — validação de subscrições e compras, identificador do utilizador da aplicação, informações da compra e estado de acesso para desbloquear funcionalidades pagas.",
-            "Firebase Cloud Messaging — entrega de notificações funcionais Android através de um identificador técnico de instalação necessário à entrega."
+            "Firebase Cloud Messaging — entrega de notificações funcionais Android através de um identificador técnico de instalação necessário à entrega.",
+            "Open Library e, quando configurado, Google Books — pesquisas de livros iniciadas pelo utilizador por título, autor ou ISBN. O pedido ao catálogo não inclui o identificador da conta NowKids, e-mail, identificador da família nem dados do perfil da criança."
           ]
         },
         {
@@ -141,6 +142,12 @@
           "h": "15. Reutilização de IA, cache e registos técnicos",
           "p": [
             "Para reduzir processamento repetido de IA, o NowKids pode manter temporariamente, por família/criança, uma extração ou resultado gerado em cache. A mesma digitalização escolar pode ser reconhecido uma vez e reutilizado no seguimento; a extração de uma digitalização em cache pode ser mantida até 30 dias e outros resultados IA em cache até 14 dias. Planos de estudo, cartões de estudo e mini-testes guardados permanecem na conta até serem eliminados segundo as regras normais. O registo ai_usage contém apenas dados técnicos como modelo, tokens, duração de áudio, custo estimado, acerto de cache, nível de encaminhamento, tentativa, latência, sucesso/erro e versão de preços; não guarda o conteúdo dos pedidos da criança."
+          ]
+        },
+        {
+          "h": "16. Pesquisas no catálogo de livros",
+          "p": [
+            "Quando o utilizador inicia uma pesquisa de livros, o NowKids pode enviar o título, autor, ISBN e idioma de catálogo introduzidos ao Open Library e, quando configurado, ao Google Books. O pedido passa por uma função protegida no servidor. O NowKids não inclui o identificador da conta, o e-mail, o identificador da família, dados do perfil da criança nem o token de autenticação nos pedidos aos catálogos, e a função de catálogo não grava os parâmetros da pesquisa na base de dados NowKids."
           ]
         }
       ]
@@ -582,6 +589,12 @@
           "h": "Materiais de estudo guardados",
           "p": [
             "Planos, mini-testes, cartões de estudo e sessões concluídas ficam organizados por disciplina. Um erro numa categoria não deve esconder as restantes."
+          ]
+        },
+        {
+          "h": "Livros e pesquisa no catálogo",
+          "p": [
+            "Os livros podem ser adicionados manualmente ou pesquisados por título, autor e ISBN. As consultas passam por uma função protegida do servidor NowKids e podem usar o Open Library e, quando configurado, o Google Books."
           ]
         },
         {
