@@ -23,7 +23,7 @@
       "terms": "Regole d’uso di NowKids, account familiari, funzioni scolastiche e responsabilità.",
       "parents": "Informazioni chiare per genitori e tutori su account dei minori e autorizzazione parentale.",
       "ai": "Come funziona l’IA NowStudy, i limiti, le protezioni e la segnalazione di risultati non sicuri.",
-      "community": "Regole per sticker condivisi e altri contenuti visibili ad altri utenti.",
+      "community": "Regole per adesivi condivisi e altri contenuti visibili ad altri utenti.",
       "rights": "Come accedere, correggere, esportare, limitare o eliminare i dati personali.",
       "deletion": "Come eliminare account e dati server associati.",
       "support": "Come contattarci per bug, privacy, sicurezza dei minori o contenuti.",
@@ -371,7 +371,7 @@
     },
     "community": {
       "title": "Regole dei Contenuti della Community",
-      "intro": "Per sticker condivisi e altri contenuti visibili ad altri utenti.",
+      "intro": "Per adesivi condivisi e altri contenuti visibili ad altri utenti.",
       "sections": [
         {
           "h": "1. Adatto ai minori",
