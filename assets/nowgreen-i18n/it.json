@@ -73,6 +73,12 @@
           "p": [
             "Impostazioni contiene documenti, diritti e funzioni di eliminazione."
           ]
+        },
+        {
+          "h": "8. Privacy ed eliminazione",
+          "p": [
+            "Nelle Impostazioni sono disponibili informative su privacy/termini/IA, diritti sui dati, eliminazione dei dati NowGreen ed eliminazione permanente dell’account. Disinstallare l’app da solo non elimina i dati nel cloud."
+          ]
         }
       ]
     },
@@ -108,6 +114,18 @@
           "h": "5. Diritti",
           "p": [
             "Accesso, rettifica, cancellazione, portabilità, limitazione o opposizione ove applicabile."
+          ]
+        },
+        {
+          "h": "6. I tuoi diritti",
+          "p": [
+            "In base alla legge applicabile puoi richiedere accesso, rettifica, cancellazione, portabilità, limitazione o opposizione. Nel SEE puoi presentare reclamo all’autorità nazionale per la protezione dei dati; in Portogallo, alla CNPD."
+          ]
+        },
+        {
+          "h": "7. Sicurezza",
+          "p": [
+            "NowGreen utilizza accesso autenticato e controlli a livello di riga per i dati dell’utente. Non caricare dati personali che non hai il diritto di trattare."
           ]
         }
       ]
@@ -145,6 +163,18 @@
           "p": [
             "Dati e account possono essere eliminati dalle Impostazioni."
           ]
+        },
+        {
+          "h": "6. Disponibilità e responsabilità",
+          "p": [
+            "Il servizio è fornito con ragionevole cura, ma senza garanzia di disponibilità ininterrotta o accuratezza perfetta. I diritti obbligatori dei consumatori non sono esclusi."
+          ]
+        },
+        {
+          "h": "7. Fine dell’utilizzo",
+          "p": [
+            "Puoi smettere di usare NowGreen ed eliminare dati o account nelle Impostazioni. L’accesso può essere limitato quando necessario per sicurezza, prevenzione degli abusi o rispetto della legge."
+          ]
         }
       ]
     },
@@ -174,6 +204,12 @@
           "h": "4. Limiti",
           "p": [
             "L’IA non è una valutazione professionale garantita."
+          ]
+        },
+        {
+          "h": "5. Generazione di immagini",
+          "p": [
+            "Le anteprime e visualizzazioni generate possono differire dalla realtà e inventare dettagli visivi. Sono strumenti di progettazione, non disegni costruttivi né una garanzia di sopravvivenza delle piante."
           ]
         }
       ]
@@ -205,6 +241,12 @@
           "p": [
             "Se non riesci ad accedere, scrivi a support@mynw.app senza password."
           ]
+        },
+        {
+          "h": "5. Diritti legali",
+          "p": [
+            "Dove applicabile, puoi richiedere accesso, rettifica, portabilità, limitazione, opposizione o cancellazione e contattare l’autorità competente per la protezione dei dati."
+          ]
         }
       ]
     },
@@ -235,6 +277,18 @@
           "p": [
             "Disinstallare l’app non garantisce la cancellazione dei dati cloud."
           ]
+        },
+        {
+          "h": "5. Dati neutrali condivisi",
+          "p": [
+            "I profili di riferimento neutrali delle specie che non contengono identità dell’utente o contenuti privati possono rimanere come dati di riferimento condivisi anziché dati dell’account."
+          ]
+        },
+        {
+          "h": "6. Abbonamenti",
+          "p": [
+            "Eliminare un account o l’app non annulla necessariamente un abbonamento Google Play. Annulla un abbonamento attivo tramite Google Play, se applicabile."
+          ]
         }
       ]
     },
@@ -258,6 +312,12 @@
           "h": "IA e sicurezza",
           "p": [
             "Indica funzione, ora approssimativa e contesto necessario."
+          ]
+        },
+        {
+          "h": "Sicurezza",
+          "p": [
+            "Segnala privatamente eventuali vulnerabilità di sicurezza sospette a support@mynw.app. Non sfruttare un problema oltre quanto necessario per dimostrarlo."
           ]
         }
       ]
