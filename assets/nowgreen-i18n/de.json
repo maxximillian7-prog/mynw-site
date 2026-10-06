@@ -73,6 +73,12 @@
           "p": [
             "Einstellungen enthält Dokumente, Datenrechte und Löschfunktionen."
           ]
+        },
+        {
+          "h": "8. Datenschutz und Löschung",
+          "p": [
+            "In den Einstellungen finden Sie Hinweise zu Datenschutz/Nutzungsbedingungen/KI, Datenrechte, die Löschung von NowGreen-Daten und die dauerhafte Kontolöschung. Das Deinstallieren der App allein löscht keine Cloud-Daten."
+          ]
         }
       ]
     },
@@ -108,6 +114,18 @@
           "h": "5. Rechte",
           "p": [
             "Zugriff, Berichtigung, Löschung, Portabilität, Einschränkung oder Widerspruch soweit anwendbar."
+          ]
+        },
+        {
+          "h": "6. Ihre Rechte",
+          "p": [
+            "Je nach anwendbarem Recht können Sie Auskunft, Berichtigung, Löschung, Datenübertragbarkeit, Einschränkung oder Widerspruch verlangen. Im EWR können Sie sich an Ihre nationale Datenschutzbehörde wenden; in Portugal an die CNPD."
+          ]
+        },
+        {
+          "h": "7. Sicherheit",
+          "p": [
+            "NowGreen verwendet authentifizierten Zugriff und zeilenbasierte Zugriffskontrollen für Nutzerdaten. Laden Sie keine personenbezogenen Daten hoch, zu deren Verarbeitung Sie nicht berechtigt sind."
           ]
         }
       ]
@@ -145,6 +163,18 @@
           "p": [
             "Daten und Konto können in Einstellungen gelöscht werden."
           ]
+        },
+        {
+          "h": "6. Verfügbarkeit und Haftung",
+          "p": [
+            "Der Dienst wird mit angemessener Sorgfalt bereitgestellt, jedoch ohne Garantie für unterbrechungsfreie Verfügbarkeit oder vollständige Genauigkeit. Zwingende Verbraucherrechte werden nicht ausgeschlossen."
+          ]
+        },
+        {
+          "h": "7. Beendigung der Nutzung",
+          "p": [
+            "Sie können NowGreen nicht mehr verwenden und Daten oder das Konto in den Einstellungen löschen. Der Zugriff kann eingeschränkt werden, wenn dies für Sicherheit, Missbrauchsprävention oder gesetzliche Anforderungen erforderlich ist."
+          ]
         }
       ]
     },
@@ -174,6 +204,12 @@
           "h": "4. Grenzen",
           "p": [
             "KI ist keine garantierte professionelle Bewertung."
+          ]
+        },
+        {
+          "h": "5. Bildgenerierung",
+          "p": [
+            "Generierte Vorschauen und Visualisierungen können von der Realität abweichen und visuelle Details erfinden. Sie sind Gestaltungshilfen, keine Bauzeichnungen und keine Garantie für das Überleben von Pflanzen."
           ]
         }
       ]
@@ -205,6 +241,12 @@
           "p": [
             "Bei verlorenem Zugang: support@mynw.app, ohne Passwort."
           ]
+        },
+        {
+          "h": "5. Gesetzliche Rechte",
+          "p": [
+            "Soweit anwendbar, können Sie Auskunft, Berichtigung, Datenübertragbarkeit, Einschränkung, Widerspruch oder Löschung verlangen und sich an die zuständige Datenschutzbehörde wenden."
+          ]
         }
       ]
     },
@@ -235,6 +277,18 @@
           "p": [
             "Die Deinstallation allein löscht Cloud-Daten nicht garantiert."
           ]
+        },
+        {
+          "h": "5. Gemeinsame neutrale Daten",
+          "p": [
+            "Neutrale Artenreferenzprofile ohne Nutzeridentität oder private Inhalte können als gemeinsame Referenzdaten erhalten bleiben und gelten nicht als Kontodaten."
+          ]
+        },
+        {
+          "h": "6. Abonnements",
+          "p": [
+            "Das Löschen eines Kontos oder der App beendet ein Google-Play-Abonnement nicht zwingend. Kündigen Sie ein aktives Abonnement gegebenenfalls über Google Play."
+          ]
         }
       ]
     },
@@ -258,6 +312,12 @@
           "h": "KI & Sicherheit",
           "p": [
             "Funktion, ungefähre Zeit und erforderlichen Kontext nennen."
+          ]
+        },
+        {
+          "h": "Sicherheit",
+          "p": [
+            "Melden Sie vermutete Sicherheitslücken vertraulich an support@mynw.app. Nutzen Sie ein Problem nicht stärker aus, als zur Demonstration erforderlich ist."
           ]
         }
       ]
