@@ -4,7 +4,7 @@
     "home": "Documentazione",
     "manual": "Manuale",
     "privacy": "Privacy",
-    "terms": "Termini",
+    "terms": "Termini e Condizioni",
     "ai": "IA e dati",
     "rights": "Diritti sui dati",
     "deletion": "Elimina account",
@@ -20,7 +20,7 @@
     "cards": {
       "manual": "Usare piante, spazi, cura, meteo, Ivy, calendario e progetti.",
       "privacy": "Quali dati vengono trattati e perché.",
-      "terms": "Regole di utilizzo.",
+      "terms": "Condizioni per NowGreen, funzioni IA, abbonamenti e contenuti.",
       "ai": "Come funzionano IA, immagini e cache.",
       "rights": "Controllare i dati.",
       "deletion": "Eliminare dati o account.",
@@ -133,49 +133,105 @@
       ]
     },
     "terms": {
-      "title": "Termini di utilizzo",
-      "intro": "Regole per usare NowGreen.",
+      "title": "Termini e Condizioni",
+      "intro": "I presenti Termini e Condizioni regolano l’uso dell’app NowGreen, del sito web e delle funzionalità correlate, compresi gli strumenti assistiti dall’IA.",
       "sections": [
         {
-          "h": "1. Servizio",
+          "h": "1. Fornitore e accettazione",
           "p": [
-            "NowGreen è uno strumento di organizzazione e pianificazione; le funzioni possono cambiare."
+            "NowGreen è fornito da Maksym Smyrnov, Portugal. Utilizzando NowGreen, creando un account o acquistando funzionalità a pagamento, accetti i presenti Termini e Condizioni e l’Informativa sulla privacy. Se non accetti, non utilizzare il servizio."
           ]
         },
         {
-          "h": "2. IA",
+          "h": "2. Cosa fa NowGreen",
           "p": [
-            "I risultati IA possono essere errati; verifica le decisioni importanti."
+            "NowGreen aiuta a organizzare la cura delle piante, gestire una collezione, pianificare attività, utilizzare il contesto meteo, identificare piante, valutarne lo stato e creare progetti e visualizzazioni degli spazi.",
+            "Le funzionalità possono evolvere, cambiare, essere testate o diventare temporaneamente non disponibili. Possiamo aggiungere, modificare o interrompere singole funzionalità quando ragionevolmente necessario per sviluppo, sicurezza o conformità legale."
           ]
         },
         {
-          "h": "3. Contenuti",
+          "h": "3. Funzionalità assistite dall’IA e raccomandazioni",
           "p": [
-            "Sei responsabile dei contenuti caricati e dei relativi diritti."
+            "Alcune funzioni utilizzano intelligenza artificiale e analisi automatizzata. Identificazione delle piante, Health Scan, Ivy, previsioni di cura, visualizzazioni e altri risultati assistiti dall’IA possono essere incompleti, imprecisi o errati.",
+            "I risultati dell’IA sono informazioni di supporto e non consulenza professionale garantita. Prima di decisioni importanti, considera lo stato reale della pianta, le istruzioni dei prodotti utilizzati e, se necessario, una consulenza professionale adeguata."
           ]
         },
         {
-          "h": "4. Abbonamenti",
+          "h": "4. Sicurezza e informazioni sulla tossicità",
           "p": [
-            "Sono previsti Free, Plus e Pro; condizioni prima dell’acquisto."
+            "Le informazioni sulla tossicità delle piante, sui rischi per persone o animali e sulla salute delle piante sono fornite solo a scopo informativo. NowGreen non sostituisce consulenza medica, veterinaria, tossicologica o di emergenza.",
+            "In caso di sospetta intossicazione, ingestione di una pianta o altra situazione urgente, contatta immediatamente i servizi medici, veterinari, antiveleni o di emergenza appropriati."
           ]
         },
         {
-          "h": "5. Eliminazione",
+          "h": "5. Il tuo account e i tuoi contenuti",
           "p": [
-            "Dati e account possono essere eliminati dalle Impostazioni."
+            "Sei responsabile della sicurezza delle credenziali di accesso e delle attività svolte tramite il tuo account. Contattaci se sospetti un accesso non autorizzato.",
+            "Mantieni i diritti su foto, testi, progetti e altri materiali caricati. Concedi a NowGreen un’autorizzazione limitata a trattarli solo nella misura necessaria per fornire le funzionalità scelte, memorizzare e sincronizzare i dati e gestire il servizio.",
+            "Devi disporre dei diritti necessari sui contenuti caricati e non puoi caricare contenuti illegali o che violino i diritti altrui."
           ]
         },
         {
-          "h": "6. Disponibilità e responsabilità",
+          "h": "6. Uso consentito",
           "p": [
-            "Il servizio è fornito con ragionevole cura, ma senza garanzia di disponibilità ininterrotta o accuratezza perfetta. I diritti obbligatori dei consumatori non sono esclusi."
+            "Non puoi utilizzare NowGreen per scopi illegali, aggirare sicurezza o limiti di utilizzo, interferire con il servizio, tentare accessi non autorizzati, distribuire codice dannoso, sovraccaricare il servizio con mezzi automatizzati o utilizzarlo in modo da danneggiare altri utenti o l’infrastruttura."
           ]
         },
         {
-          "h": "7. Fine dell’utilizzo",
+          "h": "7. Servizi di terze parti",
           "p": [
-            "Puoi smettere di usare NowGreen ed eliminare dati o account nelle Impostazioni. L’accesso può essere limitato quando necessario per sicurezza, prevenzione degli abusi o rispetto della legge."
+            "NowGreen può utilizzare o aprire servizi di terze parti, inclusi Google, Google Play, fornitori di mappe, meteo, modelli IA e altre piattaforme esterne. I loro termini e politiche possono applicarsi separatamente.",
+            "Non controlliamo la disponibilità o il contenuto dei servizi indipendenti di terzi e non siamo responsabili delle modifiche apportate da tali fornitori."
+          ]
+        },
+        {
+          "h": "8. Abbonamenti, pagamenti e annullamento",
+          "p": [
+            "NowGreen può offrire piani Free, Plus e Pro. Funzionalità correnti, prezzo, periodo di abbonamento e condizioni di rinnovo vengono mostrati prima della conferma dell’acquisto.",
+            "Se un acquisto avviene tramite Google Play o un altro app store, pagamento, rinnovo automatico, annullamento e rimborsi sono regolati anche dalle regole dello store. Puoi gestire l’abbonamento tramite l’account dello store utilizzato per acquistarlo.",
+            "Quando la legge applicabile riconosce ulteriori diritti di annullamento, rimborso o tutela del consumatore, i presenti Termini non limitano tali diritti."
+          ]
+        },
+        {
+          "h": "9. Proprietà intellettuale",
+          "p": [
+            "L’app, il design, il codice software, il marchio NowGreen e i materiali originali del servizio appartengono ai rispettivi titolari e sono protetti dalla legge applicabile. I presenti Termini non trasferiscono la proprietà del servizio.",
+            "Ti viene concesso un diritto limitato, personale, non esclusivo e revocabile di utilizzare NowGreen in conformità con questi Termini."
+          ]
+        },
+        {
+          "h": "10. Disponibilità, modifiche e cessazione dell’uso",
+          "p": [
+            "Cerchiamo di mantenere il servizio disponibile e sicuro, ma non garantiamo un funzionamento ininterrotto, privo di errori o compatibile con ogni dispositivo e servizio di terze parti.",
+            "Puoi smettere di usare NowGreen in qualsiasi momento. Quando l’eliminazione dell’account è disponibile nell’app, puoi utilizzarla; ulteriori informazioni sono disponibili nella pagina di eliminazione dell’account.",
+            "Possiamo limitare o terminare l’accesso in caso di grave violazione di questi Termini, rischi per la sicurezza, abuso del servizio o quando richiesto dalla legge."
+          ]
+        },
+        {
+          "h": "11. Esclusione e limitazione di responsabilità",
+          "p": [
+            "Nella misura massima consentita dalla legge, NowGreen viene fornito senza garanzia che risultati dell’IA, previsioni, identificazioni, calcoli o visualizzazioni siano completamente accurati. Rimani responsabile delle decisioni prese utilizzando tali risultati.",
+            "Nulla nei presenti Termini esclude o limita responsabilità o diritti che non possano essere legalmente esclusi, inclusi i diritti inderogabili dei consumatori."
+          ]
+        },
+        {
+          "h": "12. Privacy e dati",
+          "p": [
+            "Il trattamento dei dati personali è descritto nell’Informativa sulla privacy di NowGreen. Utilizzando il servizio puoi scegliere funzioni che richiedono il trattamento di foto, testo, posizione o altri dati; il trattamento dipende dalla funzione utilizzata."
+          ]
+        },
+        {
+          "h": "13. Legge applicabile e diritti dei consumatori",
+          "p": [
+            "I presenti Termini sono regolati dalla legge portoghese, fatto salvo qualsiasi diritto inderogabile del consumatore applicabile ai sensi della legge del tuo paese di residenza abituale, compreso il diritto applicabile dell’Unione europea.",
+            "Se una controversia non può essere risolta tramite il supporto, ciascuna parte conserva il diritto di utilizzare i rimedi legali disponibili e rivolgersi alle autorità o ai tribunali competenti."
+          ]
+        },
+        {
+          "h": "14. Modifiche ai Termini e contatti",
+          "p": [
+            "Possiamo aggiornare questi Termini quando cambiano il servizio, la legge o i requisiti di sicurezza. Le modifiche sostanziali saranno indicate con una nuova data di aggiornamento e, ove richiesto, con un ulteriore avviso.",
+            "Domande sui presenti Termini: support@mynw.app."
           ]
         }
       ]
