@@ -25,7 +25,9 @@
       "rights": "Cómo controlar tus datos.",
       "deletion": "Cómo eliminar datos o cuenta.",
       "support": "Soporte técnico, privacidad y cuenta."
-    }
+    },
+    "menuOpen": "Abrir menú",
+    "languageSelector": "Idioma"
   },
   "pages": {
     "manual": {
