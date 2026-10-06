@@ -25,7 +25,9 @@
       "rights": "Como aceder, corrigir ou eliminar dados.",
       "deletion": "Como eliminar dados NowGreen ou a conta.",
       "support": "Suporte técnico, privacidade e conta."
-    }
+    },
+    "menuOpen": "Abrir menu",
+    "languageSelector": "Idioma"
   },
   "pages": {
     "manual": {
