@@ -1,0 +1,19 @@
+body.ng-site{--brand:#447558;--brand-2:#6b9673;--accent:#447558;--accent-soft:#eef6ef;--bg:#f7f6ef}
+body.ng-site .site-header{background:rgba(247,246,239,.92)}
+body.ng-site .brand-badge{width:56px;height:56px;flex:0 0 56px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(145deg,#dcebdc,#f4e7b7);color:#315840;font-weight:900}
+body.ng-site .legal{padding-top:44px}
+.ng-hero{max-width:920px;margin:0 auto 28px}
+.ng-hero h1{font-size:clamp(2.5rem,6vw,4.7rem);line-height:1;letter-spacing:-.055em;margin:10px 0 16px}
+.ng-hero>p{font-size:1.08rem;color:var(--muted);max-width:820px}
+.ng-doc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:1000px;margin:auto}
+.ng-doc-card{text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;min-height:170px}
+.ng-doc-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.ng-doc-card h2{font-size:1.15rem;margin:0 0 7px}.ng-doc-card p{margin:0;color:var(--muted)}
+.ng-back{display:inline-flex;margin-bottom:18px;text-decoration:none;color:var(--brand);font-weight:850}
+.ng-intro{font-size:1.04rem;color:#3f5144!important}
+.ng-doc-section{border-top:1px solid var(--line);padding-top:18px;margin-top:24px}
+.ng-doc-section h2{margin:0 0 10px!important}.ng-doc-section ul{padding-left:22px}.ng-doc-section li+li{margin-top:7px}
+.ng-legal-card{max-width:960px}.ng-contact{line-height:1.6}.ng-action{margin:18px 0}
+body.ng-site .lang-select{min-width:125px}
+@media(max-width:780px){.ng-doc-grid{grid-template-columns:1fr}body.ng-site .brand span:last-child{display:inline}}
+@media(max-width:560px){.ng-hero h1{font-size:2.7rem}.ng-doc-card{min-height:0}body.ng-site .brand span:last-child{display:none}}
