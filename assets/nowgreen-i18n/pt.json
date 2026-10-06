@@ -73,6 +73,12 @@
           "p": [
             "As Definições incluem documentos, direitos, eliminação de dados e eliminação permanente da conta."
           ]
+        },
+        {
+          "h": "8. Privacidade e eliminação",
+          "p": [
+            "As Definições incluem avisos de privacidade/termos/IA, direitos sobre dados, eliminação dos dados NowGreen e eliminação permanente da conta. Desinstalar a aplicação, por si só, não elimina os dados na nuvem."
+          ]
         }
       ]
     },
@@ -117,6 +123,12 @@
           "p": [
             "Pode exercer direitos aplicáveis de acesso, correção, eliminação, portabilidade, limitação ou oposição. Em Portugal pode contactar a CNPD."
           ]
+        },
+        {
+          "h": "7. Segurança",
+          "p": [
+            "O NowGreen utiliza acesso autenticado e controlos ao nível das linhas para dados do utilizador. Não carregue dados pessoais que não tenha o direito de tratar."
+          ]
         }
       ]
     },
@@ -159,6 +171,12 @@
           "p": [
             "Pode eliminar dados ou a conta nas Definições."
           ]
+        },
+        {
+          "h": "7. Terminar a utilização",
+          "p": [
+            "Pode deixar de utilizar o NowGreen e eliminar os dados ou a conta nas Definições. O acesso pode ser restringido quando necessário por motivos de segurança, prevenção de abuso ou cumprimento da lei."
+          ]
         }
       ]
     },
@@ -189,6 +207,12 @@
           "p": [
             "Resultados IA são probabilísticos e não constituem avaliação profissional garantida."
           ]
+        },
+        {
+          "h": "5. Geração de imagens",
+          "p": [
+            "As pré-visualizações e visualizações geradas podem diferir da realidade e inventar detalhes visuais. São ferramentas de design, não desenhos de construção nem uma garantia de sobrevivência das plantas."
+          ]
         }
       ]
     },
@@ -218,6 +242,12 @@
           "h": "4. Pedido externo",
           "p": [
             "Se não conseguir entrar, contacte support@mynw.app sem enviar a palavra-passe."
+          ]
+        },
+        {
+          "h": "5. Direitos legais",
+          "p": [
+            "Quando aplicável, pode pedir acesso, correção, portabilidade, limitação, oposição ou eliminação e contactar a autoridade de proteção de dados competente."
           ]
         }
       ]
@@ -255,6 +285,12 @@
           "p": [
             "Uma subscrição Google Play ativa deve ser cancelada separadamente, se aplicável."
           ]
+        },
+        {
+          "h": "6. Subscrições",
+          "p": [
+            "Eliminar uma conta ou a aplicação não cancela necessariamente uma subscrição Google Play. Cancele uma subscrição ativa através do Google Play, se aplicável."
+          ]
         }
       ]
     },
@@ -278,6 +314,12 @@
           "h": "IA e segurança",
           "p": [
             "Indique função, hora aproximada e contexto necessário. Vulnerabilidades devem ser comunicadas em privado."
+          ]
+        },
+        {
+          "h": "Segurança",
+          "p": [
+            "Comunique suspeitas de vulnerabilidades de segurança de forma privada para support@mynw.app. Não explore um problema para além do necessário para o demonstrar."
           ]
         }
       ]
