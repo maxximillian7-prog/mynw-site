@@ -1,0 +1,333 @@
+{
+  "common": {
+    "language": "English",
+    "home": "Documentation",
+    "manual": "User guide",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "ai": "AI & data",
+    "rights": "Data rights",
+    "deletion": "Delete account",
+    "support": "Support",
+    "updated": "Last updated: October 6, 2026",
+    "back": "All NowGreen documents",
+    "footer": "© 2026 NowGreen / NowApps.",
+    "developer": "Developer and data controller",
+    "contact": "Privacy & support contact",
+    "status": "Current documentation for NowGreen.",
+    "title": "NowGreen — Manual, privacy & legal",
+    "intro": "Official NowGreen documentation for plant care, Ivy, Green Scan, landscape projects, AI, privacy, data rights and account deletion.",
+    "cards": {
+      "manual": "How to use plants, spaces, care, weather, Ivy, calendar and landscape projects.",
+      "privacy": "What data NowGreen processes, why, with whom and for how long.",
+      "terms": "Rules for using NowGreen and its AI-assisted features.",
+      "ai": "How AI, image generation and caching work and what context may be sent.",
+      "rights": "How to access, correct, delete or otherwise control your data.",
+      "deletion": "How to delete NowGreen data or permanently delete the account.",
+      "support": "Technical, privacy and account support."
+    }
+  },
+  "pages": {
+    "manual": {
+      "title": "NowGreen user guide",
+      "intro": "A practical guide to the main NowGreen workflows.",
+      "sections": [
+        {
+          "h": "1. Account and language",
+          "p": [
+            "Sign in with email/password or Google. On first launch NowGreen uses the device language when it is one of the eight supported languages. A manually selected language takes priority on that device."
+          ]
+        },
+        {
+          "h": "2. My Green",
+          "p": [
+            "Create spaces such as Home, Apartment, Balcony, Terrace, Garden or Greenhouse. Add plants to spaces and rooms, keep photos, permanent species information, location and care history."
+          ]
+        },
+        {
+          "h": "3. Green Scan and plant profiles",
+          "p": [
+            "Use Green Scan to identify a plant, assess health, pests, soil or a place. Species-level general information is stored as permanent text and reused from the neutral species cache when available."
+          ]
+        },
+        {
+          "h": "4. Ivy and care planning",
+          "p": [
+            "Ivy can use your plants, completed actions, health checks, pending tasks, spaces and available weather context. The Home briefing reconciles completed care with the current plan before summarising what needs attention."
+          ]
+        },
+        {
+          "h": "5. Calendar and notifications",
+          "p": [
+            "Calendar and plant care plans use the same task source. Mark completed care in Actions so future checks can be recalculated. Notification categories can be enabled separately."
+          ]
+        },
+        {
+          "h": "6. Projects and visualisation",
+          "p": [
+            "Create landscape projects, place objects and plants, and generate AI concepts. A real photo is optional: without one, NowGreen can render the saved plan on a flat neutral site; with a photo, it can visualise on the real space."
+          ]
+        },
+        {
+          "h": "7. Weather",
+          "p": [
+            "Green Forecast can use device location, a manually entered place or a project location. Weather guidance is advisory and should be combined with actual soil moisture and plant condition."
+          ]
+        },
+        {
+          "h": "8. Privacy and deletion",
+          "p": [
+            "Settings contains privacy/terms/AI notices, data rights, NowGreen data deletion and permanent account deletion. Deleting the app alone does not delete cloud data."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This policy explains how NowGreen processes data to provide plant care, planning, AI and account features.",
+      "sections": [
+        {
+          "h": "1. Controller and contact",
+          "p": [
+            "NowGreen / NowApps is developed by Maksym Smyrnov in Portugal. Privacy and support contact: support@mynw.app."
+          ]
+        },
+        {
+          "h": "2. Data we may process",
+          "items": [
+            "Account information: user ID, email, sign-in provider, language and settings.",
+            "Plants, spaces, photos, care history, health checks, tasks, projects, scans, notes and AI conversations that you choose to create.",
+            "Technical information needed to run and secure the service, including AI usage/cost telemetry, model information, errors and security logs."
+          ]
+        },
+        {
+          "h": "3. Why we use data",
+          "items": [
+            "Authenticate users and synchronise NowGreen content.",
+            "Provide care planning, weather-aware guidance, reminders, AI assistance and project visualisation.",
+            "Maintain reliability, prevent abuse and respond to support/privacy requests."
+          ]
+        },
+        {
+          "h": "4. Service providers",
+          "items": [
+            "Supabase — authentication, database, private storage and server-side functions.",
+            "OpenAI — AI inference and image generation for selected features.",
+            "Google — Google sign-in and Android/Google Play platform services where used.",
+            "MET Norway — weather data; OpenStreetMap/Nominatim and Open-Meteo — place lookup/fallback."
+          ]
+        },
+        {
+          "h": "5. Retention",
+          "p": [
+            "User content is kept until the user deletes it, deletes the account, or limited retention is required for security/legal reasons. Neutral species-level reference profiles are not tied to a user account."
+          ]
+        },
+        {
+          "h": "6. Your rights",
+          "p": [
+            "Depending on applicable law you may request access, correction, deletion, portability, restriction or objection. In the EEA you may complain to your national data protection authority; in Portugal, the CNPD."
+          ]
+        },
+        {
+          "h": "7. Security",
+          "p": [
+            "NowGreen uses authenticated access and row-level controls for user data. Do not upload personal data you do not have the right to process."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "intro": "These terms govern use of NowGreen and its AI-assisted plant and landscape features.",
+      "sections": [
+        {
+          "h": "1. Service",
+          "p": [
+            "NowGreen is a planning and organisation tool. Features may evolve, be limited or temporarily unavailable, especially before public release."
+          ]
+        },
+        {
+          "h": "2. AI and horticultural guidance",
+          "p": [
+            "AI, plant identification, health assessment, weather advice and visualisations can be incomplete or wrong. Check important decisions against direct observation and appropriate professional guidance where needed."
+          ]
+        },
+        {
+          "h": "3. Your content",
+          "p": [
+            "You remain responsible for photos, text, project data and other content you upload and must have the right to use it."
+          ]
+        },
+        {
+          "h": "4. Acceptable use",
+          "p": [
+            "Do not misuse the service, bypass security or limits, interfere with other users, upload malicious or unlawful content, or use output for unlawful activity."
+          ]
+        },
+        {
+          "h": "5. Subscriptions",
+          "p": [
+            "Free, Plus and Pro tiers are planned. Prices, renewal details and paid conditions will be shown before purchase. Development builds may show placeholders without enforcing limits."
+          ]
+        },
+        {
+          "h": "6. Availability and liability",
+          "p": [
+            "The service is provided with reasonable care but without a guarantee of uninterrupted availability or perfect accuracy. Mandatory consumer rights are not excluded."
+          ]
+        },
+        {
+          "h": "7. Ending use",
+          "p": [
+            "You may stop using NowGreen and delete data or the account in Settings. Access may be restricted when required for security, abuse prevention or law."
+          ]
+        }
+      ]
+    },
+    "ai": {
+      "title": "AI & data notice",
+      "intro": "How NowGreen uses AI and what context may be sent to AI providers.",
+      "sections": [
+        {
+          "h": "1. AI features",
+          "p": [
+            "AI may be used for Ivy, plant identification, health/pest/soil analysis, species reference profiles, landscape planning and image visualisation."
+          ]
+        },
+        {
+          "h": "2. Data sent",
+          "p": [
+            "Only context needed for the selected feature is sent. This may include user-entered text, plant/space/project metadata, selected images and recent relevant care context."
+          ]
+        },
+        {
+          "h": "3. Caching and cost control",
+          "p": [
+            "NowGreen reuses deterministic results where appropriate. Neutral species profiles and generated assets can be cached to avoid repeated AI calls. User-specific private content is not put into the shared species cache."
+          ]
+        },
+        {
+          "h": "4. AI limitations",
+          "p": [
+            "AI output is probabilistic. Plant identification, toxicity, disease, pesticide or weather-related advice should not be treated as a guaranteed professional determination."
+          ]
+        },
+        {
+          "h": "5. Image generation",
+          "p": [
+            "Generated previews and visualisations can differ from reality and may invent visual details. They are design aids, not construction drawings or a guarantee of plant survival."
+          ]
+        }
+      ]
+    },
+    "rights": {
+      "title": "Data rights",
+      "intro": "Ways to control NowGreen data and account information.",
+      "sections": [
+        {
+          "h": "1. In-app controls",
+          "p": [
+            "You can edit or delete individual plants, spaces, photos, projects and history where the feature provides that action. Settings also provides full NowGreen data deletion and permanent account deletion."
+          ]
+        },
+        {
+          "h": "2. Delete NowGreen data",
+          "p": [
+            "This removes user-owned NowGreen cloud content and private NowGreen files while keeping the sign-in account available."
+          ]
+        },
+        {
+          "h": "3. Delete account",
+          "p": [
+            "This first removes NowGreen data and private files, then permanently deletes the Supabase authentication account. The action cannot be undone."
+          ]
+        },
+        {
+          "h": "4. External request",
+          "p": [
+            "If you cannot access the app, contact support@mynw.app from the account email where possible. Do not send your password."
+          ]
+        },
+        {
+          "h": "5. Legal rights",
+          "p": [
+            "Where applicable, you may request access, correction, portability, restriction, objection or deletion and contact the relevant data protection authority."
+          ]
+        }
+      ]
+    },
+    "deletion": {
+      "title": "Delete NowGreen data or account",
+      "intro": "NowGreen provides both in-app deletion and an external support path.",
+      "sections": [
+        {
+          "h": "1. Delete NowGreen data",
+          "p": [
+            "Open Settings → Data & account deletion → Delete NowGreen data. This removes plants, spaces, projects, care/AI history and private NowGreen files while leaving your sign-in account."
+          ]
+        },
+        {
+          "h": "2. Delete account",
+          "p": [
+            "Open Settings → Data & account deletion → Delete account. After confirmation, NowGreen cloud content is removed and the authentication account is permanently deleted."
+          ]
+        },
+        {
+          "h": "3. External request",
+          "p": [
+            "If you can no longer sign in, email support@mynw.app from the account email where possible and request NowGreen account deletion. We may verify account ownership."
+          ]
+        },
+        {
+          "h": "4. Local data",
+          "p": [
+            "Uninstalling the app removes device-local app data but does not by itself guarantee deletion of cloud data. Use the in-app deletion action or contact support."
+          ]
+        },
+        {
+          "h": "5. Shared neutral data",
+          "p": [
+            "Neutral species reference profiles that contain no user identity or private content may remain because they are shared reference data rather than account data."
+          ]
+        },
+        {
+          "h": "6. Subscriptions",
+          "p": [
+            "Deleting an account or app does not necessarily cancel a Google Play subscription. Cancel an active subscription through Google Play if applicable."
+          ]
+        }
+      ]
+    },
+    "support": {
+      "title": "Support",
+      "intro": "Contact support@mynw.app for technical, privacy, account or safety questions.",
+      "sections": [
+        {
+          "h": "Technical support",
+          "p": [
+            "Include the app version, Android/device model, the feature involved and a short description of what happened. Do not send passwords."
+          ]
+        },
+        {
+          "h": "Privacy and data",
+          "p": [
+            "For access, correction or deletion requests, identify the NowGreen account using the account email where possible."
+          ]
+        },
+        {
+          "h": "AI issues",
+          "p": [
+            "For an incorrect or unsafe AI response, describe the feature, approximate time and relevant context without sending unnecessary personal data."
+          ]
+        },
+        {
+          "h": "Security",
+          "p": [
+            "Report suspected security vulnerabilities privately to support@mynw.app. Do not exploit a problem beyond what is necessary to demonstrate it."
+          ]
+        }
+      ]
+    }
+  }
+}
