@@ -20,7 +20,7 @@
     "cards": {
       "manual": "Utiliser plantes, espaces, entretien, météo, Ivy, calendrier et projets.",
       "privacy": "Données traitées et finalités.",
-      "terms": "Règles d’utilisation.",
+      "terms": "Conditions d’utilisation de NowGreen, de l’IA, des abonnements et des contenus.",
       "ai": "Fonctionnement de l’IA, des images et du cache.",
       "rights": "Contrôler vos données.",
       "deletion": "Supprimer les données ou le compte.",
@@ -133,49 +133,105 @@
       ]
     },
     "terms": {
-      "title": "Conditions d’utilisation",
-      "intro": "Règles d’utilisation de NowGreen.",
+      "title": "Conditions Générales d’Utilisation",
+      "intro": "Les présentes Conditions régissent l’utilisation de l’application NowGreen, du site web et des fonctionnalités associées, y compris les outils assistés par IA.",
       "sections": [
         {
-          "h": "1. Service",
+          "h": "1. Fournisseur et acceptation",
           "p": [
-            "NowGreen est un outil d’organisation et de planification; les fonctions peuvent évoluer."
+            "NowGreen est fourni par Maksym Smyrnov, Portugal. En utilisant NowGreen, en créant un compte ou en achetant des fonctionnalités payantes, vous acceptez les présentes Conditions et la Politique de confidentialité. Si vous n’acceptez pas ces conditions, n’utilisez pas le service."
           ]
         },
         {
-          "h": "2. IA",
+          "h": "2. Fonction de NowGreen",
           "p": [
-            "Les résultats IA peuvent être erronés; vérifiez les décisions importantes."
+            "NowGreen aide à organiser l’entretien des plantes, gérer une collection, planifier des tâches, tenir compte de la météo, identifier des plantes, évaluer leur état et créer des projets et visualisations d’espaces.",
+            "Les fonctionnalités peuvent évoluer, changer, être testées ou devenir temporairement indisponibles. Nous pouvons ajouter, modifier ou supprimer certaines fonctionnalités lorsque cela est raisonnablement nécessaire pour le développement, la sécurité ou le respect de la loi."
           ]
         },
         {
-          "h": "3. Contenu",
+          "h": "3. Fonctions assistées par IA et recommandations",
           "p": [
-            "Vous êtes responsable du contenu envoyé et des droits nécessaires."
+            "Certaines fonctions utilisent l’intelligence artificielle et l’analyse automatisée. L’identification des plantes, Health Scan, Ivy, les prévisions d’entretien, les visualisations et autres résultats assistés par IA peuvent être incomplets, imprécis ou erronés.",
+            "Les résultats de l’IA sont des informations d’assistance et non des conseils professionnels garantis. Avant toute décision importante, tenez compte de l’état réel de la plante, des instructions des produits utilisés et, si nécessaire, de conseils professionnels adaptés."
           ]
         },
         {
-          "h": "4. Abonnements",
+          "h": "4. Sécurité et informations sur la toxicité",
           "p": [
-            "Free, Plus et Pro sont prévus; conditions avant achat."
+            "Les informations relatives à la toxicité des plantes, aux risques pour les personnes ou les animaux et à la santé des plantes sont fournies à titre informatif uniquement. NowGreen ne remplace pas un avis médical, vétérinaire, toxicologique ou d’urgence.",
+            "En cas de suspicion d’intoxication, d’ingestion d’une plante ou d’une autre urgence, contactez sans délai les services médicaux, vétérinaires, antipoison ou d’urgence appropriés."
           ]
         },
         {
-          "h": "5. Suppression",
+          "h": "5. Votre compte et votre contenu",
           "p": [
-            "Données et compte peuvent être supprimés dans Réglages."
+            "Vous êtes responsable de la sécurité de vos identifiants et des activités effectuées via votre compte. Contactez-nous si vous suspectez un accès non autorisé.",
+            "Vous conservez vos droits sur les photos, textes, projets et autres contenus que vous importez. Vous accordez à NowGreen une autorisation limitée de les traiter uniquement dans la mesure nécessaire pour fournir les fonctions choisies, stocker et synchroniser les données et exploiter le service.",
+            "Vous devez disposer des droits nécessaires sur les contenus importés et ne devez pas publier de contenu illégal ou portant atteinte aux droits d’autrui."
           ]
         },
         {
-          "h": "6. Disponibilité et responsabilité",
+          "h": "6. Utilisation acceptable",
           "p": [
-            "Le service est fourni avec un soin raisonnable, sans garantie de disponibilité ininterrompue ni d’exactitude parfaite. Les droits impératifs des consommateurs ne sont pas exclus."
+            "Vous ne devez pas utiliser NowGreen à des fins illégales, contourner la sécurité ou les limites d’utilisation, perturber le service, tenter un accès non autorisé, diffuser du code malveillant, surcharger le service par des moyens automatisés ou l’utiliser d’une manière susceptible de nuire à d’autres utilisateurs ou à l’infrastructure."
           ]
         },
         {
-          "h": "7. Fin d’utilisation",
+          "h": "7. Services tiers",
           "p": [
-            "Vous pouvez cesser d’utiliser NowGreen et supprimer les données ou le compte dans les Réglages. L’accès peut être limité lorsque cela est nécessaire pour la sécurité, la prévention des abus ou le respect de la loi."
+            "NowGreen peut utiliser ou ouvrir des services tiers, notamment Google, Google Play, des fournisseurs de cartes, de météo, de modèles d’IA et d’autres plateformes externes. Leurs propres conditions et politiques peuvent s’appliquer séparément.",
+            "Nous ne contrôlons pas la disponibilité ni le contenu des services tiers indépendants et ne sommes pas responsables des modifications effectuées par leurs fournisseurs."
+          ]
+        },
+        {
+          "h": "8. Abonnements, paiements et résiliation",
+          "p": [
+            "NowGreen peut proposer des offres Free, Plus et Pro. Les fonctionnalités disponibles, le prix, la durée d’abonnement et les conditions de renouvellement sont présentés avant la confirmation de l’achat.",
+            "Si un achat est effectué via Google Play ou une autre boutique d’applications, le paiement, le renouvellement automatique, la résiliation et les remboursements sont également régis par les règles de cette boutique. Vous pouvez gérer l’abonnement depuis le compte de la boutique utilisé pour l’achat.",
+            "Lorsque la loi applicable vous accorde des droits supplémentaires en matière de résiliation, remboursement ou protection du consommateur, les présentes Conditions ne limitent pas ces droits."
+          ]
+        },
+        {
+          "h": "9. Propriété intellectuelle",
+          "p": [
+            "L’application, son design, son code, la marque NowGreen et les contenus originaux du service appartiennent à leurs titulaires respectifs et sont protégés par la loi applicable. Les présentes Conditions ne vous transfèrent aucun droit de propriété sur le service.",
+            "Vous bénéficiez d’un droit limité, personnel, non exclusif et révocable d’utiliser NowGreen conformément aux présentes Conditions."
+          ]
+        },
+        {
+          "h": "10. Disponibilité, modifications et fin d’utilisation",
+          "p": [
+            "Nous cherchons à maintenir le service disponible et sécurisé, mais nous ne garantissons pas un fonctionnement ininterrompu, sans erreur ni compatible avec tous les appareils et services tiers.",
+            "Vous pouvez cesser d’utiliser NowGreen à tout moment. Lorsque la suppression du compte est disponible dans l’application, vous pouvez l’utiliser; des informations supplémentaires figurent sur la page de suppression du compte.",
+            "Nous pouvons restreindre ou mettre fin à l’accès en cas de violation grave de ces Conditions, de risque de sécurité, d’abus du service ou lorsque la loi l’exige."
+          ]
+        },
+        {
+          "h": "11. Exclusions et limitation de responsabilité",
+          "p": [
+            "Dans la mesure maximale autorisée par la loi, NowGreen est fourni sans garantie que les résultats de l’IA, prévisions, identifications, calculs ou visualisations soient entièrement exacts. Vous restez responsable des décisions prises sur la base de ces résultats.",
+            "Aucune disposition des présentes Conditions n’exclut ou ne limite une responsabilité ou des droits qui ne peuvent légalement être exclus, notamment les droits impératifs des consommateurs."
+          ]
+        },
+        {
+          "h": "12. Confidentialité et données",
+          "p": [
+            "Le traitement des données personnelles est décrit dans la Politique de confidentialité de NowGreen. En utilisant le service, vous pouvez choisir des fonctionnalités nécessitant le traitement de photos, textes, localisation ou autres données; le traitement dépend de la fonctionnalité utilisée."
+          ]
+        },
+        {
+          "h": "13. Droit applicable et droits des consommateurs",
+          "p": [
+            "Les présentes Conditions sont régies par le droit portugais, sans préjudice des protections obligatoires du consommateur pouvant s’appliquer en vertu du droit de votre pays de résidence habituelle, y compris le droit applicable de l’Union européenne.",
+            "Si un litige ne peut être résolu par le support, chaque partie conserve le droit d’utiliser les recours légaux disponibles et de saisir les autorités ou juridictions compétentes."
+          ]
+        },
+        {
+          "h": "14. Modification des Conditions et contact",
+          "p": [
+            "Nous pouvons mettre à jour les présentes Conditions lorsque le service, la législation ou les exigences de sécurité évoluent. Les modifications importantes seront signalées par une nouvelle date de mise à jour et, lorsque cela est requis, par un avis supplémentaire.",
+            "Questions concernant ces Conditions : support@mynw.app."
           ]
         }
       ]
