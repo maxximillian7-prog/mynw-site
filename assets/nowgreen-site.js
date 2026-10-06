@@ -29,10 +29,17 @@
     const sel=$('#ngLang');
     if(sel){
       sel.innerHTML=SUPPORTED.map(code=>'<option value="'+code+'">'+esc(LABELS[code])+'</option>').join('');
-      sel.value=lang;sel.onchange=()=>loadLanguage(sel.value).catch(()=>loadLanguage('en'));
+      sel.value=lang;
+      sel.setAttribute('aria-label',c.languageSelector||c.language||'Language');
+      sel.onchange=()=>loadLanguage(sel.value).catch(()=>loadLanguage('en'));
     }
     const footer=$('#ngFooter');if(footer)footer.textContent=c.footer;
-    document.querySelectorAll('.menu').forEach(btn=>btn.onclick=()=>btn.parentElement.querySelector('nav')?.classList.toggle('open'));
+    document.querySelectorAll('.menu').forEach(btn=>{
+      btn.setAttribute('aria-label',c.menuOpen||'Open menu');
+      btn.onclick=()=>btn.parentElement.querySelector('nav')?.classList.toggle('open');
+    });
+    const meta=document.querySelector('meta[name="description"]');
+    if(meta)meta.setAttribute('content',c.intro);
   }
   function contactBox(){
     const c=data.common;
