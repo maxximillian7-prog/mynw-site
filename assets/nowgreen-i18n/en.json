@@ -25,7 +25,9 @@
       "rights": "How to access, correct, delete or otherwise control your data.",
       "deletion": "How to delete NowGreen data or permanently delete the account.",
       "support": "Technical, privacy and account support."
-    }
+    },
+    "menuOpen": "Open menu",
+    "languageSelector": "Language"
   },
   "pages": {
     "manual": {
