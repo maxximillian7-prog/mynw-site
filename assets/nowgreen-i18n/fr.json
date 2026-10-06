@@ -73,6 +73,12 @@
           "p": [
             "Réglages contient documents, droits et fonctions de suppression."
           ]
+        },
+        {
+          "h": "8. Confidentialité et suppression",
+          "p": [
+            "Les Réglages contiennent les avis de confidentialité/conditions/IA, les droits sur les données, la suppression des données NowGreen et la suppression définitive du compte. Désinstaller l’application ne supprime pas à lui seul les données du cloud."
+          ]
         }
       ]
     },
@@ -108,6 +114,18 @@
           "h": "5. Droits",
           "p": [
             "Accès, rectification, suppression, portabilité, limitation ou opposition lorsque la loi le prévoit."
+          ]
+        },
+        {
+          "h": "6. Vos droits",
+          "p": [
+            "Selon le droit applicable, vous pouvez demander l’accès, la rectification, la suppression, la portabilité, la limitation ou l’opposition. Dans l’EEE, vous pouvez saisir votre autorité nationale de protection des données ; au Portugal, la CNPD."
+          ]
+        },
+        {
+          "h": "7. Sécurité",
+          "p": [
+            "NowGreen utilise un accès authentifié et des contrôles au niveau des lignes pour les données utilisateur. N’importez pas de données personnelles que vous n’êtes pas autorisé à traiter."
           ]
         }
       ]
@@ -145,6 +163,18 @@
           "p": [
             "Données et compte peuvent être supprimés dans Réglages."
           ]
+        },
+        {
+          "h": "6. Disponibilité et responsabilité",
+          "p": [
+            "Le service est fourni avec un soin raisonnable, sans garantie de disponibilité ininterrompue ni d’exactitude parfaite. Les droits impératifs des consommateurs ne sont pas exclus."
+          ]
+        },
+        {
+          "h": "7. Fin d’utilisation",
+          "p": [
+            "Vous pouvez cesser d’utiliser NowGreen et supprimer les données ou le compte dans les Réglages. L’accès peut être limité lorsque cela est nécessaire pour la sécurité, la prévention des abus ou le respect de la loi."
+          ]
         }
       ]
     },
@@ -174,6 +204,12 @@
           "h": "4. Limites",
           "p": [
             "L’IA ne constitue pas une expertise professionnelle garantie."
+          ]
+        },
+        {
+          "h": "5. Génération d’images",
+          "p": [
+            "Les aperçus et visualisations générés peuvent différer de la réalité et inventer des détails visuels. Ce sont des aides à la conception, pas des plans de construction ni une garantie de survie des plantes."
           ]
         }
       ]
@@ -205,6 +241,12 @@
           "p": [
             "Si vous ne pouvez plus vous connecter, écrivez à support@mynw.app sans mot de passe."
           ]
+        },
+        {
+          "h": "5. Droits légaux",
+          "p": [
+            "Lorsque la loi le prévoit, vous pouvez demander l’accès, la rectification, la portabilité, la limitation, l’opposition ou la suppression et contacter l’autorité de protection des données compétente."
+          ]
         }
       ]
     },
@@ -235,6 +277,18 @@
           "p": [
             "Désinstaller l’app ne garantit pas la suppression des données cloud."
           ]
+        },
+        {
+          "h": "5. Données neutres partagées",
+          "p": [
+            "Les profils de référence neutres d’espèces ne contenant ni identité utilisateur ni contenu privé peuvent être conservés comme données de référence partagées plutôt que comme données de compte."
+          ]
+        },
+        {
+          "h": "6. Abonnements",
+          "p": [
+            "Supprimer un compte ou l’application n’annule pas nécessairement un abonnement Google Play. Annulez tout abonnement actif via Google Play le cas échéant."
+          ]
         }
       ]
     },
@@ -258,6 +312,12 @@
           "h": "IA et sécurité",
           "p": [
             "Indiquez fonction, heure approximative et contexte nécessaire."
+          ]
+        },
+        {
+          "h": "Sécurité",
+          "p": [
+            "Signalez toute vulnérabilité de sécurité présumée de manière privée à support@mynw.app. N’exploitez pas un problème au-delà de ce qui est nécessaire pour le démontrer."
           ]
         }
       ]
