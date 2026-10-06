@@ -1,0 +1,266 @@
+{
+  "common": {
+    "language": "Français",
+    "home": "Documentation",
+    "manual": "Guide",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "ai": "IA et données",
+    "rights": "Droits sur les données",
+    "deletion": "Supprimer le compte",
+    "support": "Support",
+    "updated": "Mis à jour : 6 octobre 2026",
+    "back": "Tous les documents NowGreen",
+    "footer": "© 2026 NowGreen / NowApps.",
+    "developer": "Développeur et responsable des données",
+    "contact": "Contact confidentialité et support",
+    "status": "Documentation actuelle de NowGreen.",
+    "title": "NowGreen — Guide, confidentialité et documents",
+    "intro": "Documentation officielle sur les plantes, Ivy, Green Scan, projets, IA, confidentialité et suppression.",
+    "cards": {
+      "manual": "Utiliser plantes, espaces, entretien, météo, Ivy, calendrier et projets.",
+      "privacy": "Données traitées et finalités.",
+      "terms": "Règles d’utilisation.",
+      "ai": "Fonctionnement de l’IA, des images et du cache.",
+      "rights": "Contrôler vos données.",
+      "deletion": "Supprimer les données ou le compte.",
+      "support": "Support technique, confidentialité et compte."
+    }
+  },
+  "pages": {
+    "manual": {
+      "title": "Guide NowGreen",
+      "intro": "Guide pratique des principales fonctions.",
+      "sections": [
+        {
+          "h": "1. Compte et langue",
+          "p": [
+            "Connexion par e-mail/mot de passe ou Google. Au premier lancement, une langue compatible de l’appareil est utilisée."
+          ]
+        },
+        {
+          "h": "2. Mon Green",
+          "p": [
+            "Créez des espaces, ajoutez plantes, photos, informations permanentes, emplacement et historique."
+          ]
+        },
+        {
+          "h": "3. Green Scan",
+          "p": [
+            "Identifiez les plantes et analysez santé, nuisibles, sol ou lieux. Les informations générales sont réutilisées depuis le cache neutre."
+          ]
+        },
+        {
+          "h": "4. Ivy",
+          "p": [
+            "Ivy tient compte des plantes, actions, Health Check, tâches, espaces et météo."
+          ]
+        },
+        {
+          "h": "5. Calendrier",
+          "p": [
+            "Calendrier et plan d’entretien utilisent les mêmes tâches."
+          ]
+        },
+        {
+          "h": "6. Projets",
+          "p": [
+            "Générez des concepts avec photo réelle ou sans photo sur un terrain plat."
+          ]
+        },
+        {
+          "h": "7. Confidentialité",
+          "p": [
+            "Réglages contient documents, droits et fonctions de suppression."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "intro": "Traitement des données par NowGreen.",
+      "sections": [
+        {
+          "h": "1. Responsable",
+          "p": [
+            "NowGreen / NowApps est développé par Maksym Smyrnov au Portugal. Contact : support@mynw.app."
+          ]
+        },
+        {
+          "h": "2. Données",
+          "p": [
+            "Compte, plantes, espaces, photos, historique, tâches, projets, scans, notes, conversations IA et télémétrie nécessaire."
+          ]
+        },
+        {
+          "h": "3. Finalités",
+          "p": [
+            "Authentification, synchronisation, entretien, rappels, IA, visualisations, sécurité et support."
+          ]
+        },
+        {
+          "h": "4. Prestataires",
+          "p": [
+            "Supabase, OpenAI, Google, MET Norway, OpenStreetMap/Nominatim et Open-Meteo selon la fonction."
+          ]
+        },
+        {
+          "h": "5. Droits",
+          "p": [
+            "Accès, rectification, suppression, portabilité, limitation ou opposition lorsque la loi le prévoit."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Conditions d’utilisation",
+      "intro": "Règles d’utilisation de NowGreen.",
+      "sections": [
+        {
+          "h": "1. Service",
+          "p": [
+            "NowGreen est un outil d’organisation et de planification; les fonctions peuvent évoluer."
+          ]
+        },
+        {
+          "h": "2. IA",
+          "p": [
+            "Les résultats IA peuvent être erronés; vérifiez les décisions importantes."
+          ]
+        },
+        {
+          "h": "3. Contenu",
+          "p": [
+            "Vous êtes responsable du contenu envoyé et des droits nécessaires."
+          ]
+        },
+        {
+          "h": "4. Abonnements",
+          "p": [
+            "Free, Plus et Pro sont prévus; conditions avant achat."
+          ]
+        },
+        {
+          "h": "5. Suppression",
+          "p": [
+            "Données et compte peuvent être supprimés dans Réglages."
+          ]
+        }
+      ]
+    },
+    "ai": {
+      "title": "IA et traitement des données",
+      "intro": "Utilisation de l’IA dans NowGreen.",
+      "sections": [
+        {
+          "h": "1. Fonctions",
+          "p": [
+            "Ivy, Green Scan, santé/sol, profils d’espèces, planification et images."
+          ]
+        },
+        {
+          "h": "2. Contexte",
+          "p": [
+            "Seuls les textes, métadonnées, images choisies et historique pertinent nécessaires sont envoyés."
+          ]
+        },
+        {
+          "h": "3. Cache",
+          "p": [
+            "Profils neutres et assets générés peuvent être réutilisés; les données privées ne vont pas dans le cache partagé."
+          ]
+        },
+        {
+          "h": "4. Limites",
+          "p": [
+            "L’IA ne constitue pas une expertise professionnelle garantie."
+          ]
+        }
+      ]
+    },
+    "rights": {
+      "title": "Droits sur les données",
+      "intro": "Contrôle de vos données.",
+      "sections": [
+        {
+          "h": "1. Dans l’app",
+          "p": [
+            "Modifiez/supprimez le contenu ou utilisez les actions globales."
+          ]
+        },
+        {
+          "h": "2. Supprimer les données",
+          "p": [
+            "Supprime le contenu NowGreen en conservant le compte."
+          ]
+        },
+        {
+          "h": "3. Supprimer le compte",
+          "p": [
+            "Supprime les données puis le compte d’authentification définitivement."
+          ]
+        },
+        {
+          "h": "4. Contact",
+          "p": [
+            "Si vous ne pouvez plus vous connecter, écrivez à support@mynw.app sans mot de passe."
+          ]
+        }
+      ]
+    },
+    "deletion": {
+      "title": "Supprimer données ou compte",
+      "intro": "Disponible dans l’app ou via le support.",
+      "sections": [
+        {
+          "h": "1. Données",
+          "p": [
+            "Réglages → Suppression → Supprimer les données NowGreen. Le compte reste actif."
+          ]
+        },
+        {
+          "h": "2. Compte",
+          "p": [
+            "La suppression du compte efface d’abord les données puis le compte d’authentification."
+          ]
+        },
+        {
+          "h": "3. Demande externe",
+          "p": [
+            "Écrivez à support@mynw.app de préférence depuis l’e-mail du compte."
+          ]
+        },
+        {
+          "h": "4. Données locales",
+          "p": [
+            "Désinstaller l’app ne garantit pas la suppression des données cloud."
+          ]
+        }
+      ]
+    },
+    "support": {
+      "title": "Support",
+      "intro": "Contact : support@mynw.app.",
+      "sections": [
+        {
+          "h": "Support technique",
+          "p": [
+            "Indiquez version, appareil/Android, fonction et description."
+          ]
+        },
+        {
+          "h": "Confidentialité",
+          "p": [
+            "Identifiez le compte sans envoyer de mot de passe."
+          ]
+        },
+        {
+          "h": "IA et sécurité",
+          "p": [
+            "Indiquez fonction, heure approximative et contexte nécessaire."
+          ]
+        }
+      ]
+    }
+  }
+}
