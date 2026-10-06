@@ -25,7 +25,9 @@
       "rights": "Daten kontrollieren.",
       "deletion": "Daten oder Konto löschen.",
       "support": "Technischer Support, Datenschutz und Konto."
-    }
+    },
+    "menuOpen": "Menü öffnen",
+    "languageSelector": "Sprache"
   },
   "pages": {
     "manual": {
