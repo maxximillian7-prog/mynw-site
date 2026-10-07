@@ -309,43 +309,67 @@
       ]
     },
     "deletion": {
-      "title": "Eliminar datos o cuenta",
-      "intro": "Disponible en la app o mediante soporte.",
+      "title": "Eliminar datos o cuenta NowGreen",
+      "intro": "Esta página permite solicitar la eliminación de la cuenta NowGreen y los datos asociados, o solo de los datos NowGreen manteniendo la cuenta de acceso. Puede utilizarse incluso si ya no tienes acceso a la aplicación.",
+      "accountAction": "Solicitar eliminación de la cuenta",
+      "dataAction": "Solicitar solo eliminación de datos",
       "sections": [
         {
-          "h": "1. Datos",
+          "h": "1. Eliminar la cuenta en la aplicación",
           "p": [
-            "Ajustes → Eliminar datos/cuenta → Eliminar datos NowGreen. La cuenta permanece."
+            "En NowGreen abre Ajustes → Datos → Eliminar cuenta. Tras la confirmación final, NowGreen elimina el contenido en la nube propiedad del usuario y borra permanentemente la cuenta de autenticación."
           ]
         },
         {
-          "h": "2. Cuenta",
+          "h": "2. Eliminar datos NowGreen sin eliminar la cuenta",
           "p": [
-            "La eliminación de cuenta borra primero los datos y después la cuenta de autenticación."
+            "Abre Ajustes → Datos → Eliminar datos NowGreen. Se eliminan tus contenidos en la nube y archivos privados de NowGreen, mientras la cuenta de acceso permanece disponible."
           ]
         },
         {
-          "h": "3. Solicitud externa",
+          "h": "3. Solicitar la eliminación sin la aplicación",
           "p": [
-            "Escribe a support@mynw.app preferiblemente desde el correo de la cuenta."
+            "Si no puedes acceder a la aplicación, puedes enviar una solicitud por correo electrónico desde esta página."
+          ],
+          "items": [
+            "Escribe a support@mynw.app, preferiblemente desde la dirección asociada a tu cuenta NowGreen.",
+            "Para eliminar toda la cuenta usa el asunto “Delete my NowGreen account”.",
+            "Para eliminar solo los datos usa el asunto “Delete my NowGreen data”.",
+            "Incluye el correo de la cuenta. Podemos solicitar una verificación razonable de que controlas la cuenta antes de completar la eliminación."
           ]
         },
         {
-          "h": "4. Datos locales",
+          "h": "4. Datos eliminados",
           "p": [
-            "Desinstalar la app no garantiza borrar datos en la nube."
+            "En la eliminación completa, NowGreen elimina la cuenta de autenticación y los datos en la nube de NowGreen propiedad del usuario. En la eliminación solo de datos, la cuenta de autenticación permanece pero se elimina el contenido de NowGreen."
+          ],
+          "items": [
+            "Identificador de cuenta, perfil de autenticación y correo electrónico en la eliminación completa.",
+            "Plantas, espacios y zonas.",
+            "Fotos y archivos privados de la cuenta.",
+            "Historial de cuidados, tareas, calendario e historial de actividad vinculado a la cuenta.",
+            "Proyectos, planes y visualizaciones vinculados a la cuenta.",
+            "Escaneos, controles de salud de plantas y resultados similares guardados.",
+            "Conversaciones de IA y registros de solicitudes/uso de IA vinculados a la cuenta.",
+            "Preferencias y ajustes en la nube vinculados a la cuenta NowGreen."
           ]
         },
         {
-          "h": "5. Datos neutrales compartidos",
+          "h": "5. Datos que pueden permanecer",
           "p": [
-            "Los perfiles de referencia neutrales de especies que no contienen identidad del usuario ni contenido privado pueden conservarse como datos de referencia compartidos y no como datos de la cuenta."
+            "Los perfiles neutrales de referencia de especies que no contienen identidad del usuario ni contenido privado pueden permanecer indefinidamente como datos de referencia compartidos y no como datos de la cuenta. La caché o los ajustes locales pueden permanecer en el dispositivo hasta borrar los datos de la aplicación o desinstalarla. Los registros limitados necesarios por seguridad, prevención de abusos u obligaciones legales se conservan solo durante el tiempo necesario para esa finalidad. Los datos de facturación o suscripción de Google Play son controlados por Google conforme a sus propias reglas de conservación."
           ]
         },
         {
-          "h": "6. Suscripciones",
+          "h": "6. Plazo de eliminación y conservación",
           "p": [
-            "Eliminar una cuenta o la aplicación no cancela necesariamente una suscripción de Google Play. Cancela una suscripción activa desde Google Play cuando corresponda."
+            "La eliminación desde la aplicación comienza inmediatamente tras la confirmación final. Las solicitudes externas verificadas normalmente se completan en un plazo de 30 días. Los datos activos del usuario en la nube se eliminan al finalizar el proceso. Si se aplica una obligación específica de seguridad o legal, solo se conservan los datos necesarios y únicamente durante el periodo exigido por esa finalidad o por la legislación aplicable."
+          ]
+        },
+        {
+          "h": "7. Suscripciones de Google Play",
+          "p": [
+            "Eliminar la cuenta NowGreen o desinstalar la aplicación no cancela necesariamente una suscripción activa de Google Play. Si corresponde, cancélala por separado en Google Play."
           ]
         }
       ]
