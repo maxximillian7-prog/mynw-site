@@ -53,7 +53,13 @@
       const list=s.items?.length?'<ul>'+s.items.map(x=>'<li>'+linkify(x)+'</li>').join('')+'</ul>':'';
       return '<section class="ng-doc-section"><h2>'+esc(s.h)+'</h2>'+ps+list+'</section>';
     }).join('');
-    const action=(page==='deletion'||page==='support')?'<p class="ng-action"><a class="btn btn-primary" href="mailto:support@mynw.app">support@mynw.app</a></p>':'';
+    let action='';
+    if(page==='deletion'){
+      action='<p class="ng-action"><a class="btn btn-primary" href="mailto:support@mynw.app?subject=Delete%20my%20NowGreen%20account">'+esc(d.accountAction||'Request account deletion')+'</a></p>'+
+        '<p class="ng-action"><a class="btn" href="mailto:support@mynw.app?subject=Delete%20my%20NowGreen%20data">'+esc(d.dataAction||'Request data deletion only')+'</a></p>';
+    }else if(page==='support'){
+      action='<p class="ng-action"><a class="btn btn-primary" href="mailto:support@mynw.app">support@mynw.app</a></p>';
+    }
     $('#ngContent').innerHTML='<article class="legal-card ng-legal-card"><a class="ng-back" href="/nowgreen/">← '+esc(c.back)+'</a><h1>'+esc(d.title)+'</h1><p class="meta">'+esc(c.updated)+'</p>'+contactBox()+'<p class="ng-intro">'+esc(d.intro)+'</p>'+action+sections+'</article>';
   }
   function renderHome(){
