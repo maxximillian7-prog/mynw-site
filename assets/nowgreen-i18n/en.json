@@ -317,42 +317,66 @@
     },
     "deletion": {
       "title": "Delete NowGreen data or account",
-      "intro": "NowGreen provides both in-app deletion and an external support path.",
+      "intro": "This page lets you request deletion of your NowGreen account and associated data, or deletion of your NowGreen data while keeping the sign-in account. You can use this page even if you no longer have access to the app.",
+      "accountAction": "Request account deletion",
+      "dataAction": "Request data deletion only",
       "sections": [
         {
-          "h": "1. Delete NowGreen data",
+          "h": "1. Delete your account in the app",
           "p": [
-            "Open Settings → Data & account deletion → Delete NowGreen data. This removes plants, spaces, projects, care/AI history and private NowGreen files while leaving your sign-in account."
+            "In NowGreen open Settings → Data → Delete account. After final confirmation, NowGreen removes user-owned cloud content and permanently deletes the authentication account."
           ]
         },
         {
-          "h": "2. Delete account",
+          "h": "2. Delete NowGreen data without deleting the account",
           "p": [
-            "Open Settings → Data & account deletion → Delete account. After confirmation, NowGreen cloud content is removed and the authentication account is permanently deleted."
+            "Open Settings → Data → Delete NowGreen data. This removes your NowGreen cloud content and private files while keeping the sign-in account available."
           ]
         },
         {
-          "h": "3. External request",
+          "h": "3. Request deletion without the app",
           "p": [
-            "If you can no longer sign in, email support@mynw.app from the account email where possible and request NowGreen account deletion. We may verify account ownership."
+            "If you cannot access the app, you can request deletion from this page by email."
+          ],
+          "items": [
+            "Email support@mynw.app, preferably from the email address associated with your NowGreen account.",
+            "For full account deletion use the subject “Delete my NowGreen account”.",
+            "For data-only deletion use the subject “Delete my NowGreen data”.",
+            "Include the account email address. We may request reasonable verification that you control the account before completing deletion."
           ]
         },
         {
-          "h": "4. Local data",
+          "h": "4. Data deleted",
           "p": [
-            "Uninstalling the app removes device-local app data but does not by itself guarantee deletion of cloud data. Use the in-app deletion action or contact support."
+            "For full account deletion, NowGreen deletes the authentication account and user-owned NowGreen cloud data. For data-only deletion, the authentication account remains but user-owned NowGreen content is removed."
+          ],
+          "items": [
+            "Account identifier, authentication profile and email for full account deletion.",
+            "Plants, spaces and zones.",
+            "Private photos and files stored for your account.",
+            "Care history, tasks, calendar items and account-linked activity history.",
+            "Projects, plans and account-linked visualisations.",
+            "Scans, plant health checks and similar saved results.",
+            "AI conversations and account-linked AI request/usage records.",
+            "Cloud preferences and settings tied to the NowGreen account."
           ]
         },
         {
-          "h": "5. Shared neutral data",
+          "h": "5. Data that may remain",
           "p": [
-            "Neutral species reference profiles that contain no user identity or private content may remain because they are shared reference data rather than account data."
+            "Neutral species-level reference profiles that contain no user identity or private user content may remain indefinitely because they are shared reference data, not account data. Device-local cache or settings may remain until app data is cleared or the app is uninstalled. Limited security, fraud-prevention or legally required records may be retained only for the period necessary for that purpose. Google Play billing or subscription records are controlled by Google under its own retention rules."
           ]
         },
         {
-          "h": "6. Subscriptions",
+          "h": "6. Deletion timing and retention",
           "p": [
-            "Deleting an account or app does not necessarily cancel a Google Play subscription. Cancel an active subscription through Google Play if applicable."
+            "In-app deletion starts immediately after final confirmation. Verified external deletion requests are normally completed within 30 days. User-owned active cloud data is removed when deletion is completed. If a specific security or legal retention obligation applies, only the data required for that obligation is retained and only for the period required by that purpose or applicable law."
+          ]
+        },
+        {
+          "h": "7. Google Play subscriptions",
+          "p": [
+            "Deleting a NowGreen account or uninstalling the app does not necessarily cancel an active Google Play subscription. If applicable, cancel the subscription separately in Google Play."
           ]
         }
       ]
