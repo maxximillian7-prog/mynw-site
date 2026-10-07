@@ -309,43 +309,67 @@
       ]
     },
     "deletion": {
-      "title": "Daten oder Konto löschen",
-      "intro": "In der App oder über Support.",
+      "title": "NowGreen-Daten oder Konto löschen",
+      "intro": "Auf dieser Seite können Sie die Löschung Ihres NowGreen-Kontos und der zugehörigen Daten oder nur Ihrer NowGreen-Daten bei Beibehaltung des Anmeldekontos beantragen. Die Seite kann auch genutzt werden, wenn Sie keinen Zugriff mehr auf die App haben.",
+      "accountAction": "Kontolöschung anfragen",
+      "dataAction": "Nur Datenlöschung anfragen",
       "sections": [
         {
-          "h": "1. Daten",
+          "h": "1. Konto in der App löschen",
           "p": [
-            "Einstellungen → Löschung → NowGreen-Daten löschen. Das Anmeldekonto bleibt."
+            "Öffnen Sie in NowGreen Einstellungen → Daten → Konto löschen. Nach der endgültigen Bestätigung entfernt NowGreen die nutzereigenen Cloud-Inhalte und löscht das Authentifizierungskonto dauerhaft."
           ]
         },
         {
-          "h": "2. Konto",
+          "h": "2. NowGreen-Daten löschen, Konto behalten",
           "p": [
-            "Kontolöschung entfernt zuerst Daten, dann das Auth-Konto."
+            "Öffnen Sie Einstellungen → Daten → NowGreen-Daten löschen. Dadurch werden Ihre NowGreen-Cloud-Inhalte und privaten Dateien entfernt, während das Anmeldekonto bestehen bleibt."
           ]
         },
         {
-          "h": "3. Externer Antrag",
+          "h": "3. Löschung ohne App beantragen",
           "p": [
-            "Schreiben Sie an support@mynw.app möglichst von der Konto-E-Mail."
+            "Wenn Sie keinen Zugriff auf die App haben, können Sie die Löschung per E-Mail über diese Seite beantragen."
+          ],
+          "items": [
+            "Schreiben Sie an support@mynw.app, möglichst von der mit Ihrem NowGreen-Konto verknüpften E-Mail-Adresse.",
+            "Für die vollständige Kontolöschung verwenden Sie den Betreff “Delete my NowGreen account”.",
+            "Für die reine Datenlöschung verwenden Sie den Betreff “Delete my NowGreen data”.",
+            "Geben Sie die Konto-E-Mail-Adresse an. Vor der Löschung können wir eine angemessene Bestätigung verlangen, dass Sie das Konto kontrollieren."
           ]
         },
         {
-          "h": "4. Lokale Daten",
+          "h": "4. Gelöschte Daten",
           "p": [
-            "Die Deinstallation allein löscht Cloud-Daten nicht garantiert."
+            "Bei vollständiger Kontolöschung löscht NowGreen das Authentifizierungskonto und die nutzereigenen NowGreen-Cloud-Daten. Bei reiner Datenlöschung bleibt das Authentifizierungskonto bestehen, während die NowGreen-Inhalte gelöscht werden."
+          ],
+          "items": [
+            "Konto-ID, Authentifizierungsprofil und E-Mail bei vollständiger Kontolöschung.",
+            "Pflanzen, Bereiche und Zonen.",
+            "Private Fotos und Dateien des Kontos.",
+            "Pflegeverlauf, Aufgaben, Kalender und kontobezogener Aktivitätsverlauf.",
+            "Projekte, Pläne und kontobezogene Visualisierungen.",
+            "Scans, Pflanzengesundheitsprüfungen und ähnliche gespeicherte Ergebnisse.",
+            "KI-Unterhaltungen und kontobezogene KI-Anfrage-/Nutzungsdaten.",
+            "Cloud-Einstellungen und Präferenzen des NowGreen-Kontos."
           ]
         },
         {
-          "h": "5. Gemeinsame neutrale Daten",
+          "h": "5. Daten, die verbleiben können",
           "p": [
-            "Neutrale Artenreferenzprofile ohne Nutzeridentität oder private Inhalte können als gemeinsame Referenzdaten erhalten bleiben und gelten nicht als Kontodaten."
+            "Neutrale Artenreferenzprofile ohne Nutzeridentität oder private Inhalte können unbegrenzt als gemeinsame Referenzdaten bestehen bleiben, da sie keine Kontodaten sind. Lokaler Cache oder Geräteeinstellungen können bis zum Löschen der App-Daten oder zur Deinstallation auf dem Gerät verbleiben. Begrenzte Sicherheits-, Missbrauchspräventions- oder gesetzlich erforderliche Aufzeichnungen werden nur so lange aufbewahrt, wie es für den jeweiligen Zweck erforderlich ist. Google-Play-Abrechnungs- oder Abonnementdaten unterliegen den Aufbewahrungsregeln von Google."
           ]
         },
         {
-          "h": "6. Abonnements",
+          "h": "6. Löschfrist und Aufbewahrung",
           "p": [
-            "Das Löschen eines Kontos oder der App beendet ein Google-Play-Abonnement nicht zwingend. Kündigen Sie ein aktives Abonnement gegebenenfalls über Google Play."
+            "Die Löschung in der App beginnt unmittelbar nach der endgültigen Bestätigung. Verifizierte externe Löschanfragen werden normalerweise innerhalb von 30 Tagen abgeschlossen. Aktive nutzereigene Cloud-Daten werden mit Abschluss der Löschung entfernt. Besteht eine konkrete Sicherheits- oder gesetzliche Aufbewahrungspflicht, werden nur die dafür erforderlichen Daten und nur für den erforderlichen Zeitraum aufbewahrt."
+          ]
+        },
+        {
+          "h": "7. Google-Play-Abonnements",
+          "p": [
+            "Das Löschen des NowGreen-Kontos oder der App beendet ein aktives Google-Play-Abonnement nicht zwingend. Kündigen Sie ein bestehendes Abonnement gegebenenfalls separat in Google Play."
           ]
         }
       ]
