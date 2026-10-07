@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://mynw.app/</loc><lastmod>2026-09-22</lastmod></url>
+  <url><loc>https://mynw.app/</loc><lastmod>2026-10-07</lastmod></url>
   <url><loc>https://mynw.app/manual/</loc><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://mynw.app/privacy/</loc><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://mynw.app/terms/</loc><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://mynw.app/support/</loc><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://mynw.app/delete-account/</loc><lastmod>2026-09-22</lastmod></url>
+
   <url><loc>https://mynw.app/nowcook/</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mynw.app/nowcook/privacy/</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mynw.app/nowcook/terms/</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mynw.app/nowcook/support/</loc><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://mynw.app/nowcook/delete-account/</loc><lastmod>2026-09-26</lastmod></url>
+
   <url><loc>https://mynw.app/nowkids/</loc><lastmod>2026-10-02</lastmod></url>
   <url><loc>https://mynw.app/nowkids/privacy/</loc><lastmod>2026-10-02</lastmod></url>
   <url><loc>https://mynw.app/nowkids/terms/</loc><lastmod>2026-10-02</lastmod></url>
@@ -23,4 +25,13 @@
   <url><loc>https://mynw.app/nowkids/delete-account/</loc><lastmod>2026-10-02</lastmod></url>
   <url><loc>https://mynw.app/nowkids/support/</loc><lastmod>2026-10-02</lastmod></url>
   <url><loc>https://mynw.app/nowkids/manual/</loc></url>
+
+  <url><loc>https://mynw.app/nowgreen/</loc></url>
+  <url><loc>https://mynw.app/nowgreen/privacy/</loc></url>
+  <url><loc>https://mynw.app/nowgreen/terms/</loc></url>
+  <url><loc>https://mynw.app/nowgreen/support/</loc></url>
+  <url><loc>https://mynw.app/nowgreen/delete-account/</loc></url>
+  <url><loc>https://mynw.app/nowgreen/manual/</loc></url>
+  <url><loc>https://mynw.app/nowgreen/data-rights/</loc></url>
+  <url><loc>https://mynw.app/nowgreen/ai-data/</loc></url>
 </urlset>
