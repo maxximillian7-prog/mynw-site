@@ -20,6 +20,7 @@
   const page=document.body.dataset.portfolio||'home',root=document.getElementById('portfolio');
   if(!root)return;
   let translations={},locale='en',busy=false;
+  const detailedGuides=Object.create(null), pendingGuideLoads=Object.create(null);
   const current=()=>translations[locale]||translations.en;
   function logo(app){return '<img src="'+LOGOS[app]+'" alt="'+TITLES[app]+' logo" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+FALLBACK_LOGOS[app]+'\'">';}
   function visual(app,type){return '<div class="eco-picture eco-picture-'+app+' eco-picture-'+type+'"><img src="'+BANNERS[app]+'" alt="'+TITLES[app]+' — '+(type==='hero'?'app overview':'features and preview')+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentNode.classList.add(\'eco-picture-fallback\')"><span class="eco-picture-watermark">'+TITLES[app]+'</span></div>';}
@@ -46,7 +47,7 @@
   function home(t){
     const stage=APP_IDS.map(a=>'<a href="'+URLS[a].home+'" class="eco-stage-tile">'+logo(a)+'<strong>'+TITLES[a]+'</strong></a>').join('');
     root.innerHTML='<section class="eco-hero"><div class="eco-container eco-hero-grid"><div>'+
-      '<div class="eco-eyebrow">'+E(t.eyebrow)+'</div><h1>'+E(t.head1)+'<br><em>'+E(t.head2)+'</em></h1><p>'+E(t.lead)+'</p>'+
+      '<div class="eco-eyebrow">'+E(t.eyebrow)+'</div><h1>'+E(t.head1)+'<br><em>'+E(t.head2)+'</em></h1><p>'+E(String(t.lead).split('. ')[0]+'.')+'</p>'+
       '<div class="eco-actions"><a class="eco-button eco-button-primary" href="#apps">'+E(t.explore)+' ↗</a><a class="eco-button eco-button-outline" href="mailto:support@mynw.app">'+E(t.contactUs)+'</a></div>'+
       '</div><div class="eco-stage" aria-label="MyNow Apps">'+stage+'</div></div></section>'+
       '<section class="eco-section" id="apps"><div class="eco-container"><div class="eco-section-eyebrow">'+E(t.appsKicker)+'</div>'+
@@ -86,9 +87,6 @@
       '<h2>'+TITLES[app]+'</h2><p class="eco-detail">'+E(d.description)+'</p></div></section>'+
       '<section class="eco-section" id="features"><div class="eco-container"><div class="eco-section-eyebrow">'+E(t.features)+'</div>'+
       '<h2>'+E(d.summary)+'</h2><div class="eco-feature-grid">'+features+'</div></div></section>'+
-      (app==='nowwhat'?'<section class="eco-section"><div class="eco-container"><div class="eco-gallery">'+
-      ['overview.webp','saved-folders.webp','text-to-plan.webp'].map(x=>'<img src="/assets/screens/'+x+'" alt="NowWhat application screen" loading="lazy">').join('')+
-      '</div></div></section>':'')+
       '<section class="eco-section" id="resources"><div class="eco-container"><div class="eco-section-eyebrow">'+E(t.resources)+'</div>'+
       '<h2>'+E(t.resources)+'</h2><p class="eco-section-lead">'+E(t.resourcesLead)+'</p>'+
       '<div class="eco-resource-grid">'+resources(app,t)+'</div></div></section>'+
@@ -97,14 +95,27 @@
     document.title=TITLES[app]+' — MyNow Apps';
     setMeta(d.summary);
   }
+  function ensureDetailedGuide(code){
+    if(detailedGuides[code]||pendingGuideLoads[code])return;
+    pendingGuideLoads[code]=fetch('/assets/guides-v2/'+code+'.json',{cache:'no-cache'})
+      .then(r=>{if(!r.ok)throw new Error('guide_unavailable');return r.json()})
+      .then(json=>{detailedGuides[code]=json; if(page==='nowcook-guide'&&locale===code)guidePage(current())})
+      .catch(()=>{detailedGuides[code]={}}).finally(()=>{delete pendingGuideLoads[code]});
+  }
   function guidePage(t){
     const app='nowcook';
+    const original=t.manualSteps.map(([h,body])=>({h,p:[body]}));
+    const sections=[...original,...(detailedGuides[locale]?.nowcook||[])];
+    const toc=sections.map((section,i)=>'<a href="#cook-guide-'+i+'">'+E(section.h)+'</a>').join('');
+    const content=sections.map((section,i)=>'<section class="eco-guide-section" id="cook-guide-'+i+'"><h2>'+E(section.h)+'</h2>'+
+      (section.p||[]).map(x=>'<p>'+E(x)+'</p>').join('')+'</section>').join('');
     root.innerHTML='<div class="eco-app-nowcook"><section class="eco-section"><div class="eco-container">'+
       '<a class="eco-back" href="/nowcook/">← NowCook</a>'+
-      '<div class="eco-section-eyebrow">'+E(t.guide)+'</div><h1 style="font-size:clamp(2.5rem,5vw,4rem);letter-spacing:-.05em;margin:12px 0">'+E(t.guideHeading)+'</h1>'+
-      '<p class="eco-section-lead">'+E(t.guideIntro)+'</p><div class="eco-guide">'+
-      t.manualSteps.map(([title,txt],i)=>'<details'+(i===0?' open':'')+'><summary>'+E(title)+'</summary><p>'+E(txt)+'</p></details>').join('')+
-      '</div><div class="eco-section"><div class="eco-section-eyebrow">'+E(t.resources)+'</div><div class="eco-resource-grid">'+resources(app,t)+'</div></div>'+
+      '<div class="eco-section-eyebrow">'+E(t.guide)+'</div><h1 class="eco-manual-heading">'+E(t.guideHeading)+'</h1>'+
+      '<p class="eco-section-lead">'+E(t.guideIntro)+'</p>'+
+      '<div class="eco-guide-layout"><aside class="eco-guide-toc" aria-label="'+E(t.guide)+'">'+toc+'</aside>'+
+      '<article class="eco-guide-article">'+content+'</article></div>'+
+      '<div class="eco-section"><div class="eco-section-eyebrow">'+E(t.resources)+'</div><div class="eco-resource-grid">'+resources(app,t)+'</div></div>'+
       '</div></section></div>'+footer(t,app);
     document.title=t.guideHeading+' — MyNow Apps';
     setMeta(t.guideIntro);
@@ -114,7 +125,7 @@
     const t=current();if(!t)return;
     nav(t);
     if(page==='home')home(t);
-    else if(page==='nowcook-guide')guidePage(t);
+    else if(page==='nowcook-guide'){guidePage(t);ensureDetailedGuide(locale);}
     else if(APP_IDS.includes(page))appPage(page,t);
     document.getElementById('eco-menu')?.addEventListener('click',()=>document.getElementById('eco-nav')?.classList.toggle('open'));
     document.querySelectorAll('#eco-nav a').forEach(a=>a.addEventListener('click',()=>document.getElementById('eco-nav')?.classList.remove('open')));

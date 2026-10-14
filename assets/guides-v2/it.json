@@ -1,0 +1,176 @@
+{
+  "nowcook": [
+    {
+      "h": "Idee di ricette e assistente IA",
+      "p": [
+        "Descrivi ingredienti, piatto desiderato o tempo disponibile. Specifica allergie, preferenze e porzioni, poi controlla tutti i passaggi prima di cucinare."
+      ]
+    },
+    {
+      "h": "Dispensa e ingredienti",
+      "p": [
+        "Registra prodotti, quantità, posizione e scadenza indicativa. Confronta i dati con le scorte reali prima di fare la spesa."
+      ]
+    },
+    {
+      "h": "Creare e importare ricette",
+      "p": [
+        "Salva le ricette o inserisci le tue istruzioni. Se è disponibile l'importazione di testo o foto, verifica ingredienti, misure e passaggi."
+      ]
+    },
+    {
+      "h": "Raccolta delle ricette",
+      "p": [
+        "Organizza i piatti per categoria, consulta ingredienti e preparazione e modifica la tua versione quando serve."
+      ]
+    },
+    {
+      "h": "Pianificare i pasti",
+      "p": [
+        "Crea un piano di uno o più giorni e associa i piatti ai pasti. Adattalo alle esigenze di tutta la famiglia."
+      ]
+    },
+    {
+      "h": "Lista della spesa",
+      "p": [
+        "Genera una lista dal piano o aggiungi articoli manualmente. Controlla la dispensa per evitare doppioni."
+      ]
+    },
+    {
+      "h": "Preferenze e sicurezza alimentare",
+      "p": [
+        "Indica allergeni e preferenze all'IA. I suggerimenti non sostituiscono etichette, igiene, conservazione e temperature di cottura sicure."
+      ]
+    },
+    {
+      "h": "Ricette dalle fotografie",
+      "p": [
+        "Se l'analisi delle immagini è disponibile, usa una foto nitida e verifica il risultato. Il riconoscimento può confondere ingredienti e unità."
+      ]
+    },
+    {
+      "h": "Account, crediti e piani",
+      "p": [
+        "Alcune funzioni IA richiedono registrazione e crediti disponibili. Controlla limiti e acquisti nella schermata abbonamento."
+      ]
+    },
+    {
+      "h": "Salvare, condividere e PDF",
+      "p": [
+        "Se esistono condivisione o esportazione PDF, controlla l'anteprima ed evita di inviare note personali per errore."
+      ]
+    },
+    {
+      "h": "Impostazioni, notifiche e lingua",
+      "p": [
+        "Seleziona lingua e preferenze disponibili. Le notifiche dipendono dai permessi Android e dalla versione installata."
+      ]
+    },
+    {
+      "h": "Risoluzione dei problemi",
+      "p": [
+        "Se una ricetta non si salva, controlla la connessione ed evita richieste IA ripetute. Scrivi a support@mynw.app indicando versione e dispositivo."
+      ]
+    },
+    {
+      "h": "Domande frequenti sulle ricette",
+      "p": [
+        "Le ricette possono essere inserite, importate o suggerite dall'IA. Verifica sempre ingredienti e quantità con la fonte originale."
+      ]
+    },
+    {
+      "h": "Privacy ed eliminazione account",
+      "p": [
+        "I link ufficiali sono qui sotto. Disinstallare l'app non elimina necessariamente i dati online né interrompe un abbonamento."
+      ]
+    }
+  ],
+  "nowgreen": [
+    {
+      "h": "Aggiungere la prima pianta",
+      "p": [
+        "Apri Il mio Green, scegli o crea uno spazio e aggiungi la pianta manualmente o tramite scansione. Verifica nome e posizione."
+      ]
+    },
+    {
+      "h": "Controllare il terreno e registrare la cura",
+      "p": [
+        "Osserva il terreno prima di confermare la verifica. Indica se è asciutto o umido per ricevere un suggerimento da Ivy. Controllare non equivale ad annaffiare."
+      ]
+    },
+    {
+      "h": "Cronologia e calendario",
+      "p": [
+        "Consulta cure passate e attività future nella scheda della pianta. Il calendario aiuta a evitare annaffiature ripetute."
+      ]
+    },
+    {
+      "h": "Spazi e progetti di giardino",
+      "p": [
+        "Raggruppa le piante per stanza, terrazzo o giardino. Verifica orientamento, proporzioni e oggetti prima di salvare un progetto."
+      ]
+    },
+    {
+      "h": "Visualizzazioni IA e condivisione",
+      "p": [
+        "Le immagini generate sono indicative e possono alterare dimensioni e dettagli botanici. Controlla sempre il PDF prima di condividerlo."
+      ]
+    },
+    {
+      "h": "Salute, tossicità e sicurezza",
+      "p": [
+        "Identificazione e diagnosi sono suggerimenti, non conferme specialistiche. Verifica la tossicità per bambini e animali e leggi le etichette dei prodotti."
+      ]
+    },
+    {
+      "h": "Domande frequenti su attività e meteo",
+      "p": [
+        "Un'attività può rimanere aperta fino a quando registri un'osservazione o un'azione aggiuntiva. Le previsioni sono approssimative; conta il terreno reale."
+      ]
+    }
+  ],
+  "nowkids": [
+    {
+      "h": "Primi passi per i genitori",
+      "p": [
+        "Un adulto configura famiglia, accessi e impostazioni adatte all'età. Tieni riservato il PIN del genitore."
+      ]
+    },
+    {
+      "h": "Compiti per materia",
+      "p": [
+        "Aggiungi il compito alla materia corretta con scadenza e descrizione. Controlla le date vicine e segna concluso solo il lavoro finito."
+      ]
+    },
+    {
+      "h": "Attività e presenze",
+      "p": [
+        "Registra orari di inizio e fine. Se è disponibile il registro presenze, indica la partecipazione e controlla eventuali duplicati."
+      ]
+    },
+    {
+      "h": "Usare NowStudy in sicurezza",
+      "p": [
+        "Chiedi spiegazioni, schede o brevi quiz. Incoraggia l'apprendimento autonomo e verifica le risposte importanti sui libri."
+      ]
+    },
+    {
+      "h": "Riepilogo genitori e calendario",
+      "p": [
+        "I genitori possono consultare compiti, attività ed eventi dei figli collegati. Apri le schede per i dettagli e controlla i permessi."
+      ]
+    },
+    {
+      "h": "Sicurezza dei bambini e segnalazioni",
+      "p": [
+        "Se una risposta IA sembra inappropriata, usa la segnalazione quando disponibile e informa un adulto. Evita di condividere indirizzi, dati scolastici o numeri di telefono."
+      ]
+    },
+    {
+      "h": "Domande frequenti su permessi e dati",
+      "p": [
+        "Alcune richieste IA sono bloccate dai controlli privacy. Modifica i permessi nella modalità genitore con PIN. Per cancellare i dati usa i link ufficiali."
+      ]
+    }
+  ]
+}

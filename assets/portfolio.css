@@ -164,3 +164,24 @@ body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px
  .eco-app-promo-logo{width:68px;height:68px;bottom:-12px}
  .eco-visual-float{bottom:-18px;left:0;font-size:.73rem}
 }
+
+
+/* 2026-10-14 layout and contrast refinement */
+.ecosystem a.eco-stage-tile{color:#1e3153!important}
+.eco-stage-tile strong{color:#182b49!important;font-weight:900;font-size:1.14rem;letter-spacing:-.035em}
+.eco-card h3{color:#1e3051;font-family:Inter,"Segoe UI",Arial,sans-serif;font-weight:900;letter-spacing:-.045em}
+.eco-card .eco-kind{color:var(--accent);font-weight:900}
+.eco-brand>.eco-brand-icon{display:grid;place-items:center;flex:0 0 75px;width:75px;height:75px;overflow:hidden;border-radius:18px;border:3px solid #fff;background:#fff;box-shadow:0 9px 25px rgba(31,48,81,.14)}
+.eco-brand>.eco-brand-icon img{display:block;width:100%;height:100%;object-fit:cover;transform:scale(1.35);border-radius:0;box-shadow:none;max-width:none}
+.eco-brand>.eco-brand-text{display:block;color:#142846;font-size:1.35rem;font-weight:900;letter-spacing:-.05em;line-height:1.08}
+.eco-brand>.eco-brand-text small{color:#53647d;font-size:.66rem;letter-spacing:.095em;margin-top:6px;font-weight:800}
+.eco-top{min-height:92px}
+.eco-card{display:grid;grid-template-rows:90px minmax(92px,1fr) 72px 172px 42px;align-content:stretch;gap:0;min-height:500px}
+.eco-card-top{min-height:0;align-self:start}
+.eco-card p{margin:8px 0 6px;align-self:start}
+.eco-card .eco-tags{margin:0;align-content:start;align-self:start}
+.eco-card .eco-picture-card{height:172px;margin:0;align-self:stretch}
+.eco-card .eco-card-link{margin:0;align-self:end}
+@media(max-width:900px){.eco-card{grid-template-rows:90px minmax(104px,1fr) minmax(85px,auto) 155px 45px}.eco-card .eco-picture-card{height:155px}}
+@media(max-width:740px){.eco-top{min-height:82px}.eco-brand>.eco-brand-icon{width:59px;height:59px;flex-basis:59px;border-radius:15px}.eco-brand>.eco-brand-text{font-size:1.03rem}.eco-brand>.eco-brand-text small{font-size:.51rem}.eco-nav{top:82px}.eco-card{grid-template-rows:86px minmax(90px,auto) minmax(66px,auto) auto 42px;min-height:0}.eco-card .eco-picture-card{height:auto;aspect-ratio:1.9}.eco-card .eco-card-link{align-self:end}}
+@media(max-width:410px){.eco-brand>.eco-brand-icon{width:50px;height:50px;flex-basis:50px}.eco-brand>.eco-brand-text{font-size:.93rem}.eco-brand>.eco-brand-text small{font-size:.45rem}}

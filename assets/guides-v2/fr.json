@@ -1,0 +1,176 @@
+{
+  "nowcook": [
+    {
+      "h": "Idées de recettes et assistant IA",
+      "p": [
+        "Décrivez les ingrédients disponibles, le plat souhaité ou le temps de préparation. Précisez allergies, préférences et portions, puis vérifiez toujours la recette proposée."
+      ]
+    },
+    {
+      "h": "Garde-manger et ingrédients",
+      "p": [
+        "Ajoutez les aliments, les quantités, le lieu de stockage et la date approximative de péremption. Comparez ces données avec vos provisions réelles."
+      ]
+    },
+    {
+      "h": "Créer et importer une recette",
+      "p": [
+        "Enregistrez une recette ou saisissez vos instructions. Si l'importation de texte ou de photos est disponible, vérifiez noms, mesures et étapes avant de sauvegarder."
+      ]
+    },
+    {
+      "h": "Collection de recettes",
+      "p": [
+        "Classez vos plats par catégorie, consultez leurs ingrédients et leur préparation, et modifiez vos recettes personnalisées."
+      ]
+    },
+    {
+      "h": "Planifier les repas",
+      "p": [
+        "Préparez un planning sur un ou plusieurs jours, choisissez les plats de chaque repas et adaptez-les aux besoins du foyer."
+      ]
+    },
+    {
+      "h": "Liste de courses",
+      "p": [
+        "Générez une liste depuis le planning ou ajoutez des produits manuellement. Vérifiez le garde-manger pour éviter les doublons."
+      ]
+    },
+    {
+      "h": "Préférences et sécurité alimentaire",
+      "p": [
+        "Indiquez les allergènes et contraintes alimentaires à l'IA. Ses réponses ne remplacent ni les étiquettes ni les règles d'hygiène et de cuisson."
+      ]
+    },
+    {
+      "h": "Recettes à partir de photos",
+      "p": [
+        "Si l'analyse d'images est disponible, utilisez une photo nette et contrôlez le résultat. La reconnaissance peut confondre ingrédients et quantités."
+      ]
+    },
+    {
+      "h": "Compte, crédits et abonnements",
+      "p": [
+        "Certaines fonctions IA exigent un compte et des crédits disponibles. Consultez l'écran d'abonnement pour connaître les limites et offres actuelles."
+      ]
+    },
+    {
+      "h": "Enregistrement, partage et PDF",
+      "p": [
+        "Si le partage ou l'export PDF est disponible, prévisualisez le document et vérifiez qu'il ne contient pas de notes privées."
+      ]
+    },
+    {
+      "h": "Paramètres, notifications et langue",
+      "p": [
+        "Choisissez une langue et les préférences disponibles. Les notifications dépendent des autorisations Android et de votre version."
+      ]
+    },
+    {
+      "h": "Dépannage et assistance",
+      "p": [
+        "Si l'enregistrement échoue, vérifiez la connexion avant de réessayer. Évitez les requêtes IA répétées. Contactez support@mynw.app avec le modèle d'appareil et la version."
+      ]
+    },
+    {
+      "h": "FAQ : origine et fiabilité des recettes",
+      "p": [
+        "Les recettes peuvent être saisies, importées ou suggérées par l'IA. Les ingrédients et mesures doivent toujours être comparés à la source originale."
+      ]
+    },
+    {
+      "h": "Confidentialité et suppression",
+      "p": [
+        "Les liens officiels se trouvent ci-dessous. Désinstaller l'application ne supprime pas forcément les données en ligne ni l'abonnement."
+      ]
+    }
+  ],
+  "nowgreen": [
+    {
+      "h": "Ajouter sa première plante",
+      "p": [
+        "Ouvrez Mon Green, sélectionnez ou créez un espace et ajoutez la plante manuellement ou par scan. Vérifiez le nom et l'emplacement."
+      ]
+    },
+    {
+      "h": "Observer le sol et noter les soins",
+      "p": [
+        "Vérifiez réellement le sol avant de valider la tâche. Indiquez s'il est sec ou humide pour recevoir un conseil d'Ivy. Vérifier le sol ne signifie pas arroser."
+      ]
+    },
+    {
+      "h": "Historique et calendrier",
+      "p": [
+        "Consultez les soins passés et les tâches à venir dans la fiche de la plante. Évitez ainsi les arrosages et traitements répétés."
+      ]
+    },
+    {
+      "h": "Organiser espaces et projets",
+      "p": [
+        "Classez les plantes par pièce, terrasse ou jardin. Vérifiez l'orientation et les proportions avant de sauvegarder un plan paysager."
+      ]
+    },
+    {
+      "h": "Visuels IA et partage",
+      "p": [
+        "Les illustrations générées ne garantissent pas des dimensions ou espèces exactes. Contrôlez les PDF et listes de plantes avant le partage."
+      ]
+    },
+    {
+      "h": "Santé, toxicité et sécurité",
+      "p": [
+        "Identification et diagnostic sont indicatifs. Vérifiez la toxicité pour enfants et animaux ainsi que les instructions des produits."
+      ]
+    },
+    {
+      "h": "FAQ : tâches et météo",
+      "p": [
+        "Une tâche peut rester ouverte jusqu'à une observation ou action complémentaire. La météo est indicative ; l'état réel du sol prime."
+      ]
+    }
+  ],
+  "nowkids": [
+    {
+      "h": "Premiers pas pour les parents",
+      "p": [
+        "Un adulte configure la famille, l'accès des enfants et les paramètres adaptés à leur âge. Gardez le code PIN parental confidentiel."
+      ]
+    },
+    {
+      "h": "Devoirs par matière",
+      "p": [
+        "Ajoutez un devoir à la matière concernée avec date limite et consignes. Consultez les échéances et ne validez que les travaux terminés."
+      ]
+    },
+    {
+      "h": "Activités et présence",
+      "p": [
+        "Créez une activité avec heure de début et de fin. Lorsque le suivi des présences existe, notez la participation et vérifiez le calendrier."
+      ]
+    },
+    {
+      "h": "Bien utiliser NowStudy",
+      "p": [
+        "Demandez une explication, des fiches ou un mini-test. Encouragez le travail autonome et vérifiez les réponses importantes dans les manuels scolaires."
+      ]
+    },
+    {
+      "h": "Vue parentale et calendrier",
+      "p": [
+        "Les parents consultent devoirs, événements et activités des profils reliés. Ouvrez un élément pour voir les détails et vérifier les autorisations."
+      ]
+    },
+    {
+      "h": "Protection des enfants et signalement",
+      "p": [
+        "Signalez une réponse problématique lorsqu'une option existe et prévenez un adulte. Évitez d'envoyer adresses, documents scolaires et numéros de téléphone à l'IA."
+      ]
+    },
+    {
+      "h": "FAQ : accès et confidentialité",
+      "p": [
+        "Certaines demandes d'IA peuvent être bloquées par les protections de données. Modifiez les permissions dans le mode parental avec le PIN. Consultez l'assistance pour la suppression."
+      ]
+    }
+  ]
+}

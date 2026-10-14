@@ -1,0 +1,176 @@
+{
+  "nowcook": [
+    {
+      "h": "Rezeptideen und KI-Assistent",
+      "p": [
+        "Beschreibe verfügbare Zutaten, das gewünschte Gericht oder die verfügbare Zeit. Gib Allergien, Vorlieben und Portionen an. Prüfe die vorgeschlagenen Schritte vor dem Kochen."
+      ]
+    },
+    {
+      "h": "Vorratsschrank und Zutaten",
+      "p": [
+        "Erfasse Produkte, Mengen, Lagerort und ungefähres Haltbarkeitsdatum. Vergleiche die Angaben vor dem Einkauf mit deinen tatsächlichen Vorräten."
+      ]
+    },
+    {
+      "h": "Rezepte anlegen und importieren",
+      "p": [
+        "Speichere Rezepte oder schreibe eigene Anleitungen. Wenn der Import von Text oder Fotos verfügbar ist, kontrolliere Namen, Mengen und Schritte."
+      ]
+    },
+    {
+      "h": "Rezeptsammlung",
+      "p": [
+        "Ordne Lieblingsgerichte nach Kategorien. Öffne die Zutatenliste und Anleitung und bearbeite bei Bedarf deine persönliche Variante."
+      ]
+    },
+    {
+      "h": "Essensplanung",
+      "p": [
+        "Erstelle einen Plan für einen oder mehrere Tage und wähle Gerichte für die Mahlzeiten aus. Berücksichtige die Bedürfnisse deines Haushalts."
+      ]
+    },
+    {
+      "h": "Einkaufsliste",
+      "p": [
+        "Erstelle eine Liste aus deinem Essensplan oder trage Produkte manuell ein. Prüfe vorhandene Vorräte und markiere eingekaufte Artikel."
+      ]
+    },
+    {
+      "h": "Ernährungswünsche und Lebensmittelsicherheit",
+      "p": [
+        "Teile dem Assistenten Allergene und Einschränkungen mit. KI-Tipps ersetzen keine Zutatenetiketten, Hygieneregeln oder sicheren Gartemperaturen."
+      ]
+    },
+    {
+      "h": "Rezepte aus Fotos",
+      "p": [
+        "Wenn die Bildanalyse angeboten wird, nutze ein scharfes Foto und kontrolliere das Ergebnis. Die Erkennung kann Zutaten und Maße verwechseln."
+      ]
+    },
+    {
+      "h": "Konto, Credits und Tarife",
+      "p": [
+        "Einige KI-Funktionen erfordern Registrierung und verfügbare Credits. Aktuelle Limits und Angebote stehen im Abo-Bereich der App."
+      ]
+    },
+    {
+      "h": "Speichern, Teilen und PDF",
+      "p": [
+        "Falls das Teilen oder der PDF-Export verfügbar ist, prüfe das Dokument vor dem Versand auf persönliche Notizen."
+      ]
+    },
+    {
+      "h": "Einstellungen, Mitteilungen und Sprache",
+      "p": [
+        "Wähle deine Sprache und die verfügbaren Optionen. Mitteilungen hängen von Android-Berechtigungen und der App-Version ab."
+      ]
+    },
+    {
+      "h": "Fehlerbehebung und Support",
+      "p": [
+        "Wenn ein Rezept nicht gespeichert wird, prüfe die Verbindung und vermeide unnötige wiederholte KI-Anfragen. Schreibe bei Problemen mit Versionsangabe an support@mynw.app."
+      ]
+    },
+    {
+      "h": "FAQ zu Rezepten",
+      "p": [
+        "Rezepte können eingegeben, importiert oder von der KI vorgeschlagen werden. Prüfe Zutatenmengen stets anhand der Originalquelle."
+      ]
+    },
+    {
+      "h": "Datenschutz und Kontolöschung",
+      "p": [
+        "Offizielle Links findest du unten. Das Deinstallieren entfernt nicht zwangsläufig Cloud-Daten oder ein aktives Abonnement."
+      ]
+    }
+  ],
+  "nowgreen": [
+    {
+      "h": "Die erste Pflanze hinzufügen",
+      "p": [
+        "Öffne Mein Green, erstelle oder wähle einen Bereich und füge eine Pflanze manuell oder per Scan hinzu. Prüfe Name und Standort vor dem Speichern."
+      ]
+    },
+    {
+      "h": "Boden prüfen und Pflege erfassen",
+      "p": [
+        "Prüfe die Erde tatsächlich, bevor du eine Aufgabe als kontrolliert markierst. Gib trocken oder feucht an, damit Ivy einen nächsten Schritt empfehlen kann. Prüfen heißt nicht gießen."
+      ]
+    },
+    {
+      "h": "Pflanzenhistorie und Kalender",
+      "p": [
+        "Sieh vergangene Pflegeschritte und kommende Aufgaben in der Pflanzenkarte nach. Der Kalender hilft, unnötig häufiges Gießen zu vermeiden."
+      ]
+    },
+    {
+      "h": "Bereiche und Gartenprojekte",
+      "p": [
+        "Ordne Pflanzen nach Zimmer, Balkon oder Garten. Prüfe Ausrichtung, Maße und Objektpositionen, bevor du einen Plan speicherst."
+      ]
+    },
+    {
+      "h": "KI-Vorschau und Teilen",
+      "p": [
+        "Generierte Visualisierungen dienen nur zur Illustration und können Maße oder Pflanzendetails verändern. Kontrolliere PDF und Pflanzenliste vor dem Teilen."
+      ]
+    },
+    {
+      "h": "Gesundheit, Giftigkeit und Sicherheit",
+      "p": [
+        "Pflanzenbestimmung und Diagnose sind Hinweise, keine sichere Fachanalyse. Prüfe die Giftigkeit für Kinder und Haustiere sowie die Anwendungshinweise von Produkten."
+      ]
+    },
+    {
+      "h": "FAQ zu Aufgaben und Wetter",
+      "p": [
+        "Manche Aufgaben bleiben offen, bis eine Beobachtung oder Folgeaktion erfasst wurde. Wetterwerte sind Schätzungen; der wirkliche Bodenzustand ist entscheidend."
+      ]
+    }
+  ],
+  "nowkids": [
+    {
+      "h": "Erste Schritte für Eltern",
+      "p": [
+        "Ein Erwachsener richtet die Familie sowie altersgerechte Zugriffe und Einstellungen ein. Schütze die Eltern-PIN und gib sie nicht an Kinder weiter."
+      ]
+    },
+    {
+      "h": "Hausaufgaben nach Schulfach",
+      "p": [
+        "Füge eine Aufgabe mit Fach, Fälligkeit und Beschreibung hinzu. Prüfe kommende Termine und markiere nur erledigte Arbeiten als abgeschlossen."
+      ]
+    },
+    {
+      "h": "Aktivitäten und Teilnahme",
+      "p": [
+        "Lege Aktivitäten mit Anfangs- und Endzeit an. Wenn eine Anwesenheitsfunktion verfügbar ist, notiere die Teilnahme und prüfe doppelte Einträge."
+      ]
+    },
+    {
+      "h": "NowStudy sicher verwenden",
+      "p": [
+        "Bitte um Erklärungen, Lernkarten oder kurze Tests. Kinder sollen eigenständig lernen und wichtige Antworten im Schulbuch überprüfen."
+      ]
+    },
+    {
+      "h": "Elternübersicht und Kalender",
+      "p": [
+        "Eltern können Aufgaben, Ereignisse und Aktivitäten verbundener Kinder sehen. Öffne Einträge für Details und überprüfe die Zugriffsrechte."
+      ]
+    },
+    {
+      "h": "Kinderschutz und Melden",
+      "p": [
+        "Melde ungeeignete KI-Antworten, wenn eine Meldefunktion angeboten wird, und informiere einen Erwachsenen. Teile keine Adressen, Schülernummern oder Telefonnummern im KI-Chat."
+      ]
+    },
+    {
+      "h": "FAQ zu Rechten und Daten",
+      "p": [
+        "Einige KI-Eingaben werden durch Datenschutzregeln blockiert. Ändere Berechtigungen im Elternmodus mit PIN. Für Löschanfragen nutze die offiziellen Kontaktseiten."
+      ]
+    }
+  ]
+}

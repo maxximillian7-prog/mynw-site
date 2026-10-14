@@ -1,0 +1,176 @@
+{
+  "nowcook": [
+    {
+      "h": "Ideas de recetas y asistente de IA",
+      "p": [
+        "Indica los ingredientes disponibles, el plato deseado o el tiempo que tienes. Añade alergias, preferencias y raciones; comprueba los pasos antes de cocinar."
+      ]
+    },
+    {
+      "h": "Despensa e ingredientes",
+      "p": [
+        "Registra productos, cantidades, ubicación y caducidad aproximada. Contrasta la información con lo que hay realmente en casa."
+      ]
+    },
+    {
+      "h": "Crear e importar recetas",
+      "p": [
+        "Guarda recetas o escribe tus instrucciones. Si puedes importar texto o fotos, revisa nombres, cantidades y pasos antes de guardar."
+      ]
+    },
+    {
+      "h": "Colección de recetas",
+      "p": [
+        "Organiza los platos por categorías, consulta ingredientes e instrucciones y actualiza tus versiones favoritas."
+      ]
+    },
+    {
+      "h": "Planificar comidas",
+      "p": [
+        "Crea un plan para uno o varios días y asigna platos a cada comida. Adáptalo a las necesidades de tu familia."
+      ]
+    },
+    {
+      "h": "Lista de la compra",
+      "p": [
+        "Genera una lista desde el plan o añade productos manualmente. Consulta la despensa para evitar compras repetidas."
+      ]
+    },
+    {
+      "h": "Preferencias y seguridad alimentaria",
+      "p": [
+        "Indica alérgenos y restricciones al asistente. La IA no sustituye las etiquetas, las normas de higiene ni las temperaturas de cocción seguras."
+      ]
+    },
+    {
+      "h": "Recetas desde fotografías",
+      "p": [
+        "Si existe el análisis de imágenes, utiliza una foto clara y revisa el resultado. El reconocimiento puede confundir ingredientes y medidas."
+      ]
+    },
+    {
+      "h": "Cuenta, créditos y planes",
+      "p": [
+        "Algunas funciones de IA necesitan registro y créditos. Consulta los límites y las ofertas actuales dentro de la aplicación."
+      ]
+    },
+    {
+      "h": "Guardar, compartir y PDF",
+      "p": [
+        "Cuando se permita compartir o exportar recetas, revisa el documento antes de enviarlo, especialmente si contiene notas personales."
+      ]
+    },
+    {
+      "h": "Ajustes, avisos e idioma",
+      "p": [
+        "Selecciona el idioma y las opciones disponibles. Los avisos dependen de los permisos Android y de la versión."
+      ]
+    },
+    {
+      "h": "Solución de problemas",
+      "p": [
+        "Si no puedes guardar una receta, revisa la conexión y evita repetir solicitudes de IA innecesarias. Escribe a support@mynw.app con tu versión y dispositivo."
+      ]
+    },
+    {
+      "h": "Preguntas frecuentes sobre recetas",
+      "p": [
+        "Puedes crear recetas, importarlas o recibir sugerencias de IA. Las cantidades y los ingredientes deben contrastarse con la receta original."
+      ]
+    },
+    {
+      "h": "Privacidad y eliminación",
+      "p": [
+        "Los documentos y enlaces oficiales están abajo. Desinstalar la app no siempre borra los datos en la nube ni cancela la suscripción."
+      ]
+    }
+  ],
+  "nowgreen": [
+    {
+      "h": "Añadir la primera planta",
+      "p": [
+        "En Mi Green, selecciona o crea un espacio y añade una planta manualmente o mediante escaneo. Confirma el nombre y la ubicación."
+      ]
+    },
+    {
+      "h": "Comprobar suelo y registrar cuidados",
+      "p": [
+        "Observa realmente la tierra antes de marcar la comprobación. Indica si está seca o húmeda para que Ivy pueda orientar el siguiente paso. Comprobar no es regar."
+      ]
+    },
+    {
+      "h": "Historial y calendario de plantas",
+      "p": [
+        "Consulta los cuidados realizados y las tareas próximas en la ficha. Así evitarás repetir riegos o tratamientos."
+      ]
+    },
+    {
+      "h": "Espacios y proyectos de jardín",
+      "p": [
+        "Agrupa las plantas por habitación, terraza o jardín. Revisa la orientación, las proporciones y la posición antes de guardar el diseño."
+      ]
+    },
+    {
+      "h": "Visualizaciones de IA y compartir",
+      "p": [
+        "Las imágenes de IA son ilustrativas y pueden cambiar dimensiones o detalles botánicos. Revisa las imágenes y los PDF antes de enviarlos."
+      ]
+    },
+    {
+      "h": "Salud, toxicidad y seguridad",
+      "p": [
+        "La identificación y el diagnóstico son orientativos. Comprueba la toxicidad para niños y mascotas y sigue las etiquetas de productos."
+      ]
+    },
+    {
+      "h": "Preguntas frecuentes: tareas y clima",
+      "p": [
+        "Una tarea puede seguir pendiente hasta registrar una observación o una acción adicional. El pronóstico es aproximado; importa más el estado real de la tierra."
+      ]
+    }
+  ],
+  "nowkids": [
+    {
+      "h": "Primeros pasos de los padres",
+      "p": [
+        "Un adulto configura la familia, los permisos infantiles y los ajustes adecuados a cada edad. No compartas el PIN parental."
+      ]
+    },
+    {
+      "h": "Deberes por asignatura",
+      "p": [
+        "Añade las tareas a la materia correspondiente, con fecha y descripción. Comprueba los próximos plazos y marca solo lo que esté terminado."
+      ]
+    },
+    {
+      "h": "Actividades y asistencia",
+      "p": [
+        "Crea la actividad con hora de inicio y fin. Si está disponible, registra la asistencia y comprueba que no haya eventos duplicados."
+      ]
+    },
+    {
+      "h": "Uso seguro de NowStudy",
+      "p": [
+        "Pide explicaciones, tarjetas de estudio o pruebas breves. Fomenta que el menor trabaje por sí mismo y verifique las respuestas importantes."
+      ]
+    },
+    {
+      "h": "Resumen parental y calendario",
+      "p": [
+        "Los adultos pueden revisar deberes, actividades y eventos de los perfiles vinculados. Abre cada elemento para consultar los detalles."
+      ]
+    },
+    {
+      "h": "Seguridad y denuncias",
+      "p": [
+        "Si una respuesta de IA es inapropiada, utiliza el sistema de denuncias cuando exista y avisa a un adulto. Evita compartir direcciones, documentos escolares o teléfonos."
+      ]
+    },
+    {
+      "h": "Preguntas frecuentes: permisos y datos",
+      "p": [
+        "Algunas funciones de IA se bloquean por protección de datos. Cambia los permisos desde el modo parental con PIN. Para eliminar datos, usa los enlaces oficiales."
+      ]
+    }
+  ]
+}

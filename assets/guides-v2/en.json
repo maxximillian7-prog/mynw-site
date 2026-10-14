@@ -1,0 +1,176 @@
+{
+  "nowcook": [
+    {
+      "h": "Recipe ideas and AI assistant",
+      "p": [
+        "Open the cooking assistant, describe ingredients, a desired dish or the time available, then review the proposed recipe. Include allergies, preferences and the number of portions in your request; always verify generated ingredients and preparation steps before cooking."
+      ]
+    },
+    {
+      "h": "Pantry and ingredients",
+      "p": [
+        "Add products to your pantry manually and maintain their quantities, storage location and approximate expiry dates. Use pantry items as a starting point for recipe suggestions; review what you actually have before following any shopping or cooking recommendation."
+      ]
+    },
+    {
+      "h": "Create and import recipes",
+      "p": [
+        "Save a recipe you like or enter your own instructions. If photo or text import is offered in your version, inspect the extracted title, ingredient amounts and steps for recognition errors before saving."
+      ]
+    },
+    {
+      "h": "Recipe organisation",
+      "p": [
+        "Use the recipe collection and categories to find saved dishes again. Open a recipe to review the ingredients and the preparation sequence; update the stored text when you change your own version."
+      ]
+    },
+    {
+      "h": "Meal planning",
+      "p": [
+        "Create a plan for one or several days and choose dishes for the appropriate meals. Review the proposed schedule before saving it and change any dishes that do not fit your household or dietary needs."
+      ]
+    },
+    {
+      "h": "Shopping lists",
+      "p": [
+        "Build a shopping list from your planned meals or add items manually. Check what is already available in the pantry to avoid duplicate purchases; mark items when purchased."
+      ]
+    },
+    {
+      "h": "Dietary preferences and food safety",
+      "p": [
+        "Mention relevant preferences and allergens when asking the assistant for ideas. AI suggestions are not a substitute for allergen labels, food hygiene rules, safe storage or verified cooking temperatures."
+      ]
+    },
+    {
+      "h": "Cooking with photos",
+      "p": [
+        "When your version supports analysing a recipe image or a food photograph, choose a clear photo and review the result. Recognition can confuse ingredients, units or dishes, so confirm the output before relying on it."
+      ]
+    },
+    {
+      "h": "Credits, account and plans",
+      "p": [
+        "Some AI operations require registration and available AI credits; other features can remain usable without generating AI content. Check the in-app subscription and credit screens for your current allowance and any applicable purchase options."
+      ]
+    },
+    {
+      "h": "Saving, sharing and PDFs",
+      "p": [
+        "Where available, use the app's share or PDF action to send a saved recipe to another person. Preview the result before sharing, especially if it contains a personal note or shopping information."
+      ]
+    },
+    {
+      "h": "Notifications, settings and language",
+      "p": [
+        "Use Settings to select one of the supported interface languages and adjust the available preferences. Whether reminders appear depends on device permissions and the features enabled in your version."
+      ]
+    },
+    {
+      "h": "Troubleshooting and support",
+      "p": [
+        "If a recipe does not save, verify your connection and try again without repeatedly sending costly AI requests. If an error persists, contact support@mynw.app with the app version, device and a short description; do not send passwords."
+      ]
+    },
+    {
+      "h": "FAQ — finding and saving ideas",
+      "p": [
+        "Where do recipes come from? They may be entered by you, imported from supported text/photos or suggested by the assistant. Can you trust ingredient amounts? Always compare them with the original recipe and your dietary requirements."
+      ]
+    },
+    {
+      "h": "Privacy and account deletion",
+      "p": [
+        "Use the official Privacy, Terms, Support and Account deletion links below. Uninstalling an app does not necessarily delete data stored in an online account or cancel an active Google Play subscription."
+      ]
+    }
+  ],
+  "nowgreen": [
+    {
+      "h": "Adding your first plant",
+      "p": [
+        "Open My Green, select or create a space, then add the plant using the available scan or manual option. Check the plant name, the assigned space and any imported information before saving."
+      ]
+    },
+    {
+      "h": "Checking soil and recording care",
+      "p": [
+        "Open a pending care task and mark it as checked only after completing the physical inspection. For example, after checking soil moisture, select the actual condition; Ivy can then suggest whether watering is needed. Do not mark watering completed if you have only checked the soil."
+      ]
+    },
+    {
+      "h": "Plant history and calendar",
+      "p": [
+        "Open a plant card to review its recorded care and upcoming actions. Use the plant calendar or activity history to see what was done and avoid repeated watering or treatment."
+      ]
+    },
+    {
+      "h": "Organising spaces and garden projects",
+      "p": [
+        "Group plants by room, balcony, terrace or garden. For landscape projects, adjust placements within the plan, verify north/orientation and object proportions, and save the layout before asking for a visualisation."
+      ]
+    },
+    {
+      "h": "AI previews and sharing",
+      "p": [
+        "AI plant images and garden visualisations are illustrative and may not preserve every dimension or species detail. Reuse saved previews when appropriate; if the app offers PDF sharing, check the image and plant list before sending."
+      ]
+    },
+    {
+      "h": "Plant health, toxicity and safety",
+      "p": [
+        "Plant identification and diagnoses are suggestions, not laboratory identification or veterinary advice. Check toxicity to children and pets independently and follow product labels before applying fertiliser or pesticide."
+      ]
+    },
+    {
+      "h": "FAQ — tasks and weather",
+      "p": [
+        "Why is a task still open? Some checks require an additional observation or a completed follow-up action. Why do weather suggestions differ? Local weather is approximate; real soil and plant conditions take priority."
+      ]
+    }
+  ],
+  "nowkids": [
+    {
+      "h": "Getting started with parent mode",
+      "p": [
+        "An adult should set up the family, review child access and choose age-appropriate settings before handing over the device. Child profiles are linked to parent-authorised access; keep the parent PIN private."
+      ]
+    },
+    {
+      "h": "Homework and school subjects",
+      "p": [
+        "Add a homework item under the appropriate school subject with a due date and relevant details. Sort or review by upcoming deadlines, and mark completed work only when it has been done."
+      ]
+    },
+    {
+      "h": "Activities and attendance",
+      "p": [
+        "Create a club or activity with its correct start and end time. When attendance tracking is available, record whether the child attended; verify that the calendar shows one event rather than duplicate start/end entries."
+      ]
+    },
+    {
+      "h": "Using NowStudy safely",
+      "p": [
+        "Ask NowStudy to explain a topic, create flashcards or make a short quiz. Encourage children to work through the material themselves and verify important answers with their teacher or textbook."
+      ]
+    },
+    {
+      "h": "Parent overview and schedules",
+      "p": [
+        "Parents can review relevant homework, events, activities and study progress for linked children. Open an item to check its details, and remember that child accounts should only see information allowed by the parent."
+      ]
+    },
+    {
+      "h": "Child safety and reporting",
+      "p": [
+        "If an AI reply or shared content seems inappropriate, use the in-app report option where available and tell a parent. Children should not share addresses, school IDs, phone numbers or other sensitive details in AI chats."
+      ]
+    },
+    {
+      "h": "FAQ — permissions and privacy",
+      "p": [
+        "Why is an AI image unavailable? Some inputs can be restricted by safety and privacy controls. How do I change child permissions? Use parent mode and the applicable PIN or approval flow. For deletion and data requests, contact the official support address."
+      ]
+    }
+  ]
+}

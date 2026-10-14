@@ -17,6 +17,17 @@
     const res=await fetch('/assets/nowgreen-i18n/'+target+'.json',{cache:'no-cache'});
     if(!res.ok) throw new Error('locale_failed');
     data=await res.json(); lang=target;
+    if(page==='manual'){
+      try {
+        const response=await fetch('/assets/guides-v2/'+target+'.json',{cache:'no-cache'});
+        if(response.ok){
+          const extensions=await response.json();
+          const existing=data.pages?.manual?.sections;
+          if(Array.isArray(existing)&&Array.isArray(extensions.nowgreen)) existing.push(...extensions.nowgreen);
+        }
+      }catch(error){console.warn('Optional detailed guide unavailable',error)}
+    }
+
     localStorage.setItem('nowgreen-site-lang',lang);
     document.documentElement.lang=lang;
     render();
@@ -48,10 +59,10 @@
   function renderDoc(){
     const c=data.common,d=data.pages[page]||data.pages.privacy;
     document.title=d.title+' — NowGreen';
-    const sections=(d.sections||[]).map(s=>{
+    const sections=(d.sections||[]).map((s,i)=>{
       const ps=(s.p||[]).map(x=>'<p>'+linkify(x)+'</p>').join('');
       const list=s.items?.length?'<ul>'+s.items.map(x=>'<li>'+linkify(x)+'</li>').join('')+'</ul>':'';
-      return '<section class="ng-doc-section"><h2>'+esc(s.h)+'</h2>'+ps+list+'</section>';
+      return '<section class="ng-doc-section"'+(page==='manual'?' id="guide-section-'+i+'"':'')+'><h2>'+esc(s.h)+'</h2>'+ps+list+'</section>';
     }).join('');
     let action='';
     if(page==='deletion'){
@@ -60,7 +71,8 @@
     }else if(page==='support'){
       action='<p class="ng-action"><a class="btn btn-primary" href="mailto:support@mynw.app">support@mynw.app</a></p>';
     }
-    $('#ngContent').innerHTML='<article class="legal-card ng-legal-card"><a class="ng-back" href="/nowgreen/">← '+esc(c.back)+'</a><h1>'+esc(d.title)+'</h1><p class="meta">'+esc(c.updated)+'</p>'+contactBox()+'<p class="ng-intro">'+esc(d.intro)+'</p>'+action+sections+'</article>';
+    const toc=page==='manual'?'<nav class="guide-contents" aria-label="'+esc(c.manual||'Manual')+'">'+(d.sections||[]).map((s,i)=>'<a href="#guide-section-'+i+'">'+esc(s.h)+'</a>').join('')+'</nav>':'';
+    $('#ngContent').innerHTML='<article class="legal-card ng-legal-card"><a class="ng-back" href="/nowgreen/">← '+esc(c.back)+'</a><h1>'+esc(d.title)+'</h1><p class="meta">'+esc(c.updated)+'</p>'+contactBox()+'<p class="ng-intro">'+esc(d.intro)+'</p>'+toc+action+sections+'</article>';
   }
   function renderHome(){
     const c=data.common;document.title=c.title;

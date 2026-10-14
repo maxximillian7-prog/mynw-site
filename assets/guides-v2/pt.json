@@ -1,0 +1,176 @@
+{
+  "nowcook": [
+    {
+      "h": "Ideias de receitas e assistente de IA",
+      "p": [
+        "Abra o assistente e indique ingredientes, o prato pretendido ou o tempo disponível. Inclua alergias, preferências e número de doses. Confirme sempre os ingredientes e os passos antes de cozinhar."
+      ]
+    },
+    {
+      "h": "Despensa e ingredientes",
+      "p": [
+        "Adicione produtos à despensa, registando quantidades, local de conservação e prazo aproximado. Use o que tem em casa como ponto de partida, mas confirme sempre o inventário real."
+      ]
+    },
+    {
+      "h": "Criar e importar receitas",
+      "p": [
+        "Guarde receitas ou escreva as suas instruções. Se a versão permitir importar uma fotografia ou texto, reveja título, quantidades e passos antes de guardar."
+      ]
+    },
+    {
+      "h": "Coleção de receitas",
+      "p": [
+        "Organize os pratos guardados por categorias e consulte os ingredientes e o modo de preparação. Atualize as instruções quando alterar uma receita."
+      ]
+    },
+    {
+      "h": "Planear refeições",
+      "p": [
+        "Prepare um plano para um ou vários dias e atribua pratos às refeições. Confirme o plano antes de o guardar e ajuste-o à família."
+      ]
+    },
+    {
+      "h": "Listas de compras",
+      "p": [
+        "Crie uma lista com base nos pratos planeados ou adicione produtos manualmente. Consulte a despensa para evitar compras repetidas e assinale os itens adquiridos."
+      ]
+    },
+    {
+      "h": "Preferências alimentares e segurança",
+      "p": [
+        "Indique alergias e preferências nas perguntas à IA. As sugestões não substituem os rótulos, a higiene alimentar, a conservação correta nem as temperaturas seguras de confeção."
+      ]
+    },
+    {
+      "h": "Receitas a partir de fotografias",
+      "p": [
+        "Se a análise de imagens estiver disponível, escolha uma imagem nítida e confira o resultado. O reconhecimento pode confundir ingredientes e medidas."
+      ]
+    },
+    {
+      "h": "Conta, créditos e planos",
+      "p": [
+        "Algumas funções de IA exigem registo e créditos disponíveis; outras funções gratuitas não precisam de geração por IA. Consulte os limites e as opções de compra na aplicação."
+      ]
+    },
+    {
+      "h": "Guardar, partilhar e PDF",
+      "p": [
+        "Se existir uma opção para partilhar ou exportar receitas em PDF, pré-visualize o conteúdo. Verifique se não inclui notas pessoais antes de o enviar."
+      ]
+    },
+    {
+      "h": "Definições, notificações e idioma",
+      "p": [
+        "Escolha o idioma e as preferências disponíveis nas Definições. As notificações dependem das permissões Android e das funcionalidades da versão instalada."
+      ]
+    },
+    {
+      "h": "Resolver problemas e obter apoio",
+      "p": [
+        "Se uma receita não guardar, confirme a ligação e tente novamente sem repetir pedidos dispendiosos à IA. Para problemas persistentes, escreva para support@mynw.app com a versão e o modelo do dispositivo."
+      ]
+    },
+    {
+      "h": "Perguntas frequentes sobre receitas",
+      "p": [
+        "De onde vêm as receitas? Podem ser criadas por si, importadas de fontes suportadas ou sugeridas pela IA. As quantidades estão sempre certas? Não; confirme-as com a receita original."
+      ]
+    },
+    {
+      "h": "Privacidade e eliminação da conta",
+      "p": [
+        "As ligações oficiais de Privacidade, Termos, Apoio e Eliminação estão abaixo. Desinstalar a aplicação não elimina necessariamente os dados na nuvem nem cancela uma subscrição."
+      ]
+    }
+  ],
+  "nowgreen": [
+    {
+      "h": "Adicionar a primeira planta",
+      "p": [
+        "Abra Meu Green, crie ou selecione um espaço e adicione a planta por identificação ou manualmente. Confirme o nome e a localização antes de guardar."
+      ]
+    },
+    {
+      "h": "Verificar o solo e registar cuidados",
+      "p": [
+        "Abra a tarefa, observe realmente o solo e só depois assinale a verificação. Registe se está seco ou húmido; a Ivy pode sugerir o passo seguinte. Verificar não é o mesmo que regar."
+      ]
+    },
+    {
+      "h": "Histórico e calendário da planta",
+      "p": [
+        "Consulte as ações concluídas e os cuidados previstos na ficha da planta. Use o calendário para não repetir regas ou fertilizações desnecessariamente."
+      ]
+    },
+    {
+      "h": "Organizar espaços e projetos",
+      "p": [
+        "Agrupe plantas por divisão, varanda ou jardim. Num projeto paisagístico, confirme a orientação, as proporções e a posição dos objetos antes de guardar o plano."
+      ]
+    },
+    {
+      "h": "Visualizações por IA e partilha",
+      "p": [
+        "As imagens geradas são ilustrativas e podem não representar com precisão dimensões ou espécies. Reutilize as pré-visualizações guardadas e reveja os PDFs antes de partilhar."
+      ]
+    },
+    {
+      "h": "Saúde, toxicidade e segurança",
+      "p": [
+        "A identificação e os diagnósticos sugeridos não substituem confirmação especializada. Verifique a toxicidade para crianças e animais e siga os rótulos dos produtos de cuidado."
+      ]
+    },
+    {
+      "h": "Perguntas frequentes: tarefas e tempo",
+      "p": [
+        "Uma tarefa pode continuar pendente até registar uma observação ou uma ação adicional. As previsões meteorológicas são aproximadas; a humidade real do solo é mais importante."
+      ]
+    }
+  ],
+  "nowkids": [
+    {
+      "h": "Começar no modo de pais",
+      "p": [
+        "Um adulto configura a família e verifica os acessos e as definições adequadas à idade. O perfil infantil requer autorização parental. Não partilhe o PIN de adulto."
+      ]
+    },
+    {
+      "h": "Trabalhos de casa por disciplina",
+      "p": [
+        "Adicione uma tarefa à disciplina correspondente, com prazo e descrição. Reveja as datas próximas e marque o trabalho como concluído apenas depois de o terminar."
+      ]
+    },
+    {
+      "h": "Atividades e presenças",
+      "p": [
+        "Registe uma atividade com hora de início e de fim. Quando o registo de presenças estiver disponível, indique se a criança participou e confirme que não aparecem eventos duplicados."
+      ]
+    },
+    {
+      "h": "Utilizar o NowStudy em segurança",
+      "p": [
+        "Peça explicações, cartões de estudo ou pequenos testes. Incentive a criança a resolver os exercícios e confirme respostas importantes com professores ou manuais."
+      ]
+    },
+    {
+      "h": "Resumo parental e calendário",
+      "p": [
+        "Os pais podem consultar tarefas, eventos e atividades dos perfis ligados. Abra cada item para ver detalhes e confirme que o modo infantil só apresenta informação autorizada."
+      ]
+    },
+    {
+      "h": "Segurança infantil e denúncias",
+      "p": [
+        "Se uma resposta ou conteúdo for inadequado, utilize a opção de denúncia quando disponível e informe um adulto. Não partilhe moradas, identificadores escolares nem números de telefone nos chats de IA."
+      ]
+    },
+    {
+      "h": "Perguntas frequentes: permissões e dados",
+      "p": [
+        "Algumas imagens ou respostas de IA são bloqueadas por controlos de privacidade. Para alterar permissões, use o modo parental e confirme com o PIN. Os pedidos de eliminação estão na documentação oficial."
+      ]
+    }
+  ]
+}

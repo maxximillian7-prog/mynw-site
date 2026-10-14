@@ -41,6 +41,16 @@
     const extraAll=extraRes.ok?await extraRes.json():{};
     data=deepMerge(base,extraAll[target]||{});
     lang=target;
+    if(page==='manual'){
+      try {
+        const response=await fetch('/assets/guides-v2/'+target+'.json',{cache:'no-cache'});
+        if(response.ok){
+          const extensions=await response.json();
+          const existing=data.pages?.manual?.sections;
+          if(Array.isArray(existing)&&Array.isArray(extensions.nowkids)) existing.push(...extensions.nowkids);
+        }
+      }catch(error){console.warn('Optional detailed guide unavailable',error)}
+    }
     localStorage.setItem('nowkids-site-lang',lang);
     document.documentElement.lang=lang;
     render();
@@ -90,10 +100,10 @@
     const c=data.common;
     const d=data.pages[page]||data.pages.privacy;
     document.title=d.title+' — NowKids';
-    const sections=(d.sections||[]).map(s=>{
+    const sections=(d.sections||[]).map((s,i)=>{
       const ps=(s.p||[]).map(x=>'<p>'+linkify(x)+'</p>').join('');
       const list=s.items?.length?'<ul>'+s.items.map(x=>'<li>'+linkify(x)+'</li>').join('')+'</ul>':'';
-      return '<section class="nk-doc-section"><h2>'+esc(s.h)+'</h2>'+ps+list+'</section>';
+      return '<section class="nk-doc-section"'+(page==='manual'?' id="guide-section-'+i+'"':'')+'><h2>'+esc(s.h)+'</h2>'+ps+list+'</section>';
     }).join('');
     $('#nkContent').innerHTML=
       '<article class="legal-card nk-legal-card">'+
@@ -102,6 +112,7 @@
       '<p class="meta">'+esc(c.updated)+'</p>'+
       contactBox()+
       '<p class="nk-intro">'+esc(d.intro)+'</p>'+
+      (page==='manual'?'<nav class="guide-contents" aria-label="'+esc(c.manual||'Manual')+'">'+(d.sections||[]).map((s,i)=>'<a href="#guide-section-'+i+'">'+esc(s.h)+'</a>').join('')+'</nav>':'')+
       specialAction(page)+sections+
       '</article>';
   }
