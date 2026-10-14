@@ -123,3 +123,44 @@ body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px
 }
 @media(max-width:480px){.eco-brand img{width:42px;height:42px}.eco-control{min-width:89px;padding:8px 5px;font-size:.82rem}.eco-card-logo{width:68px;height:68px}.eco-card-logo img{width:57px;height:57px}.eco-card h3{font-size:2rem}.eco-feature-grid,.eco-resource-grid,.eco-gallery{grid-template-columns:1fr}.eco-app-visual{min-height:270px}.eco-visual-orbit{width:250px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.eco-button,.eco-card-link span,.eco-resource{transition:none}}
+
+
+/* App identity imagery – official supplied artwork has graceful offline fallbacks. */
+.eco-card { min-height:510px; padding-bottom:26px }
+.eco-card .eco-tags{margin-bottom:16px}
+.eco-card p{margin:18px 0 14px;font-size:1rem;line-height:1.55}
+.eco-picture{position:relative;overflow:hidden;display:grid;place-items:center;background:linear-gradient(135deg,var(--light) 5%,var(--glow) 55%,#fff 125%);isolation:isolate}
+.eco-picture:before,.eco-picture:after{content:"";position:absolute;border:1px solid #ffffffa1;border-radius:50%;z-index:-1}
+.eco-picture:before{width:110%;aspect-ratio:1;right:-65%;top:-110%;background:#ffffff21}
+.eco-picture:after{width:78%;aspect-ratio:1;left:-43%;bottom:-120%;background:#ffffff21}
+.eco-picture img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.eco-picture-watermark{display:none;color:var(--accent);font-weight:900;font-size:clamp(1.6rem,3vw,2.5rem);letter-spacing:-.06em}
+.eco-picture-fallback .eco-picture-watermark{display:block}
+.eco-picture-card{height:180px;border-radius:18px;margin-bottom:13px;box-shadow:0 10px 25px rgba(26,35,59,.08)}
+.eco-picture-card img{object-position:center}
+.eco-card-link{margin-top:auto;padding-top:9px}
+.eco-app-visual{padding:8px;min-height:0}
+.eco-app-promo{position:relative;width:100%;max-width:620px;min-width:0}
+.eco-picture-hero{width:100%;aspect-ratio:1.88;border-radius:26px;box-shadow:0 24px 64px rgba(26,43,70,.16);border:1px solid #ffffffd9}
+.eco-picture-hero .eco-picture-watermark{font-size:clamp(2rem,4vw,3.7rem)}
+.eco-app-promo-logo{position:absolute;bottom:-18px;right:15px;padding:8px;background:#fff;border:1px solid #e5e9f2;box-shadow:0 12px 30px #23365529;border-radius:19px;width:86px;height:86px;display:grid;place-items:center}
+.eco-app-promo-logo img{width:100%;height:100%;object-fit:contain;border-radius:14px}
+.eco-visual-float{left:-6px;bottom:-21px;font-size:.85rem;border:1px solid #ffffffcc}
+.eco-app-hero .eco-app-intro{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:34px}
+.eco-app-hero .eco-app-visual{min-height:0}
+.eco-stage-tile img{object-fit:contain;border-radius:14px}
+.eco-card-logo img{border-radius:14px}
+@media(min-width:741px) and (max-width:1080px){
+ .eco-card{padding:26px}
+ .eco-picture-card{height:154px}
+ .eco-app-hero .eco-app-intro{grid-template-columns:1fr 1fr}
+}
+@media(max-width:740px){
+ .eco-card{min-height:0}
+ .eco-picture-card{height:auto;aspect-ratio:1.9;margin-top:8px}
+ .eco-app-hero .eco-app-intro{grid-template-columns:1fr;gap:32px}
+ .eco-app-visual{padding:4px 7px 28px}
+ .eco-app-promo{max-width:520px}
+ .eco-app-promo-logo{width:68px;height:68px;bottom:-12px}
+ .eco-visual-float{bottom:-18px;left:0;font-size:.73rem}
+}

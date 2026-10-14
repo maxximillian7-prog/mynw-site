@@ -10,7 +10,9 @@
     nowgreen:{home:'/nowgreen/',guide:'/nowgreen/manual/',privacy:'/nowgreen/privacy/',terms:'/nowgreen/terms/',delete:'/nowgreen/delete-account/',support:'/nowgreen/support/',ai:'/nowgreen/ai-data/',rights:'/nowgreen/data-rights/'},
     nowkids:{home:'/nowkids/',guide:'/nowkids/manual/',privacy:'/nowkids/privacy/',terms:'/nowkids/terms/',delete:'/nowkids/delete-account/',support:'/nowkids/support/',ai:'/nowkids/ai-safety/',rights:'/nowkids/data-rights/',parents:'/nowkids/parents/',safety:'/nowkids/child-safety/',community:'/nowkids/community/',permissions:'/nowkids/permissions/'}
   };
-  const LOGOS={nowwhat:'/assets/nowwhat-qr-icon.png',nowcook:'/assets/nowcook-home-logo.webp',nowgreen:'/assets/nowgreen-icon.svg',nowkids:'/assets/nowkids-home-logo.png'};
+  const LOGOS={nowwhat:'/assets/brand/nowwhat-logo.webp',nowcook:'/assets/brand/nowcook-logo.webp',nowgreen:'/assets/brand/nowgreen-logo.webp',nowkids:'/assets/brand/nowkids-logo.webp'};
+  const FALLBACK_LOGOS={nowwhat:'/assets/nowwhat-qr-icon.png',nowcook:'/assets/nowcook-home-logo.webp',nowgreen:'/assets/nowgreen-icon.svg',nowkids:'/assets/nowkids-home-logo.png'};
+  const BANNERS={nowwhat:'/assets/brand/nowwhat-banner.webp',nowcook:'/assets/brand/nowcook-banner.webp',nowgreen:'/assets/brand/nowgreen-banner.webp',nowkids:'/assets/brand/nowkids-banner.webp'};
   const SYMBOLS={nowgreen:'🌿'};
   const TITLES={nowwhat:'NowWhat',nowcook:'NowCook',nowgreen:'NowGreen',nowkids:'NowKids'};
   const KINDS={nowwhat:'📑',nowcook:'🍽️',nowgreen:'🌱',nowkids:'🎓'};
@@ -19,7 +21,8 @@
   if(!root)return;
   let translations={},locale='en',busy=false;
   const current=()=>translations[locale]||translations.en;
-  function logo(app){return LOGOS[app]?'<img src="'+LOGOS[app]+'" alt="'+TITLES[app]+' logo" loading="lazy" decoding="async">':'<span class="eco-symbol" aria-hidden="true">'+SYMBOLS[app]+'</span>';}
+  function logo(app){return '<img src="'+LOGOS[app]+'" alt="'+TITLES[app]+' logo" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+FALLBACK_LOGOS[app]+'\'">';}
+  function visual(app,type){return '<div class="eco-picture eco-picture-'+app+' eco-picture-'+type+'"><img src="'+BANNERS[app]+'" alt="'+TITLES[app]+' — '+(type==='hero'?'app overview':'features and preview')+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentNode.classList.add(\'eco-picture-fallback\')"><span class="eco-picture-watermark">'+TITLES[app]+'</span></div>';}
   function nav(localeText){
     document.documentElement.lang=locale==='uk'?'uk':locale;
     const brand=document.querySelector('.eco-brand small');if(brand)brand.textContent=localeText.brandSub;
@@ -33,7 +36,7 @@
     const d=t[app],u=URLS[app];
     return '<article class="eco-card eco-card-'+app+'">'+
       '<div class="eco-card-top"><div class="eco-card-logo">'+logo(app)+'</div><div><div class="eco-kind">'+E(d.tag)+'</div><h3>'+TITLES[app]+'</h3></div></div>'+
-      '<p>'+E(d.summary)+'</p>'+tags(d.chips)+
+      '<p>'+E(d.summary)+'</p>'+tags(d.chips)+visual(app,'card')+
       '<a class="eco-card-link" href="'+u.home+'">'+E(t.open)+' <span>→</span></a></article>';
   }
   function footer(t,app){
@@ -77,7 +80,7 @@
       '<div class="eco-section-eyebrow">'+E(d.tag)+'</div><h1>'+TITLES[app]+'</h1>'+
       '<p class="eco-app-summary">'+E(d.summary)+'</p>'+tags(d.chips)+
       '<div class="eco-actions">'+mainAction+'<a class="eco-button" href="'+u.guide+'">'+E(t.guide)+' →</a></div></div>'+
-      '<div class="eco-app-visual"><div class="eco-visual-orbit">'+logo(app)+'</div><div class="eco-visual-float">'+E(floats)+'</div></div>'+
+      '<div class="eco-app-visual"><div class="eco-app-promo">'+visual(app,'hero')+'<div class="eco-app-promo-logo">'+logo(app)+'</div></div><div class="eco-visual-float">'+E(floats)+'</div></div>'+
       '</div></section>'+
       '<section class="eco-section" id="about"><div class="eco-container"><div class="eco-section-eyebrow">'+E(t.about)+'</div>'+
       '<h2>'+TITLES[app]+'</h2><p class="eco-detail">'+E(d.description)+'</p></div></section>'+
