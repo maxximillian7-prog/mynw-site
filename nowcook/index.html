@@ -3,28 +3,62 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>NowCook — Legal & Support</title>
-  <meta name="description" content="Official NowCook legal documents, privacy policy, support and account deletion.">
-  <meta name="theme-color" content="#E7A72C">
+  
+  <meta name="robots" content="index,follow">
+  <title>NowCook — Recipes &amp; Cooking | MyNow Apps</title>
+  <meta name="description" content="Smart recipes, meal inspiration and useful cooking tools.">
+  <meta name="theme-color" content="#172746">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NowCook — Recipes &amp; Cooking | MyNow Apps">
+  <meta property="og:description" content="Smart recipes, meal inspiration and useful cooking tools.">
+  <meta property="og:url" content="https://mynw.app/nowcook/">
   <link rel="canonical" href="https://mynw.app/nowcook/">
-  <link rel="stylesheet" href="../assets/styles.css">
+  <link rel="icon" href="/assets/nowwhat-qr-icon.png">
+  <link rel="stylesheet" href="/assets/portfolio.css?v=20261014">
+  <script defer src="/assets/portfolio.js?v=20261014"></script>
 </head>
-<body data-nc-page="home">
-<header class="site-header">
-  <div class="wrap header-row">
-    <a class="brand" href="/nowcook/"><span>NowCook</span></a>
-    <button class="menu" aria-label="Open menu">☰</button>
-    <nav>
-      <a href="/nowcook/privacy/" data-nc-nav="privacy">Privacy</a>
-      <a href="/nowcook/terms/" data-nc-nav="terms">Terms</a>
-      <a href="/nowcook/support/" data-nc-nav="support">Support</a>
-      <a href="/nowcook/delete-account/" data-nc-nav="delete">Delete account</a>
+<body class="ecosystem" data-portfolio="nowcook">
+<header class="eco-header">
+  <div class="eco-container eco-top">
+    <a class="eco-brand" href="/" aria-label="MyNow Apps home">
+      <img src="/assets/nowwhat-qr-icon.png" alt="MyNow Apps logo" width="50" height="50">
+      <span>MyNow Apps<small>Everyday, made easier</small></span>
+    </a>
+    <button id="eco-menu" class="eco-menu" type="button" aria-label="Open navigation">☰</button>
+    <nav id="eco-nav" class="eco-nav" aria-label="Main navigation">
+      <a href="/" data-eco-link="navHome">Home</a>
+      <a href="/#apps" data-eco-link="navApps">Apps</a>
+      <a href="/#documentation" data-eco-link="navDocs">Documentation</a>
+      <a href="mailto:support@mynw.app" data-eco-link="navContact">Contact</a>
     </nav>
-    <select id="ncLang" class="lang-select" aria-label="Language"></select>
+    <label for="eco-language" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">Language</label>
+    <select id="eco-language" class="eco-control" aria-label="Website language">
+      <option value="en">English</option>
+      <option value="pt">Português</option>
+      <option value="ru">Русский</option>
+      <option value="uk">Українська</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+    </select>
   </div>
 </header>
-<main class="legal"><div class="wrap"><div id="ncContent"></div></div></main>
-<footer class="site-footer"><div class="wrap footer-row"><div id="ncFooter">© 2026 NowCook / NowApps.</div><div class="footer-links"><a href="/nowcook/privacy/" data-nc-nav="privacy">Privacy</a><a href="/nowcook/terms/" data-nc-nav="terms">Terms</a><a href="/nowcook/support/" data-nc-nav="support">Support</a><a href="/nowcook/delete-account/" data-nc-nav="delete">Delete account</a></div></div></footer>
-<script src="../assets/nowcook-site.js"></script>
+<main id="portfolio">
+  <section class="eco-section">
+    <div class="eco-container">
+      <h1>NowCook</h1>
+      <p>Smart recipes, meal inspiration and useful cooking tools.</p>
+      <div class="eco-actions">
+        <a class="eco-button" href="/nowwhat/">NowWhat</a>
+        <a class="eco-button" href="/nowcook/">NowCook</a>
+        <a class="eco-button" href="/nowgreen/">NowGreen</a>
+        <a class="eco-button" href="/nowkids/">NowKids</a>
+      </div>
+      <p><a href="/privacy/">NowWhat privacy</a> · <a href="/delete-account/">NowWhat account deletion</a> · <a href="/nowcook/privacy/">NowCook privacy</a> · <a href="/nowgreen/privacy/">NowGreen privacy</a> · <a href="/nowkids/privacy/">NowKids privacy</a> · <a href="mailto:support@mynw.app">Support</a></p>
+    </div>
+  </section>
+</main>
+<noscript><p style="text-align:center;padding:24px">JavaScript is required to switch website languages; all official documentation links above remain available.</p></noscript>
 </body>
 </html>

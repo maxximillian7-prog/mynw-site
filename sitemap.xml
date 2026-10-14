@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://mynw.app/</loc><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://mynw.app/</loc><lastmod>2026-10-14</lastmod></url>
   <url><loc>https://mynw.app/manual/</loc><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://mynw.app/privacy/</loc><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://mynw.app/terms/</loc><lastmod>2026-09-22</lastmod></url>
@@ -35,4 +35,6 @@
   <url><loc>https://mynw.app/nowgreen/data-rights/</loc></url>
   <url><loc>https://mynw.app/nowgreen/ai-data/</loc></url>
   <url><loc>https://mynw.app/button/privacy/</loc><lastmod>2026-10-14</lastmod></url>
+  <url><loc>https://mynw.app/nowwhat/</loc><lastmod>2026-10-14</lastmod></url>
+  <url><loc>https://mynw.app/nowcook/manual/</loc><lastmod>2026-10-14</lastmod></url>
 </urlset>

@@ -1,0 +1,125 @@
+
+/* MyNow Apps 2026 — isolated portfolio presentation; legal paths untouched */
+:root { --portfolio-text:#18233c; --portfolio-muted:#66728b; --portfolio-border:rgba(25,43,79,.11) }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.ecosystem a{color:inherit;text-decoration:none}
+.ecosystem img{max-width:100%;height:auto}
+.eco-container{width:min(1220px,calc(100% - 48px));margin-inline:auto}
+.eco-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-bottom:1px solid #e8edf5}
+.eco-top{min-height:82px;display:flex;align-items:center;gap:28px}
+.eco-brand{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.eco-brand img{width:50px;height:50px;object-fit:contain;border-radius:14px;box-shadow:0 4px 16px rgba(27,39,89,.12)}
+.eco-brand span{font-size:1.18rem;font-weight:860;letter-spacing:-.045em}
+.eco-brand small{font-size:.63rem;letter-spacing:.13em;text-transform:uppercase;color:#75839a;font-weight:800;display:block;margin-top:-5px}
+.eco-nav{display:flex;gap:28px;align-items:center;margin-left:auto}
+.eco-nav a{font-weight:700;color:#4f5d74;font-size:.92rem}
+.eco-nav a:hover,.eco-nav a:focus-visible{color:#3552ac}
+.eco-control{margin-left:9px;padding:9px 11px;border:1px solid #dce3ef;border-radius:12px;background:#fff;font-weight:760;color:#24334c;min-width:118px}
+.eco-menu{display:none;background:#eff3ff;border:0;border-radius:12px;font-size:1.4rem;padding:7px 13px}
+.eco-hero{position:relative;overflow:hidden;background:linear-gradient(126deg,#111c39 0%,#203b71 58%,#475ca0 100%);color:#fff}
+.eco-hero:after{content:"";position:absolute;width:680px;height:680px;border:1px solid #ffffff22;border-radius:50%;right:-180px;top:-310px;box-shadow:0 0 0 75px #ffffff09,0 0 0 150px #ffffff07;pointer-events:none}
+.eco-hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center;padding:104px 0 105px;position:relative;z-index:1}
+.eco-eyebrow{color:#b9ccfa;font-weight:820;letter-spacing:.14em;font-size:.75rem;text-transform:uppercase}
+.eco-hero h1{font-size:clamp(3.1rem,6vw,5.7rem);letter-spacing:-.075em;line-height:1.04;margin:20px 0 23px;font-weight:850}
+.eco-hero h1 em{font-style:normal;background:linear-gradient(95deg,#b6dfff,#ddcaff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eco-hero p{max-width:650px;color:#d9e4fa;font-size:1.15rem;line-height:1.8;margin:0 0 28px}
+.eco-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.eco-button{border-radius:14px;display:inline-flex;gap:10px;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;background:#f1f4fa;color:#1a2945!important;font-weight:800;font-size:.92rem;transition:transform .16s,box-shadow .16s;border:1px solid transparent}
+.eco-button:hover{transform:translateY(-2px);box-shadow:0 10px 26px #14284a20}
+.eco-button-primary{background:#fff;color:#1b2c4a!important}
+.eco-button-outline{background:#ffffff12;border-color:#ffffff60;color:#fff!important}
+.eco-stage{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;transform:rotate(-5deg);padding:26px}
+.eco-stage-tile{aspect-ratio:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;background:#ffffffef;color:#17274b;border:1px solid #ffffffa6;border-radius:31px;box-shadow:0 22px 60px #05133040;padding:22px}
+.eco-stage-tile:nth-child(2){transform:translateY(26px);background:#fff4df}
+.eco-stage-tile:nth-child(3){background:#e5f5e8}
+.eco-stage-tile:nth-child(4){transform:translateY(26px);background:#ebebff}
+.eco-stage-tile img{width:72px;height:72px;object-fit:contain}
+.eco-stage-tile .eco-symbol{font-size:3rem}
+.eco-stage-tile strong{font-size:1.06rem;font-weight:900}
+.eco-section{padding:82px 0}
+.eco-section-eyebrow{color:#566fba;text-transform:uppercase;letter-spacing:.16em;font-size:.74rem;font-weight:900}
+.eco-section h2{font-size:clamp(2rem,3.8vw,3.1rem);letter-spacing:-.055em;line-height:1.15;margin:12px 0}
+.eco-section-lead{color:var(--portfolio-muted);font-size:1.05rem;max-width:780px;margin:0 0 36px}
+.eco-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.eco-card{position:relative;overflow:hidden;min-height:392px;padding:36px 36px 29px;border-radius:32px;background:linear-gradient(130deg,var(--light),#fff 92%);border:1px solid var(--portfolio-border);box-shadow:0 12px 36px #2434540b;display:flex;flex-direction:column;isolation:isolate}
+.eco-card:before{content:"";position:absolute;z-index:-1;width:300px;height:300px;right:-115px;top:-105px;border-radius:50%;background:var(--glow)}
+.eco-card-top{display:flex;gap:16px;align-items:center}
+.eco-card-logo{width:80px;height:80px;display:grid;place-items:center;border-radius:23px;background:#ffffffd9;box-shadow:0 9px 26px #16243a16;flex:0 0 auto}
+.eco-card-logo img{width:65px;height:65px;object-fit:contain}
+.eco-symbol{font-size:2.9rem;line-height:1}
+.eco-card .eco-kind{font-size:.67rem;letter-spacing:.14em;font-weight:900;color:var(--accent);text-transform:uppercase}
+.eco-card h3{font-size:2.3rem;letter-spacing:-.055em;line-height:1.1;margin:4px 0 0}
+.eco-card p{font-size:1.08rem;color:#526077;line-height:1.65;margin:28px 0 20px;max-width:430px}
+.eco-tags{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:28px}
+.eco-tag{font-size:.77rem;font-weight:780;color:var(--accent);padding:6px 11px;background:#ffffffac;border:1px solid #ffffffd9;border-radius:999px}
+.eco-card-link{margin-top:auto;align-self:flex-start;display:inline-flex;gap:9px;align-items:center;color:var(--accent)!important;font-weight:900;padding:8px 0}
+.eco-card-link span{transition:transform .16s}
+.eco-card-link:hover span{transform:translateX(5px)}
+.eco-card-nowwhat,.eco-app-nowwhat{--accent:#5f62bb;--light:#e9edff;--glow:#cbd3ff}
+.eco-card-nowcook,.eco-app-nowcook{--accent:#bf752a;--light:#fff0d9;--glow:#ffe0ab}
+.eco-card-nowgreen,.eco-app-nowgreen{--accent:#3e815f;--light:#e7f4e9;--glow:#d1edd4}
+.eco-card-nowkids,.eco-app-nowkids{--accent:#5575b6;--light:#e7effd;--glow:#d8e8ff}
+.eco-note{border:1px solid #e1e8f1;border-radius:26px;padding:34px 38px;display:flex;justify-content:space-between;align-items:center;gap:28px;background:#fff;box-shadow:0 16px 42px #283e6810}
+.eco-note h2{margin:0 0 8px;font-size:1.7rem}
+.eco-note p{margin:0;color:#617089;max-width:700px}
+.eco-footer{border-top:1px solid #e2e7ef;background:#fff;padding:38px 0;color:#69748a;font-size:.89rem}
+.eco-footer-flex{display:flex;justify-content:space-between;gap:30px;align-items:flex-start;flex-wrap:wrap}
+.eco-footer-links{display:flex;flex-wrap:wrap;gap:12px 20px}
+.eco-footer-links a{font-weight:670}
+.eco-footer-links a:hover{text-decoration:underline}
+.eco-app-hero{background:linear-gradient(116deg,var(--light),#fff 85%);overflow:hidden}
+.eco-app-intro{padding:84px 0 80px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:54px;align-items:center}
+.eco-back{color:var(--accent)!important;font-weight:800;display:inline-block;margin-bottom:25px;font-size:.86rem}
+.eco-app-intro h1{font-size:clamp(3.3rem,5vw,5.8rem);margin:7px 0 16px;line-height:1.05;letter-spacing:-.075em}
+.eco-app-intro .eco-app-summary{color:#55617a;line-height:1.8;max-width:690px;font-size:1.16rem}
+.eco-app-visual{min-height:350px;position:relative;display:flex;align-items:center;justify-content:center;padding:20px}
+.eco-visual-orbit{border-radius:50%;background:linear-gradient(135deg,var(--glow),#ffffff95);width:min(100%,390px);aspect-ratio:1;display:grid;place-items:center;box-shadow:0 0 0 22px #ffffff81,0 0 0 46px #ffffff53}
+.eco-visual-orbit>img{width:min(70%,260px);max-height:240px;object-fit:contain;filter:drop-shadow(0 20px 25px #1c315239)}
+.eco-visual-orbit .eco-symbol{font-size:9rem}
+.eco-visual-float{position:absolute;bottom:10px;left:12px;max-width:260px;padding:16px 20px;background:#ffffffee;border-radius:16px;box-shadow:0 14px 40px #253c6817;color:var(--accent);font-weight:850;font-size:.9rem}
+.eco-detail{max-width:800px;color:#5d6b80;font-size:1.07rem}
+.eco-feature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-top:28px}
+.eco-feature{padding:24px 20px;min-height:163px;border:1px solid #e5eaf2;border-radius:21px;background:#fff;font-weight:760;color:#314260;box-shadow:0 6px 24px #263c6110}
+.eco-feature b{display:grid;place-items:center;background:var(--light);color:var(--accent);width:40px;height:40px;border-radius:12px;margin-bottom:16px}
+.eco-resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:26px}
+.eco-resource{background:white;border:1px solid #e2e8f1;padding:19px 21px;border-radius:18px;display:flex;align-items:center;gap:12px;transition:transform .14s,box-shadow .14s;font-weight:760}
+.eco-resource:hover{transform:translateY(-2px);box-shadow:0 10px 30px #243b5c13}
+.eco-resource-icon{font-size:1.45rem}
+.eco-resource-arrow{margin-left:auto;color:var(--accent)}
+.eco-related{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:24px}
+.eco-related a{padding:21px 23px;background:var(--light);border-radius:17px;font-weight:800}
+.eco-related a:hover{filter:brightness(.98)}
+.eco-gallery{margin-top:36px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.eco-gallery img{width:100%;height:180px;object-fit:cover;border-radius:20px;border:1px solid #e2e6ed}
+.eco-guide details{padding:19px 2px;border-bottom:1px solid #e2e9f0}
+.eco-guide summary{cursor:pointer;font-weight:800;font-size:1.1rem;color:#283952}
+.eco-guide p{max-width:800px;color:#56647a}
+@media(max-width:1000px){.eco-feature-grid{grid-template-columns:repeat(2,1fr)}.eco-stage{padding:0}.eco-app-intro{gap:22px}}
+@media(max-width:740px){
+ .eco-container{width:min(100% - 32px,1220px)}
+ .eco-top{min-height:74px;gap:12px}
+ .eco-brand span{font-size:1rem}
+ .eco-control{margin-left:auto;min-width:104px}
+ .eco-menu{display:block}
+ .eco-nav{display:none;position:absolute;top:74px;left:0;right:0;margin:0;padding:18px 24px 24px;background:#fff;box-shadow:0 16px 30px #26395918;flex-direction:column;align-items:flex-start;gap:16px}
+ .eco-nav.open{display:flex}
+ .eco-hero-grid{grid-template-columns:1fr;padding:67px 0 70px;gap:35px}
+ .eco-hero h1{font-size:clamp(3rem,12vw,4.7rem)}
+ .eco-stage{max-width:410px;margin:auto;gap:10px}
+ .eco-stage-tile{padding:13px;border-radius:22px}
+ .eco-stage-tile img{width:53px;height:53px}
+ .eco-section{padding:58px 0}
+ .eco-cards{grid-template-columns:1fr}
+ .eco-card{min-height:330px;padding:27px}
+ .eco-note{flex-direction:column;align-items:flex-start;padding:24px}
+ .eco-app-intro{grid-template-columns:1fr;padding:58px 0 55px}
+ .eco-app-visual{min-height:300px}
+ .eco-visual-orbit{width:280px}
+ .eco-feature-grid,.eco-resource-grid{grid-template-columns:1fr 1fr}
+ .eco-related{grid-template-columns:1fr}
+ .eco-gallery{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){.eco-brand img{width:42px;height:42px}.eco-control{min-width:89px;padding:8px 5px;font-size:.82rem}.eco-card-logo{width:68px;height:68px}.eco-card-logo img{width:57px;height:57px}.eco-card h3{font-size:2rem}.eco-feature-grid,.eco-resource-grid,.eco-gallery{grid-template-columns:1fr}.eco-app-visual{min-height:270px}.eco-visual-orbit{width:250px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.eco-button,.eco-card-link span,.eco-resource{transition:none}}

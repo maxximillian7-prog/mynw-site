@@ -3,41 +3,62 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>NowGreen — documentation</title>
-  <meta name="description" content="Official NowGreen manual, privacy, AI/data, terms, data rights, deletion and support documentation.">
-  <meta name="theme-color" content="#447558">
+  
+  <meta name="robots" content="index,follow">
+  <title>NowGreen — Plants &amp; Gardens | MyNow Apps</title>
+  <meta name="description" content="Plant care, garden planning and green spaces with Ivy.">
+  <meta name="theme-color" content="#172746">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NowGreen — Plants &amp; Gardens | MyNow Apps">
+  <meta property="og:description" content="Plant care, garden planning and green spaces with Ivy.">
+  <meta property="og:url" content="https://mynw.app/nowgreen/">
   <link rel="canonical" href="https://mynw.app/nowgreen/">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <link rel="stylesheet" href="/assets/nowgreen-site.css">
+  <link rel="icon" href="/assets/nowwhat-qr-icon.png">
+  <link rel="stylesheet" href="/assets/portfolio.css?v=20261014">
+  <script defer src="/assets/portfolio.js?v=20261014"></script>
 </head>
-<body class="ng-site" data-ng-page="home">
-<header class="site-header">
-  <div class="wrap header-row">
-    <a class="brand" href="/nowgreen/"><span class="brand-badge">NG</span><span>NowGreen</span></a>
-    <button class="menu" aria-label="Open menu">☰</button>
-    <nav>
-      <a href="/nowgreen/manual/" data-ng-nav="manual">Manual</a>
-      <a href="/nowgreen/privacy/" data-ng-nav="privacy">Privacy</a>
-      <a href="/nowgreen/ai-data/" data-ng-nav="ai">AI & data</a>
-      <a href="/nowgreen/support/" data-ng-nav="support">Support</a>
+<body class="ecosystem" data-portfolio="nowgreen">
+<header class="eco-header">
+  <div class="eco-container eco-top">
+    <a class="eco-brand" href="/" aria-label="MyNow Apps home">
+      <img src="/assets/nowwhat-qr-icon.png" alt="MyNow Apps logo" width="50" height="50">
+      <span>MyNow Apps<small>Everyday, made easier</small></span>
+    </a>
+    <button id="eco-menu" class="eco-menu" type="button" aria-label="Open navigation">☰</button>
+    <nav id="eco-nav" class="eco-nav" aria-label="Main navigation">
+      <a href="/" data-eco-link="navHome">Home</a>
+      <a href="/#apps" data-eco-link="navApps">Apps</a>
+      <a href="/#documentation" data-eco-link="navDocs">Documentation</a>
+      <a href="mailto:support@mynw.app" data-eco-link="navContact">Contact</a>
     </nav>
-    <select id="ngLang" class="lang-select" aria-label="Language"></select>
+    <label for="eco-language" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">Language</label>
+    <select id="eco-language" class="eco-control" aria-label="Website language">
+      <option value="en">English</option>
+      <option value="pt">Português</option>
+      <option value="ru">Русский</option>
+      <option value="uk">Українська</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+    </select>
   </div>
 </header>
-<main class="legal"><div class="wrap"><div id="ngContent"></div></div></main>
-<footer class="site-footer">
-  <div class="wrap footer-row">
-    <div id="ngFooter">© 2026 NowGreen / NowApps.</div>
-    <div class="footer-links">
-      <a href="/nowgreen/" data-ng-nav="home">Documentation</a>
-      <a href="/nowgreen/manual/" data-ng-nav="manual">Manual</a>
-      <a href="/nowgreen/privacy/" data-ng-nav="privacy">Privacy</a>
-      <a href="/nowgreen/terms/" data-ng-nav="terms">Terms</a>
-      <a href="/nowgreen/delete-account/" data-ng-nav="deletion">Delete account</a>
-      <a href="/nowgreen/support/" data-ng-nav="support">Support</a>
+<main id="portfolio">
+  <section class="eco-section">
+    <div class="eco-container">
+      <h1>NowGreen</h1>
+      <p>Plant care, garden planning and green spaces with Ivy.</p>
+      <div class="eco-actions">
+        <a class="eco-button" href="/nowwhat/">NowWhat</a>
+        <a class="eco-button" href="/nowcook/">NowCook</a>
+        <a class="eco-button" href="/nowgreen/">NowGreen</a>
+        <a class="eco-button" href="/nowkids/">NowKids</a>
+      </div>
+      <p><a href="/privacy/">NowWhat privacy</a> · <a href="/delete-account/">NowWhat account deletion</a> · <a href="/nowcook/privacy/">NowCook privacy</a> · <a href="/nowgreen/privacy/">NowGreen privacy</a> · <a href="/nowkids/privacy/">NowKids privacy</a> · <a href="mailto:support@mynw.app">Support</a></p>
     </div>
-  </div>
-</footer>
-<script src="/assets/nowgreen-site.js"></script>
+  </section>
+</main>
+<noscript><p style="text-align:center;padding:24px">JavaScript is required to switch website languages; all official documentation links above remain available.</p></noscript>
 </body>
 </html>

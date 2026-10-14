@@ -1,0 +1,542 @@
+{
+  "fr": {
+    "navHome": "Accueil",
+    "navApps": "Applications",
+    "navDocs": "Documentation",
+    "navContact": "Contact",
+    "brandSub": "Un quotidien simplifié",
+    "eyebrow": "UN ÉCOSYSTÈME · QUATRE APPLICATIONS",
+    "head1": "Plus de temps pour",
+    "head2": "l'essentiel.",
+    "lead": "Moins de routine, plus de vie. Quatre compagnons utiles pour s'organiser, cuisiner, cultiver et apprendre en famille.",
+    "explore": "Explorer les applications",
+    "contactUs": "Nous contacter",
+    "appsKicker": "LA COLLECTION MYNOW",
+    "appsTitle": "Des applications pensées pour la vraie vie.",
+    "appsLead": "Chacune a sa personnalité. Toutes privilégient la clarté et l'utilité au quotidien.",
+    "open": "Découvrir",
+    "docsKicker": "AIDE ET DOCUMENTATION",
+    "helpTitle": "Tout ce dont vous avez besoin.",
+    "helpText": "Guides officiels, confidentialité et assistance. Chaque application conserve ses documents et options de gestion des données.",
+    "footer": "MyNow Apps · Pour la vie quotidienne",
+    "allApps": "Toutes les applications",
+    "about": "À propos",
+    "features": "Fonctionnalités",
+    "resources": "Guides et confidentialité",
+    "resourcesLead": "Toutes les ressources officielles aux adresses existantes.",
+    "related": "Découvrir les autres applications",
+    "guide": "Guide d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "delete": "Suppression du compte",
+    "support": "Assistance et contact",
+    "play": "Disponible sur Google Play",
+    "ai": "IA et données",
+    "rights": "Droits sur les données",
+    "parents": "Parents et enfants",
+    "safety": "Sécurité des enfants",
+    "community": "Règles de la communauté",
+    "permissions": "Autorisations",
+    "faq": "Guide et questions fréquentes",
+    "share": "Partager",
+    "noPlay": "Découvrir l'application",
+    "home": "MyNow Apps",
+    "guideHeading": "Guide NowCook",
+    "guideIntro": "Conseils pratiques pour utiliser les recettes et organiser vos plats.",
+    "nowwhat": {
+      "tag": "PRODUCTIVITÉ INTELLIGENTE",
+      "summary": "Documents, finances, notes et projets de famille, bien organisés.",
+      "description": "NowWhat transforme les documents et les informations du quotidien en actions utiles. Gardez notes, finances, dates et rappels au même endroit.",
+      "chips": [
+        "IA documentaire",
+        "Finances",
+        "Calendrier",
+        "Famille"
+      ],
+      "features": [
+        "Comprendre documents et images avec l'IA",
+        "Classer notes, dossiers et fichiers importants",
+        "Suivre finances, tâches et rappels",
+        "Partager des éléments choisis dans Family Space"
+      ]
+    },
+    "nowcook": {
+      "tag": "CUISINEZ AVEC PLAISIR",
+      "summary": "Recettes, inspiration et cuisine facilitée.",
+      "description": "NowCook réunit les idées de recettes et la planification dans un espace accueillant. Ajoutez des recettes, gardez vos plats favoris et trouvez l'inspiration.",
+      "chips": [
+        "Recettes",
+        "Idées de plats",
+        "Import photo",
+        "Planification"
+      ],
+      "features": [
+        "Découvrir et adapter des recettes",
+        "Importer du texte ou des photos de recettes",
+        "Organiser ses plats favoris",
+        "Prévoir les repas du quotidien"
+      ]
+    },
+    "nowgreen": {
+      "tag": "CULTIVEZ EN DOUCEUR",
+      "summary": "Un lieu agréable pour plantes, jardins et espaces verts.",
+      "description": "NowGreen simplifie le soin des plantes : collections, calendrier d'entretien et idées de jardin avec Ivy.",
+      "chips": [
+        "Soin des plantes",
+        "Mes plantes",
+        "Jardin",
+        "Ivy"
+      ],
+      "features": [
+        "Organiser plantes et espaces verts",
+        "Suivre arrosages et entretien",
+        "Explorer des plans et visuels de jardin",
+        "Conserver les infos de chaque plante"
+      ]
+    },
+    "nowkids": {
+      "tag": "APPRENDRE ENSEMBLE",
+      "summary": "Études, devoirs, horaires et vie de famille.",
+      "description": "NowKids accompagne les devoirs, les activités et l'apprentissage familial, avec des contrôles parentaux et des dispositifs de sécurité.",
+      "chips": [
+        "NowStudy",
+        "Devoirs",
+        "Famille",
+        "Parents"
+      ],
+      "features": [
+        "Réviser avec des fiches et mini-tests",
+        "Organiser devoirs et activités",
+        "Garder les routines familiales à portée de main",
+        "Utiliser les contrôles parentaux"
+      ]
+    },
+    "manualSteps": [
+      [
+        "Premiers pas",
+        "Choisissez votre langue et explorez les sections recettes."
+      ],
+      [
+        "Créer une recette",
+        "Saisissez une idée ou importez du texte ou une photo. Vérifiez les ingrédients."
+      ],
+      [
+        "Garder ses favoris",
+        "Enregistrez et classez vos recettes."
+      ],
+      [
+        "IA et sécurité alimentaire",
+        "L'IA peut se tromper. Vérifiez les allergènes, l'hygiène et la cuisson."
+      ],
+      [
+        "Compte et assistance",
+        "Certaines fonctions d'IA nécessitent un compte et des crédits. Consultez les liens officiels."
+      ]
+    ]
+  },
+  "es": {
+    "navHome": "Inicio",
+    "navApps": "Aplicaciones",
+    "navDocs": "Documentación",
+    "navContact": "Contacto",
+    "brandSub": "Cada día, más sencillo",
+    "eyebrow": "UN ECOSISTEMA · CUATRO APLICACIONES",
+    "head1": "Más tiempo para",
+    "head2": "lo que importa.",
+    "lead": "Menos rutina, más vida. Cuatro compañeros para organizarte, cocinar, cuidar plantas y aprender en familia.",
+    "explore": "Explorar aplicaciones",
+    "contactUs": "Contactar",
+    "appsKicker": "LA COLECCIÓN MYNOW",
+    "appsTitle": "Aplicaciones pensadas para la vida real.",
+    "appsLead": "Cada una tiene su personalidad. Todas priorizan claridad, utilidad y comodidad.",
+    "open": "Descubrir",
+    "docsKicker": "AYUDA Y DOCUMENTACIÓN",
+    "helpTitle": "Todo lo que necesitas, en un lugar.",
+    "helpText": "Manuales, privacidad y asistencia oficiales. Cada aplicación conserva su documentación y controles de datos.",
+    "footer": "MyNow Apps · Para el día a día",
+    "allApps": "Todas las aplicaciones",
+    "about": "Acerca de la aplicación",
+    "features": "Qué puedes hacer",
+    "resources": "Guías y privacidad",
+    "resourcesLead": "Recursos oficiales con sus direcciones de siempre.",
+    "related": "Descubre las demás aplicaciones",
+    "guide": "Manual",
+    "privacy": "Política de privacidad",
+    "terms": "Condiciones de uso",
+    "delete": "Eliminar cuenta",
+    "support": "Asistencia y contacto",
+    "play": "Disponible en Google Play",
+    "ai": "IA y datos",
+    "rights": "Derechos sobre datos",
+    "parents": "Padres e hijos",
+    "safety": "Seguridad infantil",
+    "community": "Normas de la comunidad",
+    "permissions": "Permisos",
+    "faq": "Guía y preguntas frecuentes",
+    "share": "Compartir",
+    "noPlay": "Conocer la aplicación",
+    "home": "MyNow Apps",
+    "guideHeading": "Guía de NowCook",
+    "guideIntro": "Pasos para gestionar recetas, ideas y tu colección.",
+    "nowwhat": {
+      "tag": "PRODUCTIVIDAD INTELIGENTE",
+      "summary": "Documentos, finanzas, notas y planes familiares organizados.",
+      "description": "NowWhat convierte la información cotidiana en acciones útiles. Organiza documentos, notas, finanzas, fechas y recordatorios.",
+      "chips": [
+        "IA y documentos",
+        "Finanzas",
+        "Calendario",
+        "Familia"
+      ],
+      "features": [
+        "Comprende documentos e imágenes con IA",
+        "Organiza notas, carpetas y archivos",
+        "Controla finanzas, tareas y recordatorios",
+        "Comparte elementos en Family Space"
+      ]
+    },
+    "nowcook": {
+      "tag": "COCINA CON GANAS",
+      "summary": "Recetas, inspiración y una cocina más sencilla.",
+      "description": "NowCook combina ideas de recetas y planificación. Añade recetas, guarda platos favoritos y encuentra inspiración para cocinar.",
+      "chips": [
+        "Recetas",
+        "Ideas",
+        "Importar fotos",
+        "Planificación"
+      ],
+      "features": [
+        "Descubre y adapta recetas",
+        "Importa texto o fotos de recetas",
+        "Guarda y organiza tus platos favoritos",
+        "Planifica la cocina diaria"
+      ]
+    },
+    "nowgreen": {
+      "tag": "CRECE CON CUIDADO",
+      "summary": "Un espacio tranquilo para plantas y jardines.",
+      "description": "NowGreen facilita el cuidado de las plantas. Organiza tus plantas, programa tareas y explora diseños de jardines con Ivy.",
+      "chips": [
+        "Cuidado",
+        "Mis plantas",
+        "Jardines",
+        "Ivy"
+      ],
+      "features": [
+        "Organiza plantas y espacios",
+        "Programa riegos y cuidados",
+        "Explora planos y visualizaciones de jardines",
+        "Guarda datos de cada planta"
+      ]
+    },
+    "nowkids": {
+      "tag": "APRENDER JUNTOS",
+      "summary": "Estudio, deberes y rutinas para toda la familia.",
+      "description": "NowKids ayuda con los deberes, los horarios y el aprendizaje familiar, con controles parentales y herramientas de seguridad.",
+      "chips": [
+        "NowStudy",
+        "Deberes",
+        "Familia",
+        "Padres"
+      ],
+      "features": [
+        "Practica con fichas y pruebas breves",
+        "Organiza deberes y actividades",
+        "Planifica las rutinas familiares",
+        "Utiliza los controles parentales"
+      ]
+    },
+    "manualSteps": [
+      [
+        "Primeros pasos",
+        "Elige el idioma y explora las secciones de recetas."
+      ],
+      [
+        "Crear una receta",
+        "Introduce una idea o importa texto o foto. Comprueba los ingredientes."
+      ],
+      [
+        "Guardar favoritos",
+        "Organiza los platos y vuelve a tus recetas preferidas."
+      ],
+      [
+        "IA y seguridad alimentaria",
+        "La IA puede equivocarse. Verifica alérgenos, higiene y temperaturas de cocción."
+      ],
+      [
+        "Cuenta y ayuda",
+        "Algunas funciones de IA requieren cuenta y créditos. Consulta los enlaces oficiales."
+      ]
+    ]
+  },
+  "de": {
+    "navHome": "Startseite",
+    "navApps": "Apps",
+    "navDocs": "Dokumentation",
+    "navContact": "Kontakt",
+    "brandSub": "Alltag einfach gemacht",
+    "eyebrow": "EIN ÖKOSYSTEM · VIER APPS",
+    "head1": "Mehr Zeit für",
+    "head2": "das Wesentliche.",
+    "lead": "Weniger Routine, mehr Leben. Vier praktische Begleiter für Organisation, Kochen, Pflanzenpflege und gemeinsames Lernen.",
+    "explore": "Apps entdecken",
+    "contactUs": "Kontakt aufnehmen",
+    "appsKicker": "DIE MYNOW APPS",
+    "appsTitle": "Für den echten Alltag gemacht.",
+    "appsLead": "Jede App hat ihren eigenen Charakter. Alle sind klar, praktisch und angenehm zu bedienen.",
+    "open": "Mehr erfahren",
+    "docsKicker": "HILFE & DOKUMENTATION",
+    "helpTitle": "Alles Wichtige an einem Ort.",
+    "helpText": "Offizielle Anleitungen, Datenschutz und Support. Jede App behält ihre eigenen Dokumente und Datenoptionen.",
+    "footer": "MyNow Apps · Für deinen Alltag",
+    "allApps": "Alle Apps",
+    "about": "Über die App",
+    "features": "Was du machen kannst",
+    "resources": "Anleitungen & Datenschutz",
+    "resourcesLead": "Offizielle Ressourcen unter den bestehenden Adressen.",
+    "related": "Weitere Apps entdecken",
+    "guide": "Benutzerhandbuch",
+    "privacy": "Datenschutzerklärung",
+    "terms": "Nutzungsbedingungen",
+    "delete": "Konto löschen",
+    "support": "Support & Kontakt",
+    "play": "Bei Google Play erhältlich",
+    "ai": "KI & Daten",
+    "rights": "Datenrechte",
+    "parents": "Eltern & Kinder",
+    "safety": "Kindersicherheit",
+    "community": "Community-Regeln",
+    "permissions": "Berechtigungen",
+    "faq": "Anleitung & FAQ",
+    "share": "Teilen",
+    "noPlay": "App kennenlernen",
+    "home": "MyNow Apps",
+    "guideHeading": "NowCook-Handbuch",
+    "guideIntro": "Praktische Schritte für Rezepte, Ideen und deine Sammlung.",
+    "nowwhat": {
+      "tag": "SMARTE ORGANISATION",
+      "summary": "Dokumente, Finanzen, Notizen und Familienpläne im Blick.",
+      "description": "NowWhat macht aus Informationen im Alltag hilfreiche nächste Schritte. Organisiere Dokumente, Notizen, Finanzen und Erinnerungen.",
+      "chips": [
+        "Dokumenten-KI",
+        "Finanzen",
+        "Kalender",
+        "Familie"
+      ],
+      "features": [
+        "Dokumente und Bilder mit KI verstehen",
+        "Notizen, Ordner und Dateien verwalten",
+        "Finanzen, Aufgaben und Erinnerungen verfolgen",
+        "Ausgewählte Inhalte in Family Space teilen"
+      ]
+    },
+    "nowcook": {
+      "tag": "KOCHEN MIT FREUDE",
+      "summary": "Rezepte, Inspiration und entspannter Küchenalltag.",
+      "description": "NowCook verbindet Rezeptideen mit Küchenplanung. Füge Rezepte hinzu, verwalte Lieblingsgerichte und finde Inspiration für dein Essen.",
+      "chips": [
+        "Rezepte",
+        "Ideen",
+        "Fotoimport",
+        "Planung"
+      ],
+      "features": [
+        "Rezepte entdecken und anpassen",
+        "Rezepttexte oder Fotos importieren",
+        "Lieblingsgerichte sammeln und ordnen",
+        "Das tägliche Kochen planen"
+      ]
+    },
+    "nowgreen": {
+      "tag": "MIT LIEBE WACHSEN",
+      "summary": "Ein ruhiger Ort für Pflanzen, Gärten und grüne Räume.",
+      "description": "NowGreen erleichtert die Pflanzenpflege. Behalte deine Pflanzen im Blick, plane Aufgaben und erkunde Gartenideen mit Ivy.",
+      "chips": [
+        "Pflanzenpflege",
+        "Meine Pflanzen",
+        "Gärten",
+        "Ivy"
+      ],
+      "features": [
+        "Pflanzen und Bereiche organisieren",
+        "Gießen und Pflege planen",
+        "Gartenpläne und Visualisierungen ansehen",
+        "Wissen zu jeder Pflanze speichern"
+      ]
+    },
+    "nowkids": {
+      "tag": "GEMEINSAM LERNEN",
+      "summary": "Lernen, Hausaufgaben und Familienalltag organisieren.",
+      "description": "NowKids hilft bei Hausaufgaben, Aktivitäten und gemeinsamem Lernen – mit Elternkontrollen und Funktionen für Kindersicherheit.",
+      "chips": [
+        "NowStudy",
+        "Hausaufgaben",
+        "Familie",
+        "Eltern"
+      ],
+      "features": [
+        "Mit Lernkarten und Quizfragen üben",
+        "Hausaufgaben und Termine organisieren",
+        "Familienroutinen planen",
+        "Elternkontrollen und Schutzfunktionen nutzen"
+      ]
+    },
+    "manualSteps": [
+      [
+        "Erste Schritte",
+        "Wähle die Sprache und erkunde die Rezeptbereiche."
+      ],
+      [
+        "Rezept erstellen",
+        "Gib eine Idee ein oder importiere Text bzw. ein Foto. Prüfe die Zutaten."
+      ],
+      [
+        "Favoriten verwalten",
+        "Speichere Gerichte und sortiere deine Rezepte."
+      ],
+      [
+        "KI und Lebensmittelsicherheit",
+        "KI kann Fehler machen. Achte auf Allergene, Hygiene und Gartemperaturen."
+      ],
+      [
+        "Konto und Hilfe",
+        "Einige KI-Funktionen benötigen ein Konto und Guthaben. Offizielle Links findest du unten."
+      ]
+    ]
+  },
+  "it": {
+    "navHome": "Home",
+    "navApps": "App",
+    "navDocs": "Documentazione",
+    "navContact": "Contatti",
+    "brandSub": "Ogni giorno più semplice",
+    "eyebrow": "UN ECOSISTEMA · QUATTRO APP",
+    "head1": "Più tempo per",
+    "head2": "ciò che conta.",
+    "lead": "Meno routine, più vita. Quattro compagni pratici per organizzarti, cucinare, curare le piante e imparare in famiglia.",
+    "explore": "Esplora le app",
+    "contactUs": "Contattaci",
+    "appsKicker": "LE APP MYNOW",
+    "appsTitle": "Pensate per la vita di tutti i giorni.",
+    "appsLead": "Ogni app ha il proprio carattere. Tutte sono chiare, utili e piacevoli da usare.",
+    "open": "Scopri",
+    "docsKicker": "AIUTO E DOCUMENTAZIONE",
+    "helpTitle": "Tutto ciò che serve, in un unico posto.",
+    "helpText": "Guide ufficiali, privacy e assistenza. Ogni app conserva la propria documentazione e le opzioni per i dati.",
+    "footer": "MyNow Apps · Per ogni giorno",
+    "allApps": "Tutte le app",
+    "about": "Informazioni sull'app",
+    "features": "Cosa puoi fare",
+    "resources": "Guide, privacy e supporto",
+    "resourcesLead": "Risorse ufficiali agli indirizzi esistenti.",
+    "related": "Scopri le altre app",
+    "guide": "Manuale",
+    "privacy": "Informativa sulla privacy",
+    "terms": "Termini di utilizzo",
+    "delete": "Elimina account",
+    "support": "Assistenza e contatti",
+    "play": "Disponibile su Google Play",
+    "ai": "IA e dati",
+    "rights": "Diritti sui dati",
+    "parents": "Genitori e bambini",
+    "safety": "Sicurezza dei bambini",
+    "community": "Regole della community",
+    "permissions": "Autorizzazioni",
+    "faq": "Manuale e domande frequenti",
+    "share": "Condividi",
+    "noPlay": "Scopri l'app",
+    "home": "MyNow Apps",
+    "guideHeading": "Guida a NowCook",
+    "guideIntro": "Consigli pratici per ricette, idee e raccolte personali.",
+    "nowwhat": {
+      "tag": "PRODUTTIVITÀ INTELLIGENTE",
+      "summary": "Documenti, finanze, appunti e progetti di famiglia in ordine.",
+      "description": "NowWhat trasforma documenti e informazioni quotidiane in azioni utili. Organizza note, finanze, scadenze e promemoria.",
+      "chips": [
+        "IA documenti",
+        "Finanze",
+        "Calendario",
+        "Famiglia"
+      ],
+      "features": [
+        "Analizza documenti e immagini con l'IA",
+        "Organizza note, cartelle e file importanti",
+        "Gestisci finanze, attività e promemoria",
+        "Condividi elementi selezionati in Family Space"
+      ]
+    },
+    "nowcook": {
+      "tag": "CUCINA CON GUSTO",
+      "summary": "Ricette, idee e organizzazione in cucina.",
+      "description": "NowCook unisce ispirazione e praticità in cucina. Aggiungi ricette, salva i piatti preferiti e trova nuove idee per i pasti.",
+      "chips": [
+        "Ricette",
+        "Idee",
+        "Import foto",
+        "Pianificazione"
+      ],
+      "features": [
+        "Scopri e adatta nuove ricette",
+        "Importa testo o foto delle ricette",
+        "Salva e organizza i piatti preferiti",
+        "Pianifica la cucina di ogni giorno"
+      ]
+    },
+    "nowgreen": {
+      "tag": "COLTIVA CON CURA",
+      "summary": "Uno spazio sereno per piante, giardini e idee verdi.",
+      "description": "NowGreen rende più semplice curare le piante. Organizza i tuoi spazi, pianifica le attività e scopri nuove idee per il giardino con Ivy.",
+      "chips": [
+        "Cura delle piante",
+        "Le mie piante",
+        "Giardini",
+        "Ivy"
+      ],
+      "features": [
+        "Organizza piante e spazi verdi",
+        "Pianifica irrigazione e cura",
+        "Esplora progetti e visualizzazioni",
+        "Conserva informazioni su ogni pianta"
+      ]
+    },
+    "nowkids": {
+      "tag": "IMPARARE INSIEME",
+      "summary": "Studio, compiti e routine per tutta la famiglia.",
+      "description": "NowKids aiuta a gestire compiti, attività e studio, con controlli parentali e strumenti per la sicurezza dei bambini.",
+      "chips": [
+        "NowStudy",
+        "Compiti",
+        "Famiglia",
+        "Genitori"
+      ],
+      "features": [
+        "Studia con schede e piccoli quiz",
+        "Organizza compiti e attività",
+        "Gestisci le routine familiari",
+        "Usa controlli parentali e protezioni"
+      ]
+    },
+    "manualSteps": [
+      [
+        "Primi passi",
+        "Scegli la lingua ed esplora le sezioni dedicate alle ricette."
+      ],
+      [
+        "Creare una ricetta",
+        "Inserisci un'idea o importa testo o foto. Controlla gli ingredienti."
+      ],
+      [
+        "Organizzare i preferiti",
+        "Salva e suddividi i piatti in categorie."
+      ],
+      [
+        "IA e sicurezza alimentare",
+        "L'IA può sbagliare. Controlla allergeni, igiene e temperature di cottura."
+      ],
+      [
+        "Account e assistenza",
+        "Alcune funzioni IA richiedono un account e crediti. Usa i link ufficiali qui sotto."
+      ]
+    ]
+  }
+}
