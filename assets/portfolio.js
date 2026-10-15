@@ -59,7 +59,7 @@
       '<section class="eco-section" id="download"><div class="eco-container"><div class="eco-note">'+
       '<div><div class="eco-section-eyebrow">NowWhat · Android</div><h2>'+E(t.play)+'</h2><p>'+E(t.nowwhat.summary)+'</p></div>'+
       '<div class="eco-actions"><a class="eco-button" href="https://play.google.com/store/apps/details?id=com.nowwhatapp.app" target="_blank" rel="noopener noreferrer">'+E(t.play)+' ↗</a>'+
-      '<a href="https://play.google.com/store/apps/details?id=com.nowwhatapp.app" target="_blank" rel="noopener noreferrer" aria-label="NowWhat Google Play QR"><img src="/assets/nowwhat-google-play-qr.svg" alt="QR for NowWhat on Google Play" width="105" height="105" loading="lazy"></a></div>'+
+      '<a href="https://play.google.com/store/apps/details?id=com.nowwhatapp.app" target="_blank" rel="noopener noreferrer" aria-label="NowWhat Google Play QR"><img class="eco-play-qr" src="/assets/nowwhat-google-play-qr.svg?v=20261015-1" alt="Scan to install NowWhat from Google Play, with NW logo in the centre" width="150" height="150" loading="lazy" decoding="async"></a></div>'+
       '</div></div></section><div id="privacy"></div>'+footer(t,'home');
     document.title='MyNow Apps — NowWhat, NowCook, NowGreen & NowKids';
     setMeta(t.lead);
