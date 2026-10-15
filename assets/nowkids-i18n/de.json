@@ -10,7 +10,7 @@
     "rights": "Datenrechte",
     "deletion": "Konto löschen",
     "support": "Support",
-    "updated": "Zuletzt aktualisiert: 2. Oktober 2026",
+    "updated": "Zuletzt aktualisiert: 15. Oktober 2026",
     "back": "Alle NowKids-Dokumente",
     "footer": "© 2026 NowKids / NowApps.",
     "developer": "Entwickler und Verantwortlicher",
@@ -48,10 +48,10 @@
             "Eltern-/Sorgeberechtigtenkonto: Konto-ID, E-Mail, Anzeigename, Login-Anbieter, Sprache, Zeitzone und Einstellungen.",
             "Familie/Kind: Name, Familienrolle, Beziehungsbezeichnung, Geburtsdatum/Alter, Avatar, Schule, Klasse und Lernsprache.",
             "Schul- und Familiendaten: Fächer, Stundenplan, Hausaufgaben, Testvorbereitung, Lernpläne, Aktivitäten, Bücher, Termine, Erinnerungen, Packlisten, Aufgaben und Notizen.",
-            "Vom Nutzer bereitgestellte Dokumente, Fotos, Digitalisierungen, Texte, Sprache/Audio, Transkripte und Dateien.",
+            "Vom Nutzer bereitgestellte Dokumente, Fotos, Scans, Texte und andere funktionsbezogene Dateien. Die Android-Version 12 bietet keine Spracheingabe.",
             "KI-Kontext: Anfrage, Fach/Thema, jüngerer Lernverlauf und nur die Profildaten, die zur Anpassung der Schwierigkeit nötig sind: berechnetes Alter, Klasse/Jahrgang, Lernsprache und Altersmodus. Name des Kindes und Schulname werden von NowStudy nicht an OpenAI gesendet. Bilder werden nur bei ausdrücklich gewählter Bildfunktion einbezogen.",
             "Betriebsdaten: Nutzungszähler, KI-Modell-/Token-Nutzung, Fehler-/Sicherheitsprotokolle und technische Daten.",
-            "Optionale Berechtigungen: Benachrichtigungen, Kalender, Kamera/Fotos, Mikrofon, lokale Authentifizierung und lokale Einstellungen.",
+            "Optionale Berechtigungen betreffen Kamera/Fotos, Kalender, Benachrichtigungen und lokale Authentifizierung. Version 12 verwendet keine Sprachaufzeichnung.",
             "Abonnement- und Kaufdaten: Produktkennungen, Kauf-/Verlängerungsstatus, Zugriffsrecht-Status, Transaktions-/Belegmetadaten und eine Benutzerkennung der Anwendung zur Zugriffsprüfung. NowKids erhält keine vollständigen Zahlungskartendaten von Google Play oder RevenueCat."
           ]
         },
@@ -75,7 +75,7 @@
         {
           "h": "5. KI-Verarbeitung",
           "p": [
-            "NowStudy nutzt derzeit OpenAI serverseitig über eine geschützte Supabase Edge Function. Relevanter Text, Bilder und Lernkontext können zur Antwortgenerierung an OpenAI gesendet werden. KI kann Fehler machen."
+            "NowStudy nutzt serverseitige KI. OpenAI ist der reguläre Anbieter. Ein eingeschränkter Test für Betreiber/Testende kann GPT-OSS 120B für Lernhilfen und Mistral Small 24B für Sicherheitsprüfungen über den IONOS AI Model Hub in Deutschland nutzen. Das ist kein allgemeiner Rollout. Andere KI-Funktionen können OpenAI weiter verwenden. KI kann Fehler machen."
           ]
         },
         {
@@ -83,6 +83,7 @@
           "items": [
             "Supabase — Authentifizierung, Datenbank, Speicher, Echtzeitsynchronisierung und Serverfunktionen.",
             "OpenAI — KI-Verarbeitung für NowStudy und zugehörige Funktionen.",
+            "IONOS AI Model Hub — begrenzter interner Test von GPT-OSS 120B für Lernhilfen und Mistral Small 24B für Moderation; keine öffentliche Anbieterauswahl.",
             "Google — Google-Anmeldung, wenn ausgewählt, Android-/Google-Play-Vertrieb, Abrechnung kostenpflichtiger Funktionen über Google Play und vom Nutzer ausgewählte Plattformdienste.",
             "RevenueCat — Prüfung von Abonnements und Käufen, Benutzerkennung der Anwendung, Kaufinformationen und Zugriffsstatus zum Freischalten kostenpflichtiger Funktionen.",
             "Firebase Cloud Messaging — Zustellung funktionaler Android-Benachrichtigungen über eine technische Installationskennung.",
@@ -148,6 +149,12 @@
           "h": "16. Buchkatalog-Abfragen",
           "p": [
             "Bei einer Buchsuche kann NowKids Titel, Autor, ISBN und gewünschte Katalogsprache über eine geschützte Serverfunktion an Open Library und, falls konfiguriert, Google Books senden. Anbieteranfragen enthalten weder NowKids-Konto-ID noch E-Mail-Adresse, Familien-ID, Daten des Kinderprofils oder Authentifizierungstoken. Der rohe Suchtext wird nicht im gemeinsamen Katalogcache gespeichert; öffentliche Katalogantworten können mit einem gehashten Anfrageschlüssel und Ablaufzeit zwischengespeichert werden. Bei der kontextbezogenen intelligenten Suche kann die ursprüngliche Suchphrase zusätzlich nur dann an OpenAI gesendet werden, wenn Zero Data Retention (ZDR) ausdrücklich aktiviert wurde, und ausschließlich zur Erkennung von Titel/Autor/Thema/Sprache; Kennungen des NowKids-Kontos, der Familie oder des Kindes werden nicht mitgesendet. Ist ZDR nicht bestätigt, überspringt NowKids den OpenAI-Parser und verwendet die normale Katalogsuche."
+          ]
+        },
+        {
+          "h": "17. KI-Anbieter, Schutzmaßnahmen und Datenverarbeitung",
+          "p": [
+            "NoKi ist der digitale Lernassistent, kein menschlicher Betreuer. Ein Datenschutzfilter prüft manuelle Texte vor externen KI-Aufrufen; identifizierende Daten können gesperrt und Bilder bei fehlendem Schutz abgelehnt werden. Bereinigte Anfragen und Ergebnisse können im Lernverlauf gespeichert werden, während das technische ai_usage-Protokoll keine Rohtexte enthält. Externe Anbieter verarbeiten Betriebsdaten nach ihren Bedingungen; eine Nullspeicherung darf ohne Bestätigung nicht vorausgesetzt werden. Für Auskunft und Löschung gelten die bisherigen Datenschutzseiten."
           ]
         }
       ]
@@ -230,6 +237,12 @@
           "p": [
             "support@mynw.app."
           ]
+        },
+        {
+          "h": "13. KI-Anbieter und automatische Schutzmaßnahmen",
+          "p": [
+            "NowStudy nutzt externe KI-Anbieter unter serverseitiger Kontrolle. OpenAI ist der reguläre Weg; IONOS-Modelle können begrenzt getestet werden. Automatische Sicherheitsprüfungen können Anfragen fälschlich sperren oder fehlerhafte Entscheidungen treffen. Eltern können den Support kontaktieren und Datenschutzrechte ausüben."
+          ]
         }
       ]
     },
@@ -248,13 +261,13 @@
           "items": [
             "Name, Geburtsdatum/Alter, Avatar, Schule, Klasse, Lernsprache.",
             "Stundenplan, Hausaufgaben, Tests, Fortschritt, Aktivitäten, Bücher, Aufgaben und Erinnerungen.",
-            "Dokumente, Fotos, Digitalisierungen, Sprache und KI-Inhalte bei Nutzung."
+            "Dokumente, Fotos, Scans und KI-Lerngespräche, wenn diese Funktionen verwendet werden; keine Spracheingabe in Version 12."
           ]
         },
         {
           "h": "3. KI-Kontext",
           "p": [
-            "Zur Anpassung von Erklärungen kann NowStudy berechnetes Alter, Klasse/Jahrgang, Lernsprache, Altersmodus, Fach/Thema, jüngeren Lernverlauf sowie vom Nutzer bereitgestellten Text oder Bilder senden. Name des Kindes und Schulname werden von NowStudy nicht an OpenAI gesendet. Unnötige sensible Angaben sollten in Anfragen oder Bildern vermieden werden."
+            "NowStudy verwendet Fach, allgemeine Klassenstufe und aktuellen Lernkontext nach Datenschutzprüfung. Bitte keine identifizierenden Kinderdaten eingeben. Eingeschränkte IONOS-Tests sind nur für Testende möglich, regulär wird OpenAI genutzt."
           ]
         },
         {
@@ -266,7 +279,7 @@
         {
           "h": "5. Berechtigungen",
           "p": [
-            "Kamera/Fotos, Mikrofon, Benachrichtigungen, Kalender und lokale Authentifizierung nur für jeweilige Funktion."
+            "Kamera/Fotos, Benachrichtigungen, Kalender und lokale Authentifizierung sind für die jeweiligen Funktionen optional. Version 12 bietet keine Spracheingabe."
           ]
         },
         {
@@ -304,6 +317,12 @@
           "p": [
             "Eltern können Benachrichtigungskategorien einzeln steuern. Unter Android kann NowKids Firebase Cloud Messaging für funktionale serverseitig zugestellte Benachrichtigungen im Hintergrund oder bei geschlossener App verwenden."
           ]
+        },
+        {
+          "h": "12. KI-Aufsicht und eingeschränkte Testanbieter",
+          "p": [
+            "Regulärer Anbieter ist OpenAI; IONOS/GPT-OSS und Mistral werden nur in begrenzten Servertests eingesetzt und nicht allgemein Kindern angeboten. Eltern sollten Lernanfragen prüfen und fehlerhafte Sperren oder unsichere Antworten melden. Version 12 bietet keine Spracheingabe."
+          ]
         }
       ]
     },
@@ -324,7 +343,7 @@
         {
           "h": "2. KI-Daten",
           "p": [
-            "Eine KI-Anfrage kann berechnetes Alter, Klasse/Jahrgang, Lernsprache, Altersmodus, Fach/Thema, jüngeren Lernverlauf, die aktuelle Anfrage und ein zur Analyse bereitgestelltes Bild enthalten. NowStudy sendet weder den Namen des Kindes noch den Schulnamen an OpenAI. Die Anfrage läuft über die Serverfunktion; der Schlüssel des KI-Anbieters wird in der App nicht offengelegt."
+            "Letzte Frage, Thema, allgemeine Klassenstufe und kürzlicher Lernkontext können nach Datenschutzprüfung über den geschützten Server gesendet werden. Name und Schule des Kindes sollen nicht in NowStudy-KI-Anfragen enthalten sein. Bilder können ohne bestätigte Schutzmaßnahmen gesperrt werden. API-Schlüssel bleiben auf dem Server."
           ]
         },
         {
@@ -365,6 +384,12 @@
           "h": "8. Wiederverwenden statt neu generieren",
           "p": [
             "NowStudy verwendet nach Möglichkeit eine gespeicherte Extraktion aus der Digitalisierung, statt dasselbe Bild bei jeder Folgefrage erneut zu senden. Lernpläne, Karteikarten und Mini-Tests werden gespeichert und wieder geöffnet; eine ausdrückliche neue Version kann einen neuen KI-Aufruf auslösen."
+          ]
+        },
+        {
+          "h": "9. NoKi und die Rollen der KI-Modelle",
+          "p": [
+            "NoKi erklärt Inhalte, begleitet Aufgaben und prüft das Verständnis. OpenAI ist der reguläre KI-Weg. Nur in begrenzten Tests hostet IONOS GPT-OSS 120B für Nachhilfe und Mistral Small 24B für Eingabe- und Ausgabemoderation. Das sind Modellrollen, keine Personen oder Kontakte für Kinder. Die Moderation kann harmlose Lernantworten fälschlich sperren; keine echten Namen, Adressen, Passwörter oder persönliche Dokumente eingeben."
           ]
         }
       ]
@@ -623,6 +648,12 @@
           "h": "Sicherheit & Löschung",
           "p": [
             "KI-Antworten und Inhalte können gemeldet werden. Erwachsene verwalten Kinderzugriff und Löschung. support@mynw.app."
+          ]
+        },
+        {
+          "h": "KI-Tutoren und Datenschutzmeldungen",
+          "p": [
+            "NoKi ist der Lernassistent. Regulär wird OpenAI verwendet; ausgewählte Testende können IONOS mit GPT-OSS und Mistral nutzen. Keine echten persönlichen Daten eingeben. Version 12 kann eine allgemeine Fehlermeldung zeigen; das geplante Android-Update wird verständliche Hinweise in acht Sprachen zeigen."
           ]
         }
       ]
