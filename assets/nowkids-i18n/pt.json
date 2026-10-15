@@ -10,7 +10,7 @@
     "rights": "Direitos sobre dados",
     "deletion": "Eliminar conta",
     "support": "Suporte",
-    "updated": "Última atualização: 2 de outubro de 2026",
+    "updated": "Atualizado em: 15 de outubro de 2026",
     "back": "Todos os documentos NowKids",
     "footer": "© 2026 NowKids / NowApps.",
     "developer": "Programador e responsável pelo tratamento",
@@ -48,10 +48,10 @@
             "Dados da conta do pai/responsável: ID da conta, e-mail, nome apresentado, fornecedor de início de sessão, idioma, fuso horário e definições.",
             "Dados da família e da criança: nome, função familiar, identificação da relação, data de nascimento ou idade, avatar, escola, turma/ano e idioma de estudo.",
             "Dados escolares e familiares: disciplinas, horário, trabalhos de casa, preparação para testes, planos de estudo, atividades, livros, eventos, lembretes, listas, tarefas e notas familiares.",
-            "Conteúdo fornecido pelo utilizador: documentos, fotografias, digitalizações, texto, voz/áudio, transcrições e outros ficheiros.",
+            "Documentos, fotografias, digitalizações, texto e ficheiros escolhidos pelo utilizador. A versão Android 12 não dispõe de entrada de voz.",
             "Contexto de IA: o pedido, disciplina/tópico, histórico recente de tutoria e apenas os dados de perfil necessários para adaptar a dificuldade: idade derivada, turma/ano, idioma de estudo e modo etário. O nome da criança e o nome da escola não são enviados à OpenAI pelo NowStudy. Imagens só são incluídas quando o utilizador escolhe uma função de IA com imagem.",
             "Dados operacionais: contadores de utilização, uso de modelos/tokens de IA, registos de erro/segurança e informação técnica necessária ao serviço.",
-            "Permissões e dados locais: notificações, calendário, câmara/fotos, microfone, autenticação local e definições quando a função correspondente é usada.",
+            "As permissões opcionais incluem câmara/fotografias, calendário, notificações e autenticação local. A versão 12 não usa gravação de voz.",
             "Dados de subscrição e compra: identificadores de produto, estado da compra/renovação, estado de direito de acesso/acesso, metadados de transação/recibo e um identificador do utilizador da aplicação usado para validar o acesso. O NowKids não recebe os dados completos do cartão de pagamento do Google Play ou da RevenueCat."
           ]
         },
@@ -75,7 +75,7 @@
         {
           "h": "5. Tratamento por IA",
           "p": [
-            "O NowStudy utiliza atualmente serviços OpenAI no servidor através de uma Supabase Edge Function protegida. Texto, imagens e contexto de aprendizagem relevantes podem ser enviados à OpenAI para gerar uma resposta. A IA pode errar e não constitui uma decisão médica, jurídica ou de segurança garantida."
+            "O NowStudy utiliza IA através do servidor. A OpenAI é o fornecedor habitual. Um piloto limitado ao responsável/testadores pode usar GPT-OSS 120B para apoio ao estudo e Mistral Small 24B para segurança através do IONOS AI Model Hub na Alemanha. Não é um lançamento geral. Outras funções de IA podem continuar na OpenAI. A IA pode errar."
           ]
         },
         {
@@ -83,6 +83,7 @@
           "items": [
             "Supabase — autenticação, base de dados, armazenamento, sincronização em tempo real e funções de servidor.",
             "OpenAI — processamento por IA para NowStudy e funções relacionadas.",
+            "IONOS AI Model Hub — testes internos limitados de GPT-OSS 120B para estudo e Mistral Small 24B para moderação; sem escolha pública de fornecedor.",
             "Google — início de sessão com Google quando escolhido, distribuição Android/Google Play, faturação de funcionalidades pagas através do Google Play e serviços da plataforma selecionados pelo utilizador.",
             "RevenueCat — validação de subscrições e compras, identificador do utilizador da aplicação, informações da compra e estado de acesso para desbloquear funcionalidades pagas.",
             "Firebase Cloud Messaging — entrega de notificações funcionais Android através de um identificador técnico de instalação necessário à entrega.",
@@ -148,6 +149,12 @@
           "h": "16. Pesquisas no catálogo de livros",
           "p": [
             "Quando o utilizador inicia uma pesquisa de livro, o NowKids pode enviar título, autor, ISBN e idioma solicitado ao Open Library e, quando configurado, ao Google Books através de uma função protegida no servidor. Os pedidos aos fornecedores não incluem o ID da conta NowKids, e-mail, ID da família, dados do perfil da criança nem token de autenticação. O texto bruto da pesquisa não é guardado no cache partilhado; respostas públicas do catálogo podem ser guardadas com uma chave de pedido em hash e prazo de validade para reduzir pedidos repetidos. Na pesquisa inteligente contextual, a frase de pesquisa também pode ser enviada à OpenAI apenas quando a Retenção Zero de Dados (ZDR) tiver sido explicitamente ativada, exclusivamente para identificar título/autor/tema/idioma; não são incluídos identificadores da conta NowKids, da família ou da criança. Se a ZDR não estiver confirmada, o NowKids ignora o analisador OpenAI e utiliza a pesquisa normal no catálogo."
+          ]
+        },
+        {
+          "h": "17. Fornecedores de IA, proteção e tratamento de dados",
+          "p": [
+            "NoKi é um assistente educativo, não uma pessoa. Um filtro de privacidade verifica o texto introduzido antes das chamadas a IA externa; dados identificáveis podem ser bloqueados e imagens recusadas sem salvaguardas adequadas. Pedidos tratados e respostas podem ficar no histórico de estudo, mas o registo técnico ai_usage não guarda os pedidos originais. Os fornecedores externos tratam dados operacionais nos termos aplicáveis; não se deve presumir retenção zero sem confirmação. Os pedidos de acesso e eliminação usam as páginas existentes de direitos e eliminação de conta."
           ]
         }
       ]
@@ -230,6 +237,12 @@
           "p": [
             "support@mynw.app."
           ]
+        },
+        {
+          "h": "13. Fornecedores de IA e salvaguardas",
+          "p": [
+            "O NowStudy utiliza fornecedores externos sob controlo do servidor. A OpenAI é a via habitual; modelos IONOS podem ser usados em testes limitados. A moderação automática pode bloquear pedidos indevidamente ou produzir decisões incorretas. Os responsáveis podem contactar o apoio e exercer direitos de proteção de dados."
+          ]
         }
       ]
     },
@@ -248,13 +261,13 @@
           "items": [
             "Nome, data de nascimento/idade, avatar, escola, turma/ano e idioma de estudo.",
             "Horário, trabalhos de casa, testes, progresso, atividades, livros, tarefas, lembretes e notas familiares.",
-            "Documentos, fotos, digitalizações, voz e conteúdo de conversas de IA quando essas funções são usadas."
+            "Documentos, fotografias, digitalizações e conversas educativas quando utilizados; sem entrada de voz na versão 12."
           ]
         },
         {
           "h": "3. Contexto enviado à IA",
           "p": [
-            "Para adaptar as explicações, o NowStudy pode enviar idade derivada, turma/ano, idioma de estudo, modo etário, disciplina/tópico, histórico recente de tutoria e texto ou imagem fornecidos pelo utilizador. O nome da criança e o nome da escola não são enviados à OpenAI pelo NowStudy. Evite introduzir informação sensível desnecessária nos pedidos ou imagens."
+            "O NowStudy utiliza a matéria, o ano escolar genérico e contexto educativo recente após verificações de privacidade. Não inclua dados identificáveis da criança. Um piloto IONOS pode ser usado por testadores; a via habitual utiliza OpenAI."
           ]
         },
         {
@@ -266,7 +279,7 @@
         {
           "h": "5. Permissões",
           "p": [
-            "Câmara/fotos, microfone, notificações, calendário e autenticação local são usados apenas para a função correspondente. O adulto deve rever as permissões do dispositivo."
+            "Câmara/fotografias, notificações, calendário e autenticação local são opcionais para as funções respetivas. Não há entrada de voz na versão 12."
           ]
         },
         {
@@ -304,6 +317,12 @@
           "p": [
             "Os pais podem controlar categorias de notificações. No Android, o NowKids pode usar Firebase Cloud Messaging para notificações funcionais quando a app está em segundo plano ou fechada, respeitando as definições do dispositivo."
           ]
+        },
+        {
+          "h": "12. Acompanhamento da IA e fornecedores em teste",
+          "p": [
+            "O fornecedor habitual é a OpenAI; IONOS/GPT-OSS e Mistral são testes restritos no servidor e não uma funcionalidade geral para crianças. Os pais devem acompanhar os pedidos e reportar bloqueios indevidos ou respostas inseguras. A versão 12 não tem entrada de voz."
+          ]
         }
       ]
     },
@@ -324,7 +343,7 @@
         {
           "h": "2. Dados enviados",
           "p": [
-            "Um pedido de IA pode incluir idade derivada, turma/ano, idioma de estudo, modo etário, disciplina/tópico, histórico recente de tutoria, o pedido atual e uma imagem fornecida para análise. O NowStudy não envia o nome da criança nem o nome da escola à OpenAI. O pedido passa pela função de servidor; a chave do fornecedor de IA não é exposta na aplicação."
+            "O último pedido, matéria, ano escolar genérico e contexto recente podem ser enviados pelo servidor protegido após análise de privacidade. O nome e a escola da criança não devem seguir nos pedidos de IA do NowStudy. As imagens podem ser bloqueadas sem proteção confirmada. As chaves API permanecem no servidor."
           ]
         },
         {
@@ -365,6 +384,12 @@
           "h": "8. Reutilizar em vez de gerar novamente",
           "p": [
             "Sempre que possível, o NowStudy reutiliza uma extração guardada do digitalização em vez de enviar a mesma imagem em cada pergunta seguinte. Planos de preparação, cartões de estudo e mini-testes são guardados e podem ser reabertos; pedir explicitamente uma nova versão pode iniciar uma nova chamada IA. O cache técnico é limitado à família/criança relevante."
+          ]
+        },
+        {
+          "h": "9. NoKi e as funções dos modelos de IA",
+          "p": [
+            "NoKi explica, orienta e verifica a aprendizagem. A via habitual de IA é a OpenAI. Apenas em testes restritos, a IONOS aloja GPT-OSS 120B para estudo e Mistral Small 24B para classificar a segurança das entradas e saídas. São funções de modelos, não pessoas nem contactos diretos com crianças. A moderação pode bloquear respostas inocentes por engano; evite nomes, moradas, palavras-passe e documentos pessoais reais."
           ]
         }
       ]
@@ -623,6 +648,12 @@
           "h": "Segurança e eliminação",
           "p": [
             "Respostas IA e conteúdo do utilizador podem ser denunciados. Adultos gerem acesso infantil e eliminação. Pedidos de privacidade: support@mynw.app."
+          ]
+        },
+        {
+          "h": "Tutores de IA e avisos de privacidade",
+          "p": [
+            "NoKi é o tutor da aplicação. A via habitual usa OpenAI; alguns testadores podem usar GPT-OSS e Mistral na IONOS. Não introduza dados pessoais reais. Na versão 12, o bloqueio pode surgir como erro genérico; a atualização Android planeada apresentará avisos claros nos oito idiomas."
           ]
         }
       ]

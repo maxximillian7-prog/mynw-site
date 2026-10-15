@@ -68,7 +68,7 @@
           {
             "h": "Microphone",
             "p": [
-              "Used only when the user starts voice input or a recording feature. Audio may be processed to provide the requested feature."
+              "Microphone access is not requested or used for voice input in Android build 12. The app may read answers aloud using text-to-speech, which does not require microphone access."
             ]
           },
           {
@@ -186,7 +186,7 @@
           {
             "h": "Microfone",
             "p": [
-              "Usado apenas quando o utilizador inicia entrada por voz ou gravação. O áudio pode ser processado para fornecer a função pedida."
+              "A versão Android 12 não solicita nem utiliza o microfone para entrada de voz. A leitura em voz alta através de síntese de voz não requer acesso ao microfone."
             ]
           },
           {
@@ -304,7 +304,7 @@
           {
             "h": "Микрофон",
             "p": [
-              "Используется только при запуске голосового ввода или записи. Аудио может обрабатываться для выполнения выбранной функции."
+              "В Android-сборке 12 доступ к микрофону не запрашивается и голосовой ввод не используется. Чтение ответа вслух (синтез речи) не требует разрешения микрофона."
             ]
           },
           {
@@ -422,7 +422,7 @@
           {
             "h": "Мікрофон",
             "p": [
-              "Лише при запуску голосового введення або запису."
+              "Android-збірка 12 не запитує доступу до мікрофона й не використовує голосового введення. Озвучування відповіді синтезом мовлення не потребує дозволу мікрофона."
             ]
           },
           {
@@ -540,7 +540,7 @@
           {
             "h": "Mikrofon",
             "p": [
-              "Nur bei gestarteter Spracheingabe oder Aufnahme."
+              "Android-Version 12 fordert keinen Mikrofonzugriff für Spracheingabe an und verwendet ihn nicht. Vorlesen mit Text-zu-Sprache erfordert kein Mikrofon."
             ]
           },
           {
@@ -658,7 +658,7 @@
           {
             "h": "Microfono",
             "p": [
-              "Solo quando l’utente avvia voce o registrazione."
+              "La versione Android 12 non richiede né usa il microfono per l'input vocale. La lettura ad alta voce con sintesi vocale non richiede l'accesso al microfono."
             ]
           },
           {
@@ -776,7 +776,7 @@
           {
             "h": "Microphone",
             "p": [
-              "Uniquement quand l’utilisateur lance la voix ou un enregistrement."
+              "La version Android 12 ne demande ni n'utilise l'accès au microphone pour la saisie vocale. La lecture à voix haute par synthèse vocale ne nécessite pas ce droit."
             ]
           },
           {
@@ -894,7 +894,7 @@
           {
             "h": "Micrófono",
             "p": [
-              "Solo al iniciar voz o grabación."
+              "La versión Android 12 no solicita ni utiliza acceso al micrófono para la entrada de voz. La lectura en voz alta mediante síntesis no necesita permiso de micrófono."
             ]
           },
           {
