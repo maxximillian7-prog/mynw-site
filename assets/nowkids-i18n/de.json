@@ -75,7 +75,7 @@
         {
           "h": "5. KI-Verarbeitung",
           "p": [
-            "NowStudy nutzt serverseitige KI. OpenAI ist der reguläre Anbieter. Ein eingeschränkter Test für Betreiber/Testende kann GPT-OSS 120B für Lernhilfen und Mistral Small 24B für Sicherheitsprüfungen über den IONOS AI Model Hub in Deutschland nutzen. Das ist kein allgemeiner Rollout. Andere KI-Funktionen können OpenAI weiter verwenden. KI kann Fehler machen."
+            "V20: OpenAI GPT-6 Luna übernimmt Lernhilfen, Tests und Fotoanalyse. Texte passieren Privacy Firewall und IONOS Mistral Small zur Sicherheitsklassifikation. Vom Erwachsenen bereinigte Fotos gehen nach Rollenprüfung und gesonderter Zustimmung direkt an Luna, ohne IONOS-Bildverarbeitung. OpenAI Zero Data Retention (ZDR) ist nicht bestätigt; store:false ist kein ZDR. IONOS GPT-OSS/LightOnOCR sind frühere Verfahren."
           ]
         },
         {
@@ -155,6 +155,12 @@
           "h": "17. KI-Anbieter, Schutzmaßnahmen und Datenverarbeitung",
           "p": [
             "NoKi ist der digitale Lernassistent, kein menschlicher Betreuer. Ein Datenschutzfilter prüft manuelle Texte vor externen KI-Aufrufen; identifizierende Daten können gesperrt und Bilder bei fehlendem Schutz abgelehnt werden. Bereinigte Anfragen und Ergebnisse können im Lernverlauf gespeichert werden, während das technische ai_usage-Protokoll keine Rohtexte enthält. Externe Anbieter verarbeiten Betriebsdaten nach ihren Bedingungen; eine Nullspeicherung darf ohne Bestätigung nicht vorausgesetzt werden. Für Auskunft und Löschung gelten die bisherigen Datenschutzseiten."
+          ]
+        },
+        {
+          "h": "V20 — AI provider and photo-processing change (release disclosure draft)",
+          "p": [
+            "V20: OpenAI GPT-6 Luna übernimmt Lernhilfen, Tests und Fotoanalyse. Texte passieren Privacy Firewall und IONOS Mistral Small zur Sicherheitsklassifikation. Vom Erwachsenen bereinigte Fotos gehen nach Rollenprüfung und gesonderter Zustimmung direkt an Luna, ohne IONOS-Bildverarbeitung. OpenAI Zero Data Retention (ZDR) ist nicht bestätigt; store:false ist kein ZDR. IONOS GPT-OSS/LightOnOCR sind frühere Verfahren."
           ]
         }
       ]
@@ -319,9 +325,9 @@
           ]
         },
         {
-          "h": "12. KI-Aufsicht und eingeschränkte Testanbieter",
+          "h": "V20 — V20: Schulfotos nur mit einem Erwachsenen",
           "p": [
-            "Regulärer Anbieter ist OpenAI; IONOS/GPT-OSS und Mistral werden nur in begrenzten Servertests eingesetzt und nicht allgemein Kindern angeboten. Eltern sollten Lernanfragen prüfen und fehlerhafte Sperren oder unsichere Antworten melden. Version 12 bietet keine Spracheingabe."
+            "Im Kinderkonto sind Kamera und Galerie für Schulfotoanalysen nicht verfügbar. Bitte einen Erwachsenen, sein eigenes Handy und ein verifiziertes Elternkonto zu verwenden. Er schneidet auf die Aufgabe zu, deckt Namen, Gesichter, Schule, Adressen und andere Kennzeichen undurchsichtig ab (nicht weichzeichnen), prüft das Ergebnis und bestätigt gesondert Datenfreiheit und Einwilligung zur Übertragung an OpenAI. Dann geht die bearbeitete Aufnahme direkt an GPT-6 Luna. IONOS führt weder OCR noch visuelle Prüfung dieses Fotos durch. Keine unbehandelten Originale hochladen. NoKi-Antworten lassen sich kopieren."
           ]
         }
       ]
@@ -387,9 +393,9 @@
           ]
         },
         {
-          "h": "9. NoKi und die Rollen der KI-Modelle",
+          "h": "V20 — V20: Schulfotos nur mit einem Erwachsenen",
           "p": [
-            "NoKi erklärt Inhalte, begleitet Aufgaben und prüft das Verständnis. OpenAI ist der reguläre KI-Weg. Nur in begrenzten Tests hostet IONOS GPT-OSS 120B für Nachhilfe und Mistral Small 24B für Eingabe- und Ausgabemoderation. Das sind Modellrollen, keine Personen oder Kontakte für Kinder. Die Moderation kann harmlose Lernantworten fälschlich sperren; keine echten Namen, Adressen, Passwörter oder persönliche Dokumente eingeben."
+            "V20: OpenAI GPT-6 Luna übernimmt Lernhilfen, Tests und Fotoanalyse. Texte passieren Privacy Firewall und IONOS Mistral Small zur Sicherheitsklassifikation. Vom Erwachsenen bereinigte Fotos gehen nach Rollenprüfung und gesonderter Zustimmung direkt an Luna, ohne IONOS-Bildverarbeitung. OpenAI Zero Data Retention (ZDR) ist nicht bestätigt; store:false ist kein ZDR. IONOS GPT-OSS/LightOnOCR sind frühere Verfahren."
           ]
         }
       ]
@@ -651,9 +657,9 @@
           ]
         },
         {
-          "h": "KI-Tutoren und Datenschutzmeldungen",
+          "h": "V20: Schulfotos nur mit einem Erwachsenen",
           "p": [
-            "NoKi ist der Lernassistent. Regulär wird OpenAI verwendet; ausgewählte Testende können IONOS mit GPT-OSS und Mistral nutzen. Keine echten persönlichen Daten eingeben. Version 12 kann eine allgemeine Fehlermeldung zeigen; das geplante Android-Update wird verständliche Hinweise in acht Sprachen zeigen."
+            "Im Kinderkonto sind Kamera und Galerie für Schulfotoanalysen nicht verfügbar. Bitte einen Erwachsenen, sein eigenes Handy und ein verifiziertes Elternkonto zu verwenden. Er schneidet auf die Aufgabe zu, deckt Namen, Gesichter, Schule, Adressen und andere Kennzeichen undurchsichtig ab (nicht weichzeichnen), prüft das Ergebnis und bestätigt gesondert Datenfreiheit und Einwilligung zur Übertragung an OpenAI. Dann geht die bearbeitete Aufnahme direkt an GPT-6 Luna. IONOS führt weder OCR noch visuelle Prüfung dieses Fotos durch. Keine unbehandelten Originale hochladen. NoKi-Antworten lassen sich kopieren."
           ]
         }
       ]

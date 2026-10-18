@@ -62,7 +62,8 @@
           {
             "h": "Camera & photos",
             "p": [
-              "Used when the user chooses to scan school material, attach an image, set an avatar or use another image feature. NowKids does not continuously access the camera."
+              "Used when the user chooses to scan school material, attach an image, set an avatar or use another image feature. NowKids does not continuously access the camera.",
+              "V20: School-photo camera/gallery actions are available only in a verified adult account on the adult's own phone. Children are asked to contact an adult. The adult crops/masks identifiers and separately consents before sending the edited photo directly to OpenAI GPT-6 Luna; no IONOS visual OCR or pre-moderation. ISBN/QR scanning is different from capturing or uploading a school photo."
             ]
           },
           {
@@ -180,7 +181,8 @@
           {
             "h": "Câmara e fotografias",
             "p": [
-              "Usadas apenas para digitalização, imagem, avatar ou outra função de imagem escolhida pelo utilizador; não existe acesso contínuo à câmara."
+              "Usadas apenas para digitalização, imagem, avatar ou outra função de imagem escolhida pelo utilizador; não existe acesso contínuo à câmara.",
+              "V20: A câmara/galeria para fotos escolares só está disponível numa conta de adulto verificada, no telemóvel do adulto. A criança recebe a indicação de pedir ajuda. O adulto recorta, tapa identificadores e consente separadamente no envio direto da foto editada para OpenAI GPT-6 Luna, sem OCR ou moderação visual IONOS. A leitura de códigos ISBN/QR não é o mesmo que carregar uma foto escolar."
             ]
           },
           {
@@ -298,7 +300,8 @@
           {
             "h": "Камера и фотографии",
             "p": [
-              "Используются только для явно выбранного сканирования, изображения, аватара или другой функции с изображением; постоянного доступа к камере нет."
+              "Используются только для явно выбранного сканирования, изображения, аватара или другой функции с изображением; постоянного доступа к камере нет.",
+              "V20: Камера и галерея для школьных фото доступны только во взрослой подтверждённой учётной записи на телефоне взрослого. Ребёнок видит просьбу обратиться к взрослому. Взрослый обрезает/закрывает личные данные и отдельно соглашается на отправку очищенного изображения напрямую в OpenAI GPT-6 Luna, без OCR и визуальной модерации IONOS. Сканирование ISBN/QR не является загрузкой школьной фотографии."
             ]
           },
           {
@@ -416,7 +419,8 @@
           {
             "h": "Камера й фото",
             "p": [
-              "Використовуються лише для явно обраного сканування, зображення, аватара або іншої функції із зображенням; постійного доступу до камери немає."
+              "Використовуються лише для явно обраного сканування, зображення, аватара або іншої функції із зображенням; постійного доступу до камери немає.",
+              "V20: Камера й галерея для шкільних фото доступні лише в підтвердженому батьківському акаунті на телефоні дорослого. Дитина бачить пораду попросити дорослого. Дорослий обрізає й закриває особисті дані, окремо погоджується на передавання очищеного фото прямо в OpenAI GPT-6 Luna, без OCR чи візуальної модерації IONOS. Сканування ISBN/QR не є завантаженням шкільного фото."
             ]
           },
           {
@@ -534,7 +538,8 @@
           {
             "h": "Kamera & Fotos",
             "p": [
-              "Für ausdrücklich gewählte Digitalisierungs-, Bild-, Avatar- oder ähnliche Funktionen; kein dauerhafter Kamerazugriff."
+              "Für ausdrücklich gewählte Digitalisierungs-, Bild-, Avatar- oder ähnliche Funktionen; kein dauerhafter Kamerazugriff.",
+              "V20: Kamera/Galerie für Schulfotos stehen nur einem verifizierten Erwachsenenkonto auf dessen eigenem Handy zur Verfügung. Kinder werden gebeten, Erwachsene um Hilfe zu bitten. Erwachsene decken Identifikatoren ab und stimmen der direkten Übertragung des bearbeiteten Fotos an OpenAI GPT-6 Luna gesondert zu, ohne IONOS-Bild-OCR oder -Vorprüfung. ISBN/QR-Scans sind kein Upload eines Schulfotos."
             ]
           },
           {
@@ -652,7 +657,8 @@
           {
             "h": "Fotocamera e foto",
             "p": [
-              "Usate solo per digitalizzazione, immagine, avatar o altra funzione visiva scelta dall’utente; non c’è accesso continuo alla fotocamera."
+              "Usate solo per digitalizzazione, immagine, avatar o altra funzione visiva scelta dall’utente; non c’è accesso continuo alla fotocamera.",
+              "V20: Fotocamera/galleria per foto scolastiche sono disponibili solo in un account adulto verificato sul telefono dell'adulto. Il bambino viene invitato a chiedere aiuto. L'adulto ritaglia e copre gli identificatori, poi acconsente separatamente all'invio della foto modificata direttamente a OpenAI GPT-6 Luna, senza OCR o moderazione visiva IONOS. La scansione ISBN/QR non carica foto scolastiche."
             ]
           },
           {
@@ -770,7 +776,8 @@
           {
             "h": "Caméra et photos",
             "p": [
-              "Utilisées uniquement pour une numérisation, une image, un avatar ou une autre fonction visuelle choisie par l’utilisateur ; aucun accès continu à l’appareil photo."
+              "Utilisées uniquement pour une numérisation, une image, un avatar ou une autre fonction visuelle choisie par l’utilisateur ; aucun accès continu à l’appareil photo.",
+              "V20 : caméra/galerie pour les devoirs accessibles uniquement depuis le compte parent vérifié sur le téléphone de l'adulte. L'enfant est invité à demander de l'aide. L'adulte masque les identifiants et consent séparément à envoyer la photo modifiée directement à OpenAI GPT-6 Luna, sans OCR ni pré-modération visuelle IONOS. Les scans ISBN/QR ne sont pas des photos scolaires envoyées."
             ]
           },
           {
@@ -888,7 +895,8 @@
           {
             "h": "Cámara y fotos",
             "p": [
-              "Se usan solo para escanear, añadir una imagen, establecer un avatar u otra función visual elegida por el usuario; no hay acceso continuo a la cámara."
+              "Se usan solo para escanear, añadir una imagen, establecer un avatar u otra función visual elegida por el usuario; no hay acceso continuo a la cámara.",
+              "V20: Cámara/galería para tareas escolares solo desde una cuenta adulta verificada en el móvil del adulto. El niño recibe un mensaje para pedir ayuda. El adulto recorta y tapa identificadores y autoriza por separado el envío de la foto editada directamente a OpenAI GPT-6 Luna, sin OCR ni moderación visual previa de IONOS. Leer ISBN/QR no equivale a subir una foto escolar."
             ]
           },
           {
