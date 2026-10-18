@@ -2,82 +2,27 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; img-src 'self' blob: data:; connect-src https://czqwuaanobkowckpnyhg.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
-<title>NowKids · IONOS OCR · тест владельца</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<link rel="canonical" href="https://mynw.app/nowkids/ocr-test/">
+<title>NowKids — исторический OCR-тест</title>
 <style>
-:root{font-family:system-ui,-apple-system,Roboto,"Segoe UI",Arial,sans-serif;color-scheme:light;--bg:#f4f7f9;--ink:#203642;--muted:#5e7380;--edge:#dce6eb;--accent:#156a72}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);margin:0}
-main{max-width:640px;margin:auto;padding:18px 15px 45px}
-header{display:flex;align-items:center;gap:12px;margin:6px 0 24px}
-.logo{width:42px;height:42px;background:#ddf2ee;border-radius:14px;display:grid;place-items:center;font-size:23px}
-h1{font-size:22px;line-height:1.15;margin:0}
-.small{font-size:13px;color:var(--muted);line-height:1.5}
-section{background:white;border:1px solid var(--edge);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 2px 12px #2045550a}
-h2{font-size:17px;margin:0 0 11px}
-p{line-height:1.55}
-label{display:block;font-weight:550;font-size:14px;margin:12px 0 6px}
-input[type=email],input[type=password],input[type=text]{width:100%;font-size:16px;padding:13px;border:1px solid #bccbd1;border-radius:11px;background:#fff;color:var(--ink)}
-input:focus-visible,button:focus-visible{outline:3px solid #88ccc8}
-button{display:block;width:100%;border:0;border-radius:12px;background:var(--accent);color:white;padding:14px 16px;font-weight:650;font-size:16px;margin:12px 0;cursor:pointer;min-height:48px}
-button.secondary{background:#e8f3f4;color:#125b64}
-button:disabled{opacity:.5;cursor:not-allowed}
-.check{display:flex;align-items:flex-start;gap:10px;line-height:1.5;font-size:14px;font-weight:450;margin:13px 0}
-.check input{flex:0 0 20px;width:20px;height:20px;margin:3px 0 0}
-#preview{display:none;width:100%;max-height:360px;object-fit:contain;background:#fafafa;border:1px solid var(--edge);border-radius:12px;margin:12px 0}
-#result{white-space:pre-wrap;overflow-wrap:anywhere;background:#f2f7f8;border:1px solid var(--edge);padding:16px;border-radius:12px;line-height:1.6;font-size:15px;max-height:460px;overflow-y:auto}
-#status{padding:11px 12px;border-radius:10px;background:#ebf1f4;margin-top:10px;font-size:14px;display:none;line-height:1.4}
-#status[data-error="true"]{background:#fae9e8;color:#8d2822}
-.hidden{display:none!important}
-#metrics{font-size:13px;color:var(--muted);line-height:1.6}
-.danger{border-left:3px solid #bc6a29;padding-left:12px;color:#694221;font-size:14px}
-footer{font-size:12px;color:var(--muted);line-height:1.5;margin:14px 4px}
+:root{color-scheme:light;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+body{background:#f6f6f2;color:#243343;margin:0}
+main{max-width:670px;margin:10vh auto;padding:24px}
+article{background:#fff;border-radius:20px;padding:24px;box-shadow:0 6px 30px #1021360b}
+h1{font-size:24px}p{line-height:1.65}small{color:#5a6874}
 </style>
 </head>
 <body>
-<main>
-<header><div class="logo">🌱</div><div><h1>NowKids · IONOS OCR</h1><div class="small">Тест владельца · LightOnOCR-2-1B</div></div></header>
-<section id="signIn">
-<h2>1. Вход в существующий аккаунт</h2>
-<p class="small">Используется тот же аккаунт NowKids. Пароль не записывается в эту страницу или отчёты. После закрытия вкладки сеанс теста исчезает.</p>
-<label for="email">Адрес электронной почты</label>
-<input id="email" type="email" autocomplete="off" spellcheck="false" placeholder="Электронная почта">
-<label for="password">Пароль NowKids</label>
-<input id="password" type="password" autocomplete="off" placeholder="Пароль">
-<button id="login">Войти</button>
-<details><summary class="small">Вход по одноразовому коду (если пароль недоступен)</summary>
-<p class="small">Отправим код на указанную почту. Способ доставки зависит от настроек входа Supabase.</p>
-<button class="secondary" id="sendCode">Отправить код</button>
-<label for="otp">Код из письма</label>
-<input id="otp" type="text" autocomplete="one-time-code" inputmode="numeric" placeholder="Код">
-<button class="secondary" id="verifyCode">Подтвердить код</button>
-</details>
-</section>
-<section id="upload" class="hidden">
-<h2>2. Фотография документа</h2>
-<div class="small">Ты вошёл в аккаунт владельца. Изображение отправляется непосредственно на IONOS через защищённую тестовую функцию NowKids.</div>
-<p class="danger"><b>До отправки:</b> выбери только страницу учебника или задание без имён детей, названий школы, номеров, адресов, лиц, подписей и других личных данных. Если они есть — сначала обрежь или закрой их в редакторе телефона.</p>
-<label for="file">Выбрать фото с камеры или из галереи</label>
-<input id="file" type="file" accept="image/*">
-<img id="preview" alt="Предварительный просмотр выбранной страницы">
-<div class="small" id="imageInfo"></div>
-<label class="check"><input type="checkbox" id="noPersonal"><span>Подтверждаю, что изображение не содержит личных данных и полностью подготовлено к отправке.</span></label>
-<label class="check"><input type="checkbox" id="consent"><span>Согласен отправить это изображение в IONOS Cloud (Германия) для тестового распознавания текста.</span></label>
-<button id="recognize" disabled>Распознать через IONOS</button>
-<button class="secondary" id="logout">Выйти из теста</button>
-</section>
-<section id="output" class="hidden">
-<h2>3. Результат LightOnOCR</h2>
-<p class="small">Ниже — исходный распознанный текст IONOS. NoKi не переводит и не перерабатывает его.</p>
-<div id="metrics"></div>
-<pre id="result"></pre>
-<button class="secondary" id="copy">Скопировать распознанный текст</button>
-</section>
-<div id="status" role="status" aria-live="polite"></div>
-<footer>Ограниченный эксперимент NowKids. Загрузка доступна только авторизованному владельцу; обычные и детские аккаунты не имеют доступа. Снимки и результат не записываются в базу или на эту страницу. Оригинал отправляется провайдеру для обработки, поэтому убери личные данные заранее.</footer>
-</main>
-<script src="app.js" defer></script>
-</body></html>
+<main><article>
+<h1>NowKids — предыдущий тест IONOS OCR завершён</h1>
+<p>Эта страница использовалась только для ограниченной оценки качества IONOS OCR. Она больше не принимает фотографии и не вызывает сервис распознавания.</p>
+<p>В будущей версии NowKids v20 фотографию школьного задания сможет подготовить только взрослый на своём телефоне: обрезать, скрыть персональные данные непрозрачной маской и отдельно подтвердить согласие на передачу очищенной копии в OpenAI GPT-6 Luna.</p>
+<p>Current status: retired IONOS OCR demo. For NowKids v20, verified adults prepare and redact photos on their own device and separately consent before the edited image is sent to OpenAI GPT-6 Luna. No photo upload is available on this page.</p>
+<small>Не отправляйте личные данные детей. Обработка фото в приложении требует подтверждённого родительского доступа.</small>
+</article></main>
+</body>
+</html>
