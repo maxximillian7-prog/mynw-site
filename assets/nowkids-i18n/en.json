@@ -75,7 +75,7 @@
         {
           "h": "5. AI processing",
           "p": [
-            "NowStudy uses server-side AI. OpenAI is the standard provider. A limited owner/tester pilot may route tutoring to GPT-OSS 120B and safety classification to Mistral Small 24B through IONOS AI Model Hub in Germany. This is not a general rollout. Other AI features may still use OpenAI. AI can make mistakes."
+            "V20 provider split: GPT-6 Luna by OpenAI generates study explanations, tests and photo understanding. Text requests undergo the Privacy Firewall and IONOS Mistral Small safety classification. An adult-approved, de-identified photo goes directly to Luna, without IONOS photo processing. Consent and parent role checks are required. OpenAI Zero Data Retention (ZDR) has not been confirmed; store:false is not the same as ZDR. Historical IONOS GPT-OSS/LightOnOCR routes are not the intended v20 photo workflow."
           ]
         },
         {
@@ -325,12 +325,6 @@
           ]
         },
         {
-          "h": "12. AI supervision and controlled providers",
-          "p": [
-            "The standard provider is OpenAI; IONOS/GPT-OSS and Mistral are restricted server-side tests, not a general child feature. Parents should check study prompts and report incorrect blocking or unsafe responses. Build 12 does not provide voice input."
-          ]
-        },
-        {
           "h": "V20 — V20: scanning a school photo with an adult",
           "p": [
             "On the child's device the school-photo camera/gallery is unavailable. Ask a parent or guardian to use their own phone and verified adult account. They crop the exercise, cover every name, face, school, address and other identifier with an opaque mask (not blur), check the final image and separately confirm no personal data and consent to sending the edited photo to OpenAI. Only then is it sent directly to GPT-6 Luna for visual understanding. IONOS does not OCR or visually moderate this photo. Never upload an unedited original. AI results can be wrong; NoKi responses have a copy button."
@@ -396,12 +390,6 @@
           "h": "8. Reuse instead of repeated generation",
           "p": [
             "When possible, NowStudy reuses a saved scan extraction rather than sending the same image for every follow-up. Preparation plans, flashcards and mini-tests are saved and can be reopened; an explicit request to create a new version may trigger a new AI call. Technical caching is scoped to the relevant family/child."
-          ]
-        },
-        {
-          "h": "9. NoKi and the AI roles",
-          "p": [
-            "NoKi explains topics, guides solutions and checks understanding. OpenAI is the normal learning AI route. In restricted testing only, IONOS hosts GPT-OSS 120B for tutoring and Mistral Small 24B for input/output safety classification. These are separate model roles, not people or contacts with children. Safety controls can sometimes reject harmless educational replies; do not submit actual names, addresses, passwords or personal documents."
           ]
         },
         {
@@ -666,12 +654,6 @@
           "h": "Safety & deletion",
           "p": [
             "AI answers and user content can be reported. Adults manage child access and deletion. For privacy or deletion requests use support@mynw.app."
-          ]
-        },
-        {
-          "h": "AI tutors and privacy errors",
-          "p": [
-            "NoKi is the in-app tutor. The standard provider is OpenAI; selected testers may use IONOS-hosted GPT-OSS and Mistral for tutoring and moderation. Do not enter real personal data in questions. Privacy or safety blocks can be shown as a generic error in build 12; the planned Android update will show understandable warnings in all eight languages."
           ]
         },
         {
