@@ -156,6 +156,12 @@
           "p": [
             "NoKi is the teaching assistant, not a human operator. A privacy filter screens manually entered prompts before external AI calls; personal identifying data can be blocked and image processing limited when privacy requirements are unmet. The service may save sanitized tutoring requests/results in study history, while the technical ai_usage ledger does not store raw prompts. External providers process operational data under their applicable terms; do not assume Zero Data Retention without confirmation. See the existing data-rights and deletion pages for requests."
           ]
+        },
+        {
+          "h": "V20 — AI provider and photo-processing change (release disclosure draft)",
+          "p": [
+            "V20 provider split: GPT-6 Luna by OpenAI generates study explanations, tests and photo understanding. Text requests undergo the Privacy Firewall and IONOS Mistral Small safety classification. An adult-approved, de-identified photo goes directly to Luna, without IONOS photo processing. Consent and parent role checks are required. OpenAI Zero Data Retention (ZDR) has not been confirmed; store:false is not the same as ZDR. Historical IONOS GPT-OSS/LightOnOCR routes are not the intended v20 photo workflow."
+          ]
         }
       ]
     },
@@ -323,6 +329,12 @@
           "p": [
             "The standard provider is OpenAI; IONOS/GPT-OSS and Mistral are restricted server-side tests, not a general child feature. Parents should check study prompts and report incorrect blocking or unsafe responses. Build 12 does not provide voice input."
           ]
+        },
+        {
+          "h": "V20 — V20: scanning a school photo with an adult",
+          "p": [
+            "On the child's device the school-photo camera/gallery is unavailable. Ask a parent or guardian to use their own phone and verified adult account. They crop the exercise, cover every name, face, school, address and other identifier with an opaque mask (not blur), check the final image and separately confirm no personal data and consent to sending the edited photo to OpenAI. Only then is it sent directly to GPT-6 Luna for visual understanding. IONOS does not OCR or visually moderate this photo. Never upload an unedited original. AI results can be wrong; NoKi responses have a copy button."
+          ]
         }
       ]
     },
@@ -390,6 +402,12 @@
           "h": "9. NoKi and the AI roles",
           "p": [
             "NoKi explains topics, guides solutions and checks understanding. OpenAI is the normal learning AI route. In restricted testing only, IONOS hosts GPT-OSS 120B for tutoring and Mistral Small 24B for input/output safety classification. These are separate model roles, not people or contacts with children. Safety controls can sometimes reject harmless educational replies; do not submit actual names, addresses, passwords or personal documents."
+          ]
+        },
+        {
+          "h": "V20 — V20: scanning a school photo with an adult",
+          "p": [
+            "V20 provider split: GPT-6 Luna by OpenAI generates study explanations, tests and photo understanding. Text requests undergo the Privacy Firewall and IONOS Mistral Small safety classification. An adult-approved, de-identified photo goes directly to Luna, without IONOS photo processing. Consent and parent role checks are required. OpenAI Zero Data Retention (ZDR) has not been confirmed; store:false is not the same as ZDR. Historical IONOS GPT-OSS/LightOnOCR routes are not the intended v20 photo workflow."
           ]
         }
       ]
@@ -654,6 +672,12 @@
           "h": "AI tutors and privacy errors",
           "p": [
             "NoKi is the in-app tutor. The standard provider is OpenAI; selected testers may use IONOS-hosted GPT-OSS and Mistral for tutoring and moderation. Do not enter real personal data in questions. Privacy or safety blocks can be shown as a generic error in build 12; the planned Android update will show understandable warnings in all eight languages."
+          ]
+        },
+        {
+          "h": "V20: scanning a school photo with an adult",
+          "p": [
+            "On the child's device the school-photo camera/gallery is unavailable. Ask a parent or guardian to use their own phone and verified adult account. They crop the exercise, cover every name, face, school, address and other identifier with an opaque mask (not blur), check the final image and separately confirm no personal data and consent to sending the edited photo to OpenAI. Only then is it sent directly to GPT-6 Luna for visual understanding. IONOS does not OCR or visually moderate this photo. Never upload an unedited original. AI results can be wrong; NoKi responses have a copy button."
           ]
         }
       ]
