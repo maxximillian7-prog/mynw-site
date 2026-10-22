@@ -159,7 +159,7 @@ function renderEditor(){
 function renderPreview(){
  if(!draft)return;
  if(window.JournalPreview && typeof window.JournalPreview.render==="function"){
-   window.JournalPreview.render({draft,blocks,assets,authors,projectName:project?.name||"NowGreen",postId:current?.id||null,postKey:current?.id||draft,canEdit:editable(),instagramCaption:placements.find(p=>p.channel==="instagram"&&p.locale===draft.locale)?.settings?.caption||""});
+   window.JournalPreview.render({draft,blocks,assets,authors,projectName:project?.name||"NowGreen",postId:current?.id||null,postKey:current?.id||draft,canEdit:editable(),instagramCaption:draft?.caption||placements.find(p=>p.channel==="instagram"&&p.locale===draft.locale)?.settings?.caption||""});
    return;
  }
  $("preview").textContent="Предпросмотр загружается…";
@@ -241,6 +241,7 @@ async function saveInstagramCaption(){
  if(!editable())throw Error("Подпись нельзя менять после согласования");
  if(dirty)throw Error("Сначала сохраните изменения статьи");
  const caption=window.JournalPreview?.getCaption?.()||"";
+ if(window.StudioFeatures?.saveCaptionForActiveVersion && await window.StudioFeatures.saveCaptionForActiveVersion(caption))return;
  await call("/placements/settings","POST",{post_id:current.id,channel:"instagram",caption,description:""});
  placements=(await call("/placements?post_id="+current.id)).placements||[];
  window.JournalPreview?.setSavedCaption?.(caption);
