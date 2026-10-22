@@ -13,7 +13,7 @@ const editable=()=>!current||["draft","changes_requested"].includes(current.stat
 function toast(txt,error=false){const el=$("status");el.textContent=String(txt);el.classList.toggle("error",error);clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.textContent="",5500)}
 function signout(){session=null;sessionStorage.removeItem("journal_session");$("gate").hidden=false;$("workspace").hidden=true}
 async function auth(path,method="POST",payload){
- const r=await fetch(API_ROOT+"/auth/v1/"+path,{method,headers:{"apikey":PUBLIC_KEY,"Content-Type":"application/json",...(session?.access_token?{"Authorization":"Bearer "+session.access_token}:{})},body:payload?JSON.stringify(payload):undefined});
+ const r=await fetch(API_ROOT+"/auth/v1/"+path,{method,headers:{"apikey":PUBLIC_KEY,"Content-Type":"application/json"},body:payload?JSON.stringify(payload):undefined});
  const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.msg||j.error_description||j.message||j.error||"Ошибка авторизации");return j
 }
 async function call(path,method="GET",payload){
