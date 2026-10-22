@@ -10,7 +10,7 @@
     nowgreen:{home:'/nowgreen/',guide:'/nowgreen/manual/',privacy:'/nowgreen/privacy/',terms:'/nowgreen/terms/',delete:'/nowgreen/delete-account/',support:'/nowgreen/support/',ai:'/nowgreen/ai-data/',rights:'/nowgreen/data-rights/'},
     nowkids:{home:'/nowkids/',guide:'/nowkids/manual/',privacy:'/nowkids/privacy/',terms:'/nowkids/terms/',delete:'/nowkids/delete-account/',support:'/nowkids/support/',ai:'/nowkids/ai-safety/',rights:'/nowkids/data-rights/',parents:'/nowkids/parents/',safety:'/nowkids/child-safety/',community:'/nowkids/community/',permissions:'/nowkids/permissions/'}
   };
-  const LOGOS={nowwhat:'/assets/brand/nowwhat-logo.webp',nowcook:'/assets/brand/nowcook-logo.webp',nowgreen:'/assets/brand/nowgreen-logo.webp',nowkids:'/assets/brand/nowkids-logo.webp'};
+  const LOGOS={nowwhat:'/assets/brand/nowwhat-logo.webp',nowcook:'/assets/brand/nowcook-logo.webp',nowgreen:'/assets/brand/nowgreen-logo.webp?v=20261022-1',nowkids:'/assets/brand/nowkids-logo.webp'};
   const FALLBACK_LOGOS={nowwhat:'/assets/nowwhat-qr-icon.png',nowcook:'/assets/nowcook-home-logo.webp',nowgreen:'/assets/nowgreen-icon.svg',nowkids:'/assets/nowkids-home-logo.png'};
   const BANNERS={nowwhat:'/assets/brand/nowwhat-banner.webp',nowcook:'/assets/brand/nowcook-banner.webp',nowgreen:'/assets/brand/nowgreen-banner.webp',nowkids:'/assets/brand/nowkids-banner.webp'};
   const SYMBOLS={nowgreen:'🌿'};
