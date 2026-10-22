@@ -35,7 +35,7 @@ button,input,select,textarea{font:inherit}button{border-radius:10px;background:w
 'use strict';
 const $=q=>document.querySelector(q);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
-const validImage=v=>typeof v==='string'&&/^data:image\/(?:png|jpeg|webp);base64,/i.test(v);
+const validImage=v=>typeof v==='string'&&v.length<8000000&&/^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(v);
 const safeUrl=v=>{try{const u=new URL(String(v));return /^https?:$/.test(u.protocol)?u.href:''}catch{return''}};
 const types={heading:'Подзаголовок',text:'Текст',image:'Фотография',link:'Ссылка',quote:'Цитата',steps:'Шаги',warning:'Важное'};
 const labels={draft:'Черновик',review:'На проверке',changes:'На доработке',approved:'Утверждено'};
