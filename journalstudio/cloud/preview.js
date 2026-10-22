@@ -9,7 +9,7 @@ function cover(c){const a=allImages(c),prefer=a.find(x=>x.id===c.draft?.cover_pa
 function cropData(c,id){
  const block=(c.blocks||[]).find(b=>b.type==="image"&&b.asset_id===id);
  const o=block?.crop||{};
- const x=Math.max(0,Math.min(100,Number(o.x)||50)),y=Math.max(0,Math.min(100,Number(o.y)||50));
+ const x=Math.max(0,Math.min(100,Number.isFinite(Number(o.x))?Number(o.x):50)),y=Math.max(0,Math.min(100,Number.isFinite(Number(o.y))?Number(o.y):50));
  const zoom=Math.max(100,Math.min(250,Number(o.zoom)||100))/100;
  const aspect=["1:1","4:5","16:9"].includes(o.aspect)?o.aspect.replace(":","/"):null;
  return {x,y,zoom,aspect};
