@@ -1,108 +1,307 @@
-
-const URLROOT="https://npsfaymjckcqhtyiafms.supabase.co",PUBLICKEY="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
-let session=null,projects=[],active=null,posts=[],current=null,blocks=[];
-const $=id=>document.getElementById(id),safe=t=>String(t??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
-function message(t){$("status").textContent=t}
-async function auth(path,data){
-const r=await fetch(URLROOT+"/auth/v1/"+path,{method:"POST",headers:{apikey:PUBLICKEY,"Content-Type":"application/json"},body:JSON.stringify(data)});
-const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.msg||j.error_description||j.message||"Ошибка авторизации");return j
+"use strict";
+const API_ROOT="https://npsfaymjckcqhtyiafms.supabase.co";
+const PUBLIC_KEY="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const statuses={draft:"Черновик",in_review:"На проверке",changes_requested:"На доработке",approved:"Утверждена",scheduled:"Запланирована",published:"Опубликована",archived:"Архив"};
+const roles={owner:"Владелец",chief_editor:"Главный редактор",editor:"Редактор",author:"Автор",reviewer:"Рецензент"};
+const channels={nowgreen:"NowGreen",nowcook:"NowCook",nowwhat:"NowWhat",nowkids:"NowKids",website:"Сайт",wordpress:"WordPress",instagram:"Instagram"};
+let session=null,projects=[],project=null,posts=[],authors=[],current=null,draft=null,placements=[],deliveries=[],assets={},tab="home",dirty=false,toastTimer=null,flashError=false;
+const editorRole=()=>["owner","chief_editor","editor"].includes(project?.role);
+const chiefRole=()=>["owner","chief_editor"].includes(project?.role);
+const editable=()=>!current||["draft","changes_requested"].includes(current.status);
+function toast(txt,error=false){const el=$("status");el.textContent=String(txt);el.classList.toggle("error",error);clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.textContent="",5500)}
+function signout(){session=null;sessionStorage.removeItem("journal_session");$("gate").hidden=false;$("workspace").hidden=true}
+async function auth(path,method="POST",payload){
+ const r=await fetch(API_ROOT+"/auth/v1/"+path,{method,headers:{"apikey":PUBLIC_KEY,"Content-Type":"application/json",...(session?.access_token?{"Authorization":"Bearer "+session.access_token}:{})},body:payload?JSON.stringify(payload):undefined});
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.msg||j.error_description||j.message||j.error||"Ошибка авторизации");return j
 }
-async function api(path,method="GET",body){
-if(!session)throw Error("Сначала войдите");
-const go=()=>fetch(URLROOT+"/functions/v1/studio-api"+path,{method,headers:{apikey:PUBLICKEY,Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
-let r=await go();if(r.status===401&&session.refresh_token){session=await auth("token?grant_type=refresh_token",{refresh_token:session.refresh_token});sessionStorage.setItem("journal_session",JSON.stringify(session));r=await go()}
-const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||"Ошибка сервера");return j
+async function call(path,method="GET",payload){
+ if(!session?.access_token)throw Error("Пожалуйста, войдите в редакцию");
+ const request=()=>fetch(API_ROOT+"/functions/v1/studio-api"+path,{method,headers:{"apikey":PUBLIC_KEY,"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:payload?JSON.stringify(payload):undefined});
+ let r=await request();
+ if(r.status===401&&session.refresh_token){session=await auth("token?grant_type=refresh_token","POST",{refresh_token:session.refresh_token});sessionStorage.setItem("journal_session",JSON.stringify(session));r=await request()}
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||"Ошибка сервера");return j
 }
-async function enter(){
-const mail=$("email").value.trim(),password=$("password").value;
-session=await auth("token?grant_type=password",{email:mail,password});sessionStorage.setItem("journal_session",JSON.stringify(session));await initialize()
+async function login(){
+ const email=$("email").value.trim(),password=$("password").value;
+ session=await auth("token?grant_type=password","POST",{email,password});
+ sessionStorage.setItem("journal_session",JSON.stringify(session));
+ await initialize();
 }
 async function signup(){
-const password=$("password").value,email=$("email").value.trim();
-if(password.length<12)throw Error("Пароль не короче 12 символов");
-const j=await auth("signup?redirect_to="+encodeURIComponent(location.origin+location.pathname),{email,password});
-if(j.access_token){session=j;sessionStorage.setItem("journal_session",JSON.stringify(session));await initialize()}
-else message("Подтвердите электронную почту по письму и войдите с этим паролем")
-}
-async function bootstrap(){
-const x=$("setup").value;if(!x)throw Error("Введите установочный ключ");
-await api("/bootstrap","POST",{setup_key:x});$("setup").value="";await initialize()
+ const password=$("password").value,email=$("email").value.trim();
+ if(password.length<12)throw Error("Пароль должен содержать не меньше 12 символов");
+ const redirect="https://mynw.app/journalstudio/cloud/";
+ const d=await auth("signup?redirect_to="+encodeURIComponent(redirect),"POST",{email,password});
+ if(d.access_token){session=d;sessionStorage.setItem("journal_session",JSON.stringify(session));await initialize()}
+ else toast("Проверьте почту. После подтверждения вернитесь на эту страницу и войдите с паролем.");
 }
 async function initialize(){
-const r=await api("/projects");projects=r.projects||[];
-if(!projects.length){$("gate").hidden=false;$("workspace").hidden=true;$("setupZone").hidden=false;message("Пользователь подтверждён. Для первого входа нужен одноразовый ключ.");return}
-active=projects[0];$("gate").hidden=true;$("workspace").hidden=false;
-$("project").innerHTML=projects.map(p=>'<option value="'+safe(p.slug)+'">'+safe(p.name)+" — "+safe(p.role)+"</option>").join("");
-await refresh();
+ const data=await call("/projects");projects=data.projects||[];
+ if(!projects.length){$("gate").hidden=false;$("workspace").hidden=true;$("setupZone").hidden=false;toast("Аккаунт подтверждён. Доступ выдаётся главным редактором; при первом запуске нужен одноразовый ключ.");return}
+ $("gate").hidden=true;$("workspace").hidden=false;$("setupZone").hidden=true;
+ const currentProject=project?.slug;project=projects.find(p=>p.slug===currentProject)||projects[0];
+ $("project").innerHTML=projects.map(p=>'<option value="'+esc(p.slug)+'">'+esc(p.name)+" · "+esc(roles[p.role]||p.role)+"</option>").join("");
+ $("project").value=project.slug;
+ $("avatar").textContent=(session.user?.email||"JS").slice(0,2).toUpperCase();
+ $("userDisplay").textContent=session.user?.email||roles[project.role]||"Редактор";
+ $("invite").hidden=!chiefRole();
+ $("authorsInvite").hidden=!chiefRole();
+ await loadData();showTab("home",true);
 }
-async function refresh(){posts=(await api("/posts?project="+encodeURIComponent(active.slug))).posts;showPosts();}
-function showPosts(){
-$("headline").textContent=active.name+" — Редакция";
-$("library").innerHTML=posts.map(p=>'<div class="entry"><div><strong>'+safe(p.title)+'</strong><small>'+safe(p.status)+" · "+safe(p.locale)+" · v"+p.revision+"</small></div><button data-open='"+safe(p.id)+"'>Открыть</button></div>").join("")||'<p>Статей пока нет. Создайте первую.</p>';
-document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openPost(b.dataset.open));
+async function claimOwner(){
+ const key=$("setup").value;if(!key)throw Error("Введите ключ активации");
+ await call("/bootstrap","POST",{setup_key:key});$("setup").value="";await initialize();toast("Главный редактор активирован");
 }
-function newPost(){current=null;blocks=[];$("title").value="";$("summary").value="";$("category").value="";$("locale").value=active.default_locale;$("editor").hidden=false;$("workTitle").textContent="Новый материал";renderBlocks();editorButtons();}
+async function loadData(){
+ const result=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug))]);
+ posts=result[0].posts||[];authors=result[1].authors||[];
+}
+function statusTag(s){return '<span class="chip '+(["in_review","scheduled"].includes(s)?"amber":s==="published"?"":"gray")+'">'+esc(statuses[s]||s)+'</span>'}
+function listEntry(p){
+ return '<div class="listItem"><div><strong>'+esc(p.title||"Без названия")+'</strong><div class="muted">'+esc(p.locale)+" · "+esc(p.updated_at?.slice(0,10)||"")+' · версия '+Number(p.revision||1)+'</div></div><div class="btns">'+statusTag(p.status)+'<button data-open-post="'+esc(p.id)+'">Открыть ↗</button></div></div>'
+}
+function authorMini(a){
+ return '<div class="authorCard"><span class="authorAvatar">'+esc((a.name||"A").slice(0,1))+'</span><div style="min-width:0;flex:1"><strong>'+esc(a.name)+'</strong><div class="muted small">'+(a.kind==="ai"?"ИИ-персонаж":"Приглашённый автор")+(a.kind==="partner"?" · "+esc(a.consent_status):"")+'</div></div><span class="chip">'+(a.kind==="ai"?"AI":"Автор")+'</span></div>';
+}
+function renderDashboard(){
+ const n=s=>posts.filter(x=>x.status===s).length;
+ $("statAll").textContent=posts.length;$("statDraft").textContent=n("draft")+n("changes_requested");
+ $("statReview").textContent=n("in_review");$("statPublished").textContent=n("published");
+ $("pipeDraft").textContent=n("draft")+n("changes_requested");$("pipeReview").textContent=n("in_review");
+ $("pipeReady").textContent=n("approved")+n("scheduled")+n("published");
+ $("recentPosts").innerHTML=posts.length?posts.slice(0,6).map(listEntry).join(""):'<div class="empty"><span class="emptyIcon">▤</span><h3>Пока нет публикаций</h3><p>Создай первый материал для журнала '+esc(project.name)+'</p><button class="primary" data-create>+ Первая статья</button></div>';
+ $("recentAuthors").innerHTML=authors.length?authors.slice(0,4).map(authorMini).join(""):'<div class="empty"><span class="emptyIcon">♙</span><b>Авторов ещё нет</b><p>Добавьте ИИ-персонажей или пригласите настоящих блогеров.</p><button data-open-tab="authors">Управлять авторами</button></div>';
+ $("channelSummary").innerHTML='<div class="channelCard"><span>❧ &nbsp;'+esc(project.name)+' Journal</span><span class="chip">Feed активен</span></div><div class="channelCard"><span>◈ &nbsp; Сайт / блог</span><span class="chip amber">Адаптер ожидает</span></div><div class="channelCard"><span>◎ &nbsp; Instagram</span><span class="chip amber">Подключить</span></div>';
+}
+function renderLibrary(){
+ $("library").innerHTML=posts.length?posts.map(listEntry).join(""):'<div class="empty"><span class="emptyIcon">▤</span><h3>Статей пока нет</h3><p>Добавьте первый материал для журнала</p><button class="primary" data-create>+ Написать статью</button></div>'
+}
+function renderAuthors(){
+ $("authorsList").innerHTML=authors.length?authors.map(a=>{
+ const canApprove=chiefRole()&&a.kind==="partner"&&a.consent_status!=="approved";
+ return '<div class="authorCard"><span class="authorAvatar">'+esc(a.name.slice(0,1))+'</span><div style="flex:1"><b>'+esc(a.name)+'</b><div class="small muted">'+esc(a.bio||"Без описания")+'</div><span class="chip '+(a.consent_status==="approved"?"":"amber")+'">'+(a.kind==="ai"?"ИИ-автор":a.consent_status==="approved"?"Права подтверждены":"Согласие ожидается")+'</span></div>'+(canApprove?'<button data-author-approve="'+esc(a.id)+'">Проверить права</button>':"")+'</div>';
+ }).join(""):'<div class="empty"><span class="emptyIcon">♙</span><h3>Создайте профиль автора</h3><p>Например, Ivy, Nora или Leo для NowGreen, либо настоящего партнёра.</p></div>';
+ $("authorKind").querySelector('option[value="ai"]').disabled=!chiefRole();
+}
+async function refreshPosts(){
+ const [ps,au]=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug))]);
+ posts=ps.posts||[];authors=au.authors||[];renderDashboard();renderLibrary();renderAuthors();
+}
+function paintPublication(){
+ const ready=posts.filter(p=>["approved","scheduled","published"].includes(p.status));
+ $("readyPosts").innerHTML=ready.length?ready.map(p=>'<div class="listItem"><div><b>'+esc(p.title)+'</b><div class="muted">'+esc(statuses[p.status])+'</div></div><button data-delivery="'+esc(p.id)+'">Проверить</button></div>').join(""):'<div class="empty"><span class="emptyIcon">↗</span><b>Готовых материалов пока нет</b><p>Утверждённые статьи появятся здесь.</p></div>';
+}
+async function viewDelivery(id){
+ const data=await call("/deliveries?post_id="+encodeURIComponent(id));
+ $("deliveryDetails").innerHTML='<h3 style="margin-top:20px">Результаты отправки</h3>'+(data.deliveries||[]).map(x=>'<div class="channelCard"><div><b>'+esc(channels[x.channel]||x.channel)+'</b><div class="small muted">'+esc(x.error||"")+'</div></div>'+statusTag(x.status)+'</div>').join("")||'<div class="tip">Каналы публикации пока не выбраны.</div>';
+}
+async function showTab(target,force=false){
+ if(!force&&target!==tab&&dirty&&!confirm("Есть несохранённые изменения. Покинуть конструктор?"))return;
+ if(target!==tab){dirty=false}
+ tab=target;
+ document.querySelectorAll("[data-view]").forEach(el=>el.classList.toggle("active",el.dataset.view===target));
+ document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("selected",el.dataset.tab===target));
+ const labels={home:["Обзор редакции","Сегодня в Journal Studio"],library:["Материалы","Черновики, проверка и опубликованные статьи"],editor:["Конструктор статей","Подготовка и предпросмотр"],authors:["Авторы","ИИ-персонажи и приглашённые блогеры"],publish:["Публикации","Каналы и результаты отправки"],settings:["Настройки","Аккаунт и подключение редакции"]};
+ $("headline").textContent=labels[target][0];$("subtitle").textContent=project.name+" · "+labels[target][1];
+ $("crumb").textContent="Journal Studio / "+labels[target][0];
+ if(target==="home")renderDashboard();
+ if(target==="library")renderLibrary();
+ if(target==="authors")renderAuthors();
+ if(target==="publish")paintPublication();
+ if(target==="editor")renderEditor();
+ if(target==="settings"){$("settingsProject").textContent=project.name;$("settingsRole").textContent=roles[project.role]||project.role}
+ window.scrollTo({top:0,behavior:"instant"});
+}
+function resetDraft(){
+ current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",blocks:[],author_id:null};
+ blocks=draft.blocks;assets={};placements=[];dirty=false;
+}
+async function createPost(){resetDraft();await showTab("editor",true);}
 async function openPost(id){
-current=(await api("/posts/"+id)).post;blocks=JSON.parse(JSON.stringify(current.blocks||[]));
-$("title").value=current.title;$("summary").value=current.summary;$("category").value=current.category;$("locale").value=current.locale;
-$("editor").hidden=false;$("workTitle").textContent=current.title;renderBlocks();editorButtons();
+ const x=(await call("/posts/"+encodeURIComponent(id))).post;
+ current=x;draft=structuredClone(x);blocks=draft.blocks||[];assets={};dirty=false;
+ placements=(await call("/placements?post_id="+encodeURIComponent(id))).placements||[];
+ await showTab("editor",true);
+ await fetchMedia();
 }
-function collect(){document.querySelectorAll("[data-block]").forEach(el=>{blocks[+el.dataset.block][el.dataset.prop]=el.value})}
-function renderBlocks(){
-const editable=!current||["draft","changes_requested"].includes(current.status);
-$("blocks").innerHTML=blocks.map((b,i)=>{
-let item='<div class="block"><label>'+safe(b.type)+'</label>';
-if(b.type==="image")item+='<small>📷 Фото загружено: '+safe(b.asset_id)+'</small><input data-block="'+i+'" data-prop="caption" value="'+safe(b.caption||'')+'" placeholder="Подпись">';
-else if(b.type==="link")item+='<input data-block="'+i+'" data-prop="label" value="'+safe(b.label||'')+'" placeholder="Подпись ссылки"><input data-block="'+i+'" data-prop="url" value="'+safe(b.url||'')+'" placeholder="https://...">';
-else item+='<textarea data-block="'+i+'" data-prop="text">'+safe(b.text||"")+'</textarea>';
-return item+(editable?'<button data-remove="'+i+'">Убрать блок</button>':'')+'</div>'
-}).join("");
-document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{collect();blocks.splice(+b.dataset.remove,1);renderBlocks()})
-for(const id of ["title","summary","category","locale"])$(id).disabled=!editable;
-$("editTools").hidden=!editable;
+function blockHtml(b,i,edit){
+ let inner="";
+ if(b.type==="link"){inner='<label>Текст ссылки</label><input data-block="'+i+'" data-prop="label" value="'+esc(b.label||"")+'"><label>URL</label><input data-block="'+i+'" data-prop="url" value="'+esc(b.url||"")+'" placeholder="https://...">';}
+ else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'">';}
+ else inner='<textarea data-block="'+i+'" data-prop="text" rows="'+(b.type==="text"?5:2)+'" placeholder="Введите текст">'+esc(b.text||"")+'</textarea>';
+ return '<div class="block"><div class="row"><strong>'+({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок")+'</strong>'+(edit?'<div class="btns"><button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button><button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+'</div>';
 }
-function editorButtons(){
-const s=current?.status||"draft",role=active.role;
-$("statusLine").textContent="Статус: "+s;
-$("save").hidden=!["draft","changes_requested"].includes(s);
-$("submit").hidden=!current||!["draft","changes_requested"].includes(s);
-$("approve").hidden=!current||s!=="in_review"||!["owner","chief_editor"].includes(role);
-$("return").hidden=!current||s!=="in_review"||!["owner","chief_editor","editor"].includes(role);
-$("publish").hidden=!current||s!=="approved"||!["owner","chief_editor"].includes(role);
-$("schedule").hidden=!current||s!=="approved"||!["owner","chief_editor"].includes(role);
+function capture(){
+ if(!draft)return;
+ for(const key of ["title","summary","locale","category"]){const el=$(key);if(el)draft[key]=el.value}
+ draft.author_id=$("authorSelect").value||null;
+ document.querySelectorAll("[data-block]").forEach(el=>{const b=blocks[+el.dataset.block];if(b)b[el.dataset.prop]=el.value});
 }
-function addBlock(t){collect();blocks.push(t==="link"?{type:t,label:"",url:""}:{type:t,text:""});renderBlocks()}
-async function upload(){
-const file=$("file").files[0];if(!file)return;if(file.size>8*1024*1024)throw Error("Файл больше 8 МБ");
-const holder=prompt("Автор изображения / правообладатель:","")||"",license=prompt("Лицензия / разрешение:","")||"";
-if(!confirm("Подтверждаете право использовать и публиковать фотографию?"))return;
-const data=await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(String(fr.result).split(",")[1]);fr.onerror=reject;fr.readAsDataURL(file)});
-const r=await api("/media","POST",{project:active.slug,base64:data,mime:file.type,rights_confirmed:true,copyright_holder:holder,license,alt_text:file.name});
-collect();blocks.push({type:"image",asset_id:r.asset.id,caption:"",alt:file.name});renderBlocks();message("Фотография загружена в закрытое хранилище");
+function renderEditor(){
+ $("editor").hidden=!draft;$("emptyEditor").hidden=!!draft;if(!draft)return;
+ const edit=editable();$("workTitle").textContent=current?.title||"Новый материал";
+ $("statusLine").innerHTML=statusTag(current?.status||"draft")+" · "+(current?"Версия "+current.revision:"Материал ещё не сохранён");
+ for(const k of ["title","summary","locale","category"]){$(k).value=draft[k]||"";$(k).disabled=!edit}
+ $("authorSelect").innerHTML='<option value="">Редакция</option>'+authors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.kind==="ai"?" · ИИ":"")+'</option>').join("");
+ $("authorSelect").value=draft.author_id||"";$("authorSelect").disabled=!edit;
+ $("blocks").innerHTML=blocks.map((b,i)=>blockHtml(b,i,edit)).join("")||'<div class="empty">Добавьте первый текстовый блок, заголовок или фотографию.</div>';
+ $("editTools").hidden=!edit;
+ const s=current?.status||"draft";
+ $("save").hidden=!edit;$("submit").hidden=!current||!edit;
+ $("return").hidden=!current||s!=="in_review"||!editorRole();
+ $("approve").hidden=!current||s!=="in_review"||!chiefRole();
+ $("publish").hidden=!current||s!=="approved"||!chiefRole();
+ $("schedule").hidden=!current||s!=="approved"||!chiefRole();
+ renderPreview();renderEditorChannels();
+}
+function renderPreview(){
+ if(!draft)return;
+ const a=authors.find(x=>x.id===draft.author_id);
+ $("preview").innerHTML='<div class="eyebrow">'+esc(draft.category||"Journal")+'</div><h2 style="margin-top:8px">'+esc(draft.title||"Заголовок будущей статьи")+'</h2><div class="small muted">'+esc(a?.name||"Редакция")+(a?.kind==="ai"?" · ИИ-автор":"")+' · '+esc(draft.locale||"ru")+'</div><p>'+esc(draft.summary||"Краткое описание статьи")+'</p>'+blocks.map(b=>{
+ switch(b.type){
+ case"text":return '<p>'+esc(b.text||"")+'</p>';
+ case"heading":return '<h3>'+esc(b.text||"")+'</h3>';
+ case"quote":return '<blockquote>'+esc(b.text||"")+'</blockquote>';
+ case"link":return /^https:\/\//.test(b.url||"")?'<p><a href="'+esc(b.url)+'" target="_blank" rel="noopener noreferrer">'+esc(b.label||b.url)+'</a></p>':"";
+ case"image":return assets[b.asset_id]?'<figure style="margin:15px 0"><img alt="'+esc(b.alt||"")+'" src="'+esc(assets[b.asset_id])+'"><figcaption class="small muted">'+esc(b.caption||"")+'</figcaption></figure>':'<p class="muted">📷 Фото будет показано после загрузки.</p>';
+ default:return "";
+ }
+ }).join("");
+}
+function renderEditorChannels(){
+ const html=placements.map(p=>'<div class="channelCard"><span>'+esc(channels[p.channel]||p.channel)+' · '+esc(p.locale)+'</span>'+statusTag(p.status)+'</div>').join("");
+ $("editorChannels").innerHTML=(html||'<p class="muted small">Сначала сохраните статью. Для журнала выбранного приложения будет создан канал по умолчанию.</p>')+
+ (current&&editable()?'<div style="display:flex;gap:8px"><select id="addChannel"><option value="website">Сайт</option><option value="wordpress">WordPress</option><option value="instagram">Instagram</option></select><button id="addChannelBtn">+ Добавить</button></div>':'');
+}
+async function addChannel(){
+ const ch=$("addChannel").value;if(!current)throw Error("Сначала сохраните материал");
+ await call("/placements","POST",{post_id:current.id,channel:ch,locale:current.locale});
+ placements=(await call("/placements?post_id="+current.id)).placements||[];renderEditorChannels();toast("Канал добавлен. Для внешней публикации потребуется авторизация.");
+}
+async function fetchMedia(){
+ const ids=[...new Set(blocks.filter(b=>b.type==="image").map(b=>b.asset_id))];
+ for(const id of ids){try{const r=await call("/media/"+id);assets[id]=r.url;}catch{}}
+ if(tab==="editor")renderEditor();
 }
 async function savePost(){
-collect();const data={title:$("title").value.trim(),summary:$("summary").value,category:$("category").value,locale:$("locale").value,blocks};
-if(!data.title)throw Error("Введите заголовок");
-const r=current?await api("/posts/"+current.id,"PATCH",{...data,expected_revision:current.revision}):await api("/posts","POST",{...data,project:active.slug});
-current=r.post;
-await api("/placements","POST",{post_id:current.id,channel:active.slug,locale:current.locale});
-await refresh();editorButtons();message("Черновик сохранён");
+ if(!draft)throw Error("Откройте конструктор");
+ capture();if(!draft.title?.trim())throw Error("Укажите заголовок");
+ const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,blocks};
+ let r;
+ if(current){r=await call("/posts/"+current.id,"PATCH",{...data,expected_revision:current.revision,author_id:draft.author_id||undefined})}
+ else {
+ r=await call("/posts","POST",{...data,project:project.slug});
+ if(draft.author_id){r=await call("/posts/"+r.post.id,"PATCH",{expected_revision:r.post.revision,author_id:draft.author_id})}
+ }
+ current=r.post;draft=structuredClone(current);blocks=draft.blocks||[];dirty=false;
+ try{await call("/placements","POST",{post_id:current.id,channel:project.slug,locale:current.locale})}catch(e){toast("Статья сохранена, но канал: "+e.message,true)}
+ placements=(await call("/placements?post_id="+current.id)).placements||[];
+ await refreshPosts();renderEditor();toast("Материал сохранён на сервере");
 }
 async function workflow(action){
-const b={action};if(action==="schedule"){b.scheduled_at=prompt("Дата и время публикации (ISO 8601):",new Date(Date.now()+86400000).toISOString());if(!b.scheduled_at)return}
-if(action==="request_changes")b.note=prompt("Комментарий автору:")||"";
-current=(await api("/posts/"+current.id+"/action","POST",b)).post;await refresh();editorButtons();message("Статус: "+current.status);
+ if(!current)throw Error("Сохраните материал");
+ if(dirty)throw Error("Есть изменения: сначала нажмите «Сохранить»");
+ const payload={action};
+ if(action==="request_changes"){const note=prompt("Комментарий автору:");if(note===null)return;payload.note=note}
+ if(action==="schedule"){
+ const value=prompt("Время выпуска в ISO 8601 (включая часовой пояс)",new Date(Date.now()+86400000).toISOString());if(!value)return;payload.scheduled_at=value;
+ }
+ const r=await call("/posts/"+current.id+"/action","POST",payload);
+ current=r.post;draft=structuredClone(current);blocks=draft.blocks||[];dirty=false;
+ await refreshPosts();renderEditor();toast("Статус изменён: "+(statuses[current.status]||current.status));
 }
-async function invite(){const address=prompt("E-mail приглашаемого автора:");if(!address)return;await api("/invite","POST",{project:active.slug,email:address,role:"author"});message("Приглашение отправлено")}
-function logout(){session=null;sessionStorage.removeItem("journal_session");$("gate").hidden=false;$("workspace").hidden=true}
-async function click(fn){try{await fn()}catch(e){message("Ошибка: "+e.message)}}
-$("login").onclick=()=>click(enter);$("register").onclick=()=>click(signup);$("activate").onclick=()=>click(bootstrap);
-$("create").onclick=()=>click(async()=>newPost());$("save").onclick=()=>click(savePost);$("submit").onclick=()=>click(()=>workflow("submit"));
-$("approve").onclick=()=>click(()=>workflow("approve"));$("return").onclick=()=>click(()=>workflow("request_changes"));
-$("publish").onclick=()=>click(()=>workflow("publish"));$("schedule").onclick=()=>click(()=>workflow("schedule"));
-$("invite").onclick=()=>click(invite);$("logout").onclick=logout;
-$("project").onchange=async e=>click(async()=>{active=projects.find(x=>x.slug===e.target.value);$("editor").hidden=true;await refresh()});
-document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addBlock(b.dataset.add));$("file").onchange=()=>click(upload);
-(async()=>{const q=new URLSearchParams(location.hash.slice(1));if(q.get("access_token")){session={access_token:q.get("access_token"),refresh_token:q.get("refresh_token")};sessionStorage.setItem("journal_session",JSON.stringify(session));history.replaceState(null,"",location.pathname)}
-else{try{session=JSON.parse(sessionStorage.getItem("journal_session")||"null")}catch{}}
-if(session)click(initialize)})();
+function addBlock(t){
+ if(!draft||!editable())return;capture();
+ blocks.push(t==="link"?{type:"link",label:"",url:""}:{type:t,text:""});draft.blocks=blocks;dirty=true;renderEditor();
+}
+function modifyBlock(index,operation){
+ if(!editable())return;capture();
+ if(operation==="remove")blocks.splice(index,1);
+ else{const to=index+(operation==="up"?-1:1);if(to<0||to>=blocks.length)return;[blocks[index],blocks[to]]=[blocks[to],blocks[index]]}
+ dirty=true;renderEditor();
+}
+async function upload(){
+ const f=$("file").files?.[0];if(!f)return;
+ if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>8*1024*1024)throw Error("Нужен JPG/PNG/WebP до 8 МБ");
+ const copyright=prompt("Кому принадлежат права на фотографию?",f.name);if(copyright===null)return;
+ const license=prompt("Лицензия / разрешение на публикацию:", "Собственная фотография");if(license===null)return;
+ if(!confirm("Подтверждаете право использовать фотографию в публикации?"))return;
+ const base64=await new Promise((ok,no)=>{const reader=new FileReader();reader.onload=()=>ok(String(reader.result).split(",")[1]);reader.onerror=no;reader.readAsDataURL(f)});
+ const r=await call("/media","POST",{project:project.slug,mime:f.type,base64,alt_text:f.name,copyright_holder:copyright,license,rights_confirmed:true});
+ capture();const b={type:"image",asset_id:r.asset.id,caption:"",alt:f.name};blocks.push(b);draft.blocks=blocks;dirty=true;
+ try{const media=await call("/media/"+r.asset.id);assets[r.asset.id]=media.url}catch{}
+ renderEditor();toast("Изображение добавлено. Сохраните материал.");
+}
+async function invite(){
+ if(!chiefRole())throw Error("Приглашать авторов может только главный редактор");
+ const email=prompt("Email автора:");if(!email)return;
+ await call("/invite","POST",{project:project.slug,email,role:"author"});toast("Приглашение отправлено на "+email);
+}
+async function saveAuthor(){
+ const name=$("authorName").value.trim();if(!name)throw Error("Введите имя");
+ const kind=$("authorKind").value;
+ await call("/authors","POST",{project:project.slug,name,bio:$("authorBio").value,kind,social_url:$("authorSocial").value.trim()});
+ $("authorName").value="";$("authorBio").value="";$("authorSocial").value="";
+ await refreshPosts();toast("Профиль автора создан");
+}
+async function approveAuthor(id){
+ const ref=prompt("Ссылка на согласие автора или номер договора:");
+ if(!ref)return;
+ await call("/authors/"+id+"/approve","POST",{consent_ref:ref});await refreshPosts();toast("Согласие автора подтверждено");
+}
+async function changeProject(slug){
+ if(dirty&&!confirm("Несохранённые изменения будут потеряны. Продолжить?")){$("project").value=project.slug;return}
+ const target=projects.find(p=>p.slug===slug);if(!target)return;
+ project=target;current=null;draft=null;placements=[];assets={};dirty=false;
+ $("invite").hidden=!chiefRole();$("authorsInvite").hidden=!chiefRole();
+ await loadData();await showTab("home",true);
+}
+async function run(f){
+ try{await f()}catch(e){toast("Ошибка: "+e.message,true)}
+}
+document.addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.tab) return void run(()=>showTab(b.dataset.tab));
+ if(b.dataset.openTab)return void run(()=>showTab(b.dataset.openTab));
+ if(b.dataset.create!==undefined)return void run(createPost);
+ if(b.dataset.openPost)return void run(()=>openPost(b.dataset.openPost));
+ if(b.dataset.delivery)return void run(()=>viewDelivery(b.dataset.delivery));
+ if(b.dataset.authorApprove)return void run(()=>approveAuthor(b.dataset.authorApprove));
+ if(b.dataset.add)return void run(async()=>addBlock(b.dataset.add));
+ if(b.dataset.blockRemove!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockRemove,"remove"));
+ if(b.dataset.blockUp!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockUp,"up"));
+ if(b.dataset.blockDown!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockDown,"down"));
+});
+for(const id of ["create","heroCreate","libraryCreate","editorCreate"])$(id).onclick=()=>run(createPost);
+for(const id of ["invite","authorsInvite"])$(id).onclick=()=>run(invite);
+$("saveAuthor").onclick=()=>run(saveAuthor);
+$("project").onchange=e=>run(()=>changeProject(e.target.value));
+$("login").onclick=()=>run(login);$("register").onclick=()=>run(signup);$("activate").onclick=()=>run(claimOwner);
+$("logout").onclick=signout;
+$("backLibrary").onclick=()=>run(()=>showTab("library"));
+$("save").onclick=()=>run(savePost);
+for(const x of ["submit","return","approve","publish","schedule"]){const action={submit:"submit",return:"request_changes",approve:"approve",publish:"publish",schedule:"schedule"}[x];$(x).onclick=()=>run(()=>workflow(action))}
+$("file").onchange=()=>run(upload);
+document.addEventListener("click",e=>{if(e.target?.id==="addChannelBtn")run(addChannel)});
+document.addEventListener("input",e=>{
+ if(!draft||tab!=="editor"||!editable())return;
+ const t=e.target;
+ if(["title","summary","category"].includes(t.id)){draft[t.id]=t.value;dirty=true;renderPreview()}
+ else if(t.dataset.block!==undefined){
+ const b=blocks[+t.dataset.block];if(b){b[t.dataset.prop]=t.value;dirty=true;renderPreview()}
+ }
+});
+document.addEventListener("change",e=>{
+ if(!draft||tab!=="editor"||!editable())return;
+ const t=e.target;if(t.id==="authorSelect"){draft.author_id=t.value||null;dirty=true;renderPreview()}
+ else if(t.id==="locale"){draft.locale=t.value;dirty=true;renderPreview()}
+});
+window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
+(async()=>{
+ const params=new URLSearchParams(location.hash.slice(1));
+ if(params.has("access_token")){session={access_token:params.get("access_token"),refresh_token:params.get("refresh_token")};sessionStorage.setItem("journal_session",JSON.stringify(session));history.replaceState(null,"",location.pathname)}
+ else{try{session=JSON.parse(sessionStorage.getItem("journal_session")||"null")}catch{}}
+ if(session)run(initialize);
+})();
