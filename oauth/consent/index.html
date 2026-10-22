@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://esm.sh; style-src 'self'; connect-src https://hkzzpfrifcbvgvzmrwvr.supabase.co https://esm.sh; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'none'; upgrade-insecure-requests">
+  <title>MyNow Mail — Подтверждение доступа</title>
+  <link rel="stylesheet" href="./consent.css?v=1">
+  <script type="module" src="./consent.js?v=1"></script>
+</head>
+<body>
+  <main>
+    <div class="brand"><span class="brand-icon">✉</span> MyNow Mail</div>
+    <h1>Разрешение на чтение почты</h1>
+    <p class="muted">ChatGPT запрашивает доступ к письмам MyNow Mail через защищённую авторизацию Supabase.</p>
+    <div class="notice">Только чтение. Отправка, удаление и изменение писем отключены на сервере.</div>
+    <section id="loading" class="muted" role="status">Проверяем запрос авторизации…</section>
+    <section id="login" hidden>
+      <form id="login-form" autocomplete="on">
+        <label for="email">Email пользователя Supabase Auth</label>
+        <input id="email" name="email" type="email" autocomplete="username" required>
+        <label for="password">Пароль пользователя Supabase Auth</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button id="signin" type="submit">Войти и проверить запрос</button>
+      </form>
+      <p class="muted note">Используй пароль, с которым прошёл проверку PowerShell. Это <strong>не</strong> пароль Namecheap. Данные входа отправляются только в Supabase Auth.</p>
+    </section>
+    <section id="consent" hidden>
+      <p class="notice">Проверь имя приложения и адрес возврата. Разрешай подключение, только если сам начал его в ChatGPT.</p>
+      <dl>
+        <dt>Приложение</dt><dd id="app-name"></dd>
+        <dt>Адрес возврата</dt><dd id="redirect-uri"></dd>
+        <dt>Запрошенные OAuth-права</dt><dd id="scopes"></dd>
+      </dl>
+      <button type="button" id="approve">Разрешить чтение почты</button>
+      <button type="button" id="deny" class="secondary">Отклонить</button>
+    </section>
+    <p class="error" id="error" role="alert"></p>
+    <footer>MyNow Apps · Secure OAuth 2.1</footer>
+  </main>
+</body>
+</html>
