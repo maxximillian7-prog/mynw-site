@@ -115,7 +115,7 @@ async function showTab(target,force=false){
  window.scrollTo({top:0,behavior:"instant"});
 }
 function resetDraft(){
- current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",blocks:[],author_id:null,cover_path:null};
+ current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",blocks:[],author_id:null,cover_path:null,template_id:"editorial"};
  blocks=draft.blocks;assets={};placements=[];dirty=false;
 }
 async function createPost(){resetDraft();await showTab("editor",true);}
@@ -182,7 +182,7 @@ async function fetchMedia(){
 async function savePost(){
  if(!draft)throw Error("Откройте конструктор");
  capture();if(!draft.title?.trim())throw Error("Укажите заголовок");
- const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,blocks,cover_path:draft.cover_path||null};
+ const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,blocks,cover_path:draft.cover_path||null,template_id:draft.template_id||"editorial"};
  let r;
  if(current){r=await call("/posts/"+current.id,"PATCH",{...data,expected_revision:current.revision,author_id:draft.author_id||undefined})}
  else {
