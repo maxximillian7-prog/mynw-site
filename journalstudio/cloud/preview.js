@@ -6,6 +6,23 @@ const live={mode:"phone",shape:"4:5",photo:0,ctx:null,articleKey:null,caption:""
 const link=u=>typeof u==="string"&&/^https:\/\//i.test(u);
 function allImages(c){return (c.blocks||[]).filter(b=>b.type==="image").map(b=>({id:b.asset_id,src:c.assets?.[b.asset_id],alt:b.alt||"",caption:b.caption||"",isCover:!!b.is_cover})).filter(b=>b.src)}
 function cover(c){const a=allImages(c),prefer=a.find(x=>x.id===c.draft?.cover_path||x.isCover);return prefer||a[0]||null}
+function cropData(c,id){
+ const block=(c.blocks||[]).find(b=>b.type==="image"&&b.asset_id===id);
+ const o=block?.crop||{};
+ const x=Math.max(0,Math.min(100,Number(o.x)||50)),y=Math.max(0,Math.min(100,Number(o.y)||50));
+ const zoom=Math.max(100,Math.min(250,Number(o.zoom)||100))/100;
+ const aspect=["1:1","4:5","16:9"].includes(o.aspect)?o.aspect.replace(":","/"):null;
+ return {x,y,zoom,aspect};
+}
+function imageStyle(c,id){
+ const v=cropData(c,id);
+ return 'object-position:'+v.x+'% '+v.y+'%;transform:scale('+v.zoom+');transform-origin:'+v.x+'% '+v.y+'%';
+}
+function imageFrame(c,id,src,alt,caption){
+ const v=cropData(c,id);
+ const css=v.aspect?' style="aspect-ratio:'+v.aspect+'"':'';
+ return '<figure><div class="jp-crop-frame"'+css+'><img loading="lazy" src="'+E(src)+'" alt="'+E(alt)+'" style="'+imageStyle(c,id)+'"></div>'+(caption?'<figcaption>'+E(caption)+'</figcaption>':'')+'</figure>';
+}
 function content(c){
 return (c.blocks||[]).map(b=>{
  const t=E(b.text||"");switch(b.type){
@@ -13,19 +30,19 @@ return (c.blocks||[]).map(b=>{
  case"text":return '<p>'+t+'</p>';
  case"quote":return '<blockquote>'+t+'</blockquote>';
  case"link":return link(b.url)?'<p class="jp-link">↗ <a target="_blank" rel="noopener noreferrer" href="'+E(b.url)+'">'+E(b.label||b.url)+'</a></p>':'';
- case"image":{const url=c.assets?.[b.asset_id];return url?'<figure><img loading="lazy" src="'+E(url)+'" alt="'+E(b.alt||"Фотография статьи")+'">'+(b.caption?'<figcaption>'+E(b.caption)+'</figcaption>':'')+'</figure>':'<p class="jp-placeholder">Изображение загружается…</p>'}
+ case"image":{const url=c.assets?.[b.asset_id];return url?imageFrame(c,b.asset_id,url,b.alt||"Фотография статьи",b.caption):'<p class="jp-placeholder">Изображение загружается…</p>'}
  default:return"";
  }
  }).join("")||'<p class="jp-placeholder">Содержание появится здесь, когда автор добавит блоки.</p>';
 }
 function articleTitle(c){return E(c.draft?.title||"Заголовок вашей будущей статьи")}
 function byline(c){const a=(c.authors||[]).find(x=>x.id===c.draft?.author_id);return E(a?.name||"Редакция MyNow")+(a?.kind==="ai"?" · ИИ-автор":"")}
-function imageOrPlaceholder(a,what){return a?'<img class="jp-cover-img" src="'+E(a.src)+'" alt="'+E(a.alt||what)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Обложка статьи</small></div>'}
+function imageOrPlaceholder(a,what,c){return a?'<img class="jp-cover-img" src="'+E(a.src)+'" alt="'+E(a.alt||what)+'" style="'+imageStyle(c,a.id)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Обложка статьи</small></div>'}
 function phone(c){
  const cv=cover(c);
  return '<div class="jp-phone-shell"><div class="jp-phone"><div class="jp-phone-top"><span>9:41</span><span>◉  ▂▃▅</span></div>'+
  '<div class="jp-appnav"><span>‹</span><strong>'+E(c.projectName||"NowGreen")+' Journal</strong><span>♡</span></div>'+
- '<div class="jp-article-scroll"><div class="jp-cover jp-mobile-cover">'+imageOrPlaceholder(cv,"Обложка")+'</div><div class="jp-article-body"><span class="jp-kicker">'+E(c.draft?.category||"ЖУРНАЛ")+'</span><h2>'+articleTitle(c)+'</h2><div class="jp-byline">✒ '+byline(c)+' · '+E(c.draft?.locale||"ru")+'</div><p class="jp-summary">'+E(c.draft?.summary||"Краткое описание статьи")+'</p><div class="jp-body">'+content(c)+'</div></div></div><div class="jp-phone-bar"><span>⌂</span><span>◫</span><span>♡</span><span>⚙</span></div></div></div>';
+ '<div class="jp-article-scroll"><div class="jp-cover jp-mobile-cover">'+imageOrPlaceholder(cv,"Обложка",c)+'</div><div class="jp-article-body"><span class="jp-kicker">'+E(c.draft?.category||"ЖУРНАЛ")+'</span><h2>'+articleTitle(c)+'</h2><div class="jp-byline">✒ '+byline(c)+' · '+E(c.draft?.locale||"ru")+'</div><p class="jp-summary">'+E(c.draft?.summary||"Краткое описание статьи")+'</p><div class="jp-body">'+content(c)+'</div></div></div><div class="jp-phone-bar"><span>⌂</span><span>◫</span><span>♡</span><span>⚙</span></div></div></div>';
 }
 function website(c){
  const cv=cover(c);
@@ -33,7 +50,7 @@ function website(c){
  '<div class="jp-sitehead"><b>MYNOW <span>JOURNAL</span></b><span>Главная &nbsp;&nbsp; Статьи &nbsp;&nbsp; Авторы</span></div>'+
  '<div class="jp-webarticle"><div class="jp-crumb">Журнал / '+E(c.projectName||"NowGreen")+' / '+E(c.draft?.category||"Советы")+'</div>'+
  '<span class="jp-kicker">'+E(c.draft?.category||"РЕДАКЦИЯ")+'</span><h2>'+articleTitle(c)+'</h2><div class="jp-byline">'+byline(c)+' · Пример страницы статьи</div>'+
- '<div class="jp-cover jp-site-cover">'+imageOrPlaceholder(cv,"Обложка")+'</div><p class="jp-summary">'+E(c.draft?.summary||"Краткое описание статьи")+'</p><div class="jp-body">'+content(c)+'</div></div>'+
+ '<div class="jp-cover jp-site-cover">'+imageOrPlaceholder(cv,"Обложка",c)+'</div><p class="jp-summary">'+E(c.draft?.summary||"Краткое описание статьи")+'</p><div class="jp-body">'+content(c)+'</div></div>'+
  '<footer>© MyNow Apps · Пример макета сайта</footer></div>';
 }
 function insta(c){
@@ -44,7 +61,7 @@ function insta(c){
  const short=caption.slice(0,2200);
  return '<div class="jp-insta-wrap"><div class="jp-instagram"><div class="jp-insta-header"><div class="jp-insta-logo">◎</div><strong>Instagram</strong><span>♡ &nbsp;➤</span></div>'+
  '<div class="jp-insta-user"><span class="jp-insta-avatar">✦</span><div><strong>mynow.apps</strong><small>Пример аккаунта издателя</small></div><span>···</span></div>'+
- '<div class="jp-insta-media '+(live.shape==="1:1"?"square":"portrait")+'">'+(a?'<img src="'+E(a.src)+'" alt="'+E(a.alt||"Фото публикации")+'">':'<div class="jp-cover-empty"><span>❧</span><small>Добавьте фото для Instagram</small></div>')+
+ '<div class="jp-insta-media '+(live.shape==="1:1"?"square":"portrait")+'">'+(a?'<img src="'+E(a.src)+'" alt="'+E(a.alt||"Фото публикации")+'" style="'+imageStyle(c,a.id)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Добавьте фото для Instagram</small></div>')+
  (photos.length>1?'<button class="jp-photo-prev" data-jp-step="-1" title="Предыдущее фото">‹</button><button class="jp-photo-next" data-jp-step="1" title="Следующее фото">›</button><span class="jp-photo-count">'+(live.photo%photos.length+1)+' / '+photos.length+'</span>':'')+'</div>'+
  '<div class="jp-insta-actions">♡ &nbsp; ▢ &nbsp; ➤ <span>♧</span></div><p class="jp-insta-caption"><b>mynow.apps </b>'+E(short)+'</p><div class="jp-insta-muted">Предпросмотр · без отправки в Instagram</div></div>'+
  '<div class="jp-insta-guidance"><strong>Особенности Instagram</strong><p>Фото будет обрезано под выбранное соотношение. Прямые ссылки из текста статьи здесь не становятся кликабельными. Для этой площадки обычно нужна отдельная короткая подпись и подборка фотографий.</p>'+
@@ -57,6 +74,9 @@ function render(ctx){
   live.captionDirty=false;
  }else if(!live.captionDirty&&ctx.instagramCaption!==undefined&&ctx.instagramCaption!==live.caption)live.caption=ctx.instagramCaption||"";
  live.ctx=ctx;const root=document.getElementById("preview");if(!root)return;
+ const template=String(ctx.draft?.template_id||"editorial");
+ root.classList.remove("jp-template-editorial","jp-template-guide","jp-template-story","jp-template-gallery","jp-template-minimal");
+ root.classList.add(["editorial","guide","story","gallery","minimal"].includes(template)?"jp-template-"+template:"jp-template-editorial");
  root.innerHTML=live.mode==="site"?website(ctx):live.mode==="instagram"?insta(ctx):phone(ctx);
  document.querySelectorAll("[data-preview-mode]").forEach(x=>{x.classList.toggle("selected",x.dataset.previewMode===live.mode);x.setAttribute("aria-pressed",x.dataset.previewMode===live.mode?"true":"false")});
  const shapes=document.getElementById("jpShape");if(shapes)shapes.hidden=live.mode!=="instagram";
