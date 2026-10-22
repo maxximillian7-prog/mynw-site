@@ -58,6 +58,7 @@ function versionUI(){
    "Новая версия «"+label(activeChannel)+"» создана на основе основной статьи. Сохраните её отдельно.";
  }
  const select=document.getElementById("templateSelect");if(select){select.value=draft?.template_id||"editorial";select.disabled=!editable()}
+ const authorSel=document.getElementById("authorSelect");if(authorSel&&activeChannel!=="base")authorSel.disabled=true;
  const save=document.getElementById("save");if(save&&activeChannel!=="base"&&editable())save.textContent="Сохранить версию: "+label(activeChannel);else if(save)save.textContent="Сохранить статью";
  const variantsCount=variants.length;
  const channelPanel=document.getElementById("editorChannels");
@@ -191,5 +192,16 @@ document.addEventListener("drop",e=>{
  capture();const [item]=blocks.splice(from,1);blocks.splice(to,0,item);draft.blocks=blocks;dirty=true;renderEditor();toast("Блок перемещён. Сохраните изменения.");
 });
 document.addEventListener("dragend",()=>{dragIndex=null;$all("#blocks .block").forEach(x=>x.classList.remove("dragging","drop-target"))});
+window.StudioFeatures={
+ saveCaptionForActiveVersion:async function(caption){
+   if(activeChannel!=="instagram")return false;
+   if(!current||!editable())throw Error("После согласования изменить подпись нельзя");
+   draft.caption=String(caption||"").slice(0,2200);
+   dirty=true;
+   await savePost();
+   return true;
+ },
+ activeVersion:()=>activeChannel
+};
 roleUI();
 })();
