@@ -125,7 +125,16 @@ savePost=async function(...args){
  await refreshPosts();await fetchMedia();renderEditor();toast("Редакционная версия «"+label(activeChannel)+"» сохранена на сервере");
 };
 const oldDashboard=renderDashboard;
-renderDashboard=function(...args){oldDashboard(...args);roleUI()};
+renderDashboard=function(...args){
+ oldDashboard(...args);roleUI();
+ if(!isAuthor())return;
+ const items=document.getElementById("recentPosts");
+ if(items)items.innerHTML=posts.length?posts.map(listEntry).join(""):'<div class="empty"><h3>У вас пока нет статей</h3><p>Создайте первый материал и отправьте его редактору.</p><button class="primary" data-create>+ Начать статью</button></div>';
+ const recentTitle=$s('[data-view="home"] .dashboardGrid .sectionHeading h2');
+ if(recentTitle)recentTitle.textContent="Все мои статьи";
+ const browse=$s('[data-view="home"] [data-open-tab="library"]');
+ if(browse)browse.hidden=true;
+};
 const oldAuthors=renderAuthors;
 renderAuthors=function(...args){
  oldAuthors(...args);roleUI();
