@@ -20,7 +20,7 @@ session=await auth("token?grant_type=password",{email:mail,password});sessionSto
 async function signup(){
 const password=$("password").value,email=$("email").value.trim();
 if(password.length<12)throw Error("Пароль не короче 12 символов");
-const j=await auth("signup",{email,password,options:{email_redirect_to:location.origin+location.pathname}});
+const j=await auth("signup?redirect_to="+encodeURIComponent(location.origin+location.pathname),{email,password});
 if(j.access_token){session=j;sessionStorage.setItem("journal_session",JSON.stringify(session));await initialize()}
 else message("Подтвердите электронную почту по письму и войдите с этим паролем")
 }
