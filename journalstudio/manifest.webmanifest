@@ -1,0 +1,10 @@
+{
+  "name": "Journal Studio — MyNow Apps",
+  "short_name": "Journal Studio",
+  "start_url": "/journalstudio/",
+  "scope": "/journalstudio/",
+  "display": "standalone",
+  "background_color": "#f4f6f0",
+  "theme_color": "#193a2d",
+  "description": "Локальная редакция MyNow Apps"
+}
