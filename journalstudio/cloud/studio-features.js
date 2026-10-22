@@ -2,7 +2,7 @@
 /* Journal Studio v0.4 — shared advanced constructor + role-aware workspace.
    This module extends the authenticated editor; permissions remain server-enforced. */
 (function(){
-let activeChannel="base",variants=[],dragIndex=null,knownPostId=null;
+let activeChannel="base",variants=[],dragIndex=null,knownPostId=null,editAuthorId=null;
 const templates={editorial:"Журнал",guide:"Инструкция",story:"История",gallery:"Галерея",minimal:"Минимализм"};
 const $s=s=>document.querySelector(s),$all=s=>Array.from(document.querySelectorAll(s));
 const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -145,6 +145,26 @@ renderAuthors=function(...args){
  const heading=$s('[data-view="authors"] h2');if(heading)heading.textContent="Мой профиль";
  const inviteBtn=document.getElementById("authorsInvite");if(inviteBtn)inviteBtn.hidden=true;
  const note=document.getElementById("authorProfileHint");if(note)note.hidden=false;
+ if(pane&&authors.length&&!pane.querySelector("[data-edit-own-author]")){
+   const items=authors.filter(a=>a.kind==="partner");
+   pane.insertAdjacentHTML("beforeend",'<div class="btns">'+items.map(a=>'<button type="button" data-edit-own-author="'+escape(a.id)+'">✎ Изменить профиль: '+escape(a.name)+'</button>').join("")+'</div>');
+ }
+ const save=document.getElementById("saveAuthor");
+ if(save)save.textContent=editAuthorId?"Сохранить изменения":"Создать профиль";
+};
+const oldSaveAuthor=saveAuthor;
+saveAuthor=async function(...args){
+ if(!editAuthorId)return oldSaveAuthor(...args);
+ const author=authors.find(a=>a.id===editAuthorId);
+ if(!author||author.kind!=="partner")throw Error("Профиль недоступен");
+ const name=document.getElementById("authorName").value.trim();
+ if(!name)throw Error("Укажите имя автора");
+ const data={name,bio:document.getElementById("authorBio").value,social_url:document.getElementById("authorSocial").value.trim()};
+ const response=await call("/authors/"+editAuthorId,"PATCH",data);
+ editAuthorId=null;
+ for(const id of ["authorName","authorBio","authorSocial"])document.getElementById(id).value="";
+ await refreshPosts();renderAuthors();
+ toast(response.consent_requires_review?"Профиль обновлён. Изменённая ссылка требует повторного согласования.":"Профиль сохранён");
 };
 const oldPublish=paintPublication;
 paintPublication=function(...args){
@@ -161,6 +181,18 @@ const oldRenderChannels=renderEditorChannels;
 renderEditorChannels=function(...args){oldRenderChannels(...args);if(draft)versionUI()};
 document.addEventListener("click",e=>{
  const button=e.target.closest("button");if(!button)return;
+ if(button.dataset.editOwnAuthor!==undefined){
+ e.preventDefault();
+ const person=authors.find(x=>x.id===button.dataset.editOwnAuthor);
+ if(!person)return;
+ editAuthorId=person.id;
+ document.getElementById("authorName").value=person.name||"";
+ document.getElementById("authorBio").value=person.bio||"";
+ document.getElementById("authorSocial").value=person.social_links?.website||"";
+ document.getElementById("authorKind").value="partner";
+ document.getElementById("saveAuthor").textContent="Сохранить изменения";
+ document.getElementById("authorName").focus();
+ }
  if(button.dataset.version!==undefined){e.preventDefault();run(()=>chooseVersion(button.dataset.version))}
  if(button.dataset.studioGrip!==undefined)e.preventDefault();
 });
