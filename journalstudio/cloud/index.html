@@ -46,6 +46,38 @@
 .jp-insta-muted{font-size:10px;color:#aaa;padding:4px 13px 12px}.jp-insta-guidance{padding:12px;color:#687b70;font-size:11px}.jp-insta-guidance p{margin:5px 0}.jp-counter{font-weight:700;color:#306947}
 .jp-shape-row{display:flex;align-items:center;gap:11px;margin:9px 0}.jp-shape-row label{margin:0;flex:none}.jp-shape-row select{width:auto;flex:1;padding:8px;font-size:12px}
 .jp-caption-fields{padding:12px 13px;background:#f7f9f4;border:1px solid #e1e9db;border-radius:12px;margin:10px 0 16px}.jp-caption-fields textarea{font-size:12px;min-height:110px}.jp-caption-fields .row{margin-top:8px}.jp-caption-fields .row button{font-size:11px;padding:8px 10px}.jp-upload-area{padding:17px;border:1px dashed #b9d6be;background:#f7fbf7;border-radius:14px;margin-top:15px}.jp-upload-area .row{margin-bottom:7px}.jp-upload-area label{margin-top:10px}.jp-check{display:flex;gap:9px;align-items:center;font-size:12px;color:#365f47;margin:14px 0!important}.jp-check input{width:auto;margin:0;flex:none}.jp-cover-select{padding:6px 9px!important;font-size:11px!important}.jp-cover-select.active{background:#dff0e1;color:#22694a;border-color:#b0d1b5}
+
+/* Author workspace and advanced editorial constructor */
+[data-studio-role="author"] [data-admin-nav],[data-studio-role="author"] [data-tab="library"],[data-studio-role="author"] #studioHero,[data-studio-role="author"] #invite,[data-studio-role="author"] #authorsInvite{display:none!important}
+[data-studio-role="author"] #authorHomeHint,[data-studio-role="author"] #authorProfileHint{display:block!important}
+[data-studio-role="author"] .sidebarFoot .tiny{display:none}
+.studio-version-bar{background:#f3f7f2;border-radius:14px;border:1px solid #e3ede3;padding:14px;margin-bottom:19px}
+.studio-version-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}
+.studio-version-tabs button{padding:8px 11px;font-size:12px;background:white}
+.studio-version-tabs button.selected{background:#245b42;border-color:#245b42;color:white}
+.studio-version-bar .muted{margin:8px 0 0}
+.studio-template-picker{background:#f9fbf7;border:1px solid #e6ede4;border-radius:12px;padding:13px 15px;margin-top:12px}
+.studio-template-picker p{margin:6px 0 0}
+#blocks .block{position:relative}
+#blocks .block[draggable="true"]{cursor:grab}
+#blocks .block.dragging{opacity:.45;border-style:solid}
+#blocks .block.drop-target{outline:2px dashed #438763;outline-offset:3px}
+.studio-grip{border:0;background:#edf5ed;color:#2d6047;font-size:18px;padding:4px 8px;margin-right:9px;cursor:grab}
+.studio-crop{background:#f0f6ee;border-radius:10px;padding:12px;margin-top:11px;border:1px solid #d8e7d9}
+.studio-crop label{font-size:11px;margin:8px 0 3px}
+.studio-crop input[type=range]{padding:0;accent-color:#3c8656;height:20px}
+.studio-crop .studio-slider-row{display:grid;grid-template-columns:1fr 42px;gap:10px;align-items:center}
+.studio-crop .studio-slider-row output{text-align:right;font-size:11px;color:#345c43;font-weight:750}
+.studio-crop-preview{margin:13px 0 8px;border-radius:10px;overflow:hidden;background:#d9e6d5;max-width:220px;aspect-ratio:4/5}
+.studio-crop-preview img{display:block;width:100%;height:100%;object-fit:cover}
+.studio-variant-badge{font-size:11px;display:inline-block;margin:5px 5px 5px 0;border-radius:40px;background:#e4f0e5;padding:4px 9px;color:#336a4b}
+.jp-crop-frame{position:relative;overflow:hidden;max-width:100%;border-radius:9px}
+.jp-crop-frame img{width:100%;height:100%;display:block;object-fit:cover}
+.jp-template-guide .jp-body h3{border-left:4px solid #7fb68b;padding-left:10px}
+.jp-template-story .jp-body p:first-child{font-family:Georgia,serif;font-size:18px}
+.jp-template-gallery .jp-body figure{margin:20px -7px}
+.jp-template-minimal .jp-body{font-size:12px;letter-spacing:.01em}
+
 </style></head><body>
 <div id="gate">
 <div class="gateHero"><div class="brand"><span class="brandMark">✦</span><span>Journal Studio<small>MYNOW EDITORIAL</small></span></div><div><div class="eyebrow" style="color:#d3e6d8">Центр управления публикациями</div><h1>Истории, которые хочется читать.</h1><p>Создавайте статьи вместе с ИИ и реальными авторами. Редактируйте, утверждайте и публикуйте в своих приложениях и на сайтах — из одной редакции.</p><div class="gateList"><span>✎ Конструктор</span><span>◈ Авторы</span><span>✓ Согласование</span><span>↗ Публикации</span></div></div><div style="color:#c2dbc7;font-size:12px">MyNow Apps · закрытое рабочее пространство</div></div>
@@ -60,20 +92,20 @@
 <div class="brand"><span class="brandMark">✦</span><span>Journal Studio<small>MYNOW PUBLISHING</small></span></div>
 <div class="navhead">РАБОЧЕЕ ПРОСТРАНСТВО</div>
 <nav class="nav" aria-label="Разделы">
-<button class="selected" data-tab="home"><b>▦</b> Главная</button>
-<button data-tab="library"><b>▤</b> Материалы</button>
-<button data-tab="editor"><b>✎</b> Конструктор</button>
-<button data-tab="authors"><b>♙</b> Авторы</button>
-<button data-tab="publish"><b>↗</b> Публикации</button></nav>
+<button class="selected" data-tab="home"><b>▦</b> <span data-role-label="home">Главная</span></button>
+<button data-tab="library"><b>▤</b> <span data-role-label="library">Материалы</span></button>
+<button data-tab="editor"><b>✎</b> <span data-role-label="editor">Конструктор</span></button>
+<button data-tab="authors"><b>♙</b> <span data-role-label="authors">Авторы</span></button>
+<button data-tab="publish"><b>↗</b> <span data-role-label="publish">Публикации</span></button></nav>
 <div class="navhead">УПРАВЛЕНИЕ</div>
-<nav class="nav"><button data-tab="settings"><b>⚙</b> Настройки</button></nav>
+<nav class="nav" data-admin-nav><button data-tab="settings"><b>⚙</b> Настройки</button></nav>
 <div class="sidebarFoot"><div id="userDisplay">Редакционный аккаунт</div><div class="tiny">Доступ по приглашению · MyNow</div><button id="logout">↩ Выйти</button></div>
 </aside>
 <main class="main">
 <header class="topbar"><div class="topTitle"><div class="eyebrow" id="crumb">Journal Studio / Обзор</div><h1 id="headline">Редакционная панель</h1><div class="muted small" id="subtitle">Работа со статьями и авторами</div></div>
 <div class="topControls"><select id="project" aria-label="Выбор приложения"></select><button id="invite">+ Автор</button><button id="create" class="primary">+ Новая статья</button><span class="avatar" id="avatar">JS</span></div></header>
 <section class="view active" data-view="home">
-<div class="hero"><div><div class="eyebrow" style="color:#c5e5cc">MYNOW · EDITORIAL WORKSPACE</div><h2>Хорошие идеи становятся публикациями.</h2><p>Создавайте материалы, собирайте иллюстрации и ссылки. Все черновики проходят через главного редактора.</p><button id="heroCreate">Создать материал ↗</button></div><div class="heroArtwork">✦</div></div>
+<div id="authorHomeHint" class="card" hidden><span class="eyebrow">ЛИЧНЫЙ КАБИНЕТ АВТОРА</span><h2 style="margin:6px 0">Ваши материалы и редакционные решения</h2><p class="muted">Здесь отображаются только ваши статьи. Вы можете создавать, исправлять и отправлять материалы на проверку. Публикацию утверждает редактор.</p></div><div class="hero" id="studioHero"><div><div class="eyebrow" style="color:#c5e5cc">MYNOW · EDITORIAL WORKSPACE</div><h2>Хорошие идеи становятся публикациями.</h2><p>Создавайте материалы, собирайте иллюстрации и ссылки. Все черновики проходят через главного редактора.</p><button id="heroCreate">Создать материал ↗</button></div><div class="heroArtwork">✦</div></div>
 <div class="metrics">
 <div class="card metric"><div class="row"><span class="muted">Всего статей</span><span class="iconbox">▤</span></div><strong id="statAll">0</strong><small>В выбранном приложении</small></div>
 <div class="card metric"><div class="row"><span class="muted">Черновики</span><span class="iconbox">✎</span></div><strong id="statDraft">0</strong><small>В работе редакции</small></div>
@@ -90,12 +122,12 @@
 <div id="emptyEditor" class="card"><div class="empty"><span class="emptyIcon">✎</span><h2>Откройте статью или начните новую</h2><p>Блочный конструктор сохранит черновик на сервере редакции.</p><button class="primary" id="editorCreate">+ Создать статью</button></div></div>
 <div id="editor" hidden><div class="sectionHeading"><div><div class="eyebrow">КОНСТРУКТОР МАТЕРИАЛА</div><h2 id="workTitle">Новая статья</h2><p id="statusLine">Черновик</p></div><div class="btns"><button id="backLibrary">← К библиотеке</button></div></div>
 <div class="editorGrid"><div class="stack">
-<div class="card editorHeader"><h2>Основная информация</h2><label for="title">Заголовок</label><input id="title" maxlength="200" placeholder="Например: Как подготовить растения к зиме">
+<div class="card editorHeader"><h2>Основная информация</h2><div id="versionBar" class="studio-version-bar"><div class="eyebrow">ВЕРСИИ ДЛЯ ПЛОЩАДОК</div><div class="studio-version-tabs" role="group" aria-label="Версия статьи"><button data-version="base" class="selected" type="button">Основная статья</button><button data-version="website" type="button">Сайт</button><button data-version="instagram" type="button">Instagram</button></div><p id="versionHint" class="small muted">Основная статья для приложения. Для других площадок создаются независимые версии.</p></div><label for="title">Заголовок</label><input id="title" maxlength="200" placeholder="Например: Как подготовить растения к зиме">
 <label for="summary">Краткое описание</label><textarea id="summary" placeholder="О чём эта статья и зачем её читать?"></textarea>
 <div class="editorFields"><div><label for="locale">Язык материала</label><select id="locale"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="it">Italiano</option></select></div><div><label for="category">Рубрика</label><input id="category" placeholder="Советы, сезон, уход"></div></div>
-<div><label for="authorSelect">Автор статьи</label><select id="authorSelect"><option value="">Редакция</option></select></div></div>
+<div><label for="authorSelect">Автор статьи</label><select id="authorSelect"><option value="">Редакция</option></select></div><div class="studio-template-picker"><label for="templateSelect">Шаблон оформления</label><select id="templateSelect"><option value="editorial">Журнал — классическая статья</option><option value="guide">Пошаговая инструкция</option><option value="story">История автора</option><option value="gallery">Фотогалерея</option><option value="minimal">Минималистичный</option></select><p class="small muted">Шаблон можно менять отдельно для каждой площадки.</p></div></div>
 <div class="card"><div class="sectionHeading"><div><h2>Содержание статьи</h2><p>Располагайте изображения и текст в нужном порядке</p></div></div>
-<div id="blocks"></div><div id="editTools"><div class="btns">
+<p class="small muted">Перетаскивайте блоки за значок ⠿, либо используйте стрелки ↑↓ на телефоне. Перемещение не публикует материал автоматически.</p><div id="blocks" aria-label="Блоки статьи"></div><div id="editTools"><div class="btns">
 <button data-add="heading">+ Заголовок</button><button data-add="text">+ Текст</button><button data-add="quote">+ Цитата</button><button data-add="link">+ Ссылка</button></div>
 <div class="jp-upload-area"><div class="row"><strong>📷 Фото для статьи</strong><span class="chip">JPG · PNG · WebP</span></div><p class="small muted" style="margin:8px 0">Загружайте собственные снимки. Можно добавить несколько фото, расположить их между абзацами и выбрать обложку.</p><label for="file">Выберите фотографию (до 8 МБ)</label><input id="file" type="file" accept="image/png,image/jpeg,image/webp"><label for="imageAlt">Описание фото для читателей</label><input id="imageAlt" placeholder="Например: зелёные листья монстеры у окна"><div class="editorFields"><div><label for="imageCopyright">Фотограф / правообладатель</label><input id="imageCopyright" placeholder="Ваше имя"></div><div><label for="imageLicense">Основание использования</label><select id="imageLicense"><option value="own">Моя фотография</option><option value="licensed">Есть разрешение автора</option><option value="other">Другая подтверждённая лицензия</option></select></div></div><label class="jp-check"><input id="imageRights" type="checkbox"> Я подтверждаю, что имею право опубликовать это изображение</label><button type="button" class="primary" id="uploadImage">+ Добавить фото в статью</button></div></div>
 <div class="workflow"><div class="eyebrow">РЕДАКЦИОННЫЙ ПРОЦЕСС</div><div class="btns" style="margin-top:9px"><button id="save" class="primary">Сохранить</button><button id="submit">На проверку</button><button id="return">На доработку</button><button id="approve">✓ Утвердить</button><button id="publish" class="primary">↗ Опубликовать</button><button id="schedule">◷ Запланировать</button></div></div>
@@ -103,11 +135,12 @@
 <div class="stack editorPreview"><div class="card"><div class="sectionHeading"><div><h2>Предпросмотр публикации</h2><p>Выберите площадку до утверждения статьи</p></div><span class="chip">Live preview</span></div><div class="jp-mode-switch" role="group" aria-label="Формат предпросмотра"><button type="button" data-preview-mode="phone" class="selected">▯ Телефон</button><button type="button" data-preview-mode="site">▤ Сайт</button><button type="button" data-preview-mode="instagram">◎ Instagram</button></div><div id="jpShape" class="jp-shape-row" hidden><label for="jpAspect">Формат фото</label><select id="jpAspect"><option value="4:5">Вертикальный 4:5</option><option value="1:1">Квадрат 1:1</option></select></div><div id="jpCaptionFields" class="jp-caption-fields" hidden><label for="jpCaptionText">Подпись для Instagram (необязательно)</label><textarea id="jpCaptionText" maxlength="2200" rows="4" placeholder="Здесь можно написать отдельный текст для Instagram. Если оставить пустым, будет создан краткий вариант из статьи."></textarea><div class="row"><span id="jpCaptionLength" class="small muted">0 / 2200</span><button type="button" id="jpSaveCaption">Сохранить подпись</button></div><div class="small muted" style="margin-top:7px">Сохраняется отдельно от основного текста статьи. Без подключения Meta пост не отправляется.</div></div><div id="preview" class="jp-preview-window" aria-live="polite"><div class="empty">Добавьте заголовок и блоки, чтобы увидеть статью.</div></div><div id="jpNotice" class="jp-preview-note">Предварительный макет без публикации.</div></div>
 <div class="card"><h2>Каналы публикации</h2><div id="editorChannels"></div><div class="tip">Внешние площадки подключаются отдельно. Утверждение материала не означает, что он уже появился в Instagram.</div></div></div></div></div>
 </section>
-<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2"><div class="card"><div id="authorsList"></div></div><div class="card"><h2>Новый профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorBio">О себе / специализация</label><textarea id="authorBio"></textarea><label for="authorSocial">Ссылка на страницу автора</label><input id="authorSocial" type="url" placeholder="https://"><button id="saveAuthor" class="primary" style="margin-top:15px">Добавить автора</button><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div></section>
+<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2"><div class="card"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card"><h2>Новый профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorBio">О себе / специализация</label><textarea id="authorBio"></textarea><label for="authorSocial">Ссылка на страницу автора</label><input id="authorSocial" type="url" placeholder="https://"><button id="saveAuthor" class="primary" style="margin-top:15px">Добавить автора</button><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div></section>
 <section class="view" data-view="publish"><div class="sectionHeading"><div><h2>Центр публикаций</h2><p>Отслеживание публикаций по каналам</p></div></div><div class="grid2"><div class="card"><h2>Готовые статьи</h2><div id="readyPosts"></div><div id="deliveryDetails"></div></div><div class="card"><h2>Подключённые направления</h2><div class="channelCard"><span>❧ &nbsp; Журнал приложения</span><span class="chip">Studio Feed активен</span></div><div class="channelCard"><span>◎ &nbsp; Instagram</span><span class="chip amber">Нужен Meta API</span></div><div class="channelCard"><span>◈ &nbsp; Веб-сайт / блог</span><span class="chip amber">Нужно подключить</span></div><div class="tip">Публикация статьи в Studio Feed не равна появлению статьи в установленном мобильном приложении, пока клиент NowGreen не подключён к новому API.</div></div></div></section>
 <section class="view" data-view="settings"><div class="card"><h2>Настройки редакции</h2><p>Выбранный проект: <strong id="settingsProject">—</strong></p><p>Роль аккаунта: <strong id="settingsRole">—</strong></p><p class="muted">Авторизация: Supabase Auth. Данные хранятся в выделенной базе Journal Studio.</p><div class="tip"><b>Подтверждение email</b><p>Чтобы письма вели обратно в редакцию, в Supabase → Authentication → URL Configuration укажите Site URL и Redirect URL: <code>https://mynw.app/journalstudio/cloud/</code></p></div><p class="small muted">ИИ-генерация и внешние публикации будут включены после настройки соответствующих ключей.</p></div></section>
 </main></div>
 <div id="status" role="status" aria-live="polite"></div>
 <script defer src="./preview.js?v=20261023-4"></script>
-<script defer src="./client.js?v=20261023-4"></script>
+<script defer src="./client.js?v=20261023-5"></script>
+<script defer src="./studio-features.js?v=20261023-5"></script>
 </body></html>
