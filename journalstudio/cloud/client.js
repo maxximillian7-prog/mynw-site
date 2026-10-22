@@ -159,7 +159,7 @@ function renderEditor(){
 function renderPreview(){
  if(!draft)return;
  if(window.JournalPreview && typeof window.JournalPreview.render==="function"){
-   window.JournalPreview.render({draft,blocks,assets,authors,projectName:project?.name||"NowGreen"});
+   window.JournalPreview.render({draft,blocks,assets,authors,projectName:project?.name||"NowGreen",postId:current?.id||null,postKey:current?.id||draft,canEdit:editable(),instagramCaption:placements.find(p=>p.channel==="instagram"&&p.locale===draft.locale)?.settings?.caption||""});
    return;
  }
  $("preview").textContent="Предпросмотр загружается…";
@@ -236,6 +236,16 @@ async function upload(){
  $("file").value="";$("imageAlt").value="";$("imageRights").checked=false;
  renderEditor();toast("Фото добавлено. При необходимости выберите другое фото в качестве обложки, затем сохраните статью.");
 }
+async function saveInstagramCaption(){
+ if(!draft||!current)throw Error("Сначала сохраните статью");
+ if(!editable())throw Error("Подпись нельзя менять после согласования");
+ if(dirty)throw Error("Сначала сохраните изменения статьи");
+ const caption=window.JournalPreview?.getCaption?.()||"";
+ await call("/placements/settings","POST",{post_id:current.id,channel:"instagram",caption,description:""});
+ placements=(await call("/placements?post_id="+current.id)).placements||[];
+ window.JournalPreview?.setSavedCaption?.(caption);
+ renderEditorChannels();toast("Подпись Instagram сохранена отдельно от статьи");
+}
 async function invite(){
  if(!chiefRole())throw Error("Приглашать авторов может только главный редактор");
  const email=prompt("Email автора:");if(!email)return;
@@ -287,6 +297,7 @@ $("backLibrary").onclick=()=>run(()=>showTab("library"));
 $("save").onclick=()=>run(savePost);
 for(const x of ["submit","return","approve","publish","schedule"]){const action={submit:"submit",return:"request_changes",approve:"approve",publish:"publish",schedule:"schedule"}[x];$(x).onclick=()=>run(()=>workflow(action))}
 $("uploadImage").onclick=()=>run(upload);
+$("jpSaveCaption").onclick=()=>run(saveInstagramCaption);
 document.addEventListener("click",e=>{if(e.target?.id==="addChannelBtn")run(addChannel)});
 document.addEventListener("input",e=>{
  if(!draft||tab!=="editor"||!editable())return;
