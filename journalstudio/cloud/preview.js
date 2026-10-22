@@ -37,7 +37,7 @@ function website(c){
  '<footer>© MyNow Apps · Пример макета сайта</footer></div>';
 }
 function insta(c){
- const photos=allImages(c),a=photos[live.photo%photos.length]||cover(c),b=c.draft||{};
+ const photos=allImages(c).sort((a,b)=>Number(b.id===c.draft?.cover_path)-Number(a.id===c.draft?.cover_path)),a=photos[live.photo%photos.length]||cover(c),b=c.draft||{};
  const intro=[b.summary||"",...((c.blocks||[]).filter(x=>x.type==="text").slice(0,3).map(x=>x.text||""))].filter(Boolean).join("\n\n");
  const selectedTitle=b.title||"Заголовок вашей публикации";
  const caption=live.caption.trim()||selectedTitle+"\n\n"+(intro||"Описание публикации")+"\n\n"+(c.blocks||[]).filter(x=>x.type==="link"&&link(x.url)).map(x=>x.url).join("\n");
@@ -61,7 +61,7 @@ function render(ctx){
  document.querySelectorAll("[data-preview-mode]").forEach(x=>{x.classList.toggle("selected",x.dataset.previewMode===live.mode);x.setAttribute("aria-pressed",x.dataset.previewMode===live.mode?"true":"false")});
  const shapes=document.getElementById("jpShape");if(shapes)shapes.hidden=live.mode!=="instagram";
  const captionFields=document.getElementById("jpCaptionFields");if(captionFields)captionFields.hidden=live.mode!=="instagram";
- const captionInput=document.getElementById("jpCaptionText");if(captionInput&&document.activeElement!==captionInput)captionInput.value=live.caption;
+ const captionInput=document.getElementById("jpCaptionText");if(captionInput){captionInput.disabled=!ctx.canEdit;if(document.activeElement!==captionInput)captionInput.value=live.caption;}
  const counter=document.getElementById("jpCaptionLength");if(counter)counter.textContent=live.caption.length+" / 2200";
  const save=document.getElementById("jpSaveCaption");if(save){save.disabled=!ctx.postId||!ctx.canEdit;save.title=!ctx.postId?"Сначала сохраните статью":!ctx.canEdit?"После утверждения подпись заблокирована":"";}
  const notice=document.getElementById("jpNotice");if(notice)notice.textContent=live.mode==="phone"?"Пример отображения в приложении. Окончательный дизайн зависит от версии NowGreen.":live.mode==="site"?"Пример веб-статьи. Публичный сайт журнала пока не подключён.":"Макет публикации Instagram. Формат, обрезка и детали могут отличаться от приложения Meta.";
