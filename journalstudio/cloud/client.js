@@ -115,7 +115,7 @@ async function showTab(target,force=false){
  window.scrollTo({top:0,behavior:"instant"});
 }
 function resetDraft(){
- current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",blocks:[],author_id:null};
+ current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",blocks:[],author_id:null,cover_path:null};
  blocks=draft.blocks;assets={};placements=[];dirty=false;
 }
 async function createPost(){resetDraft();await showTab("editor",true);}
@@ -129,7 +129,7 @@ async function openPost(id){
 function blockHtml(b,i,edit){
  let inner="";
  if(b.type==="link"){inner='<label>Текст ссылки</label><input data-block="'+i+'" data-prop="label" value="'+esc(b.label||"")+'"><label>URL</label><input data-block="'+i+'" data-prop="url" value="'+esc(b.url||"")+'" placeholder="https://...">';}
- else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'">';}
+ else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'"><label>Альтернативный текст (для доступности)</label><input data-block="'+i+'" data-prop="alt" value="'+esc(b.alt||"")+'">'+(edit?'<button type="button" class="jp-cover-select '+(draft?.cover_path===b.asset_id?'active':'')+'" data-block-cover="'+i+'">'+(draft?.cover_path===b.asset_id?'✓ Выбрана обложкой':'○ Сделать обложкой')+'</button>':'');}
  else inner='<textarea data-block="'+i+'" data-prop="text" rows="'+(b.type==="text"?5:2)+'" placeholder="Введите текст">'+esc(b.text||"")+'</textarea>';
  return '<div class="block"><div class="row"><strong>'+({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок")+'</strong>'+(edit?'<div class="btns"><button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button><button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+'</div>';
 }
@@ -158,17 +158,11 @@ function renderEditor(){
 }
 function renderPreview(){
  if(!draft)return;
- const a=authors.find(x=>x.id===draft.author_id);
- $("preview").innerHTML='<div class="eyebrow">'+esc(draft.category||"Journal")+'</div><h2 style="margin-top:8px">'+esc(draft.title||"Заголовок будущей статьи")+'</h2><div class="small muted">'+esc(a?.name||"Редакция")+(a?.kind==="ai"?" · ИИ-автор":"")+' · '+esc(draft.locale||"ru")+'</div><p>'+esc(draft.summary||"Краткое описание статьи")+'</p>'+blocks.map(b=>{
- switch(b.type){
- case"text":return '<p>'+esc(b.text||"")+'</p>';
- case"heading":return '<h3>'+esc(b.text||"")+'</h3>';
- case"quote":return '<blockquote>'+esc(b.text||"")+'</blockquote>';
- case"link":return /^https:\/\//.test(b.url||"")?'<p><a href="'+esc(b.url)+'" target="_blank" rel="noopener noreferrer">'+esc(b.label||b.url)+'</a></p>':"";
- case"image":return assets[b.asset_id]?'<figure style="margin:15px 0"><img alt="'+esc(b.alt||"")+'" src="'+esc(assets[b.asset_id])+'"><figcaption class="small muted">'+esc(b.caption||"")+'</figcaption></figure>':'<p class="muted">📷 Фото будет показано после загрузки.</p>';
- default:return "";
+ if(window.JournalPreview && typeof window.JournalPreview.render==="function"){
+   window.JournalPreview.render({draft,blocks,assets,authors,projectName:project?.name||"NowGreen"});
+   return;
  }
- }).join("");
+ $("preview").textContent="Предпросмотр загружается…";
 }
 function renderEditorChannels(){
  const html=placements.map(p=>'<div class="channelCard"><span>'+esc(channels[p.channel]||p.channel)+' · '+esc(p.locale)+'</span>'+statusTag(p.status)+'</div>').join("");
@@ -188,7 +182,7 @@ async function fetchMedia(){
 async function savePost(){
  if(!draft)throw Error("Откройте конструктор");
  capture();if(!draft.title?.trim())throw Error("Укажите заголовок");
- const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,blocks};
+ const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,blocks,cover_path:draft.cover_path||null};
  let r;
  if(current){r=await call("/posts/"+current.id,"PATCH",{...data,expected_revision:current.revision,author_id:draft.author_id||undefined})}
  else {
@@ -218,21 +212,29 @@ function addBlock(t){
 }
 function modifyBlock(index,operation){
  if(!editable())return;capture();
- if(operation==="remove")blocks.splice(index,1);
+ if(operation==="remove"){const item=blocks[index];blocks.splice(index,1);if(item?.asset_id===draft.cover_path){draft.cover_path=blocks.find(x=>x.type==="image")?.asset_id||null}}
  else{const to=index+(operation==="up"?-1:1);if(to<0||to>=blocks.length)return;[blocks[index],blocks[to]]=[blocks[to],blocks[index]]}
  dirty=true;renderEditor();
 }
 async function upload(){
- const f=$("file").files?.[0];if(!f)return;
- if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>8*1024*1024)throw Error("Нужен JPG/PNG/WebP до 8 МБ");
- const copyright=prompt("Кому принадлежат права на фотографию?",f.name);if(copyright===null)return;
- const license=prompt("Лицензия / разрешение на публикацию:", "Собственная фотография");if(license===null)return;
- if(!confirm("Подтверждаете право использовать фотографию в публикации?"))return;
+ const f=$("file").files?.[0];
+ if(!f)throw Error("Выберите фотографию");
+ if(!draft||!editable())throw Error("Материал не открыт для редактирования");
+ if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>8*1024*1024)throw Error("Нужен JPG, PNG или WebP до 8 МБ");
+ if(!$("imageRights").checked)throw Error("Подтвердите право публикации фото");
+ const copyright=$("imageCopyright").value.trim();
+ if(!copyright)throw Error("Введите имя фотографа или правообладателя");
+ const license=$("imageLicense").value;
+ const alt=$("imageAlt").value.trim()||f.name;
  const base64=await new Promise((ok,no)=>{const reader=new FileReader();reader.onload=()=>ok(String(reader.result).split(",")[1]);reader.onerror=no;reader.readAsDataURL(f)});
- const r=await call("/media","POST",{project:project.slug,mime:f.type,base64,alt_text:f.name,copyright_holder:copyright,license,rights_confirmed:true});
- capture();const b={type:"image",asset_id:r.asset.id,caption:"",alt:f.name};blocks.push(b);draft.blocks=blocks;dirty=true;
+ const r=await call("/media","POST",{project:project.slug,mime:f.type,base64,alt_text:alt,copyright_holder:copyright,license,rights_confirmed:true});
+ capture();const b={type:"image",asset_id:r.asset.id,caption:"",alt};
+ blocks.push(b);draft.blocks=blocks;
+ if(!draft.cover_path)draft.cover_path=b.asset_id;
+ dirty=true;
  try{const media=await call("/media/"+r.asset.id);assets[r.asset.id]=media.url}catch{}
- renderEditor();toast("Изображение добавлено. Сохраните материал.");
+ $("file").value="";$("imageAlt").value="";$("imageRights").checked=false;
+ renderEditor();toast("Фото добавлено. При необходимости выберите другое фото в качестве обложки, затем сохраните статью.");
 }
 async function invite(){
  if(!chiefRole())throw Error("Приглашать авторов может только главный редактор");
@@ -270,6 +272,7 @@ document.addEventListener("click",e=>{
  if(b.dataset.delivery)return void run(()=>viewDelivery(b.dataset.delivery));
  if(b.dataset.authorApprove)return void run(()=>approveAuthor(b.dataset.authorApprove));
  if(b.dataset.add)return void run(async()=>addBlock(b.dataset.add));
+ if(b.dataset.blockCover!==undefined)return void run(async()=>{const item=blocks[+b.dataset.blockCover];if(!item||item.type!=="image")return;capture();draft.cover_path=item.asset_id;dirty=true;renderEditor();toast("Обложка выбрана. Сохраните изменения.");});
  if(b.dataset.blockRemove!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockRemove,"remove"));
  if(b.dataset.blockUp!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockUp,"up"));
  if(b.dataset.blockDown!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockDown,"down"));
@@ -283,7 +286,7 @@ $("logout").onclick=signout;
 $("backLibrary").onclick=()=>run(()=>showTab("library"));
 $("save").onclick=()=>run(savePost);
 for(const x of ["submit","return","approve","publish","schedule"]){const action={submit:"submit",return:"request_changes",approve:"approve",publish:"publish",schedule:"schedule"}[x];$(x).onclick=()=>run(()=>workflow(action))}
-$("file").onchange=()=>run(upload);
+$("uploadImage").onclick=()=>run(upload);
 document.addEventListener("click",e=>{if(e.target?.id==="addChannelBtn")run(addChannel)});
 document.addEventListener("input",e=>{
  if(!draft||tab!=="editor"||!editable())return;
