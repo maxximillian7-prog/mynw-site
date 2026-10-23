@@ -260,6 +260,10 @@ function renderEditor(){
  const s=current?.status||"draft";
  $("save").hidden=!edit;$("submit").hidden=!current||!edit;
  $("deletePost").hidden=!current||!canDeletePost(current);
+ $("hidePost").hidden=!current||!canManagePost(current);
+ $("hidePost").textContent=current?.is_hidden?"Показать статью":"Скрыть статью";
+ $("editPublishedPost").hidden=!current||!canManagePost(current)||
+  !["published","approved","scheduled","in_review"].includes(current.status);
  $("return").hidden=!current||s!=="in_review"||!editorRole();
  $("approve").hidden=!current||s!=="in_review"||!chiefRole();
  $("publish").hidden=!current||s!=="approved"||!chiefRole();
@@ -441,6 +445,9 @@ document.addEventListener("click",e=>{
  if(b.dataset.openTab)return void run(()=>showTab(b.dataset.openTab));
  if(b.dataset.create!==undefined)return void run(createPost);
  if(b.dataset.openPost)return void run(()=>openPost(b.dataset.openPost));
+ if(b.dataset.editPost)return void run(()=>editArticle(b.dataset.editPost));
+ if(b.dataset.articleTranslations)return void run(()=>openArticleTranslations(b.dataset.articleTranslations));
+ if(b.dataset.togglePostHidden)return void run(()=>toggleArticleHidden(b.dataset.togglePostHidden));
  if(b.dataset.deletePost)return void run(()=>deletePost(b.dataset.deletePost));
  if(b.dataset.delivery)return void run(()=>viewDelivery(b.dataset.delivery));
  if(b.dataset.authorApprove)return void run(()=>approveAuthor(b.dataset.authorApprove));
@@ -460,6 +467,8 @@ $("logout").onclick=signout;
 $("backLibrary").onclick=()=>run(()=>showTab("library"));
 $("save").onclick=()=>run(savePost);
 $("deletePost").onclick=()=>run(()=>current&&deletePost(current.id));
+$("hidePost").onclick=()=>run(()=>current&&toggleArticleHidden(current.id));
+$("editPublishedPost").onclick=()=>run(()=>current&&editArticle(current.id));
 $("publishedTopicSave").onclick=()=>run(async()=>{
  if(!current||!chiefRole()||!["approved","scheduled","published"].includes(current.status))throw Error("Недоступно для данной статьи");
  const id=$("topicSelect").value||null;
