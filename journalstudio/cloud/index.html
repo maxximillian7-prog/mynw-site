@@ -200,6 +200,18 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-cover-indicator button{font-size:12px}
 .studio-cover-indicator .studio-cover-title{font-size:13px;font-weight:850}
 .studio-cover-indicator .studio-cover-note{font-size:11px;color:var(--muted)}
+.studio-topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:15px 0 22px}
+.studio-topic-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper)}
+.studio-topic-image{width:100%;aspect-ratio:4/3;display:grid;place-items:center;background:var(--mint);overflow:hidden}
+.studio-topic-image img{width:100%;height:100%;object-fit:cover}
+.studio-topic-card-content{padding:12px}
+.studio-topic-card-content h3{font-size:15px;margin:0 0 6px}
+.studio-topic-card-content p{margin:0 0 10px;font-size:11px}
+.studio-topic-form{padding:17px;border:1px solid var(--line);border-radius:16px}
+.studio-topic-form input[type=checkbox]{width:auto}
+.studio-topic-upload{margin:18px 0 8px;padding:14px;border:1px dashed var(--line);border-radius:12px;display:grid;gap:8px}
+.studio-topic-preview img{width:100%;max-width:270px;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
+@media(max-width:560px){.studio-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 </head><body>
@@ -243,7 +255,29 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <div class="stack"><div class="card"><div class="sectionHeading"><div><h2>Авторы журнала</h2><p>ИИ-авторы и приглашённые эксперты</p></div><button data-open-tab="authors">Все ↗</button></div><div id="recentAuthors"></div></div>
 <div class="card"><h2>Каналы публикации</h2><div id="channelSummary"></div><p class="small muted" style="margin:16px 0 0">Публикации в приложение ожидают интеграции мобильного клиента; социальные сети требуют подключения.</p></div></div></div>
 </section>
-<section class="view" data-view="library"><div class="card"><div class="sectionHeading"><div><h2>Библиотека материалов</h2><p>Все статьи выбранного приложения</p></div><button class="primary" id="libraryCreate">+ Написать статью</button></div><div id="library"></div></div></section>
+<section class="view" data-view="library">
+<div class="card" id="studioTopicsPanel">
+ <div class="sectionHeading"><div><h2>Темы журнала</h2><p>Создайте темы, назначьте изображения и распределяйте статьи по ним.</p></div><button type="button" id="topicsRefresh">↻ Темы</button></div>
+ <div id="studioTopicList" class="studio-topic-grid"></div>
+ <form id="studioTopicForm" class="studio-topic-form">
+  <div class="editorFields">
+    <div><label for="topicTitleInput">Название темы</label><input id="topicTitleInput" maxlength="100" required placeholder="Например: Комнатные растения"></div>
+    <div><label for="topicSlugInput">Код темы (латиницей)</label><input id="topicSlugInput" maxlength="60" pattern="[a-z0-9-]{2,60}" required placeholder="indoor-plants"></div>
+  </div>
+  <div class="editorFields">
+    <div><label for="topicImageSelect">Изображение темы</label><select id="topicImageSelect"><option value="">Без изображения</option></select><p class="small muted">Картинка выбирается из одобренной медиатеки. Повторная загрузка не нужна.</p></div>
+    <div><label for="topicTitlePt">Название для PT (необязательно)</label><input id="topicTitlePt" maxlength="100" placeholder="Plantas de interior"></div>
+  </div>
+  <div class="btns"><button type="button" id="topicMediaRefresh">↻ Загрузить медиатеку</button><button class="primary" type="submit" id="topicSave">+ Создать тему</button><button type="button" id="topicCancel" hidden>Отмена</button></div>
+  <div class="studio-topic-upload"><label for="topicNewImage">Загрузить изображение темы (JPG, PNG, WebP, до 8 МБ)</label><input type="file" id="topicNewImage" accept="image/png,image/jpeg,image/webp">
+  <label for="topicImageCopyright">Автор / правообладатель</label><input id="topicImageCopyright" maxlength="160" placeholder="Имя или компания">
+  <label><input type="checkbox" id="topicImageRights"> Подтверждаю права на использование этого изображения</label>
+  <button type="button" id="topicUploadImage">↑ Сохранить изображение в медиатеке</button></div>
+  <div id="topicImagePreview" class="studio-topic-preview" hidden></div>
+  <p id="studioTopicStatus" class="small muted" role="status"></p>
+ </form>
+</div>
+<div class="card"><div class="sectionHeading"><div><h2>Библиотека материалов</h2><p>Все статьи выбранного приложения</p></div><button class="primary" id="libraryCreate">+ Написать статью</button></div><div id="library"></div></div></section>
 <section class="view" data-view="editor">
 <div id="emptyEditor" class="card"><div class="empty"><span class="emptyIcon">✎</span><h2>Откройте статью или начните новую</h2><p>Блочный конструктор сохранит черновик на сервере редакции.</p><button class="primary" id="editorCreate">+ Создать статью</button></div></div>
 <div id="editor" hidden><div class="sectionHeading"><div><div class="eyebrow">КОНСТРУКТОР МАТЕРИАЛА</div><h2 id="workTitle">Новая статья</h2><p id="statusLine">Черновик</p></div><div class="btns"><button id="backLibrary">← К библиотеке</button></div></div>
@@ -251,6 +285,7 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <div class="card editorHeader"><h2>Основная информация</h2><div id="versionBar" class="studio-version-bar"><div class="eyebrow">ВЕРСИИ ДЛЯ ПЛОЩАДОК</div><div class="studio-version-tabs" role="group" aria-label="Версия статьи"><button data-version="base" class="selected" type="button">Основная статья</button><button data-version="website" type="button">Сайт</button><button data-version="instagram" type="button">Instagram</button></div><p id="versionHint" class="small muted">Основная статья для приложения. Для других площадок создаются независимые версии.</p></div><label for="title">Заголовок</label><input id="title" maxlength="200" placeholder="Например: Как подготовить растения к зиме">
 <label for="summary">Краткое описание</label><textarea id="summary" placeholder="О чём эта статья и зачем её читать?"></textarea>
 <div class="editorFields"><div><label for="locale">Язык материала</label><select id="locale"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="it">Italiano</option></select></div><div><label for="category">Рубрика</label><input id="category" placeholder="Советы, сезон, уход"></div></div>
+<div><label for="topicSelect">Тема журнала</label><select id="topicSelect"><option value="">Без темы</option></select><p class="small muted">Тему можно создать на вкладке «Материалы». Изображение темы хранится отдельно от обложки статьи.</p></div>
 <div><label for="authorSelect">Автор статьи</label><select id="authorSelect"><option value="">Редакция</option></select></div><div class="studio-template-picker"><label for="templateSelect">Шаблон оформления</label><select id="templateSelect"><option value="editorial">Журнал — классическая статья</option><option value="guide">Пошаговая инструкция</option><option value="story">История автора</option><option value="gallery">Фотогалерея</option><option value="minimal">Минималистичный</option></select><p class="small muted">Шаблон можно менять отдельно для каждой площадки.</p></div></div>
 <div class="card"><div class="sectionHeading"><div><h2>Содержание статьи</h2><p>Располагайте изображения и текст в нужном порядке</p></div></div>
 <p class="small muted">Перетаскивайте блоки за значок ⠿, либо используйте стрелки ↑↓ на телефоне. Перемещение не публикует материал автоматически.</p><div id="studioCoverIndicator" class="studio-cover-indicator" aria-live="polite"></div>
@@ -368,4 +403,5 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./ai-studio.js?v=20261023-15"></script>
 <script defer src="./studio-images.js?v=20261023-23"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
+<script defer src="./journal-topics.js?v=20261023-41"></script>
 </body></html>
