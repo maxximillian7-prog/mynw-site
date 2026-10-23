@@ -173,7 +173,10 @@ function renderEditor(){
  $("statusLine").innerHTML=statusTag(current?.status||"draft")+" · "+(current?"Версия "+current.revision:"Материал ещё не сохранён");
  for(const k of ["title","summary","locale","category"]){$(k).value=draft[k]||"";$(k).disabled=!edit}
  $("topicSelect").innerHTML='<option value="">Без темы</option>'+topics.filter(t=>t.is_active).map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title)+'</option>').join("");
- $("topicSelect").value=draft.topic_id||"";$("topicSelect").disabled=!edit;
+ $("topicSelect").value=draft.topic_id||"";
+ const canReassign=!!current&&["approved","scheduled","published"].includes(current.status)&&chiefRole();
+ $("topicSelect").disabled=!(edit||canReassign);
+ $("publishedTopicSave").hidden=!canReassign;
  $("authorSelect").innerHTML='<option value="">Редакция</option>'+authors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.kind==="ai"?" · ИИ":"")+'</option>').join("");
  $("authorSelect").value=draft.author_id||"";$("authorSelect").disabled=!edit;
  $("blocks").innerHTML=blocks.map((b,i)=>blockHtml(b,i,edit)).join("")||'<div class="empty">Добавьте первый текстовый блок, заголовок или фотографию.</div>';
@@ -379,6 +382,16 @@ $("login").onclick=()=>run(login);$("register").onclick=()=>run(signup);$("activ
 $("logout").onclick=signout;
 $("backLibrary").onclick=()=>run(()=>showTab("library"));
 $("save").onclick=()=>run(savePost);
+$("publishedTopicSave").onclick=()=>run(async()=>{
+ if(!current||!chiefRole()||!["approved","scheduled","published"].includes(current.status))throw Error("Недоступно для данной статьи");
+ const id=$("topicSelect").value||null;
+ const result=await call("/posts/"+encodeURIComponent(current.id)+"/topic","PATCH",{
+  topic_id:id,expected_revision:current.revision
+ });
+ current=result.post;draft.topic_id=id;
+ await refreshPosts();renderEditor();
+ toast("Тема опубликованной статьи обновлена. Основное содержание не менялось.");
+});
 for(const x of ["submit","return","approve","publish","schedule"]){const action={submit:"submit",return:"request_changes",approve:"approve",publish:"publish",schedule:"schedule"}[x];$(x).onclick=()=>run(()=>workflow(action))}
 $("uploadImage").onclick=()=>run(upload);
 $("jpSaveCaption").onclick=()=>run(saveInstagramCaption);
