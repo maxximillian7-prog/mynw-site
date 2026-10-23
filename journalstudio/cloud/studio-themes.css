@@ -1,0 +1,128 @@
+/* Journal Studio project palettes.
+   NG: retain current interface, NC: site warm ochre reference,
+   NW: requested blue (site currently indigo), NK: requested yellow (site currently blue).
+   CSS-only visual changes; authorization and publication state are unaffected. */
+:root,body[data-studio-app="nowgreen"]{
+  --studio-accent:#3e815f;--studio-muted-accent:#cfe6d1;
+  --studio-hero-a:#254d3b;--studio-hero-b:#3c7855;--studio-gate-a:#143b30;--studio-gate-b:#20523a;
+  --studio-hero-copy:#ddf0df;--studio-decor:#eaf2d7;
+  --studio-nav-hover:#315e49;--studio-nav-edge:#9cce99;--studio-nav-text:#c9e0d0;
+  --studio-nav-divider:#3d6251;--studio-nav-bottom:#2c5946;
+  --studio-symbol-bg:#d7e8c9;--studio-symbol-fg:#346549;
+  --studio-soft-panel:#f6f8f4;--studio-warm-panel:#fff7e7;
+  --studio-accent-contrast:#24583d;
+}
+body[data-studio-app="nowcook"]{
+  --ink:#423125;--muted:#877365;--deep:#5b4030;--deep2:#70513d;--green:#986337;
+  --line:#e9dfd3;--cream:#faf6ef;--mint:#f3e7d9;
+  --studio-accent:#bf752a;--studio-muted-accent:#f8e4c8;
+  --studio-hero-a:#6c4a32;--studio-hero-b:#a77346;--studio-gate-a:#4e3528;--studio-gate-b:#79533a;
+  --studio-hero-copy:#f5e7d6;--studio-decor:#ffddb2;
+  --studio-nav-hover:#7c5c43;--studio-nav-edge:#efc58f;--studio-nav-text:#e9d7c6;
+  --studio-nav-divider:#80634e;--studio-nav-bottom:#73533e;
+  --studio-symbol-bg:#f3ddbf;--studio-symbol-fg:#855228;
+  --studio-soft-panel:#faf4ec;--studio-warm-panel:#fff0d9;
+  --studio-accent-contrast:#805020;
+}
+body[data-studio-app="nowwhat"]{
+  --ink:#213750;--muted:#72849c;--deep:#204668;--deep2:#2b5981;--green:#347bb3;
+  --line:#dce8f2;--cream:#f2f8fd;--mint:#e1effa;
+  --studio-accent:#3989c9;--studio-muted-accent:#d2eaff;
+  --studio-hero-a:#265580;--studio-hero-b:#4c94c3;--studio-gate-a:#193e64;--studio-gate-b:#306b99;
+  --studio-hero-copy:#e3f2ff;--studio-decor:#e1f4ff;
+  --studio-nav-hover:#356789;--studio-nav-edge:#9bcced;--studio-nav-text:#d6eafa;
+  --studio-nav-divider:#477391;--studio-nav-bottom:#325e80;
+  --studio-symbol-bg:#d5eafa;--studio-symbol-fg:#256a99;
+  --studio-soft-panel:#f1f7fc;--studio-warm-panel:#e7f4ff;
+  --studio-accent-contrast:#275a86;
+}
+body[data-studio-app="nowkids"]{
+  --ink:#4a4026;--muted:#857960;--deep:#6a5429;--deep2:#836629;--green:#a37a1d;
+  --line:#eee4c9;--cream:#fffcf1;--mint:#fff1c9;
+  --studio-accent:#c39423;--studio-muted-accent:#ffeaaa;
+  --studio-hero-a:#8b6b27;--studio-hero-b:#c89d3a;--studio-gate-a:#554622;--studio-gate-b:#8e702f;
+  --studio-hero-copy:#fff8df;--studio-decor:#fff0b7;
+  --studio-nav-hover:#856d39;--studio-nav-edge:#f0ce6b;--studio-nav-text:#f7e9c0;
+  --studio-nav-divider:#98804a;--studio-nav-bottom:#806735;
+  --studio-symbol-bg:#ffebb7;--studio-symbol-fg:#7c601b;
+  --studio-soft-panel:#fffbec;--studio-warm-panel:#fff0c4;
+  --studio-accent-contrast:#72551a;
+}
+/* Color surfaces and accents that are hard-coded in the original NG stylesheet. */
+body[data-studio-app] .sidebar{background:var(--deep)}
+body[data-studio-app] .sidebar .brandMark{background:var(--studio-symbol-bg);color:var(--studio-symbol-fg)}
+body[data-studio-app] .nav button{color:var(--studio-nav-text)}
+body[data-studio-app] .nav button:hover,
+body[data-studio-app] .nav button.selected{background:var(--studio-nav-hover);color:#fff}
+body[data-studio-app] .nav button.selected{box-shadow:inset 3px 0 0 var(--studio-nav-edge)}
+body[data-studio-app] .sidebarFoot{border-top-color:var(--studio-nav-divider);color:var(--studio-nav-text)}
+body[data-studio-app] .sidebarFoot button{background:var(--studio-nav-bottom);border-color:var(--studio-nav-divider);color:#fff}
+body[data-studio-app] .navhead{color:var(--studio-nav-text)}
+body[data-studio-app] .hero{background:linear-gradient(116deg,var(--studio-hero-a),var(--studio-hero-b))}
+body[data-studio-app] .hero p{color:var(--studio-hero-copy)}
+body[data-studio-app] .hero .eyebrow{color:var(--studio-hero-copy)!important}
+body[data-studio-app] .heroArtwork{color:var(--studio-decor)}
+body[data-studio-app] .hero button{background:#fffdf6;border-color:#fffdf6;color:var(--studio-accent-contrast)}
+body[data-studio-app] .gateHero{background:radial-gradient(circle at 85% 20%,var(--studio-hero-b),transparent 45%),linear-gradient(130deg,var(--studio-gate-a),var(--studio-gate-b))}
+body[data-studio-app] .gateHero p{color:var(--studio-hero-copy)}
+body[data-studio-app] .gateList{color:var(--studio-hero-copy)}
+body[data-studio-app] .gateList span{border-color:var(--studio-nav-divider)}
+body[data-studio-app] .brandMark{background:var(--studio-symbol-bg);color:var(--studio-symbol-fg)}
+body[data-studio-app] .metric .iconbox,
+body[data-studio-app] .iconbox,
+body[data-studio-app] .emptyIcon{background:var(--mint);color:var(--green)}
+body[data-studio-app] .lane,
+body[data-studio-app] .studio-version-bar{background:var(--studio-soft-panel);border-color:var(--line)}
+body[data-studio-app] .authorAvatar{background:linear-gradient(130deg,var(--mint),var(--studio-muted-accent));color:var(--studio-accent-contrast)}
+body[data-studio-app] .chip{background:var(--mint);border-color:var(--line);color:var(--studio-accent-contrast)}
+body[data-studio-app] .chip.amber{background:#fff4df;border-color:#f0e2c4;color:#966621}
+body[data-studio-app] .chip.gray{background:#f1f2ee;border-color:#e0e6e1;color:#7a8478}
+body[data-studio-app] .studio-version-tabs button.selected,
+body[data-studio-app] .jp-mode-switch button.selected{background:var(--studio-hero-a);border-color:var(--studio-hero-a);color:white}
+body[data-studio-app] .studio-version-tabs button.selected{box-shadow:0 2px 7px #0000001a}
+body[data-studio-app] .studio-template-picker,
+body[data-studio-app] .workflow,
+body[data-studio-app] .studio-crop,
+body[data-studio-app] .jp-caption-fields,
+body[data-studio-app] .jp-upload-area{background:var(--studio-soft-panel);border-color:var(--line)}
+body[data-studio-app] .studio-grip{background:var(--mint);color:var(--green)}
+body[data-studio-app] #blocks .block{border-color:var(--line);background:var(--studio-soft-panel)}
+body[data-studio-app] .block.drop-target{outline-color:var(--studio-accent)!important}
+body[data-studio-app] .studio-crop input[type="range"]{accent-color:var(--studio-accent)}
+body[data-studio-app] .studio-crop-preview{background:var(--mint)}
+body[data-studio-app] .studio-variant-badge{background:var(--mint);color:var(--studio-accent-contrast)}
+body[data-studio-app] .tip{background:var(--studio-warm-panel);border-color:var(--line);color:var(--studio-accent-contrast)}
+body[data-studio-app] .loginNote{background:var(--studio-soft-panel)}
+body[data-studio-app] .loginCard{border-color:var(--line)}
+body[data-studio-app] .jp-appnav{color:var(--studio-accent-contrast)}
+body[data-studio-app] .jp-phone-bar{color:var(--green)}
+body[data-studio-app] .jp-kicker{color:var(--studio-accent)}
+body[data-studio-app] .jp-website .jp-sitehead b span{color:var(--studio-accent)}
+body[data-studio-app] .jp-website footer{background:var(--studio-soft-panel);color:var(--studio-accent-contrast)}
+body[data-studio-app] .jp-template-guide .jp-body h3{border-left-color:var(--studio-accent);background:var(--studio-soft-panel)}
+body[data-studio-app] .jp-template-guide .jp-body h3:before{color:var(--studio-accent)}
+body[data-studio-app] .jp-template-story .jp-body blockquote{color:var(--studio-accent-contrast)}
+body[data-studio-app] .jp-template-gallery .jp-body figure{background:var(--studio-soft-panel)}
+body[data-studio-app] .jp-instagram{color:#15191a;background:white} /* Instagram stays neutral */
+body[data-studio-app] .jp-insta-header{background:white;color:#15191a}
+body[data-studio-app] .jp-insta-avatar{background:var(--studio-muted-accent);color:var(--studio-accent-contrast)}
+body[data-studio-app] .jp-cover-empty{background:linear-gradient(135deg,var(--studio-muted-accent),var(--studio-soft-panel));color:var(--studio-accent)}
+body[data-studio-app] .jp-insta-guidance{color:var(--muted)}
+body[data-studio-app] .jp-counter{color:var(--studio-accent-contrast)}
+body[data-studio-app] .jp-preview-window{background:var(--studio-soft-panel);border-color:var(--line)}
+body[data-studio-app] .previewArticle blockquote,
+body[data-studio-app] .jp-body blockquote{border-left-color:var(--studio-accent);background:var(--studio-soft-panel);color:var(--studio-accent-contrast)}
+body[data-studio-app] .jp-photo-prev,body[data-studio-app] .jp-photo-next{color:#333;background:#fffc}
+body[data-studio-app] .jp-website a,body[data-studio-app] .jp-body a{color:var(--studio-accent-contrast)}
+body[data-studio-app] .avatar{background:var(--mint);color:var(--green);border-color:var(--line)}
+body[data-studio-app] input:focus,body[data-studio-app] textarea:focus,body[data-studio-app] select:focus{outline-color:var(--studio-accent)}
+body[data-studio-app] #status:not(.error){background:var(--studio-hero-a);color:#fff}
+body[data-studio-app] [data-view="home"] .eyebrow:not(.hero .eyebrow){color:var(--studio-accent-contrast)}
+body[data-studio-app] .jp-template-minimal .jp-kicker{color:var(--studio-accent-contrast)}
+/* Color transitions; respect user's reduced-motion setting. */
+@media(prefers-reduced-motion:no-preference){
+ body[data-studio-app] .sidebar,body[data-studio-app] .hero,
+ body[data-studio-app] .card,body[data-studio-app] button.primary,
+ body[data-studio-app] .lane,body[data-studio-app] .studio-crop,
+ body[data-studio-app] .nav button{transition:background-color .18s ease,color .18s ease,border-color .18s ease}
+}
