@@ -129,13 +129,22 @@ async function openPost(id){
  await showTab("editor",true);
  await fetchMedia();
 }
+function groupNumberAt(index){
+ let number=0,hasHeading=false;
+ for(let k=0;k<=index;k++){
+  const t=blocks[k]?.type;
+  if(t==="heading"){number++;hasHeading=true}
+  else if(t==="text"&&!hasHeading){number++}
+ }
+ return Math.max(1,number);
+}
 function blockHtml(b,i,edit){
  let inner="";
  if(b.type==="link"){inner='<label>Текст ссылки</label><input data-block="'+i+'" data-prop="label" value="'+esc(b.label||"")+'"><label>URL</label><input data-block="'+i+'" data-prop="url" value="'+esc(b.url||"")+'" placeholder="https://...">';}
  else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img data-media-id="'+esc(b.asset_id)+'" alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<div class="studio-media-size" data-optimized-id="'+esc(b.asset_id)+'">'+esc(window.StudioOptimizer?.label?.(b.asset_id)||"Оптимизация изображений") +'</div>';
  inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'"><label>Альтернативный текст (для доступности)</label><input data-block="'+i+'" data-prop="alt" value="'+esc(b.alt||"")+'">'+(edit?'<button type="button" class="jp-cover-select '+(draft?.cover_path===b.asset_id?'active':'')+'" data-block-cover="'+i+'">'+(draft?.cover_path===b.asset_id?'✓ Выбрана обложкой':'○ Сделать обложкой')+'</button>':'');}
  else inner='<textarea data-block="'+i+'" data-prop="text" rows="'+(b.type==="text"?5:2)+'" placeholder="Введите текст">'+esc(b.text||"")+'</textarea>';
- return '<div class="block"><div class="row"><strong>'+({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок")+'</strong>'+(edit?'<div class="btns"><button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button><button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+'</div>';
+ return '<div class="block"><div class="row"><strong>'+(["heading","text"].includes(b.type)?'<span class="studio-group-index">'+esc(window.StudioI18n?.t?.("group")||"Группа")+' '+groupNumberAt(i)+' · </span>':'')+({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок")+'</strong>'+(edit?'<div class="btns"><button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button><button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+'</div>';
 }
 function capture(){
  if(!draft)return;
@@ -249,7 +258,7 @@ function addBlock(t){
 }
 function modifyBlock(index,operation){
  if(!editable())return;capture();
- if(operation==="remove"){const item=blocks[index];blocks.splice(index,1);if(item?.asset_id===draft.cover_path){draft.cover_path=blocks.find(x=>x.type==="image")?.asset_id||null}}
+ if(operation==="remove"){blocks.splice(index,1);/* Text blocks are independent of the cover. Never alter draft.cover_path here. */}
  else{const to=index+(operation==="up"?-1:1);if(to<0||to>=blocks.length)return;[blocks[index],blocks[to]]=[blocks[to],blocks[index]]}
  dirty=true;renderEditor();
 }
