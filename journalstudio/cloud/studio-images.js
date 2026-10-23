@@ -4,13 +4,14 @@
 (function(){
  const $=id=>document.getElementById(id);
  const esc=t=>String(t??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
- let result=null,busy=false,startedPost=null,startedProject=null;
+ let result=null,busy=false,startedPost=null,startedProject=null,pendingRequest=null;
  let library=[],libraryOffset=0,libraryMore=false,libraryBusy=false,libraryProject=null,libraryRequest=0;
  const url="https://npsfaymjckcqhtyiafms.supabase.co/functions/v1/studio-image";
  const status=(message,error=false)=>{const el=$("imageGenerateStatus");if(!el)return;el.textContent=message;el.style.color=error?"#9d453b":""};
  const editablePost=()=>Boolean(current?.id&&draft&&editable()&&project?.slug);
  function clear(){
-  result=null;
+  result=null;pendingRequest=null;
+  $("imageGenerateConfirm").hidden=true;
   $("imageGeneratedPreview").hidden=true;
   $("imageGeneratedImg").removeAttribute("src");
   $("imageGeneratedAlt").textContent="";
@@ -18,8 +19,10 @@
  function refreshControls(){
   const allowed=editablePost();
   $("imageGenerate").disabled=!allowed||busy;
-  if(!allowed)status("Сначала сохраните черновик статьи. Генерация доступна только для редактируемых материалов.");
-  else if(!busy&&result===null)status("Изображение будет генерироваться только после подтверждения платного запроса.");
+  if(!allowed&&!current?.id)status("Сначала создайте и сохраните черновик статьи: после сохранения генератор станет доступен.");
+  else if(!allowed&&!editable())status("Статья сейчас «"+(current.status||"на проверке")+"». Создавать изображения можно для черновиков и материалов на доработке. Перевод опубликованной статьи в редактирование снимает её с публикации.");
+  else if(!allowed)status("Откройте сохранённую статью с правом редактирования, чтобы создать изображение.");
+  else if(!busy&&result===null&&pendingRequest===null)status("Введите описание, выберите формат и нажмите «Сгенерировать изображение». Перед платным запросом будет отдельное подтверждение.");
  }
  function setSource(id,autoload=true){
   document.querySelectorAll("[data-image-source]").forEach(b=>b.classList.toggle("active",b.dataset.imageSource===id));
@@ -126,7 +129,7 @@
  }
  async function api(method,payload){
   if(!session?.access_token)throw Error("Сначала войдите в редакцию");
-  const callOne=()=>fetch(url,{method,headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:payload?JSON.stringify(payload):undefined});
+  const callOne=()=>fetch(url,{method,signal:AbortSignal.timeout(165000),headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:payload?JSON.stringify(payload):undefined});
   let response=await callOne();
   if(response.status===401&&session.refresh_token){
    session=await auth("token?grant_type=refresh_token","POST",{refresh_token:session.refresh_token});
@@ -136,36 +139,99 @@
   if(!response.ok)throw Error(body.error||"Ошибка генерации изображения");
   return body;
  }
- async function generate(){
+ function generationOptions(){
+  return {project:project?.slug,post_id:current?.id,
+   prompt:$("imagePrompt").value.trim(),style:$("imageStyle").value,
+   size:$("imageSize").value,quality:$("imageQuality").value};
+ }
+ function prepareGeneration(){
   if(busy)return;
-  if(!editablePost())throw Error("Сначала сохраните редактируемую статью");
-  const prompt=$("imagePrompt").value.trim(),style=$("imageStyle").value,size=$("imageSize").value,quality=$("imageQuality").value;
-  if(prompt.length<8||prompt.length>650)throw Error("Опишите изображение подробнее (от 8 до 650 символов)");
-  const ratio={ "1024x1024":"квадрат","1536x1024":"горизонтальный","1024x1536":"вертикальный"}[size]||size;
-  const confirmText="Создать одно платное изображение?\n\nФормат: "+ratio+"\nКачество: "+(quality==="low"?"экономичное":"среднее")+
-    "\nМодель: GPT Image 2.5 Flare\n\nЦена зависит от числа токенов и размера. Запрос спишет средства с OpenAI API. Результат останется черновиком, без публикации.";
-  if(!confirm(confirmText))return;
-  clear();startedPost=current.id;startedProject=project.slug;
-  busy=true;$("imageGenerate").disabled=true;$("imageGenerate").textContent="⌛ Изображение создаётся…";
-  status("Запрос отправлен. Генерация может потребовать времени; не нажимайте повторно.");
+  if(!editablePost()){
+   refreshControls();
+   return;
+  }
+  const request=generationOptions();
+  if(request.prompt.length<8||request.prompt.length>650){
+   status("Опишите изображение подробнее (от 8 до 650 символов).",true);
+   $("imagePrompt").focus();
+   return;
+  }
+  if(!["editorial","photorealistic","botanical","illustration"].includes(request.style)
+   ||!["1024x1024","1536x1024","1024x1536"].includes(request.size)
+   ||!["low","medium"].includes(request.quality)){
+   status("Неверный стиль, размер или качество. Выберите параметры заново.",true);
+   return;
+  }
+  const ratio={"1024x1024":"квадратный","1536x1024":"горизонтальный",
+   "1024x1536":"вертикальный"}[request.size];
+  const costQuality=request.quality==="low"?"экономичное":"среднее";
+  $("imageGenerateConfirmDetails").textContent=
+   "Одно платное изображение · "+ratio+" · качество: "+costQuality+
+   " · GPT Image 2.5 Flare. Стоимость зависит от размера и количества токенов. "+
+   "При подтверждении будет отправлен один запрос к OpenAI API. "+
+   "Изображение сохранится в медиатеке, но не будет автоматически опубликовано.";
+  pendingRequest=request;
+  $("imageGenerateConfirm").hidden=false;
+  status("Проверьте условия генерации ниже и нажмите «✓ Создать одно изображение». Денежные средства пока не списывались.");
+  $("imageGenerateConfirm").scrollIntoView({behavior:"smooth",block:"nearest"});
+ }
+ function friendlyImageError(error){
+  const message=String(error?.message||error||"Неизвестная ошибка");
+  if(error?.name==="TimeoutError"||error?.name==="AbortError"||message==="Failed to fetch")
+   return "Не удалось подтвердить завершение запроса. Перед повтором проверьте вкладку «Медиатека»: изображение могло сохраниться, и повторная генерация может стоить денег.";
+  if(message.includes("OpenAI API key missing"))
+   return "На сервере отсутствует ключ OpenAI для генерации изображений.";
+  if(message.includes("Image API quota")||message.includes("429"))
+   return "Достигнут лимит генерации изображений или лимит средств OpenAI.";
+  if(message.includes("A saved editable article is required"))
+   return "Эта статья не является редактируемым черновиком. Откройте черновик или материал на доработке.";
+  if(message.includes("Authentication required"))return "Сессия завершилась. Войдите в редакцию снова.";
+  return message;
+ }
+ async function generate(){
+  if(busy||!pendingRequest)return;
+  if(!editablePost())throw Error("Статья больше недоступна для генерации. Откройте черновик.");
+  const input={...pendingRequest};
+  if(JSON.stringify(generationOptions())!==JSON.stringify(input)){
+   pendingRequest=null;
+   $("imageGenerateConfirm").hidden=true;
+   status("Параметры изменились. Проверьте и подтвердите запрос ещё раз.",true);
+   return;
+  }
+  clear();startedPost=input.post_id;startedProject=input.project;
+  busy=true;$("imageGenerate").disabled=true;$("imageGenerateConfirmYes").disabled=true;
+  $("imageGenerate").textContent="⌛ Изображение создаётся…";
+  status("Генерация запущена. Не нажимайте повторно и не закрывайте страницу.");
   try{
-   const data=await api("POST",{project:startedProject,post_id:startedPost,prompt,style,size,quality});
-   if(current?.id!==startedPost||project.slug!==startedProject){status("Изображение создано, но текущая статья изменилась. Вернитесь к прежнему черновику.");return}
+   const data=await api("POST",input);
+   if(current?.id!==startedPost||project?.slug!==startedProject){
+    status("Изображение создано и сохранено в медиатеке. Вернитесь к исходному черновику.");return;
+   }
    result={...data,postId:startedPost,project:startedProject};
-   if(!result.asset_id)throw Error("Не получено сохранённое изображение");
+   if(!result.asset_id)throw Error("Сервер не подтвердил сохранение изображения. Проверьте медиатеку.");
    if(!result.url){
-    const media=await call("/media/"+result.asset_id);
+    const media=await call("/media/"+encodeURIComponent(result.asset_id));
     result.url=media.url;
    }
+   if(!result.url){
+    status("Изображение создано и сохранено, но просмотр недоступен. Откройте «Медиатека» и обновите.",true);
+    void loadLibrary({reset:true});return;
+   }
    $("imageGeneratedImg").src=result.url;
-   $("imageGeneratedAlt").textContent=prompt+" · Создано ИИ, необходимо проверить перед публикацией.";
+   $("imageGeneratedAlt").textContent=input.prompt+" · Создано ИИ, необходимо проверить перед публикацией.";
    $("imageGeneratedPreview").hidden=false;
-   status("Изображение сохранено в медиатеке. Можно использовать позже без повторной генерации.");
+   status("Изображение готово и сохранено в медиатеке. Можно использовать позже без повторной генерации.");
    void loadLibrary({reset:true});
-   toast("Готово! Проверь результат и нажми «Добавить в статью» или «Сделать обложкой».");
+   toast("Готово! Проверьте результат и выберите «Добавить в статью» или «Сделать обложкой».");
   }catch(error){
-   status("Ошибка: "+error.message,true);throw error;
-  }finally{busy=false;$("imageGenerate").disabled=!editablePost();$("imageGenerate").textContent="✦ Сгенерировать изображение"}
+   status("Ошибка генерации: "+friendlyImageError(error),true);
+   throw error;
+  }finally{
+   busy=false;
+   $("imageGenerate").disabled=!editablePost();
+   $("imageGenerateConfirmYes").disabled=false;
+   $("imageGenerate").textContent="✦ Сгенерировать изображение";
+  }
  }
  async function accept(asCover){
   if(!result?.asset_id)throw Error("Сначала сгенерируйте изображение");
@@ -203,7 +269,13 @@
  changeProject=async function(...args){clear();library=[];libraryOffset=0;libraryProject=null;libraryRequest++;const r=await originalChange(...args);refreshControls();if(project?.slug&&tab==="editor")void loadLibrary({reset:true});return r};
  const originalOpen=openPost;
  openPost=async function(...args){clear();const r=await originalOpen(...args);refreshControls();if(project?.slug&&tab==="editor")void loadLibrary({reset:true});return r};
- $("imageGenerate").onclick=()=>run(generate);
+ $("imageGenerate").onclick=()=>run(prepareGeneration);
+ $("imageGenerateConfirmYes").onclick=()=>run(generate);
+ $("imageGenerateConfirmNo").onclick=()=>{
+  pendingRequest=null;
+  $("imageGenerateConfirm").hidden=true;
+  status("Генерация отменена до отправки платного запроса.");
+ };
  $("imageAccept").onclick=()=>run(()=>accept(false));
  $("imageAcceptCover").onclick=()=>run(()=>accept(true));
  $("imageDiscard").onclick=()=>{clear();status("Изображение осталось в медиатеке — можно использовать позже без затрат.");void showLibrary("ai")};
