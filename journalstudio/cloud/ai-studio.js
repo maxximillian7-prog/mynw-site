@@ -43,6 +43,34 @@
   $("aiGenerateResult").textContent=providerReady?"Выберите автора и тему. Пустая тема означает самостоятельный выбор идеи. Статьи создаются только как черновики.":"Генерация и переводы подготовлены, но ещё не активированы. Добавьте OPENAI_API_KEY в Supabase → Edge Functions → Secrets. Ключ нельзя вводить в браузер.";
   personas();
  }
+ function imageArticleChoices(){
+  const picker=$("aiImagePost"),go=$("aiOpenImage");
+  if(!picker||!go)return;
+  const previous=picker.value;
+  const available=(posts||[]).filter(p=>["draft","changes_requested"].includes(p.status));
+  picker.innerHTML=available.length?'<option value="">Выберите черновик для изображения</option>'+available.map(p=>'<option value="'+E(p.id)+'">'+E(p.title||"Без названия")+'</option>').join(""):'<option value="">Нет редактируемых статей — сначала создайте и сохраните новую</option>';
+  if(available.some(x=>x.id===previous))picker.value=previous;
+  else if(available.length===1)picker.value=available[0].id;
+  go.disabled=!picker.value;
+ }
+ async function openImageForDraft(){
+  const postId=$("aiImagePost")?.value;
+  if(!postId)throw Error("Выберите сохранённый черновик или создайте статью");
+  if(dirty&&!confirm("Есть несохранённые изменения. Перейти к другой статье?"))return;
+  await openPost(postId);
+  const panel=document.querySelector(".studio-images-menu");
+  if(!panel)throw Error("Панель изображений не найдена. Обновите страницу.");
+  const aiButton=panel.querySelector('[data-image-source="ai"]');
+  if(aiButton)aiButton.click();
+  panel.scrollIntoView({behavior:"smooth",block:"start"});
+  $("imagePrompt")?.focus({preventScroll:true});
+  toast("Введите описание фотографии и выберите формат. Генерация начнётся только после подтверждения.");
+ }
+ async function newArticleForImage(){
+  await createPost();
+  $("title")?.focus();
+  toast("Создайте статью и нажмите «Сохранить». После этого откройте раздел «Фото для статьи» и задайте запрос.");
+ }
  function jobsList(){
   $("aiJobs").innerHTML=jobs.length?jobs.slice(0,12).map(j=>'<div class="ai-job"><div class="row"><b>'+E(j.kind==="translate"?"Перевод":"Статья")+'</b><span class="chip '+(j.status==="failed"||j.status==="blocked"?"amber":"")+'">'+E(({completed:"Готово",processing:"В работе",pending:"В очереди",blocked:"Нужен API-ключ",failed:"Ошибка"})[j.status]||j.status)+'</span></div><div class="muted small">'+E(j.topic||"Самостоятельная тема")+'</div><small>'+E(j.created_at?.slice(0,16))+(j.error?" · "+E(j.error):"")+'</small>'+((j.post_id&&j.status==="completed")?'<button data-ai-open="'+E(j.post_id)+'" type="button">Открыть статью ↗</button>':"")+'</div>').join(""):'<div class="empty">Заданий пока нет.</div>';
  }
@@ -54,7 +82,7 @@
   if(all[2].status==="fulfilled")providerReady=all[2].value.provider_configured===true;
   $("aiProviderStatus").textContent=providerReady?"ИИ-провайдер подключён":"Нужен API-ключ";
   $("aiProviderStatus").className="chip"+(providerReady?"":" amber");
-  personas();jobsList();
+  personas();jobsList();imageArticleChoices();
   if(!providerReady)$("aiGenerateResult").textContent="Для генерации нужен OPENAI_API_KEY в Supabase → Edge Functions → Secrets. Никаких ключей в браузере хранить не нужно.";
  }
  async function generate(){
@@ -176,6 +204,9 @@ function showTranslation(locale){
  $("aiGenerate").onclick=()=>run(generate);
  $("aiRefresh").onclick=()=>run(refreshAI);
  $("aiSaveSchedule").onclick=()=>run(saveSchedule);
+ $("aiOpenImage").onclick=()=>run(openImageForDraft);
+ $("aiNewForImage").onclick=()=>run(newArticleForImage);
+ $("aiImagePost").onchange=()=>{$("aiOpenImage").disabled=!$("aiImagePost").value};
  $("translateArticle").onclick=()=>run(translate);
  $("translateAll").onclick=()=>run(translateAll);
  $("aiScheduleEnabled").onchange=()=>{$("aiScheduleInfo").textContent=$("aiScheduleEnabled").checked?"Новые материалы будут создаваться по расписанию, только если сохраните настройки.":"Автогенерация выключена. Сохраните настройки.";$("aiSaveSchedule").disabled=!selected||busy||(!providerReady&&$("aiScheduleEnabled").checked);};
