@@ -132,7 +132,7 @@ async function openPost(id){
 function blockHtml(b,i,edit){
  let inner="";
  if(b.type==="link"){inner='<label>Текст ссылки</label><input data-block="'+i+'" data-prop="label" value="'+esc(b.label||"")+'"><label>URL</label><input data-block="'+i+'" data-prop="url" value="'+esc(b.url||"")+'" placeholder="https://...">';}
- else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'"><label>Альтернативный текст (для доступности)</label><input data-block="'+i+'" data-prop="alt" value="'+esc(b.alt||"")+'">'+(edit?'<button type="button" class="jp-cover-select '+(draft?.cover_path===b.asset_id?'active':'')+'" data-block-cover="'+i+'">'+(draft?.cover_path===b.asset_id?'✓ Выбрана обложкой':'○ Сделать обложкой')+'</button>':'');}
+ else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img data-media-id="'+esc(b.asset_id)+'" alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'"><label>Альтернативный текст (для доступности)</label><input data-block="'+i+'" data-prop="alt" value="'+esc(b.alt||"")+'">'+(edit?'<button type="button" class="jp-cover-select '+(draft?.cover_path===b.asset_id?'active':'')+'" data-block-cover="'+i+'">'+(draft?.cover_path===b.asset_id?'✓ Выбрана обложкой':'○ Сделать обложкой')+'</button>':'');}
  else inner='<textarea data-block="'+i+'" data-prop="text" rows="'+(b.type==="text"?5:2)+'" placeholder="Введите текст">'+esc(b.text||"")+'</textarea>';
  return '<div class="block"><div class="row"><strong>'+({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок")+'</strong>'+(edit?'<div class="btns"><button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button><button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+'</div>';
 }
@@ -179,8 +179,16 @@ async function addChannel(){
 }
 async function fetchMedia(){
  const ids=[...new Set(blocks.filter(b=>b.type==="image").map(b=>b.asset_id))];
- for(const id of ids){try{const r=await call("/media/"+id);assets[id]=r.url;}catch{}}
+ let failed=0;
+ for(const id of ids){
+  try{
+   const r=await call("/media/"+encodeURIComponent(id));
+   if(typeof r.url!=="string"||!r.url.startsWith("https://")||!r.url.includes("/storage/v1/object/sign/"))throw Error("Invalid signed photo URL");
+   assets[id]=r.url;
+  }catch{failed++}
+ }
  if(tab==="editor")renderEditor();
+ if(failed)toast("Не удалось открыть "+failed+" изображений. Попробуйте ещё раз открыть статью.",true);
 }
 async function savePost(){
  if(!draft)throw Error("Откройте конструктор");
