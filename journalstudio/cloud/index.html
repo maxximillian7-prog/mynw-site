@@ -193,6 +193,13 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 #workspace:not([hidden]) ~ .studio-lang-switch{bottom:15px}
 .studio-group-index{color:var(--green);font-weight:800;background:var(--mint);padding:2px 6px;margin-right:5px;border-radius:6px}
 @media(max-width:700px){.studio-lang-switch{bottom:8px;right:8px;padding:4px 6px}.studio-lang-switch label span:last-child{display:none}.studio-lang-switch select{font-size:11px}}
+
+.studio-cover-indicator{padding:12px;margin:0 0 17px;background:var(--mint);border:1px solid var(--line);border-radius:14px}
+.studio-cover-indicator .row{align-items:center}
+.studio-cover-indicator img{width:90px;height:65px;object-fit:cover;border-radius:9px;border:1px solid var(--line)}
+.studio-cover-indicator button{font-size:12px}
+.studio-cover-indicator .studio-cover-title{font-size:13px;font-weight:850}
+.studio-cover-indicator .studio-cover-note{font-size:11px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 </head><body>
@@ -246,7 +253,8 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <div class="editorFields"><div><label for="locale">Язык материала</label><select id="locale"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="it">Italiano</option></select></div><div><label for="category">Рубрика</label><input id="category" placeholder="Советы, сезон, уход"></div></div>
 <div><label for="authorSelect">Автор статьи</label><select id="authorSelect"><option value="">Редакция</option></select></div><div class="studio-template-picker"><label for="templateSelect">Шаблон оформления</label><select id="templateSelect"><option value="editorial">Журнал — классическая статья</option><option value="guide">Пошаговая инструкция</option><option value="story">История автора</option><option value="gallery">Фотогалерея</option><option value="minimal">Минималистичный</option></select><p class="small muted">Шаблон можно менять отдельно для каждой площадки.</p></div></div>
 <div class="card"><div class="sectionHeading"><div><h2>Содержание статьи</h2><p>Располагайте изображения и текст в нужном порядке</p></div></div>
-<p class="small muted">Перетаскивайте блоки за значок ⠿, либо используйте стрелки ↑↓ на телефоне. Перемещение не публикует материал автоматически.</p><div id="blocks" aria-label="Блоки статьи"></div><div id="editTools"><div class="btns">
+<p class="small muted">Перетаскивайте блоки за значок ⠿, либо используйте стрелки ↑↓ на телефоне. Перемещение не публикует материал автоматически.</p><div id="studioCoverIndicator" class="studio-cover-indicator" aria-live="polite"></div>
+<div id="blocks" aria-label="Блоки статьи"></div><div id="editTools"><div class="btns">
 <button data-add="heading">+ Заголовок</button><button data-add="text">+ Текст</button><button data-add="quote">+ Цитата</button><button data-add="link">+ Ссылка</button></div>
 <div class="studio-images-menu">
 <div class="studio-images-source-tabs" role="group" aria-label="Источник фотографий">
