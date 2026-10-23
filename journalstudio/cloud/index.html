@@ -211,6 +211,7 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-topic-form input[type=checkbox]{width:auto}
 .studio-topic-upload{margin:18px 0 8px;padding:14px;border:1px dashed var(--line);border-radius:12px;display:grid;gap:8px}
 .studio-topic-preview img{width:100%;max-width:320px;aspect-ratio:1/1;object-fit:cover;border-radius:12px}
+.studio-topic-translate-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}.studio-topic-translate-controls p{flex-basis:100%}
 .studio-topic-focus{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
 .studio-topic-focus label{font-size:12px}
 .studio-topic-focus input{width:100%}
@@ -284,6 +285,18 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
       <div><label for="topicTitleIt">Italiano</label><input id="topicTitleIt" maxlength="100"></div>
     </div>
   </details>
+  <div class="studio-topic-translate-controls">
+    <label for="topicSourceLocale">Язык введённого названия
+      <select id="topicSourceLocale">
+        <option value="ru" selected>Русский</option><option value="en">English</option>
+        <option value="pt-PT">Português (PT)</option><option value="uk">Українська</option>
+        <option value="es">Español</option><option value="fr">Français</option>
+        <option value="de">Deutsch</option><option value="it">Italiano</option>
+      </select>
+    </label>
+    <button type="button" id="topicTranslateAll">✦ Предложить переводы на 8 языков (ИИ)</button>
+    <p class="muted small">После генерации проверьте все названия. Непроверенные машинные переводы не следует публиковать.</p>
+  </div>
   <div class="btns"><button type="button" id="topicMediaRefresh">↻ Загрузить медиатеку</button><button class="primary" type="submit" id="topicSave">+ Создать тему</button><button type="button" id="topicCancel" hidden>Отмена</button></div>
   <div class="studio-topic-upload"><label for="topicNewImage">Загрузить изображение темы (JPG, PNG, WebP, до 8 МБ)</label><input type="file" id="topicNewImage" accept="image/png,image/jpeg,image/webp">
   <label for="topicImageCopyright">Автор / правообладатель</label><input id="topicImageCopyright" maxlength="160" placeholder="Имя или компания">
@@ -423,5 +436,5 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./ai-studio.js?v=20261023-15"></script>
 <script defer src="./studio-images.js?v=20261023-23"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
-<script defer src="./journal-topics.js?v=20261023-43"></script>
+<script defer src="./journal-topics.js?v=20261023-44"></script>
 </body></html>
