@@ -6,7 +6,7 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const statuses={draft:"Черновик",in_review:"На проверке",changes_requested:"На доработке",approved:"Утверждена",scheduled:"Запланирована",published:"Опубликована",archived:"Архив"};
 const roles={owner:"Владелец",chief_editor:"Главный редактор",editor:"Редактор",author:"Автор",reviewer:"Рецензент"};
 const channels={nowgreen:"NowGreen",nowcook:"NowCook",nowwhat:"NowWhat",nowkids:"NowKids",website:"Сайт",wordpress:"WordPress",instagram:"Instagram"};
-let session=null,projects=[],project=null,posts=[],authors=[],current=null,draft=null,placements=[],deliveries=[],assets={},tab="home",dirty=false,toastTimer=null,flashError=false;
+let session=null,projects=[],project=null,posts=[],authors=[],topics=[],current=null,draft=null,placements=[],deliveries=[],assets={},tab="home",dirty=false,toastTimer=null,flashError=false;
 const editorRole=()=>["owner","chief_editor","editor"].includes(project?.role);
 const chiefRole=()=>["owner","chief_editor"].includes(project?.role);
 const editable=()=>!current||["draft","changes_requested"].includes(current.status);
@@ -57,8 +57,9 @@ async function claimOwner(){
  await call("/bootstrap","POST",{setup_key:key});$("setup").value="";await initialize();toast("Главный редактор активирован");
 }
 async function loadData(){
- const result=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug))]);
- posts=result[0].posts||[];authors=result[1].authors||[];
+ const result=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug)),call("/topics?project="+encodeURIComponent(project.slug))]);
+ posts=result[0].posts||[];authors=result[1].authors||[];topics=result[2].topics||[];
+ window.StudioTopics?.render?.();
 }
 function statusTag(s){return '<span class="chip '+(["in_review","scheduled"].includes(s)?"amber":s==="published"?"":"gray")+'">'+esc(statuses[s]||s)+'</span>'}
 function listEntry(p){
@@ -88,8 +89,8 @@ function renderAuthors(){
  $("authorKind").querySelector('option[value="ai"]').disabled=!chiefRole();
 }
 async function refreshPosts(){
- const [ps,au]=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug))]);
- posts=ps.posts||[];authors=au.authors||[];renderDashboard();renderLibrary();renderAuthors();
+ const [ps,au,t]=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug)),call("/topics?project="+encodeURIComponent(project.slug))]);
+ posts=ps.posts||[];authors=au.authors||[];topics=t.topics||[];renderDashboard();renderLibrary();renderAuthors();window.StudioTopics?.render?.();
 }
 function paintPublication(){
  const ready=posts.filter(p=>["approved","scheduled","published"].includes(p.status));
@@ -118,7 +119,7 @@ async function showTab(target,force=false){
  window.scrollTo({top:0,behavior:"instant"});
 }
 function resetDraft(){
- current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",blocks:[],author_id:null,cover_path:null,template_id:"editorial"};
+ current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",topic_id:null,blocks:[],author_id:null,cover_path:null,template_id:"editorial"};
  blocks=draft.blocks;assets={};placements=[];dirty=false;
 }
 async function createPost(){resetDraft();await showTab("editor",true);}
@@ -149,6 +150,7 @@ function blockHtml(b,i,edit){
 function capture(){
  if(!draft)return;
  for(const key of ["title","summary","locale","category"]){const el=$(key);if(el)draft[key]=el.value}
+ draft.topic_id=$("topicSelect")?.value||null;
  draft.author_id=$("authorSelect").value||null;
  document.querySelectorAll("[data-block]").forEach(el=>{const b=blocks[+el.dataset.block];if(b)b[el.dataset.prop]=el.value});
 }
@@ -170,6 +172,8 @@ function renderEditor(){
  const edit=editable();$("workTitle").textContent=current?.title||"Новый материал";
  $("statusLine").innerHTML=statusTag(current?.status||"draft")+" · "+(current?"Версия "+current.revision:"Материал ещё не сохранён");
  for(const k of ["title","summary","locale","category"]){$(k).value=draft[k]||"";$(k).disabled=!edit}
+ $("topicSelect").innerHTML='<option value="">Без темы</option>'+topics.filter(t=>t.is_active).map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title)+'</option>').join("");
+ $("topicSelect").value=draft.topic_id||"";$("topicSelect").disabled=!edit;
  $("authorSelect").innerHTML='<option value="">Редакция</option>'+authors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.kind==="ai"?" · ИИ":"")+'</option>').join("");
  $("authorSelect").value=draft.author_id||"";$("authorSelect").disabled=!edit;
  $("blocks").innerHTML=blocks.map((b,i)=>blockHtml(b,i,edit)).join("")||'<div class="empty">Добавьте первый текстовый блок, заголовок или фотографию.</div>';
@@ -230,7 +234,7 @@ async function fetchMedia(){
 async function savePost(){
  if(!draft)throw Error("Откройте конструктор");
  capture();if(!draft.title?.trim())throw Error("Укажите заголовок");
- const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,blocks,cover_path:draft.cover_path||null,template_id:draft.template_id||"editorial"};
+ const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,topic_id:draft.topic_id||null,blocks,cover_path:draft.cover_path||null,template_id:draft.template_id||"editorial"};
  let r;
  if(current){r=await call("/posts/"+current.id,"PATCH",{...data,expected_revision:current.revision,author_id:draft.author_id||undefined})}
  else {
@@ -391,6 +395,7 @@ document.addEventListener("change",e=>{
  if(!draft||tab!=="editor"||!editable())return;
  const t=e.target;if(t.id==="authorSelect"){draft.author_id=t.value||null;dirty=true;renderPreview()}
  else if(t.id==="locale"){draft.locale=t.value;dirty=true;renderPreview()}
+ else if(t.id==="topicSelect"){draft.topic_id=t.value||null;dirty=true;renderPreview()}
 });
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 (async()=>{
