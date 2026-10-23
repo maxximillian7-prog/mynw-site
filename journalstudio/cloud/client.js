@@ -41,7 +41,9 @@ async function initialize(){
  const data=await call("/projects");projects=data.projects||[];
  if(!projects.length){$("gate").hidden=false;$("workspace").hidden=true;$("setupZone").hidden=false;toast("Аккаунт подтверждён. Доступ выдаётся главным редактором; при первом запуске нужен одноразовый ключ.");return}
  $("gate").hidden=true;$("workspace").hidden=false;$("setupZone").hidden=true;
- const currentProject=project?.slug;project=projects.find(p=>p.slug===currentProject)||projects[0];
+ const currentProject=project?.slug, savedProject=sessionStorage.getItem('journal_active_project');
+ project=projects.find(p=>p.slug===currentProject)||projects.find(p=>p.slug===savedProject)||projects[0];
+ window.StudioTheme?.apply(project.slug);
  $("project").innerHTML=projects.map(p=>'<option value="'+esc(p.slug)+'">'+esc(p.name)+" · "+esc(roles[p.role]||p.role)+"</option>").join("");
  $("project").value=project.slug;
  $("avatar").textContent=(session.user?.email||"JS").slice(0,2).toUpperCase();
@@ -267,7 +269,8 @@ async function approveAuthor(id){
 async function changeProject(slug){
  if(dirty&&!confirm("Несохранённые изменения будут потеряны. Продолжить?")){$("project").value=project.slug;return}
  const target=projects.find(p=>p.slug===slug);if(!target)return;
- project=target;current=null;draft=null;placements=[];assets={};dirty=false;
+ project=target;window.StudioTheme?.apply(project.slug);sessionStorage.setItem('journal_active_project',project.slug);
+ current=null;draft=null;placements=[];assets={};dirty=false;
  $("invite").hidden=!chiefRole();$("authorsInvite").hidden=!chiefRole();
  await loadData();await showTab("home",true);
 }
