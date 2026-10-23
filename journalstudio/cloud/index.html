@@ -146,6 +146,22 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .ai-translation-item{padding:9px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:9px}
 .ai-translation-item .btns button{font-size:11px;padding:6px 9px}
 @media(max-width:960px){.ai-grid{grid-template-columns:1fr}}@media(max-width:560px){.ai-personas{grid-template-columns:1fr 1fr}.author-photo-editor{grid-template-columns:1fr}}
+
+/* Media source chooser + optional paid AI image generation */
+.studio-images-menu{background:var(--studio-soft-panel,#f5f7f4);border-radius:14px;border:1px solid var(--line);margin:18px 0;padding:13px}
+.studio-images-source-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.studio-images-source-tabs button{padding:9px 11px;font-size:12px;border-radius:9px}
+.studio-images-source-tabs button.active{background:var(--studio-hero-a,#254d3b);color:white}
+.studio-image-panel{background:white;border-radius:11px;padding:15px;border:1px solid var(--line)}
+.studio-image-panel .row{align-items:flex-start}.studio-image-panel .row p{margin:4px 0}
+.studio-image-panel textarea{min-height:96px}
+.studio-img-spacer{padding:0 6px}.studio-img-spacer p{margin:10px 0}
+.studio-ai-legal{font-size:11px;color:var(--studio-accent-contrast,#4e7154);padding:11px 12px;background:var(--studio-warm-panel,#fff8e6);border-radius:9px;margin:16px 0}
+.studio-image-result{margin:15px 0 0;padding:12px;background:var(--studio-soft-panel,#f4f8f3);border-radius:12px}
+.studio-image-result img{width:100%;max-height:310px;object-fit:contain;border-radius:9px;background:#ddd;display:block}
+.studio-image-result p{margin:8px 0}
+.studio-stock-links{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.studio-stock-links a{border-radius:9px;border:1px solid var(--line);padding:9px 12px;background:var(--mint);color:var(--studio-accent-contrast);font-weight:700;text-decoration:none;font-size:12px}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-12">
 </head><body>
@@ -201,7 +217,42 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <div class="card"><div class="sectionHeading"><div><h2>Содержание статьи</h2><p>Располагайте изображения и текст в нужном порядке</p></div></div>
 <p class="small muted">Перетаскивайте блоки за значок ⠿, либо используйте стрелки ↑↓ на телефоне. Перемещение не публикует материал автоматически.</p><div id="blocks" aria-label="Блоки статьи"></div><div id="editTools"><div class="btns">
 <button data-add="heading">+ Заголовок</button><button data-add="text">+ Текст</button><button data-add="quote">+ Цитата</button><button data-add="link">+ Ссылка</button></div>
-<div class="jp-upload-area"><div class="row"><strong>📷 Фото для статьи</strong><span class="chip">JPG · PNG · WebP</span></div><p class="small muted" style="margin:8px 0">Загружайте собственные снимки. Можно добавить несколько фото, расположить их между абзацами и выбрать обложку.</p><label for="file">Выберите фотографию (до 8 МБ)</label><input id="file" type="file" accept="image/png,image/jpeg,image/webp"><label for="imageAlt">Описание фото для читателей</label><input id="imageAlt" placeholder="Например: зелёные листья монстеры у окна"><div class="editorFields"><div><label for="imageCopyright">Фотограф / правообладатель</label><input id="imageCopyright" placeholder="Ваше имя"></div><div><label for="imageLicense">Основание использования</label><select id="imageLicense"><option value="own">Моя фотография</option><option value="licensed">Есть разрешение автора</option><option value="other">Другая подтверждённая лицензия</option></select></div></div><label class="jp-check"><input id="imageRights" type="checkbox"> Я подтверждаю, что имею право опубликовать это изображение</label><button type="button" class="primary" id="uploadImage">+ Добавить фото в статью</button></div></div>
+<div class="studio-images-menu">
+<div class="studio-images-source-tabs" role="group" aria-label="Источник фотографий">
+  <button type="button" class="active" data-image-source="ai">✦ Создать изображение ИИ</button>
+  <button type="button" data-image-source="stock">⌕ Бесплатные фотобанки</button>
+  <button type="button" data-image-source="own">↑ Загрузить своё</button>
+</div>
+<div id="studioImageAi" class="studio-image-panel">
+  <div class="row"><div><strong>Генератор иллюстраций</strong><p class="muted small">Готовый снимок можно сначала проверить и только потом вставить в статью.</p></div><span class="chip">GPT Image</span></div>
+  <label for="imagePrompt">Что изобразить?</label>
+  <textarea id="imagePrompt" maxlength="650" rows="3" placeholder="Например: спатифиллум в светлой гостиной у окна, мягкий утренний свет, реалистичная ботаника, без людей и надписей"></textarea>
+  <div class="editorFields">
+    <div><label for="imageStyle">Стиль</label><select id="imageStyle">
+      <option value="editorial">Журнальная фотография</option><option value="photorealistic">Реалистичная фотография</option><option value="botanical">Ботаническая иллюстрация</option><option value="illustration">Авторская иллюстрация</option>
+    </select></div>
+    <div><label for="imageSize">Формат</label><select id="imageSize">
+      <option value="1536x1024">Горизонтальный · сайт</option><option value="1024x1024">Квадрат · соцсети</option><option value="1024x1536">Вертикальный · Instagram</option>
+    </select></div>
+  </div>
+  <div class="editorFields"><div><label for="imageQuality">Качество</label><select id="imageQuality"><option value="low">Экономичное · для черновика</option><option value="medium">Среднее · для обложки</option></select></div>
+  <div class="studio-img-spacer"><label>Лимиты безопасности</label><p class="small muted">До 5 изображений на пользователя за 24 часа и 40 на проект за месяц.</p></div></div>
+  <div class="studio-ai-legal">ИИ-иллюстрация может неверно изображать сорт, признаки заболевания или устройство растения. Проверяйте её до публикации. Генерация платная — запрос отправляется только после подтверждения.</div>
+  <button type="button" id="imageGenerate" class="primary">✦ Сгенерировать изображение</button>
+  <div id="imageGenerateStatus" role="status" class="small muted" style="margin-top:10px">Сначала сохраните черновик статьи.</div>
+  <div id="imageGeneratedPreview" hidden class="studio-image-result"><img id="imageGeneratedImg" alt="Предварительный просмотр сгенерированной иллюстрации"><p class="small muted" id="imageGeneratedAlt"></p><div class="btns">
+   <button type="button" id="imageAccept" class="primary">✓ Добавить в статью</button>
+   <button type="button" id="imageAcceptCover">✓ Сделать обложкой</button>
+   <button type="button" id="imageDiscard">Не использовать</button>
+  </div></div>
+</div>
+<div id="studioImageStock" class="studio-image-panel" hidden>
+ <strong>Где искать бесплатные изображения</strong><p class="small muted">Найди фотографию, проверь условия использования, скачай её, затем загрузи ниже и сохрани ссылку на источник.</p>
+ <div class="studio-stock-links"><a href="https://www.pexels.com/search/plants/" target="_blank" rel="noopener noreferrer">Pexels ↗</a><a href="https://unsplash.com/s/photos/garden" target="_blank" rel="noopener noreferrer">Unsplash ↗</a><a href="https://pixabay.com/images/search/plants/" target="_blank" rel="noopener noreferrer">Pixabay ↗</a></div>
+ <p class="small muted">В зависимости от лицензии некоторые изображения нельзя перепродавать без переработки или использовать как фирменный знак. Сохраняйте ссылку на оригинальную страницу.</p>
+</div>
+</div>
+<div class="jp-upload-area"><div class="row"><strong>📷 Фото для статьи</strong><span class="chip">JPG · PNG · WebP</span></div><p class="small muted" style="margin:8px 0">Загружайте собственные снимки. Можно добавить несколько фото, расположить их между абзацами и выбрать обложку.</p><label for="file">Выберите фотографию (до 8 МБ)</label><input id="file" type="file" accept="image/png,image/jpeg,image/webp"><label for="imageSourceUrl">Ссылка на страницу оригинала (для фото из фотобанка)</label><input type="url" id="imageSourceUrl" maxlength="850" placeholder="https://www.pexels.com/photo/..."><p class="small muted" style="margin:5px 0">Оставьте пустым для собственных фотографий.</p><label for="imageAlt">Описание фото для читателей</label><input id="imageAlt" placeholder="Например: зелёные листья монстеры у окна"><div class="editorFields"><div><label for="imageCopyright">Фотограф / правообладатель</label><input id="imageCopyright" placeholder="Ваше имя"></div><div><label for="imageLicense">Основание использования</label><select id="imageLicense"><option value="own">Моя фотография</option><option value="licensed">Есть разрешение автора</option><option value="other">Другая подтверждённая лицензия</option></select></div></div><label class="jp-check"><input id="imageRights" type="checkbox"> Я подтверждаю, что имею право опубликовать это изображение</label><button type="button" class="primary" id="uploadImage">+ Добавить фото в статью</button></div></div>
 <div class="workflow"><div class="eyebrow">РЕДАКЦИОННЫЙ ПРОЦЕСС</div><div class="btns" style="margin-top:9px"><button id="save" class="primary">Сохранить</button><button id="submit">На проверку</button><button id="return">На доработку</button><button id="approve">✓ Утвердить</button><button id="publish" class="primary">↗ Опубликовать</button><button id="schedule">◷ Запланировать</button></div></div>
 </div></div>
 <div class="stack editorPreview"><div class="card"><div class="sectionHeading"><div><h2>Предпросмотр публикации</h2><p>Выберите площадку до утверждения статьи</p></div><span class="chip">Live preview</span></div><div class="jp-mode-switch" role="group" aria-label="Формат предпросмотра"><button type="button" data-preview-mode="phone" class="selected">▯ Телефон</button><button type="button" data-preview-mode="site">▤ Сайт</button><button type="button" data-preview-mode="instagram">◎ Instagram</button></div><div id="jpShape" class="jp-shape-row" hidden><label for="jpAspect">Формат фото</label><select id="jpAspect"><option value="4:5">Вертикальный 4:5</option><option value="1:1">Квадрат 1:1</option></select></div><div id="jpCaptionFields" class="jp-caption-fields" hidden><label for="jpCaptionText">Подпись для Instagram (необязательно)</label><textarea id="jpCaptionText" maxlength="2200" rows="4" placeholder="Здесь можно написать отдельный текст для Instagram. Если оставить пустым, будет создан краткий вариант из статьи."></textarea><div class="row"><span id="jpCaptionLength" class="small muted">0 / 2200</span><button type="button" id="jpSaveCaption">Сохранить подпись</button></div><div class="small muted" style="margin-top:7px">Сохраняется отдельно от основного текста статьи. Без подключения Meta пост не отправляется.</div></div><div id="preview" class="jp-preview-window" aria-live="polite"><div class="empty">Добавьте заголовок и блоки, чтобы увидеть статью.</div></div><div id="jpNotice" class="jp-preview-note">Предварительный макет без публикации.</div></div>
@@ -245,5 +296,6 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./studio-features.js?v=20261023-12"></script>
 <script defer src="./review-workflow.js?v=20261023-12"></script>
 <script defer src="./author-profiles.js?v=20261023-12"></script>
-<script defer src="./ai-studio.js?v=20261023-12"></script>
+<script defer src="./ai-studio.js?v=20261023-13"></script>
+<script defer src="./studio-images.js?v=20261023-13"></script>
 </body></html>
