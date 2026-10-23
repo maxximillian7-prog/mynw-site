@@ -268,6 +268,16 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
     <div><label for="topicImageSelect">Изображение темы</label><select id="topicImageSelect"><option value="">Без изображения</option></select><p class="small muted">Картинка выбирается из одобренной медиатеки. Повторная загрузка не нужна.</p></div>
     <div><label for="topicTitlePt">Название для PT (необязательно)</label><input id="topicTitlePt" maxlength="100" placeholder="Plantas de interior"></div>
   </div>
+  <details style="margin:13px 0"><summary>Переводы названия темы для других языков</summary>
+    <div class="editorFields" style="margin-top:10px">
+      <div><label for="topicTitleEn">English</label><input id="topicTitleEn" maxlength="100"></div>
+      <div><label for="topicTitleUk">Українська</label><input id="topicTitleUk" maxlength="100"></div>
+      <div><label for="topicTitleFr">Français</label><input id="topicTitleFr" maxlength="100"></div>
+      <div><label for="topicTitleDe">Deutsch</label><input id="topicTitleDe" maxlength="100"></div>
+      <div><label for="topicTitleEs">Español</label><input id="topicTitleEs" maxlength="100"></div>
+      <div><label for="topicTitleIt">Italiano</label><input id="topicTitleIt" maxlength="100"></div>
+    </div>
+  </details>
   <div class="btns"><button type="button" id="topicMediaRefresh">↻ Загрузить медиатеку</button><button class="primary" type="submit" id="topicSave">+ Создать тему</button><button type="button" id="topicCancel" hidden>Отмена</button></div>
   <div class="studio-topic-upload"><label for="topicNewImage">Загрузить изображение темы (JPG, PNG, WebP, до 8 МБ)</label><input type="file" id="topicNewImage" accept="image/png,image/jpeg,image/webp">
   <label for="topicImageCopyright">Автор / правообладатель</label><input id="topicImageCopyright" maxlength="160" placeholder="Имя или компания">
