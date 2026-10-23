@@ -20,7 +20,7 @@
   const allowed=editablePost();
   $("imageGenerate").disabled=!allowed||busy;
   if(!allowed&&!current?.id)status("Сначала создайте и сохраните черновик статьи: после сохранения генератор станет доступен.");
-  else if(!allowed&&!editable())status("Статья сейчас «"+(current.status||"на проверке")+"». Создавать изображения можно для черновиков и материалов на доработке. Перевод опубликованной статьи в редактирование снимает её с публикации.");
+  else if(!allowed&&!editable())status("Статья сейчас недоступна для изменений (статус: "+({published:"Опубликована",approved:"Утверждена",scheduled:"Запланирована",in_review:"На проверке"}[current.status]||"Не редактируется")+"). Изображения можно генерировать для сохранённого черновика или материала на доработке. Возврат опубликованной статьи на доработку временно скрывает её в приложении.");
   else if(!allowed)status("Откройте сохранённую статью с правом редактирования, чтобы создать изображение.");
   else if(!busy&&result===null&&pendingRequest===null)status("Введите описание, выберите формат и нажмите «Сгенерировать изображение». Перед платным запросом будет отдельное подтверждение.");
  }
@@ -149,6 +149,9 @@
   if(!editablePost()){
    refreshControls();
    return;
+  }
+  if(!session?.access_token){
+   status("Для генерации необходимо войти в Journal Studio заново.",true);return;
   }
   const request=generationOptions();
   if(request.prompt.length<8||request.prompt.length>650){
