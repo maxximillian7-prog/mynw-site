@@ -300,6 +300,10 @@ function showTranslation(locale,offerApproval=false){
     pendingReviewLocale=null;$("translationPreview").hidden=true;
   }
  });
+ $("translationRefresh").onclick=()=>run(async()=>{
+   await translationsForCurrent();
+   toast("Статусы переводов обновлены с сервера.");
+ });
  $("translateArticle").onclick=()=>run(translate);
  $("translateAll").onclick=()=>run(translateAll);
  $("aiScheduleEnabled").onchange=()=>{$("aiScheduleInfo").textContent=$("aiScheduleEnabled").checked?"Новые материалы будут создаваться по расписанию, только если сохраните настройки.":"Автогенерация выключена. Сохраните настройки.";$("aiSaveSchedule").disabled=!selected||busy||(!providerReady&&$("aiScheduleEnabled").checked);};
