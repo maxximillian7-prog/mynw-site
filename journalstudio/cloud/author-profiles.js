@@ -4,18 +4,47 @@
  const $=id=>document.getElementById(id);
  const E=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  let editing=null,uploadBusy=false;
- const photos=new Map();
+ // Private Storage image URLs expire after ten minutes.
+ // Coalesce requests and retry failed signing instead of caching null forever.
+ const photos=new Map(),photoRequests=new Map(),retryAfter=new Map();
  const canEdit=a=>project?.role==="owner"||project?.role==="chief_editor"||a.kind==="partner"&&a.owner_user_id===session?.user?.id;
  const profileFields={name:"authorName",bio:"authorBio",tagline:"authorTagline",focus:"authorFocus",voice_style:"authorVoice",preferred_locale:"authorLang",website:"authorSocial",instagram:"authorInstagram",youtube:"authorYoutube",photo_asset_id:"authorPhotoId"};
  const safeLink=v=>typeof v==="string"&&/^https:\/\//i.test(v)?v:"";
  function photo(id){
   if(!id)return null;
-  if(photos.has(id))return photos.get(id);
+  const item=photos.get(id);
+  if(item&&item.expiresAt>Date.now()&&item.projectSlug===project?.slug)return item.url;
+  if(item)photos.delete(id);
   return null;
  }
  async function signed(id){
-  if(!id||photos.has(id))return;
-  try{const d=await call("/media/"+encodeURIComponent(id));photos.set(id,d.url);renderImages()}catch{photos.set(id,null)}
+  if(!id)return null;
+  const cached=photo(id);
+  if(cached)return cached;
+  if(photoRequests.has(id))return photoRequests.get(id);
+  if((retryAfter.get(id)||0)>Date.now())return null;
+  const projectSlug=project?.slug;
+  const task=(async()=>{
+   try{
+    const media=await call("/media/"+encodeURIComponent(id));
+    if(typeof media?.url!=="string" ||
+       !/^https:\/\//i.test(media.url) ||
+       !media.url.includes("/storage/v1/object/sign/"))
+      throw Error("Invalid signed author photo URL");
+    const seconds=Math.max(30,Math.min(Number(media.expires_in)||600,600)-90);
+    if(project?.slug!==projectSlug)return null;
+    photos.set(id,{url:media.url,expiresAt:Date.now()+seconds*1000,projectSlug});
+    retryAfter.delete(id);
+    renderImages();
+    return media.url;
+   }catch(error){
+    retryAfter.set(id,Date.now()+3500);
+    console.warn("Journal Studio: author photo loading failed",id,String(error));
+    return null;
+   }finally{photoRequests.delete(id)}
+  })();
+  photoRequests.set(id,task);
+  return task;
  }
  function face(author){
   const url=photo(author.photo_asset_id);
@@ -34,6 +63,23 @@
    const img=photo(editing.photo_asset_id);
    if(img)$("authorPhotoPreview").innerHTML='<img alt="Фото автора" src="'+E(img)+'">';
   }
+  // AI-persona tiles are drawn before media signing completes. Patch them
+  // when the signed URL arrives, without changing the selected author.
+  for(const a of authors||[]){
+   if(!a.photo_asset_id)continue;
+   const url=photo(a.photo_asset_id);
+   if(!url)continue;
+   document.querySelectorAll('[data-ai-persona="'+a.id+'"] .ai-face').forEach(el=>{
+    el.innerHTML='<img alt="Аватар '+E(a.name)+'" src="'+E(url)+'">';
+   });
+  }
+  // Also keep dashboard author previews in sync with the Authors section.
+  document.querySelectorAll("[data-author-face]").forEach(el=>{
+   const a=(authors||[]).find(author=>author.id===el.dataset.authorFace);
+   if(!a?.photo_asset_id)return;
+   const url=photo(a.photo_asset_id);
+   if(url)el.innerHTML='<img alt="Фото '+E(a.name)+'" src="'+E(url)+'">';
+  });
  }
  function links(a){
   const data=a.social_links||{},arr=[];
@@ -57,7 +103,8 @@
     (["owner","chief_editor"].includes(project.role)&&a.kind==="partner"&&a.consent_status!=="approved"?'<button type="button" data-author-approve="'+E(a.id)+'">✓ Согласие</button>':"")+'</div></article>';
   }).join(""):'<div class="empty">Добавьте первого автора.</div>';
   if(editing&&!(authors||[]).some(a=>a.id===editing.id))reset();
-  for(const a of authors||[])if(a.photo_asset_id&&!photos.has(a.photo_asset_id))void signed(a.photo_asset_id);
+  for(const a of authors||[])if(a.photo_asset_id&&!photo(a.photo_asset_id))void signed(a.photo_asset_id);
+  renderImages();
  }
  function reset(){
   editing=null;
@@ -123,7 +170,22 @@
    await signed(response.asset.id);
    const img=photo(response.asset.id);
    if(img)$("authorPhotoPreview").innerHTML='<img src="'+E(img)+'" alt="Предпросмотр аватара">';
-   toast("Фото загружено. Нажмите «Сохранить профиль», чтобы закрепить его за автором.");
+   if(editing?.id&&canEdit(editing)){
+    // An upload should persist for an existing author immediately; previously
+    // the unsaved second step was lost when the page was reloaded.
+    const original=editing;
+    try{
+     const saved=await call("/authors/"+encodeURIComponent(editing.id),"PATCH",{photo_asset_id:response.asset.id});
+     editing={...original,...(saved.author||{}),photo_asset_id:response.asset.id};
+     authors=authors.map(a=>a.id===editing.id?{...a,...editing}:a);
+     render();
+     toast("Фото загружено и сохранено в профиле. После перезагрузки оно останется.");
+    }catch(error){
+     toast("Фото загружено, но не закреплено: "+error.message+". Нажмите «Сохранить профиль».",true);
+    }
+   }else{
+    toast("Фото загружено. Нажмите «Добавить автора», чтобы закрепить его за новым профилем.");
+   }
   }finally{uploadBusy=false}
  }
  document.addEventListener("click",e=>{
