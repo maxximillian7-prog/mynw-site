@@ -99,39 +99,85 @@
   if(activeProject!==project?.slug)await loadMedia();fillMediaSelect(t.image_asset_id);
   $("studioTopicForm").scrollIntoView({behavior:"smooth",block:"center"});
  }
+ function topicTranslationStatus(message,error=false){
+  const el=$("topicTranslateFeedback");
+  el.textContent=message;el.dataset.error=error?"true":"false";
+  status(message);
+ }
+ function topicTranslationError(error){
+  const message=String(error?.message||error||"Неизвестная ошибка");
+  if(message.includes("AI_PROVIDER_NOT_CONFIGURED"))
+   return "ИИ-провайдер для перевода тем не подключён (OPENAI_API_KEY на сервере).";
+  if(/AI_PROVIDER_401|AI_PROVIDER_403/.test(message))
+   return "Неверный ключ AI-провайдера. Проверьте настройку сервера.";
+  if(/AI_PROVIDER_429/.test(message))
+   return "Достигнут лимит AI-провайдера. Повторите позже.";
+  if(error?.name==="TimeoutError"||error?.name==="AbortError")
+   return "Сервер не ответил за 95 секунд. Попробуйте снова.";
+  if(message==="Failed to fetch")
+   return "Нет соединения с сервером. Проверьте интернет и повторите.";
+  return message;
+ }
+ function offerTopicTranslations(){
+  if(!isEditor()){topicTranslationStatus("Только редактор может запустить перевод.",true);return}
+  if(!$("topicTitleInput").value.trim()){
+   topicTranslationStatus("Введите название темы выше, затем повторите.",true);
+   $("topicTitleInput").focus();return;
+  }
+  if(!session?.access_token){
+   topicTranslationStatus("Сессия истекла. Войдите в Journal Studio заново.",true);return;
+  }
+  $("topicTranslateConfirm").hidden=false;
+  topicTranslationStatus("Подтвердите перевод. Введённые названия не будут перезаписаны.");
+  $("topicTranslateConfirm").scrollIntoView({behavior:"smooth",block:"nearest"});
+ }
  async function translateAllTopics(){
   if(!isEditor())throw Error("Переводы доступны редактору");
   const source=$("topicTitleInput").value.trim(),locale=$("topicSourceLocale").value;
   if(!source)throw Error("Сначала введите название темы");
-  if(!confirm("Сгенерировать 8 вариантов названия с помощью ИИ? Могут применяться расходы на API. Все переводы нужно проверить перед сохранением."))return;
-  const button=$("topicTranslateAll");button.disabled=true;
-  status("Генерируем варианты на 8 языков. После получения проверьте каждый перевод.");
+  if(!["ru","en","pt-PT","uk","fr","de","es","it"].includes(locale))throw Error("Неверный язык названия");
+  const button=$("topicTranslateAll"),confirmButton=$("topicTranslateConfirmYes");
+  const originalLabel=confirmButton.textContent;
+  button.disabled=true;confirmButton.disabled=true;confirmButton.textContent="⌛ Переводим…";
+  topicTranslationStatus("Запрос отправляется в ИИ. Не закрывайте страницу.");
   try{
    const endpoint=API_ROOT+"/functions/v1/studio-ai/translate-topic";
-   const doRequest=()=>fetch(endpoint,{method:"POST",headers:{
-     apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,
-     "Content-Type":"application/json"},body:JSON.stringify({
-       project:project.slug,title:source,locale})});
-   let response=await doRequest();
-   if(response.status===401&&session.refresh_token){
-    session=await auth("token?grant_type=refresh_token","POST",{refresh_token:session.refresh_token});
-    sessionStorage.setItem("journal_session",JSON.stringify(session));response=await doRequest();
-   }
+   const doRequest=()=>fetch(endpoint,{method:"POST",signal:AbortSignal.timeout(95000),
+    headers:{apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,
+      "Content-Type":"application/json"},
+    body:JSON.stringify({project:project.slug,title:source,locale})});
+   let response;
+   try{
+    response=await doRequest();
+    if(response.status===401&&session.refresh_token){
+     session=await auth("token?grant_type=refresh_token","POST",{refresh_token:session.refresh_token});
+     sessionStorage.setItem("journal_session",JSON.stringify(session));
+     response=await doRequest();
+    }
+   }catch(error){throw Error(topicTranslationError(error))}
    const result=await response.json().catch(()=>({}));
-   if(!response.ok)throw Error(result.error||"Сервис перевода недоступен");
+   if(!response.ok)throw Error(topicTranslationError(result.error||("HTTP "+response.status)));
    const t=result.translations||{};
-   if(!["ru","en","pt-PT","uk","fr","de","es","it"].every(k=>typeof t[k]==="string"&&t[k].trim()))throw Error("Переводы неполные");
-   // Fill only blank translations: previously reviewed/manual titles remain.
-   if(locale!=="ru")$("topicTitleInput").value=t.ru;
-   if(!$("topicTitlePt").value.trim())$("topicTitlePt").value=t["pt-PT"];
-   for(const [lang,id] of [["en","topicTitleEn"],["uk","topicTitleUk"],
-      ["fr","topicTitleFr"],["de","topicTitleDe"],["es","topicTitleEs"],
-      ["it","topicTitleIt"]]){
-     if(!$(id).value.trim())$(id).value=t[lang];
+   if(!["ru","en","pt-PT","uk","fr","de","es","it"].every(k=>typeof t[k]==="string"&&t[k].trim()))
+    throw Error("ИИ не вернул все восемь переводов. Повторите запрос.");
+   const added=[];
+   if(locale!=="ru"){$("topicTitleInput").value=t.ru;added.push("ru")}
+   for(const [language,id] of [["pt-PT","topicTitlePt"],["en","topicTitleEn"],
+      ["uk","topicTitleUk"],["fr","topicTitleFr"],["de","topicTitleDe"],
+      ["es","topicTitleEs"],["it","topicTitleIt"]]){
+    if(!$(id).value.trim()){$(id).value=t[language];added.push(language)}
    }
-   $("topicSourceLocale").value="ru";
-   status("Варианты для восьми языков заполнены. Проверьте каждый текст перед сохранением.");
-  } finally {button.disabled=false}
+   const details=$("topicTitleEn").closest("details");
+   if(details)details.open=true;
+   topicTranslationStatus("Готово. Добавлено языков: "+added.length+
+    ". Проверьте переводы и нажмите «Сохранить тему». Ранее введённые названия не изменены.");
+  }catch(error){
+   topicTranslationStatus("Ошибка перевода: "+topicTranslationError(error),true);
+   throw error;
+  }finally{
+   button.disabled=false;confirmButton.disabled=false;confirmButton.textContent=originalLabel;
+   $("topicTranslateConfirm").hidden=true;
+  }
  }
  async function save(){
   if(!isEditor())throw Error("Создавать темы может только редактор");
@@ -194,7 +240,12 @@
  $("topicMediaRefresh").onclick=()=>run(async()=>{await loadMedia();render()});
  $("topicCancel").onclick=reset;
  $("topicUploadImage").onclick=()=>run(uploadImage);
- $("topicTranslateAll").onclick=()=>run(translateAllTopics);
+ $("topicTranslateAll").onclick=offerTopicTranslations;
+ $("topicTranslateConfirmYes").onclick=()=>run(translateAllTopics);
+ $("topicTranslateConfirmNo").onclick=()=>{
+  $("topicTranslateConfirm").hidden=true;
+  topicTranslationStatus("Перевод отменён. Можно заполнить названия вручную.");
+ };
  $("topicImageSelect").onchange=()=>run(previewMedia);
  for(const id of ["topicFocusX","topicFocusY"]){$(id).oninput=()=>{updateCrop();if(editing)status("Кадрирование изменено. Нажмите «Сохранить тему».");}}
  $("topicImagePreviewImg").onerror=()=>{status("Изображение недоступно по временной ссылке. Обновите медиатеку.");};
