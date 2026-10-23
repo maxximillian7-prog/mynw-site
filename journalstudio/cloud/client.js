@@ -140,6 +140,41 @@ function resetDraft(){
  blocks=draft.blocks;assets={};placements=[];dirty=false;
 }
 async function createPost(){resetDraft();await showTab("editor",true);}
+async function toggleArticleHidden(id){
+ const p=posts.find(item=>item.id===id);
+ if(!canManagePost(p))throw Error("Только главный редактор может скрывать материалы.");
+ const hide=!p.is_hidden;
+ if(hide&&!confirm("Скрыть статью во всех языках? Текст, переводы и изображения сохранятся."))return;
+ const result=await call("/posts/"+encodeURIComponent(id)+"/visibility","PATCH",{
+   expected_revision:p.revision,is_hidden:hide
+ });
+ if(result.post?.id!==id)throw Error("Сервер не подтвердил изменение.");
+ if(current?.id===id){current=result.post;draft=structuredClone(current);blocks=draft.blocks||[];dirty=false;}
+ await refreshPosts();
+ if(tab==="editor")renderEditor();
+ if(tab==="publish")paintPublication();
+ toast(hide?"Статья скрыта в журнале.":"Статья снова отображается, если опубликована.");
+}
+async function editArticle(id){
+ const p=posts.find(item=>item.id===id);
+ if(!p)throw Error("Обновите список статей.");
+ if(["published","approved","scheduled","in_review"].includes(p.status)){
+   if(!canManagePost(p))throw Error("Изменение опубликованного текста доступно главному редактору.");
+   if(!confirm("Вернуть статью на доработку? Она будет скрыта в приложении до повторной публикации. Все фотографии и переводы сохранятся."))return;
+   const result=await call("/posts/"+encodeURIComponent(id)+"/reopen","PATCH",{
+     expected_revision:p.revision
+   });
+   if(result.post?.id!==id)throw Error("Не удалось открыть статью для редактирования.");
+   await refreshPosts();
+ }
+ await openPost(id);
+ toast("Внесите изменения, сохраните статью и отправьте её на повторное согласование.");
+}
+async function openArticleTranslations(id){
+ await openPost(id);
+ document.getElementById("translationList")?.scrollIntoView({behavior:"smooth",block:"center"});
+ toast("Переводы можно дополнить без изменения оригинала и снятия статьи с публикации.");
+}
 async function deletePost(id){
  const article=posts.find(p=>p.id===id);
  if(!article)throw Error("Статья не найдена в текущем проекте. Обновите материалы.");
