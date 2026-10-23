@@ -97,6 +97,25 @@
 .jp-template-minimal .jp-kicker{letter-spacing:.25em;color:#888}
 .jp-template-minimal .jp-body{font-size:12px;line-height:1.8}
 .jp-template-minimal .jp-cover{height:125px}
+
+/* Collaboration and moderation */
+[data-studio-role="author"] [data-review-nav]{display:none!important}
+.studio-queue-count{background:#fbe9a9;color:#4d401b;border-radius:99px;padding:2px 8px;font-size:11px;margin-left:auto;font-weight:800}
+.studio-review-toolbar{display:flex;align-items:center;gap:12px;margin:0 0 19px}
+.studio-review-toolbar label{margin:0}.studio-review-toolbar select{max-width:220px}
+.studio-review-timeline{max-height:330px;overflow:auto;padding:4px 1px 8px}
+.studio-review-item{border-left:3px solid var(--studio-accent,#3e815f);padding:9px 12px;margin-bottom:11px;background:var(--studio-soft-panel,#f6f8f4);border-radius:0 10px 10px 0}
+.studio-review-item.status{border-left-color:#c8a15a}
+.studio-review-item header{display:flex;gap:10px;align-items:center;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:6px}
+.studio-review-item p{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font-size:12px;color:var(--ink)}
+.studio-review-empty{text-align:center;color:var(--muted);padding:22px 8px}
+.studio-review-queue-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:15px 0;border-top:1px solid var(--line)}
+.studio-review-queue-item b{font-size:14px}.studio-review-queue-item small{display:block;color:var(--muted)}
+.studio-review-queue-item .btns{flex:none}
+.studio-review-queue-item .btns button{font-size:12px;padding:7px 12px}
+.studio-review-status{display:inline-block;margin-top:6px;font-size:11px;background:var(--mint);border:1px solid var(--line);border-radius:9px;padding:3px 8px}
+body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="reviewer"] [data-tab="authors"],body[data-studio-role="reviewer"] [data-tab="publish"],body[data-studio-role="reviewer"] [data-tab="library"],body[data-studio-role="reviewer"] [data-tab="editor"],body[data-studio-role="reviewer"] [data-admin-nav]{display:none!important}
+@media(max-width:600px){.studio-review-queue-item{display:block}.studio-review-queue-item .btns{margin-top:10px}.studio-review-toolbar{flex-wrap:wrap}}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-8">
 </head><body>
@@ -117,7 +136,8 @@
 <button data-tab="library"><b>▤</b> <span data-role-label="library">Материалы</span></button>
 <button data-tab="editor"><b>✎</b> <span data-role-label="editor">Конструктор</span></button>
 <button data-tab="authors"><b>♙</b> <span data-role-label="authors">Авторы</span></button>
-<button data-tab="publish"><b>↗</b> <span data-role-label="publish">Публикации</span></button></nav>
+<button data-tab="publish"><b>↗</b> <span data-role-label="publish">Публикации</span></button>
+<button data-tab="review-queue" data-review-nav><b>✓</b> Согласование <span id="reviewQueueCount" class="studio-queue-count" hidden>0</span></button></nav>
 <div class="navhead">УПРАВЛЕНИЕ</div>
 <nav class="nav" data-admin-nav><button data-tab="settings"><b>⚙</b> Настройки</button></nav>
 <div class="sidebarFoot"><div id="userDisplay">Редакционный аккаунт</div><div class="tiny">Доступ по приглашению · MyNow</div><button id="logout">↩ Выйти</button></div>
@@ -154,8 +174,9 @@
 <div class="workflow"><div class="eyebrow">РЕДАКЦИОННЫЙ ПРОЦЕСС</div><div class="btns" style="margin-top:9px"><button id="save" class="primary">Сохранить</button><button id="submit">На проверку</button><button id="return">На доработку</button><button id="approve">✓ Утвердить</button><button id="publish" class="primary">↗ Опубликовать</button><button id="schedule">◷ Запланировать</button></div></div>
 </div></div>
 <div class="stack editorPreview"><div class="card"><div class="sectionHeading"><div><h2>Предпросмотр публикации</h2><p>Выберите площадку до утверждения статьи</p></div><span class="chip">Live preview</span></div><div class="jp-mode-switch" role="group" aria-label="Формат предпросмотра"><button type="button" data-preview-mode="phone" class="selected">▯ Телефон</button><button type="button" data-preview-mode="site">▤ Сайт</button><button type="button" data-preview-mode="instagram">◎ Instagram</button></div><div id="jpShape" class="jp-shape-row" hidden><label for="jpAspect">Формат фото</label><select id="jpAspect"><option value="4:5">Вертикальный 4:5</option><option value="1:1">Квадрат 1:1</option></select></div><div id="jpCaptionFields" class="jp-caption-fields" hidden><label for="jpCaptionText">Подпись для Instagram (необязательно)</label><textarea id="jpCaptionText" maxlength="2200" rows="4" placeholder="Здесь можно написать отдельный текст для Instagram. Если оставить пустым, будет создан краткий вариант из статьи."></textarea><div class="row"><span id="jpCaptionLength" class="small muted">0 / 2200</span><button type="button" id="jpSaveCaption">Сохранить подпись</button></div><div class="small muted" style="margin-top:7px">Сохраняется отдельно от основного текста статьи. Без подключения Meta пост не отправляется.</div></div><div id="preview" class="jp-preview-window" aria-live="polite"><div class="empty">Добавьте заголовок и блоки, чтобы увидеть статью.</div></div><div id="jpNotice" class="jp-preview-note">Предварительный макет без публикации.</div></div>
-<div class="card"><h2>Каналы публикации</h2><div id="editorChannels"></div><div class="tip">Внешние площадки подключаются отдельно. Утверждение материала не означает, что он уже появился в Instagram.</div></div></div></div></div>
+<div class="card" id="reviewDiscussion"><div class="sectionHeading"><div><h2>Обсуждение с редакцией</h2><p>История комментариев и решений по статье</p></div><button type="button" id="reviewReload" class="small">↻</button></div><div id="reviewTimeline" class="studio-review-timeline"><p class="muted small">Сначала сохраните статью.</p></div><label for="reviewMessage">Комментарий</label><textarea id="reviewMessage" maxlength="1200" rows="3" placeholder="Напишите замечание или ответ редактору"></textarea><div class="btns"><button type="button" id="reviewSend" class="primary">Отправить комментарий</button><small class="muted">Комментарии видны автору и редакции</small></div></div><div class="card"><h2>Каналы публикации</h2><div id="editorChannels"></div><div class="tip">Внешние площадки подключаются отдельно. Утверждение материала не означает, что он уже появился в Instagram.</div></div></div></div></div>
 </section>
+<section class="view" data-view="review-queue"><div class="sectionHeading"><div><div class="eyebrow">РЕДАКЦИОННЫЙ КОНТРОЛЬ</div><h2>Очередь согласования</h2><p class="muted small">Материалы, ожидающие проверки, и решения редакции</p></div><div class="btns"><button id="reviewRefresh">↻ Обновить очередь</button></div></div><div class="card"><div class="studio-review-toolbar"><label for="reviewFilter">Показать</label><select id="reviewFilter"><option value="in_review">На проверке</option><option value="changes_requested">На доработке</option><option value="approved">Утверждены</option><option value="scheduled">Запланированы</option><option value="published">Опубликованы</option><option value="all">Все материалы</option></select></div><div id="reviewQueueList"><div class="empty">Загрузка очереди…</div></div></div></section>
 <section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2"><div class="card"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card"><h2>Новый профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorBio">О себе / специализация</label><textarea id="authorBio"></textarea><label for="authorSocial">Ссылка на страницу автора</label><input id="authorSocial" type="url" placeholder="https://"><button id="saveAuthor" class="primary" style="margin-top:15px">Добавить автора</button><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div></section>
 <section class="view" data-view="publish"><div class="sectionHeading"><div><h2>Центр публикаций</h2><p>Отслеживание публикаций по каналам</p></div></div><div class="grid2"><div class="card"><h2>Готовые статьи</h2><div id="readyPosts"></div><div id="deliveryDetails"></div></div><div class="card"><h2>Подключённые направления</h2><div class="channelCard"><span>❧ &nbsp; Журнал приложения</span><span class="chip">Studio Feed активен</span></div><div class="channelCard"><span>◎ &nbsp; Instagram</span><span class="chip amber">Нужен Meta API</span></div><div class="channelCard"><span>◈ &nbsp; Веб-сайт / блог</span><span class="chip amber">Нужно подключить</span></div><div class="tip">Публикация статьи в Studio Feed не равна появлению статьи в установленном мобильном приложении, пока клиент NowGreen не подключён к новому API.</div></div></div></section>
 <section class="view" data-view="settings"><div class="card"><h2>Настройки редакции</h2><p>Выбранный проект: <strong id="settingsProject">—</strong></p><p>Роль аккаунта: <strong id="settingsRole">—</strong></p><p class="muted">Авторизация: Supabase Auth. Данные хранятся в выделенной базе Journal Studio.</p><div class="tip"><b>Подтверждение email</b><p>Чтобы письма вели обратно в редакцию, в Supabase → Authentication → URL Configuration укажите Site URL и Redirect URL: <code>https://mynw.app/journalstudio/cloud/</code></p></div><p class="small muted">ИИ-генерация и внешние публикации будут включены после настройки соответствующих ключей.</p></div></section>
@@ -164,5 +185,6 @@
 <script defer src="./preview.js?v=20261023-8"></script>
 <script defer src="./studio-themes.js?v=20261023-8"></script>
 <script defer src="./client.js?v=20261023-8"></script>
-<script defer src="./studio-features.js?v=20261023-8"></script>
+<script defer src="./studio-features.js?v=20261023-9"></script>
+<script defer src="./review-workflow.js?v=20261023-9"></script>
 </body></html>
