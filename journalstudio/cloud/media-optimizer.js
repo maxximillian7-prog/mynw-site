@@ -67,12 +67,12 @@
   if(file.size>8*1024*1024)throw Error("Оригинал слишком большой для браузерной оптимизации");
   return file;
  }
- async function perform(id,file){
+ async function perform(id,file,readyVariants){
   if(!/^[0-9a-f-]{36}$/i.test(String(id)))throw Error("Некорректный ID фотографии");
   if(pending.has(id))return pending.get(id);
   const work=(async()=>{
    const original=file||await sourceBlob(id);
-   const prepared=await renderVersions(original);
+   const prepared=readyVariants||await renderVersions(original);
    const result=await call("/media/"+id+"/optimize","POST",{variants:prepared,original_bytes:original.size});
    if(result?.optimization){
     summaries.set(id,result.optimization);
@@ -104,10 +104,19 @@
    return false;
   }
  }
+ async function fromPrepared(id,prepared,originalBytes){
+  if(pending.has(id))return pending.get(id);
+  const task=(async()=>{
+   const result=await call("/media/"+id+"/optimize","POST",{variants:prepared,original_bytes:originalBytes});
+   if(result?.optimization){summaries.set(id,result.optimization);updateLabels(id)}
+   return result.optimization;
+  })().finally(()=>pending.delete(id));
+  pending.set(id,task);return task;
+ }
  async function fromFile(id,file){
   const data=await perform(id,file);
   if(data?.optimization?.status!=="ready")throw Error("Оптимизированные версии не сохранились");
   return data.optimization;
  }
- window.StudioOptimizer={renderVersions,fromFile,optimizeExisting,track,label:id=>stamp(summaries.get(id)),bytesText};
+ window.StudioOptimizer={renderVersions,fromPrepared,fromFile,optimizeExisting,track,label:id=>stamp(summaries.get(id)),bytesText};
 })();
