@@ -202,7 +202,7 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-cover-indicator .studio-cover-note{font-size:11px;color:var(--muted)}
 .studio-topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:15px 0 22px}
 .studio-topic-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper)}
-.studio-topic-image{width:100%;aspect-ratio:4/3;display:grid;place-items:center;background:var(--mint);overflow:hidden}
+.studio-topic-image{width:100%;aspect-ratio:1/1;display:grid;place-items:center;background:var(--mint);overflow:hidden}
 .studio-topic-image img{width:100%;height:100%;object-fit:cover}
 .studio-topic-card-content{padding:12px}
 .studio-topic-card-content h3{font-size:15px;margin:0 0 6px}
@@ -210,7 +210,13 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-topic-form{padding:17px;border:1px solid var(--line);border-radius:16px}
 .studio-topic-form input[type=checkbox]{width:auto}
 .studio-topic-upload{margin:18px 0 8px;padding:14px;border:1px dashed var(--line);border-radius:12px;display:grid;gap:8px}
-.studio-topic-preview img{width:100%;max-width:270px;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
+.studio-topic-preview img{width:100%;max-width:320px;aspect-ratio:1/1;object-fit:cover;border-radius:12px}
+.studio-topic-focus{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+.studio-topic-focus label{font-size:12px}
+.studio-topic-focus input{width:100%}
+.studio-topic-preview{border:1px dashed var(--line);padding:12px;border-radius:14px;max-width:346px}
+.studio-topic-card .studio-topic-image img{object-fit:cover}
+.studio-topic-preview img{display:block}
 @media(max-width:560px){.studio-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
@@ -283,7 +289,11 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
   <label for="topicImageCopyright">Автор / правообладатель</label><input id="topicImageCopyright" maxlength="160" placeholder="Имя или компания">
   <label><input type="checkbox" id="topicImageRights"> Подтверждаю права на использование этого изображения</label>
   <button type="button" id="topicUploadImage">↑ Сохранить изображение в медиатеке</button></div>
-  <div id="topicImagePreview" class="studio-topic-preview" hidden></div>
+  <div id="topicImagePreview" class="studio-topic-preview" hidden><img id="topicImagePreviewImg" alt="Предпросмотр обложки темы"><p class="small muted">Квадрат 1:1 — так тема будет выглядеть в приложении.</p></div>
+  <div class="studio-topic-focus">
+    <label for="topicFocusX">Центр по горизонтали <output id="topicFocusXValue">50%</output><input type="range" id="topicFocusX" min="0" max="100" value="50"></label>
+    <label for="topicFocusY">Центр по вертикали <output id="topicFocusYValue">50%</output><input type="range" id="topicFocusY" min="0" max="100" value="50"></label>
+  </div>
   <p id="studioTopicStatus" class="small muted" role="status"></p>
  </form>
 </div>
@@ -413,5 +423,5 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./ai-studio.js?v=20261023-15"></script>
 <script defer src="./studio-images.js?v=20261023-23"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
-<script defer src="./journal-topics.js?v=20261023-41"></script>
+<script defer src="./journal-topics.js?v=20261023-43"></script>
 </body></html>
