@@ -274,8 +274,8 @@ async function upload(){
  catch(e){toast("Оригинал загружен, но WebP-оптимизация не завершена: "+e.message,true)}
  const destination=$("uploadPlacement").value;
  if(!["library","cover","inline"].includes(destination))throw Error("Некорректный выбор размещения");
+ capture(); // Preserve any unsaved editor fields even when only saving media.
  if(destination!=="library"){
-  capture();
   if(destination==="cover")draft.cover_path=r.asset.id;
   if(destination==="inline"){
    if(!blocks.some(b=>b.type==="image"&&b.asset_id===r.asset.id))
