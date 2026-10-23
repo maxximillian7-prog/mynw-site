@@ -152,6 +152,19 @@ function capture(){
  draft.author_id=$("authorSelect").value||null;
  document.querySelectorAll("[data-block]").forEach(el=>{const b=blocks[+el.dataset.block];if(b)b[el.dataset.prop]=el.value});
 }
+function renderCoverIndicator(edit){
+ const el=$("studioCoverIndicator");if(!el)return;
+ const coverId=draft?.cover_path||null;
+ const label=window.StudioI18n?.t?.("Обложка")||"Обложка";
+ if(!coverId){el.innerHTML='<span class="studio-cover-title">'+esc(label)+'</span><span class="studio-cover-note"> · —</span>';return}
+ const src=assets[coverId]||"";
+ const image=src?'<img data-media-id="'+esc(coverId)+'" src="'+esc(src)+'" alt="'+esc(label)+'">':'<span class="studio-cover-note">'+esc(window.StudioI18n?.t?.("Изображение загружается…")||"Изображение загружается…")+'</span>';
+ el.innerHTML='<div class="row" style="gap:10px;align-items:center">'+image+
+ '<div style="flex:1"><div class="studio-cover-title">'+esc(label)+'</div>'+
+ '<div class="studio-cover-note">'+esc(window.StudioI18n?.t?.("В медиатеке")||"В медиатеке")+'</div></div>'+
+ (edit?'<button type="button" data-cover-clear="1">'+esc(window.StudioI18n?.t?.("Удалить")||"Удалить")+' '+esc(label)+'</button>':'')+
+ '</div>';
+}
 function renderEditor(){
  $("editor").hidden=!draft;$("emptyEditor").hidden=!!draft;if(!draft)return;
  const edit=editable();$("workTitle").textContent=current?.title||"Новый материал";
@@ -160,6 +173,7 @@ function renderEditor(){
  $("authorSelect").innerHTML='<option value="">Редакция</option>'+authors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.kind==="ai"?" · ИИ":"")+'</option>').join("");
  $("authorSelect").value=draft.author_id||"";$("authorSelect").disabled=!edit;
  $("blocks").innerHTML=blocks.map((b,i)=>blockHtml(b,i,edit)).join("")||'<div class="empty">Добавьте первый текстовый блок, заголовок или фотографию.</div>';
+ renderCoverIndicator(edit);
  $("editTools").hidden=!edit;
  const s=current?.status||"draft";
  $("save").hidden=!edit;$("submit").hidden=!current||!edit;
@@ -347,6 +361,7 @@ document.addEventListener("click",e=>{
  if(b.dataset.delivery)return void run(()=>viewDelivery(b.dataset.delivery));
  if(b.dataset.authorApprove)return void run(()=>approveAuthor(b.dataset.authorApprove));
  if(b.dataset.add)return void run(async()=>addBlock(b.dataset.add));
+ if(b.dataset.coverClear!==undefined)return void run(async()=>{if(!editable())return;capture();draft.cover_path=null;dirty=true;renderEditor();toast("Обложка снята. Фото внутри статьи и в медиатеке сохранено.");});
  if(b.dataset.blockCover!==undefined)return void run(async()=>{const item=blocks[+b.dataset.blockCover];if(!item||item.type!=="image")return;capture();draft.cover_path=item.asset_id;dirty=true;renderEditor();toast("Обложка выбрана. Сохраните изменения.");});
  if(b.dataset.blockRemove!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockRemove,"remove"));
  if(b.dataset.blockUp!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockUp,"up"));
