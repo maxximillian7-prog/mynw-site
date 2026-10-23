@@ -102,7 +102,7 @@
    const result=await response.json();
    if(thisRequest!==requested||locale!==target)return;
    if(result.locale===target&&result.version===1&&result.translations&&typeof result.translations==="object"){
-    dictionary={...(fallback[target]||{}),...result.translations};
+    dictionary={...result.translations,...(fallback[target]||{})};
     schedule();
    }
   }catch(error){console.warn("Journal Studio locale fallback",String(error))}
