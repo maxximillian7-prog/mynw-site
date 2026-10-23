@@ -58,6 +58,9 @@
   const t=topics.find(item=>item.id===id);if(!t)return;
   editing=t;$("topicTitleInput").value=t.title;$("topicSlugInput").value=t.slug;
   $("topicSlugInput").disabled=true;$("topicTitlePt").value=t.translations?.["pt-PT"]||"";
+  for(const [lang,input] of [["en","topicTitleEn"],["uk","topicTitleUk"],["fr","topicTitleFr"],["de","topicTitleDe"],["es","topicTitleEs"],["it","topicTitleIt"]]){
+    $(input).value=t.translations?.[lang]||"";
+  }
   $("topicSave").textContent="Сохранить тему";$("topicCancel").hidden=false;
   if(activeProject!==project?.slug)await loadMedia();fillMediaSelect(t.image_asset_id);
   $("studioTopicForm").scrollIntoView({behavior:"smooth",block:"center"});
@@ -69,6 +72,10 @@
   const pt=$("topicTitlePt").value.trim();
   const translations={...(editing?.translations||{})};
   if(pt)translations["pt-PT"]=pt;else delete translations["pt-PT"];
+  for(const [lang,input] of [["en","topicTitleEn"],["uk","topicTitleUk"],["fr","topicTitleFr"],["de","topicTitleDe"],["es","topicTitleEs"],["it","topicTitleIt"]]){
+    const value=$(input).value.trim();
+    if(value)translations[lang]=value;else delete translations[lang];
+  }
   const payload={project:project.slug,title,slug,translations,image_asset_id:$("topicImageSelect").value||null};
   status("Сохраняю тему...");
   if(editing){
