@@ -56,7 +56,7 @@
     '</div><div class="btns">'+(edit?'<button type="button" data-profile-edit="'+E(a.id)+'">Редактировать</button>':"")+
     (["owner","chief_editor"].includes(project.role)&&a.kind==="partner"&&a.consent_status!=="approved"?'<button type="button" data-author-approve="'+E(a.id)+'">✓ Согласие</button>':"")+'</div></article>';
   }).join(""):'<div class="empty">Добавьте первого автора.</div>';
-  if(editing&&!(""+(authors||[]).some(a=>a.id===editing.id)))reset();
+  if(editing&&!(authors||[]).some(a=>a.id===editing.id))reset();
   for(const a of authors||[])if(a.photo_asset_id&&!photos.has(a.photo_asset_id))void signed(a.photo_asset_id);
  }
  function reset(){
