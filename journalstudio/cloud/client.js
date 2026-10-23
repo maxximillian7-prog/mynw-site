@@ -132,7 +132,8 @@ async function openPost(id){
 function blockHtml(b,i,edit){
  let inner="";
  if(b.type==="link"){inner='<label>Текст ссылки</label><input data-block="'+i+'" data-prop="label" value="'+esc(b.label||"")+'"><label>URL</label><input data-block="'+i+'" data-prop="url" value="'+esc(b.url||"")+'" placeholder="https://...">';}
- else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img data-media-id="'+esc(b.asset_id)+'" alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'"><label>Альтернативный текст (для доступности)</label><input data-block="'+i+'" data-prop="alt" value="'+esc(b.alt||"")+'">'+(edit?'<button type="button" class="jp-cover-select '+(draft?.cover_path===b.asset_id?'active':'')+'" data-block-cover="'+i+'">'+(draft?.cover_path===b.asset_id?'✓ Выбрана обложкой':'○ Сделать обложкой')+'</button>':'');}
+ else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img data-media-id="'+esc(b.asset_id)+'" alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<div class="studio-media-size" data-optimized-id="'+esc(b.asset_id)+'">'+esc(window.StudioOptimizer?.label?.(b.asset_id)||"Оптимизация изображений") +'</div>';
+ inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'"><label>Альтернативный текст (для доступности)</label><input data-block="'+i+'" data-prop="alt" value="'+esc(b.alt||"")+'">'+(edit?'<button type="button" class="jp-cover-select '+(draft?.cover_path===b.asset_id?'active':'')+'" data-block-cover="'+i+'">'+(draft?.cover_path===b.asset_id?'✓ Выбрана обложкой':'○ Сделать обложкой')+'</button>':'');}
  else inner='<textarea data-block="'+i+'" data-prop="text" rows="'+(b.type==="text"?5:2)+'" placeholder="Введите текст">'+esc(b.text||"")+'</textarea>';
  return '<div class="block"><div class="row"><strong>'+({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок")+'</strong>'+(edit?'<div class="btns"><button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button><button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+'</div>';
 }
@@ -179,16 +180,29 @@ async function addChannel(){
 }
 async function fetchMedia(){
  const ids=[...new Set(blocks.filter(b=>b.type==="image").map(b=>b.asset_id))];
- let failed=0;
+ if(draft?.cover_path&&!ids.includes(draft.cover_path))ids.push(draft.cover_path);
+ let failed=0,needOptimization=[];
  for(const id of ids){
   try{
    const r=await call("/media/"+encodeURIComponent(id));
    if(typeof r.url!=="string"||!r.url.startsWith("https://")||!r.url.includes("/storage/v1/object/sign/"))throw Error("Invalid signed photo URL");
    assets[id]=r.url;
+   window.StudioOptimizer?.track?.(id,r.optimization);
+   if(r.optimization?.status!=="ready"&&!r.optimization?.original_deleted)needOptimization.push(id);
   }catch{failed++}
  }
  if(tab==="editor")renderEditor();
  if(failed)toast("Не удалось открыть "+failed+" изображений. Попробуйте ещё раз открыть статью.",true);
+ if(needOptimization.length&&window.StudioOptimizer){
+  const originPost=current?.id;
+  void (async()=>{
+   let finished=0;
+   for(const id of needOptimization)if(await window.StudioOptimizer.optimizeExisting(id))finished++;
+   if(finished&&tab==="editor"&&current?.id===originPost&&!dirty){
+    renderEditor();toast("Оптимизировано изображений: "+finished+". Вместо оригиналов используются WebP.");
+   }
+  })();
+ }
 }
 async function savePost(){
  if(!draft)throw Error("Откройте конструктор");
@@ -237,10 +251,15 @@ async function upload(){
  if(!copyright)throw Error("Введите имя фотографа или правообладателя");
  const license=$("imageLicense").value;
  const alt=$("imageAlt").value.trim()||f.name;
+ if(!window.StudioOptimizer)throw Error("Обновите страницу: модуль оптимизации изображений не загружен");
+ const renditions=await window.StudioOptimizer.renderVersions(f);
  const base64=await new Promise((ok,no)=>{const reader=new FileReader();reader.onload=()=>ok(String(reader.result).split(",")[1]);reader.onerror=no;reader.readAsDataURL(f)});
  const sourceUrl=$("imageSourceUrl").value.trim();
  if(sourceUrl&&!/^https:\/\//i.test(sourceUrl))throw Error("Источник должен начинаться с https://");
  const r=await call("/media","POST",{project:project.slug,mime:f.type,base64,alt_text:alt,copyright_holder:copyright,license,source_url:sourceUrl,rights_confirmed:true});
+ let photoStatus=null;
+ try{photoStatus=await window.StudioOptimizer.fromPrepared(r.asset.id,renditions,f.size)}
+ catch(e){toast("Оригинал загружен, но WebP-оптимизация не завершена: "+e.message,true)}
  capture();const b={type:"image",asset_id:r.asset.id,caption:"",alt};
  blocks.push(b);draft.blocks=blocks;
  if(!draft.cover_path)draft.cover_path=b.asset_id;
