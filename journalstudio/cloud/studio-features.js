@@ -74,7 +74,7 @@ function cropUi(b,i){
  const block='<div class="studio-crop"><div class="eyebrow">КАДРИРОВАНИЕ ЭТОГО ФОТО · '+escape(label(activeChannel))+'</div>'+
  '<label>Формат кадра</label><select data-crop-index="'+i+'" data-crop-prop="aspect">'+option+'</select>'+
  [['x','Центр по горизонтали',0,100],['y','Центр по вертикали',0,100],['zoom','Приближение, %',100,250]].map(([key,title,min,max])=>'<label>'+title+'</label><div class="studio-slider-row"><input type="range" min="'+min+'" max="'+max+'" step="1" data-crop-index="'+i+'" data-crop-prop="'+key+'" value="'+Number(c[key])+'"><output data-crop-output="'+i+'-'+key+'">'+Number(c[key])+(key==="zoom"?"%":"")+'</output></div>').join("")+
- (asset?'<div class="studio-crop-preview" data-crop-thumb="'+i+'"><img alt="Пример кадрирования" src="'+escape(asset)+'"></div>':"")+
+ (asset?'<div class="studio-crop-preview" data-crop-thumb="'+i+'"><img data-media-id="'+escape(b.asset_id)+'" alt="Пример кадрирования" src="'+escape(asset)+'"></div>':"")+
  '<div class="small muted">Кадрирование сохраняется отдельно в каждой версии площадки. Исходный файл не изменяется.</div></div>';
  return block;
 }
