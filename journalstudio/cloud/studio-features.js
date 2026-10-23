@@ -105,24 +105,65 @@ function decorate(){if(!project)return;roleUI();if(!draft)return;versionUI();pho
 const originalRender=renderEditor;
 renderEditor=function(...a){originalRender(...a);decorate()};
 const originalOpen=openPost;
-openPost=async function(id){activeChannel="base";knownPostId=id;variants=[];await originalOpen(id);await loadVersions();renderEditor()};
+openPost=async function(id){
+ activeChannel="base";knownPostId=id;variants=[];
+ await originalOpen(id);await loadVersions();
+ const selected=["in_review","approved","scheduled","published"].includes(current?.status)?current?.review_channel:"base";
+ if(selected&&selected!=="base"&&variants.some(v=>v.channel===selected&&v.locale===current?.locale)){
+  activeChannel=selected;draft=candidate(selected);blocks=draft.blocks||[];dirty=false;
+  await fetchMedia();
+ }
+ renderEditor();
+};
 const originalCreate=createPost;
 createPost=async function(...args){activeChannel="base";knownPostId=null;variants=[];await originalCreate(...args);renderEditor()};
 const originalSave=savePost;
+let editionSavePending=null;
 savePost=async function(...args){
- if(activeChannel==="base"){await originalSave(...args);return}
- if(!current)throw Error("Сначала сохраните основную статью");
- if(!editable())throw Error("После отправки на согласование редакционные версии заблокированы");
- capture();
- if(!draft.title?.trim())throw Error("Введите заголовок версии");
- const data={post_id:current.id,expected_revision:current.revision,channel:activeChannel,locale:current.locale,
-  title:draft.title,summary:draft.summary,caption:activeChannel==="instagram"?(draft.caption||""):"",
-  blocks,template_id:draft.template_id||"editorial",cover_path:draft.cover_path||null};
- await call("/variants","POST",data);
- current=(await call("/posts/"+current.id)).post;await loadVersions();
- draft=candidate(activeChannel);blocks=draft.blocks||[];dirty=false;
- placements=(await call("/placements?post_id="+current.id)).placements||[];
- await refreshPosts();await fetchMedia();renderEditor();toast("Редакционная версия «"+label(activeChannel)+"» сохранена на сервере");
+ if(editionSavePending)return await editionSavePending;
+ const runSave=(async()=>{
+  if(activeChannel==="base"){await originalSave(...args);return}
+  if(!current)throw Error("Сначала сохраните основную статью");
+  if(!editable())throw Error("После отправки на согласование редакционные версии заблокированы");
+  capture();
+  if(!draft.title?.trim())throw Error("Введите заголовок версии");
+  const channel=activeChannel,id=current.id;
+  const data={post_id:id,expected_revision:current.revision,channel,locale:current.locale,
+    title:draft.title,summary:draft.summary,caption:channel==="instagram"?(draft.caption||""):"",
+    blocks,template_id:draft.template_id||"editorial",cover_path:draft.cover_path||null};
+  const receipt=await call("/variants","POST",data);
+  current=(await call("/posts/"+id)).post;
+  if(Number(receipt.revision)!==current.revision)throw Error("Не удалось подтвердить сохранённую ревизию площадки");
+  await loadVersions();
+  draft=candidate(channel);blocks=draft.blocks||[];dirty=false;
+  placements=(await call("/placements?post_id="+id)).placements||[];
+  await refreshPosts();await fetchMedia();renderEditor();
+  toast("Версия «"+label(channel)+"» сохранена: ревизия "+current.revision);
+ })();
+ editionSavePending=runSave;
+ try{return await runSave}finally{if(editionSavePending===runSave)editionSavePending=null}
+};
+function hasUnsavedChanges(){
+ if(!current||!draft)return !!dirty;
+ const saved=activeChannel==="base"?current:variants.find(v=>v.channel===activeChannel&&v.locale===current.locale);
+ if(!saved)return true;
+ const props=["title","summary","blocks","cover_path","template_id","locale"];
+ if(activeChannel==="base"){props.push("category","author_id")}
+ if(activeChannel==="instagram")props.push("caption");
+ return props.some(k=>JSON.stringify(draft[k]??null)!==JSON.stringify(saved[k]??null));
+}
+const originalWorkflow=workflow;
+workflow=async function(action,...args){
+ const selected=activeChannel;
+ await originalWorkflow(action,...args);
+ if(selected!=="base"&&current){
+  await loadVersions();
+  const chosen=variants.find(v=>v.channel===selected&&v.locale===current.locale);
+  if(chosen){
+   activeChannel=selected;draft=candidate(selected);blocks=draft.blocks||[];dirty=false;
+   await fetchMedia();renderEditor();
+  }
+ }
 };
 const oldDashboard=renderDashboard;
 renderDashboard=function(...args){
@@ -243,7 +284,9 @@ window.StudioFeatures={
    await savePost();
    return true;
  },
- activeVersion:()=>activeChannel
+ activeVersion:()=>activeChannel,
+ waitForSave:async()=>{if(editionSavePending)await editionSavePending},
+ hasUnsavedChanges
 };
 roleUI();
 })();
