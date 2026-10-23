@@ -200,13 +200,13 @@ function showTranslation(locale,offerApproval=false){
   const stale=t.source_revision!==currentSourceRevision();
   const canApprove=offerApproval&&chiefRoleAi()&&!stale&&t.status!=="reviewed";
   pendingReviewLocale=canApprove?locale:null;
-  area.innerHTML='<div class="eyebrow">'+E(locales[locale]||locale)+' · '+
+  area.innerHTML='<div class="studio-translation-preview-content"><div class="eyebrow">'+E(locales[locale]||locale)+' · '+
    (t.status==="reviewed"?"Проверено редакцией":"Черновик перевода")+
    '</div><h3>'+E(t.title)+'</h3><p>'+E(t.summary)+'</p>'+
    (t.blocks||[]).map(b=>b.type==="heading"?'<h3>'+E(b.text)+'</h3>':
     b.type==="text"||b.type==="quote"?'<p>'+E(b.text)+'</p>':
     b.type==="image"?'<p class="muted small">📷 '+E(b.caption||b.alt||"Фото сохранено")+'</p>':
-    b.type==="link"?'<p class="muted small">↗ '+E(b.label||"Ссылка")+'</p>':"").join("")+
+    b.type==="link"?'<p class="muted small">↗ '+E(b.label||"Ссылка")+'</p>':"").join("")+'</div>'+
    (canApprove?'<div class="studio-translation-approval">'+
     '<p><b>Проверьте весь перевод.</b> Подтверждение сделает языковую версию доступной читателям опубликованной статьи.</p>'+
     '<div class="btns"><button type="button" class="primary" data-ai-translation-confirm="'+E(locale)+'">✓ Подтвердить проверку</button>'+
