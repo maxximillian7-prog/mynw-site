@@ -60,6 +60,10 @@ function versionUI(){
  const select=document.getElementById("templateSelect");if(select){select.value=draft?.template_id||"editorial";select.disabled=!editable()}
  const authorSel=document.getElementById("authorSelect");if(authorSel&&activeChannel!=="base")authorSel.disabled=true;
  const save=document.getElementById("save");if(save&&activeChannel!=="base"&&editable())save.textContent="Сохранить версию: "+label(activeChannel);else if(save)save.textContent="Сохранить статью";
+ const send=document.getElementById("submit");
+ if(send&&editable())send.textContent="На проверку · "+label(activeChannel);
+ const status=document.getElementById("statusLine");
+ if(status&&current?.status==="in_review")status.textContent+=" · На проверке: "+label(current.review_channel||"base");
  const variantsCount=variants.length;
  const channelPanel=document.getElementById("editorChannels");
  if(channelPanel&&variantsCount&&!channelPanel.querySelector(".studio-variant-info")){
