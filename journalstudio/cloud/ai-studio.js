@@ -7,7 +7,7 @@
  const chiefRoleAi=()=>["owner","chief_editor"].includes(project?.role||"");
  const locales={ru:"Русский","pt-PT":"Português (PT)",en:"English",uk:"Українська",es:"Español",fr:"Français",de:"Deutsch",it:"Italiano"};
  let selected=null,schedules=[],jobs=[],translations=[],busy=false,providerReady=false,lastPhotoCache=new Map();
- let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null;
+ let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null,bulkStarting=false;
  async function request(path,method="GET",body,options={}){
   if(!session?.access_token)throw Error("Войдите в редакцию");
   const signal=options.timeoutMs?{signal:AbortSignal.timeout(options.timeoutMs)}:{};
@@ -189,7 +189,7 @@
     !translations.some(t=>t.locale===locale&&t.source_revision===revision));
  }
  async function prepareTranslateAll(){
-  if(busy)return;
+  if(busy||bulkStarting)return;
   clearBulk();
   if(!current?.id){bulkMessage("Сначала сохраните исходную статью.",true);return}
   if(dirty){bulkMessage("Сначала сохраните несохранённые изменения статьи.",true);return}
@@ -389,7 +389,17 @@
  });
  $("translateArticle").onclick=()=>run(translate);
  $("translateAll").onclick=()=>run(prepareTranslateAll);
- $("translateAllConfirmYes").onclick=()=>run(translateAll);
+ $("translateAllConfirmYes").onclick=()=>{
+   // Lock synchronously; otherwise two quick taps could both pass the
+   // server preflight and incur duplicate paid translations.
+   if(bulkStarting||busy)return;
+   bulkStarting=true;
+   $("translateAllConfirmYes").disabled=true;
+   void run(translateAll).finally(()=>{
+     bulkStarting=false;
+     $("translateAllConfirmYes").disabled=false;
+   });
+ };
  $("translateAllConfirmNo").onclick=()=>{
    clearBulk();
    bulkMessage("Перевод отменён до отправки платных запросов.");
