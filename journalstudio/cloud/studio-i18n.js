@@ -80,7 +80,7 @@
   const sel=document.getElementById("studioUILanguage");
   if(sel)sel.value=locale;
   const lbl=document.getElementById("studioUILangLabel");
-  if(lbl)lbl.textContent=languageNames[locale]||"Language";
+  if(lbl&&lbl.textContent!==(languageNames[locale]||"Language"))lbl.textContent=languageNames[locale]||"Language";
   const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
   let textNode;while((textNode=walk.nextNode()))phrase(textNode);
   for(const el of document.querySelectorAll("[placeholder],[aria-label],[title]"))
