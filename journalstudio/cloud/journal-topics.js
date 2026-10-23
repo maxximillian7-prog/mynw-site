@@ -14,11 +14,29 @@
   el.value=selected||"";
   previewMedia();
  }
- function previewMedia(){
-  const preview=$("topicImagePreview");if(!preview)return;
-  const id=$("topicImageSelect").value,record=media.find(m=>m.id===id);
-  preview.hidden=!record?.thumb_url;
-  preview.innerHTML=record?.thumb_url?'<img alt="Обложка темы" src="'+safe(record.thumb_url)+'">':"";
+ function updateCrop(){
+  const x=Number($("topicFocusX").value),y=Number($("topicFocusY").value);
+  $("topicFocusXValue").textContent=x+"%";$("topicFocusYValue").textContent=y+"%";
+  $("topicImagePreviewImg").style.objectPosition=x+"% "+y+"%";
+ }
+ async function previewMedia(){
+  const id=$("topicImageSelect").value,preview=$("topicImagePreview"),
+    record=media.find(m=>m.id===id);
+  if(!id){preview.hidden=true;return}
+  preview.hidden=false;
+  const img=$("topicImagePreviewImg");img.hidden=true;
+  const slug=project?.slug;
+  let url=record?.thumb_url||null;
+  if(!url){
+    try{
+      const result=await call("/media/"+encodeURIComponent(id)+"?variant=cover");
+      url=result.url||null;
+      if(record&&url)record.thumb_url=url;
+    }catch(e){status("Снимок сохранён; предпросмотр пока недоступен: "+e.message)}
+  }
+  if(project?.slug!==slug || $("topicImageSelect").value!==id)return;
+  if(url){img.src=url;img.hidden=false}
+  updateCrop();
  }
  async function loadMedia(){
   if(!project?.slug)return;
@@ -38,6 +56,7 @@
   if(project?.slug!==slug)return;
   media=all;activeProject=slug;fillMediaSelect(editing?.image_asset_id||null);
   status((hasMore?"Показана часть медиатеки. ":"")+"Доступно изображений: "+media.length+".");
+  render();
  }
  function render(){
   const host=$("studioTopicList");if(!host||!project)return;
@@ -47,7 +66,7 @@
   host.innerHTML=topics.length?topics.map(t=>{
    const image=media.find(m=>m.id===t.image_asset_id);
    return '<article class="studio-topic-card"><div class="studio-topic-image">'+
-    (image?.thumb_url?'<img src="'+safe(image.thumb_url)+'" alt="'+safe(t.title)+'">':'<span style="font-size:30px">🌿</span>')+
+    (image?.thumb_url?'<img src="'+safe(image.thumb_url)+'" alt="'+safe(t.title)+'" style="object-position:'+Number(t.focus_x??50)+'% '+Number(t.focus_y??50)+'%">':'<span style="font-size:30px">🌿</span>')+
     '</div><div class="studio-topic-card-content"><h3>'+safe(t.title)+'</h3>'+
     '<p class="muted">'+safe(t.slug)+' · v'+Number(t.revision||1)+(t.is_active?'':' · Скрыта')+'</p>'+
     (writable?'<div class="btns"><button type="button" data-topic-edit="'+safe(t.id)+'">Изменить</button>'+
@@ -63,6 +82,7 @@
  function reset(){
   editing=null;$("studioTopicForm").reset();$("topicSlugInput").disabled=false;
   $("topicSave").textContent="+ Создать тему";$("topicCancel").hidden=true;
+  $("topicFocusX").value=50;$("topicFocusY").value=50;updateCrop();
   fillMediaSelect(null);status("");
  }
  async function edit(id){
@@ -72,6 +92,8 @@
   for(const [lang,input] of [["en","topicTitleEn"],["uk","topicTitleUk"],["fr","topicTitleFr"],["de","topicTitleDe"],["es","topicTitleEs"],["it","topicTitleIt"]]){
     $(input).value=t.translations?.[lang]||"";
   }
+  $("topicFocusX").value=Number(t.focus_x??50);$("topicFocusY").value=Number(t.focus_y??50);
+  updateCrop();
   $("topicSave").textContent="Сохранить тему";$("topicCancel").hidden=false;
   if(activeProject!==project?.slug)await loadMedia();fillMediaSelect(t.image_asset_id);
   $("studioTopicForm").scrollIntoView({behavior:"smooth",block:"center"});
@@ -87,7 +109,8 @@
     const value=$(input).value.trim();
     if(value)translations[lang]=value;else delete translations[lang];
   }
-  const payload={project:project.slug,title,slug,translations,image_asset_id:$("topicImageSelect").value||null};
+  const payload={project:project.slug,title,slug,translations,image_asset_id:$("topicImageSelect").value||null,
+    focus_x:Number($("topicFocusX").value),focus_y:Number($("topicFocusY").value)};
   status("Сохраняю тему...");
   if(editing){
    await call("/topics/"+editing.id,"PATCH",{...payload,expected_revision:editing.revision});
@@ -113,10 +136,15 @@
   const base64=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(",")[1]);r.onerror=reject;r.readAsDataURL(f)});
   const result=await call("/media","POST",{project:project.slug,mime:f.type,base64,rights_confirmed:true,copyright_holder:holder,license:"editorial-permission",alt_text:f.name});
   await loadMedia();
+  let signed=null;
+  try{const response=await call("/media/"+encodeURIComponent(result.asset.id)+"?variant=cover");signed=response.url||null}catch(e){}
   if(!media.some(m=>m.id===result.asset.id)){
-   media.unshift({id:result.asset.id,alt:f.name,thumb_url:null});
+   media.unshift({id:result.asset.id,alt:f.name,thumb_url:signed});
+  }else if(signed){
+   media.find(m=>m.id===result.asset.id).thumb_url=signed;
   }
   fillMediaSelect(result.asset.id);
+  await previewMedia();
   status("Изображение загружено. Нажмите «Сохранить тему», чтобы привязать его к теме.");
  }
  document.addEventListener("click",e=>{
@@ -129,7 +157,9 @@
  $("topicMediaRefresh").onclick=()=>run(async()=>{await loadMedia();render()});
  $("topicCancel").onclick=reset;
  $("topicUploadImage").onclick=()=>run(uploadImage);
- $("topicImageSelect").onchange=previewMedia;
+ $("topicImageSelect").onchange=()=>run(previewMedia);
+ for(const id of ["topicFocusX","topicFocusY"]){$(id).oninput=()=>{updateCrop();if(editing)status("Кадрирование изменено. Нажмите «Сохранить тему».");}}
+ $("topicImagePreviewImg").onerror=()=>{status("Изображение недоступно по временной ссылке. Обновите медиатеку.");};
  document.addEventListener("click",e=>{
   if(e.target.closest('[data-open-tab="library"],[data-tab="library"]')){
    if(project?.slug&&activeProject!==project.slug)void run(async()=>{await loadMedia();render()});
