@@ -221,13 +221,25 @@ async function savePost(){
 }
 async function workflow(action){
  if(!current)throw Error("Сохраните материал");
- if(dirty)throw Error("Есть изменения: сначала нажмите «Сохранить»");
- const payload={action};
+ if(action==="submit"){
+  await window.StudioFeatures?.waitForSave?.();
+  capture();
+  if(dirty||window.StudioFeatures?.hasUnsavedChanges?.()){
+   await savePost();
+  }
+  await window.StudioFeatures?.waitForSave?.();
+  if(dirty)throw Error("Изменения не сохранены. Отправка на согласование отменена.");
+ }
+ const payload={action,expected_revision:current.revision};
+ if(action==="submit")payload.submitted_channel=window.StudioFeatures?.activeVersion?.()||"base";
  if(action==="request_changes"){const note=prompt("Что автору нужно исправить? Комментарий обязателен:");if(note===null)return;if(!note.trim())throw Error("Укажите причину возврата на доработку");payload.note=note.trim()}
  if(action==="schedule"){
  const value=prompt("Время выпуска в ISO 8601 (включая часовой пояс)",new Date(Date.now()+86400000).toISOString());if(!value)return;payload.scheduled_at=value;
  }
- const r=await call("/posts/"+current.id+"/action","POST",payload);
+ const expectedPostId=current.id,expectedRevision=current.revision;
+ const remote=(await call("/posts/"+encodeURIComponent(expectedPostId))).post;
+ if(remote.revision!==expectedRevision||remote.id!==expectedPostId)throw Error("Статья изменилась на сервере. Откройте актуальную версию перед согласованием.");
+ const r=await call("/posts/"+expectedPostId+"/action","POST",payload);
  current=r.post;draft=structuredClone(current);blocks=draft.blocks||[];dirty=false;
  await refreshPosts();renderEditor();toast("Статус изменён: "+(statuses[current.status]||current.status));
 }
