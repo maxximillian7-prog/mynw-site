@@ -112,17 +112,20 @@
  async function translationsForCurrent(){
   const host=$("translationList"),notice=$("translationStatus"),button=$("translateArticle");
   if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;return}
-  button.disabled=!providerReady||busy||!editable()||dirty;
-  $("translateAll").disabled=!providerReady||busy||!editable()||dirty;
+  // Approved/published articles may receive new reviewed translations without
+  // editing or mutating their frozen original content.
+  const translateAllowed=["draft","changes_requested","in_review","approved","scheduled","published"].includes(current.status);
+  button.disabled=!providerReady||busy||!translateAllowed||dirty;
+  $("translateAll").disabled=!providerReady||busy||!translateAllowed||dirty;
   const r=await request("/translations?post_id="+encodeURIComponent(current.id));
   translations=r.translations||[];
   const rows=translations.map(x=>{
-   const stale=x.source_revision!==current.revision;
+   const stale=x.source_revision!==(current.approved_revision||current.revision);
    return '<div class="ai-translation-item"><div><b>'+E(locales[x.locale]||x.locale)+'</b> <span class="chip '+(stale?"amber":x.status==="reviewed"?"":"gray")+'">'+(stale?"Устарел":x.status==="reviewed"?"Проверен":"Ожидает редактора")+'</span><div class="small muted">'+E(x.title)+'</div></div><div class="btns"><button type="button" data-ai-translation-view="'+E(x.locale)+'">Просмотр</button>'+
    (chiefRoleAi()&&!stale&&x.status!=="reviewed"?'<button type="button" data-ai-translation-approve="'+E(x.locale)+'">✓ Проверить</button>':"")+'</div></div>'
   }).join("");
   host.innerHTML=rows||'<p class="small muted">Переводов пока нет. Выберите язык и нажмите «Перевести статью».</p>';
-  notice.textContent=providerReady?"Модель переводит только текст. Переводы нужно проверить перед утверждением статьи.":"Для запуска перевода нужен API-ключ сервера.";
+  notice.textContent=providerReady?"Модель переводит только текст. После публикации можно добавить перевод, но он станет доступен читателям только после проверки главным редактором.":"Для запуска перевода нужен API-ключ сервера.";
  }
  async function translate(){
   if(!current?.id)throw Error("Сначала сохраните статью");
@@ -145,7 +148,8 @@
   if(!providerReady)throw Error("Подключите AI-провайдера");
   if(busy)return;
   const all=Object.keys(locales).filter(lang=>lang!==current.locale);
-  const todo=all.filter(locale=>!translations.some(t=>t.locale===locale&&t.source_revision===current.revision));
+  const expectedRevision=current.approved_revision||current.revision;
+  const todo=all.filter(locale=>!translations.some(t=>t.locale===locale&&t.source_revision===expectedRevision));
   if(!todo.length){toast("Все доступные языки уже переведены для текущей версии статьи.");return}
   if(!confirm("Создать "+todo.length+" переводов? Каждый язык — отдельный платный запрос ИИ. Результаты останутся черновиками для проверки."))return;
   busy=true;$("translateAll").disabled=true;$("translateArticle").disabled=true;
@@ -171,7 +175,7 @@ function showTranslation(locale){
   if(!chiefRoleAi())throw Error("Проверку выполняет главный редактор");
   if(!confirm("Вы проверили текст и подтверждаете перевод на "+(locales[locale]||locale)+"?"))return;
   await request("/review-translation","POST",{post_id:current.id,locale});
-  await translationsForCurrent();toast("Перевод отмечен проверенным и будет включён в утверждённую версию.");
+  await translationsForCurrent();toast("Перевод проверен. Если оригинал уже опубликован, новая языковая версия доступна через Studio Feed.");
  }
  const originalRenderAuthors=renderAuthors;
  renderAuthors=function(...args){originalRenderAuthors(...args);if(tab==="ai-studio")personas()};
