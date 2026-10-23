@@ -2,10 +2,16 @@
 /* Journal Studio: read-only layout previews. No external publication is performed here. */
 (function(){
 const E=s=>String(s??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
-const live={mode:"phone",shape:"4:5",photo:0,ctx:null,articleKey:null,caption:"",captionDirty:false};
+const live={mode:"phone",shape:"4:5",photo:0,ctx:null,articleKey:null,coverId:null,caption:"",captionDirty:false};
 const link=u=>typeof u==="string"&&/^https:\/\//i.test(u);
 function allImages(c){return (c.blocks||[]).filter(b=>b.type==="image").map(b=>({id:b.asset_id,src:c.assets?.[b.asset_id],alt:b.alt||"",caption:b.caption||"",isCover:!!b.is_cover})).filter(b=>b.src)}
-function cover(c){const a=allImages(c),prefer=a.find(x=>x.id===c.draft?.cover_path||x.isCover);return prefer||a[0]||null}
+function cover(c){
+ const id=c.draft?.cover_path;
+ // Cover is a standalone asset, not an inline article block.
+ // Missing/expired asset URLs must never show the previous inline photo instead.
+ if(id)return {id,src:c.assets?.[id]||"",alt:"Обложка статьи",caption:"",isCover:true};
+ const a=allImages(c);return a.find(x=>x.isCover)||a[0]||null;
+}
 function cropData(c,id){
  const block=(c.blocks||[]).find(b=>b.type==="image"&&b.asset_id===id);
  const o=block?.crop||{};
@@ -54,7 +60,7 @@ function website(c){
  '<footer>© MyNow Apps · Пример макета сайта</footer></div>';
 }
 function insta(c){
- const photos=allImages(c).sort((a,b)=>Number(b.id===c.draft?.cover_path)-Number(a.id===c.draft?.cover_path)),a=photos[live.photo%photos.length]||cover(c),b=c.draft||{};
+ const featured=cover(c),inline=allImages(c),photos=[...(featured?[featured]:[]),...inline.filter(x=>!featured||x.id!==featured.id)],a=photos[live.photo%photos.length]||featured,b=c.draft||{};
  const intro=[b.summary||"",...((c.blocks||[]).filter(x=>x.type==="text").slice(0,3).map(x=>x.text||""))].filter(Boolean).join("\n\n");
  const selectedTitle=b.title||"Заголовок вашей публикации";
  const caption=live.caption.trim()||selectedTitle+"\n\n"+(intro||"Описание публикации")+"\n\n"+(c.blocks||[]).filter(x=>x.type==="link"&&link(x.url)).map(x=>x.url).join("\n");
@@ -68,6 +74,7 @@ function insta(c){
  '<div class="jp-counter">Текст в макете: '+short.length+' символов'+(caption.length>2200?' · сокращён для макета':'')+'</div></div></div>';
 }
 function render(ctx){
+ if(ctx.draft?.cover_path!==live.coverId){live.coverId=ctx.draft?.cover_path||null;live.photo=0}
  if(ctx.postKey!==live.articleKey){
   live.articleKey=ctx.postKey;
   live.caption=ctx.instagramCaption||"";
@@ -89,7 +96,7 @@ function render(ctx){
 document.addEventListener("click",e=>{
  const b=e.target.closest("button");if(!b)return;
  if(b.dataset.previewMode){live.mode=b.dataset.previewMode;live.photo=0;if(live.ctx)render(live.ctx)}
- if(b.dataset.jpStep){const imgs=allImages(live.ctx||{});if(imgs.length){live.photo=(live.photo+Number(b.dataset.jpStep)+imgs.length)%imgs.length;render(live.ctx)}}
+ if(b.dataset.jpStep){const v=live.ctx||{};const hero=cover(v),imgs=[...(hero?[hero]:[]),...allImages(v).filter(x=>!hero||x.id!==hero.id)];if(imgs.length){live.photo=(live.photo+Number(b.dataset.jpStep)+imgs.length)%imgs.length;render(live.ctx)}}
 });
 document.addEventListener("change",e=>{if(e.target.id==="jpAspect"){live.shape=e.target.value;if(live.ctx)render(live.ctx)}});
 document.addEventListener("input",e=>{if(e.target.id==="jpCaptionText"){
