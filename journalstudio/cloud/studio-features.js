@@ -116,6 +116,7 @@ openPost=async function(id){
  if(selected&&selected!=="base"&&variants.some(v=>v.channel===selected&&v.locale===current?.locale)){
   activeChannel=selected;draft=candidate(selected);blocks=draft.blocks||[];dirty=false;
   await fetchMedia();
+  window.JournalPreview?.choose(selected==="instagram"?"instagram":selected==="website"?"site":"phone");
  }
  renderEditor();
 };
@@ -166,6 +167,7 @@ workflow=async function(action,...args){
   if(chosen){
    activeChannel=selected;draft=candidate(selected);blocks=draft.blocks||[];dirty=false;
    await fetchMedia();renderEditor();
+   window.JournalPreview?.choose(selected==="instagram"?"instagram":selected==="website"?"site":"phone");
   }
  }
 };
