@@ -219,6 +219,16 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-topic-card .studio-topic-image img{object-fit:cover}
 .studio-topic-preview img{display:block}
 @media(max-width:560px){.studio-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
+/* v43 consistent photo frames: editorial article 3:2, topic 1:1,
+   mobile and website covers 16:9. Per-block crop overrides remain valid. */
+.jp-crop-frame{width:100%;aspect-ratio:3/2;max-height:none}
+.jp-crop-frame img{width:100%;height:100%;object-fit:cover}
+.jp-mobile-cover,.jp-site-cover{width:100%;aspect-ratio:16/9;height:auto;max-height:none}
+.jp-cover-img{width:100%;height:100%;object-fit:cover}
+.jp-article-body h2{font-size:21px}
+.jp-webarticle h2{font-size:25px}
+.studio-media-visual{aspect-ratio:4/3}
+.studio-topic-image,.studio-topic-preview img{aspect-ratio:1/1}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 </head><body>
