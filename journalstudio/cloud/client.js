@@ -83,7 +83,9 @@ function listEntry(p){
 }
 
 function authorMini(a){
- return '<div class="authorCard"><span class="authorAvatar">'+esc((a.name||"A").slice(0,1))+'</span><div style="min-width:0;flex:1"><strong>'+esc(a.name)+'</strong><div class="muted small">'+(a.kind==="ai"?"ИИ-персонаж":"Приглашённый автор")+(a.kind==="partner"?" · "+esc(a.consent_status):"")+'</div></div><span class="chip">'+(a.kind==="ai"?"AI":"Автор")+'</span></div>';
+ const portrait=window.StudioProfiles?.photo?.(a.photo_asset_id);
+ const face=portrait?'<img src="'+esc(portrait)+'" alt="Фото '+esc(a.name||"Автора")+'">':esc((a.name||"A").slice(0,1));
+ return '<div class="authorCard"><span class="authorAvatar" data-author-face="'+esc(a.id)+'">'+face+'</span><div style="min-width:0;flex:1"><strong>'+esc(a.name)+'</strong><div class="muted small">'+(a.kind==="ai"?"ИИ-персонаж":"Приглашённый автор")+(a.kind==="partner"?" · "+esc(a.consent_status):"")+'</div></div><span class="chip">'+(a.kind==="ai"?"AI":"Автор")+'</span></div>';
 }
 function renderDashboard(){
  const n=s=>posts.filter(x=>x.status===s).length;
