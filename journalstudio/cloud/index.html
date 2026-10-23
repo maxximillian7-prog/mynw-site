@@ -133,6 +133,12 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .ai-translated-content{padding:15px;border-radius:13px;background:var(--studio-soft-panel,#f6faf5);border:1px solid var(--line);margin-top:13px;max-height:none;overflow:visible}
 .studio-translation-preview-content{max-height:350px;overflow:auto;scrollbar-gutter:stable;overscroll-behavior:contain}
 .studio-translation-approval{margin-top:12px;padding:12px 0 0;border-top:1px solid var(--line)}
+.studio-bulk-translate-confirm{background:var(--mint,#eff6ef);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:12px}
+.studio-bulk-translate-confirm[hidden]{display:none!important}
+.studio-bulk-translate-confirm strong{font-size:13px;display:block;margin-bottom:7px}
+.studio-bulk-translate-confirm p{font-size:12px;line-height:1.5;margin:0 0 12px;white-space:pre-line}
+#translationStatus[data-error="true"]{color:#a44435;font-weight:650}
+
 .studio-translation-approval p{font-size:12px;margin:0 0 9px;line-height:1.45}
 .studio-translation-approval .btns{display:flex;flex-wrap:wrap;gap:8px}
 .ai-translated-content p{white-space:pre-wrap;font-size:13px}
@@ -478,8 +484,13 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
    </select>
   </div>
  </div>
- <div class="btns" style="margin-top:10px"><button class="primary" id="translateArticle">✦ Перевести выбранный язык</button></div><div class="btns" style="margin-top:10px"><button type="button" id="translateAll">Перевести на все остальные языки</button><span class="small muted">До 7 отдельных переводов с расходом AI-токенов</span></div>
-<div id="translationStatus" class="small muted" style="margin:9px 0">Сначала сохраните оригинал статьи.</div><div class="btns" style="margin:8px 0"><button type="button" id="translationRefresh">↻ Обновить статусы переводов</button></div><div id="translationList"></div>
+ <div class="btns" style="margin-top:10px"><button class="primary" id="translateArticle">✦ Перевести выбранный язык</button></div><div class="btns" style="margin-top:10px"><button type="button" id="translateAll">Перевести на все остальные языки</button><span class="small muted">Только недостающие языки · каждый перевод — отдельный платный запрос</span></div>
+<div id="translateAllConfirm" class="studio-bulk-translate-confirm" hidden role="group" aria-label="Подтверждение массового перевода">
+  <strong>Подтверждение перевода на остальные языки</strong>
+  <p id="translateAllConfirmDetails" class="small"></p>
+  <div class="btns"><button type="button" id="translateAllConfirmYes" class="primary">✓ Создать недостающие переводы</button><button type="button" id="translateAllConfirmNo">Отмена</button></div>
+</div>
+<div id="translationStatus" class="small muted" role="status" aria-live="polite" style="margin:9px 0">Сначала сохраните оригинал статьи.</div><div class="btns" style="margin:8px 0"><button type="button" id="translationRefresh">↻ Обновить статусы переводов</button></div><div id="translationList"></div>
 <div id="translationPreview" class="ai-translated-content" hidden></div></div><div class="card" id="reviewDiscussion"><div class="sectionHeading"><div><h2>Обсуждение с редакцией</h2><p>История комментариев и решений по статье</p></div><button type="button" id="reviewReload" class="small">↻</button></div><div id="reviewTimeline" class="studio-review-timeline"><p class="muted small">Сначала сохраните статью.</p></div><label for="reviewMessage">Комментарий</label><textarea id="reviewMessage" maxlength="1200" rows="3" placeholder="Напишите замечание или ответ редактору"></textarea><div class="btns"><button type="button" id="reviewSend" class="primary">Отправить комментарий</button><small class="muted">Комментарии видны автору и редакции</small></div></div><div class="card"><h2>Каналы публикации</h2><div id="editorChannels"></div><div class="tip">Внешние площадки подключаются отдельно. Утверждение материала не означает, что он уже появился в Instagram.</div></div></div></div></div>
 </section>
 <section class="view" data-view="ai-studio">
@@ -524,7 +535,7 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./studio-features.js?v=20261023-20"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
 <script defer src="./author-profiles.js?v=20261023-14"></script>
-<script defer src="./ai-studio.js?v=20261023-50"></script>
+<script defer src="./ai-studio.js?v=20261023-54"></script>
 <script defer src="./studio-images.js?v=20261023-53"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
