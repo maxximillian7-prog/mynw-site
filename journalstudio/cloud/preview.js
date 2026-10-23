@@ -94,6 +94,7 @@ document.addEventListener("click",e=>{
 document.addEventListener("change",e=>{if(e.target.id==="jpAspect"){live.shape=e.target.value;if(live.ctx)render(live.ctx)}});
 document.addEventListener("input",e=>{if(e.target.id==="jpCaptionText"){
  live.caption=e.target.value.slice(0,2200);live.captionDirty=true;
+ window.StudioFeatures?.setDraftCaption?.(live.caption);
  const counter=document.getElementById("jpCaptionLength");if(counter)counter.textContent=live.caption.length+" / 2200";
  if(live.ctx){const root=document.getElementById("preview");if(root&&live.mode==="instagram")root.innerHTML=insta(live.ctx)}
  }});
