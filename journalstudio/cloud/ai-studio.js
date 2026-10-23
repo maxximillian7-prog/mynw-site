@@ -85,6 +85,7 @@
   const host=$("translationList"),notice=$("translationStatus"),button=$("translateArticle");
   if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;return}
   button.disabled=!providerReady||busy||!editable()||dirty;
+  $("translateAll").disabled=!providerReady||busy||!editable()||dirty;
   const r=await request("/translations?post_id="+encodeURIComponent(current.id));
   translations=r.translations||[];
   const rows=translations.map(x=>{
@@ -110,7 +111,29 @@
    toast("Перевод на "+(locales[locale]||locale)+" сохранён как черновик.");
   }finally{busy=false;$("translateArticle").textContent="✦ Перевести статью";$("translateArticle").disabled=!providerReady}
  }
- function showTranslation(locale){
+ async function translateAll(){
+  if(!current?.id)throw Error("Сначала сохраните оригинал статьи");
+  if(dirty)throw Error("Сохраните изменения перед переводом");
+  if(!providerReady)throw Error("Подключите AI-провайдера");
+  if(busy)return;
+  const all=Object.keys(locales).filter(lang=>lang!==current.locale);
+  const todo=all.filter(locale=>!translations.some(t=>t.locale===locale&&t.source_revision===current.revision));
+  if(!todo.length){toast("Все доступные языки уже переведены для текущей версии статьи.");return}
+  if(!confirm("Создать "+todo.length+" переводов? Каждый язык — отдельный платный запрос ИИ. Результаты останутся черновиками для проверки."))return;
+  busy=true;$("translateAll").disabled=true;$("translateArticle").disabled=true;
+  const errors=[];let done=0;
+  try{
+   for(let i=0;i<todo.length;i++){
+    const locale=todo[i];
+    $("translationStatus").textContent="Перевод "+(i+1)+" / "+todo.length+": "+locales[locale]+"…";
+    try{const x=await request("/translate","POST",{post_id:current.id,locale});if(!x.translated)throw Error(x.error||"Перевод не завершён");done++}
+    catch(e){errors.push(locales[locale]+": "+e.message);if(/key|provider|401|403/i.test(e.message))break}
+   }
+   await translationsForCurrent();
+   toast("Готово переводов: "+done+". "+(errors.length?"Ошибки: "+errors.join("; "):"Откройте переводы для проверки."),errors.length>0);
+  }finally{busy=false;$("translateAll").disabled=!providerReady;$("translateArticle").disabled=!providerReady}
+}
+function showTranslation(locale){
   const t=translations.find(x=>x.locale===locale);if(!t)return;
   const area=$("translationPreview");area.hidden=false;
   area.innerHTML='<div class="eyebrow">'+E(locales[locale]||locale)+' · '+(t.status==="reviewed"?"Проверено редакцией":"Черновик перевода")+'</div><h3>'+E(t.title)+'</h3><p>'+E(t.summary)+'</p>'+
@@ -154,6 +177,7 @@
  $("aiRefresh").onclick=()=>run(refreshAI);
  $("aiSaveSchedule").onclick=()=>run(saveSchedule);
  $("translateArticle").onclick=()=>run(translate);
+ $("translateAll").onclick=()=>run(translateAll);
  $("aiScheduleEnabled").onchange=()=>{$("aiScheduleInfo").textContent=$("aiScheduleEnabled").checked?"Новые материалы будут создаваться по расписанию, только если сохраните настройки.":"Автогенерация выключена. Сохраните настройки."};
  window.StudioAI={refresh:refreshAI,translations:translationsForCurrent,health};
 })();
