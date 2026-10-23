@@ -229,13 +229,15 @@ async function upload(){
  const license=$("imageLicense").value;
  const alt=$("imageAlt").value.trim()||f.name;
  const base64=await new Promise((ok,no)=>{const reader=new FileReader();reader.onload=()=>ok(String(reader.result).split(",")[1]);reader.onerror=no;reader.readAsDataURL(f)});
- const r=await call("/media","POST",{project:project.slug,mime:f.type,base64,alt_text:alt,copyright_holder:copyright,license,rights_confirmed:true});
+ const sourceUrl=$("imageSourceUrl").value.trim();
+ if(sourceUrl&&!/^https:\/\//i.test(sourceUrl))throw Error("Источник должен начинаться с https://");
+ const r=await call("/media","POST",{project:project.slug,mime:f.type,base64,alt_text:alt,copyright_holder:copyright,license,source_url:sourceUrl,rights_confirmed:true});
  capture();const b={type:"image",asset_id:r.asset.id,caption:"",alt};
  blocks.push(b);draft.blocks=blocks;
  if(!draft.cover_path)draft.cover_path=b.asset_id;
  dirty=true;
  try{const media=await call("/media/"+r.asset.id);assets[r.asset.id]=media.url}catch{}
- $("file").value="";$("imageAlt").value="";$("imageRights").checked=false;
+ $("file").value="";$("imageAlt").value="";$("imageSourceUrl").value="";$("imageRights").checked=false;
  renderEditor();toast("Фото добавлено. При необходимости выберите другое фото в качестве обложки, затем сохраните статью.");
 }
 async function saveInstagramCaption(){
