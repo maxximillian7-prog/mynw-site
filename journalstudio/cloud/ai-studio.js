@@ -25,7 +25,7 @@
   if(!selected&&a.length)selected=a[0].id;
   $("aiPersonaCards").innerHTML=a.length?a.map(p=>'<button type="button" class="ai-persona '+(p.id===selected?"selected":"")+'" data-ai-persona="'+E(p.id)+'"><span class="ai-face">'+avatar(p)+'</span><b>'+E(p.name)+'</b><p>'+E(p.tagline||p.focus||"")+'</p></button>').join(""):'<div class="empty">В этом приложении пока нет ИИ-авторов. Создайте профиль во вкладке «Авторы».</div>';
   $("aiGenerate").disabled=!providerReady||!selected||busy;
-  $("aiSaveSchedule").disabled=!providerReady||!selected||busy;
+  $("aiSaveSchedule").disabled=!selected||busy||(!providerReady&&$("aiScheduleEnabled").checked);
   scheduleControls();
  }
  function scheduleControls(){
@@ -178,6 +178,6 @@ function showTranslation(locale){
  $("aiSaveSchedule").onclick=()=>run(saveSchedule);
  $("translateArticle").onclick=()=>run(translate);
  $("translateAll").onclick=()=>run(translateAll);
- $("aiScheduleEnabled").onchange=()=>{$("aiScheduleInfo").textContent=$("aiScheduleEnabled").checked?"Новые материалы будут создаваться по расписанию, только если сохраните настройки.":"Автогенерация выключена. Сохраните настройки."};
+ $("aiScheduleEnabled").onchange=()=>{$("aiScheduleInfo").textContent=$("aiScheduleEnabled").checked?"Новые материалы будут создаваться по расписанию, только если сохраните настройки.":"Автогенерация выключена. Сохраните настройки.";$("aiSaveSchedule").disabled=!selected||busy||(!providerReady&&$("aiScheduleEnabled").checked);};
  window.StudioAI={refresh:refreshAI,translations:translationsForCurrent,health};
 })();
