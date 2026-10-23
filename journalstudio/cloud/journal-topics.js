@@ -23,10 +23,21 @@
  async function loadMedia(){
   if(!project?.slug)return;
   const slug=project.slug;status("Загружаю одобренные изображения...");
-  const result=await call("/media/library?project="+encodeURIComponent(slug)+"&source=all&offset=0&limit=24");
+  // Load all authorized media pages without silently limiting topic images
+  // to the most recent 24 uploads.
+  const all=[],seen=new Set();
+  let offset=0,hasMore=true;
+  while(hasMore && offset<=1000 && project?.slug===slug){
+    const result=await call("/media/library?project="+encodeURIComponent(slug)+"&source=all&offset="+offset+"&limit=24");
+    for(const item of result.items||[]){
+      if(!seen.has(item.id)){seen.add(item.id);all.push(item)}
+    }
+    hasMore=result.has_more===true;
+    offset=result.next_offset??(offset+24);
+  }
   if(project?.slug!==slug)return;
-  media=result.items||[];activeProject=slug;fillMediaSelect(editing?.image_asset_id||null);
-  status(result.has_more?"Показаны последние 24 изображения. Для старых изображений можно использовать его ID в теме.":"Медиатека готова: "+media.length+" изображений.");
+  media=all;activeProject=slug;fillMediaSelect(editing?.image_asset_id||null);
+  status((hasMore?"Показана часть медиатеки. ":"")+"Доступно изображений: "+media.length+".");
  }
  function render(){
   const host=$("studioTopicList");if(!host||!project)return;
