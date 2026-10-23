@@ -75,7 +75,14 @@
   const item={type:"image",asset_id:result.asset_id,caption:"Иллюстрация создана ИИ",alt:result.alt||$("imagePrompt").value.trim(),crop:{x:50,y:50,zoom:100,aspect:"auto"}};
   blocks.push(item);draft.blocks=blocks;assets[result.asset_id]=result.url;dirty=true;
   if(asCover||!draft.cover_path)draft.cover_path=result.asset_id;
-  clear();renderEditor();status("ИИ-изображение добавлено в статью. Не забудьте нажать «Сохранить»!");
+  const imageId=result.asset_id;
+  clear();renderEditor();status("ИИ-изображение добавлено в статью. Идёт бесплатная WebP-оптимизация — сохраните материал.");
+  if(window.StudioOptimizer){
+   void window.StudioOptimizer.optimizeExisting(imageId,{status:"pending"}).then(ok=>{
+    if(ok)status("WebP-копии готовы. Сохрани статью; после публикации оригинал удалится безопасно.");
+    else status("ИИ-изображение сохранено, но оптимизация ожидает повторной попытки.");
+   });
+  }
   toast("Изображение добавлено в черновик; проверь кадрирование и сохрани статью.");
  }
  document.addEventListener("click",e=>{
