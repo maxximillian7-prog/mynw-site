@@ -276,8 +276,7 @@ function showTranslation(locale,offerApproval=false){
   const b=event.target.closest("button");if(!b)return;
   if(b.dataset.aiPersona!==undefined){selected=b.dataset.aiPersona;personas()}
   if(b.dataset.aiOpen!==undefined)run(()=>openPost(b.dataset.aiOpen));
-  if(b.dataset.aiTranslationView!==undefined)showTranslation(b.dataset.aiTranslationView);
-  if(b.dataset.aiTranslationApprove!==undefined)run(()=>reviewTranslation(b.dataset.aiTranslationApprove));
+
  });
  $("aiGenerate").onclick=()=>run(generate);
  $("aiRefresh").onclick=()=>run(refreshAI);
@@ -285,6 +284,22 @@ function showTranslation(locale,offerApproval=false){
  $("aiOpenImage").onclick=()=>run(openImageForDraft);
  $("aiNewForImage").onclick=()=>run(newArticleForImage);
  $("aiImagePost").onchange=()=>{$("aiOpenImage").disabled=!$("aiImagePost").value};
+ $("translationPanel").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.aiTranslationView!==undefined){
+    e.preventDefault();e.stopPropagation();
+    showTranslation(b.dataset.aiTranslationView);
+  }else if(b.dataset.aiTranslationApprove!==undefined){
+    e.preventDefault();e.stopPropagation();
+    showTranslation(b.dataset.aiTranslationApprove,true);
+  }else if(b.dataset.aiTranslationConfirm!==undefined){
+    e.preventDefault();e.stopPropagation();
+    run(()=>reviewTranslation(b.dataset.aiTranslationConfirm));
+  }else if(b.dataset.aiTranslationCancel!==undefined){
+    e.preventDefault();e.stopPropagation();
+    pendingReviewLocale=null;$("translationPreview").hidden=true;
+  }
+ });
  $("translateArticle").onclick=()=>run(translate);
  $("translateAll").onclick=()=>run(translateAll);
  $("aiScheduleEnabled").onchange=()=>{$("aiScheduleInfo").textContent=$("aiScheduleEnabled").checked?"Новые материалы будут создаваться по расписанию, только если сохраните настройки.":"Автогенерация выключена. Сохраните настройки.";$("aiSaveSchedule").disabled=!selected||busy||(!providerReady&&$("aiScheduleEnabled").checked);};
