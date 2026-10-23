@@ -239,9 +239,9 @@ async function upload(){
 async function saveInstagramCaption(){
  if(!draft||!current)throw Error("Сначала сохраните статью");
  if(!editable())throw Error("Подпись нельзя менять после согласования");
- if(dirty)throw Error("Сначала сохраните изменения статьи");
  const caption=window.JournalPreview?.getCaption?.()||"";
  if(window.StudioFeatures?.saveCaptionForActiveVersion && await window.StudioFeatures.saveCaptionForActiveVersion(caption))return;
+ if(dirty)throw Error("Сначала сохраните изменения статьи");
  await call("/placements/settings","POST",{post_id:current.id,channel:"instagram",caption,description:""});
  placements=(await call("/placements?post_id="+current.id)).placements||[];
  window.JournalPreview?.setSavedCaption?.(caption);
