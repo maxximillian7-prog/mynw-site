@@ -7,12 +7,31 @@
  const chiefRoleAi=()=>["owner","chief_editor"].includes(project?.role||"");
  const locales={ru:"Русский","pt-PT":"Português (PT)",en:"English",uk:"Українська",es:"Español",fr:"Français",de:"Deutsch",it:"Italiano"};
  let selected=null,schedules=[],jobs=[],translations=[],busy=false,providerReady=false,lastPhotoCache=new Map();
- async function request(path,method="GET",body){
+ let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0;
+ async function request(path,method="GET",body,options={}){
   if(!session?.access_token)throw Error("Войдите в редакцию");
-  const callOnce=()=>fetch("https://npsfaymjckcqhtyiafms.supabase.co/functions/v1/studio-ai"+path,{method,headers:{"apikey":PUBLIC_KEY,"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
-  let r=await callOnce();
-  if(r.status===401&&session.refresh_token){session=await auth("token?grant_type=refresh_token","POST",{refresh_token:session.refresh_token});sessionStorage.setItem("journal_session",JSON.stringify(session));r=await callOnce()}
-  const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||"Ошибка ИИ-сервера");return j;
+  const signal=options.timeoutMs?{signal:AbortSignal.timeout(options.timeoutMs)}:{};
+  const callOnce=()=>fetch("https://npsfaymjckcqhtyiafms.supabase.co/functions/v1/studio-ai"+path,{
+   method,...signal,
+   headers:{"apikey":PUBLIC_KEY,"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},
+   body:body?JSON.stringify(body):undefined
+  });
+  let r;
+  try{
+   r=await callOnce();
+   if(r.status===401&&session.refresh_token){
+    session=await auth("token?grant_type=refresh_token","POST",{refresh_token:session.refresh_token});
+    sessionStorage.setItem("journal_session",JSON.stringify(session));
+    r=await callOnce();
+   }
+  }catch(e){
+   if(["TimeoutError","AbortError"].includes(e.name))
+    throw Error("Превышено время ожидания ответа. Обновите статус и повторите.");
+   throw e;
+  }
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw Error(j.error||"Ошибка ИИ-сервера ("+r.status+")");
+  return j;
  }
  function aiAuthors(){return (authors||[]).filter(x=>x.kind==="ai")}
  function avatar(author){
@@ -114,6 +133,7 @@
    ? (current.approved_revision||current.revision) : current.revision;
  }
  async function translationsForCurrent(){
+   const sequence=++translationRefreshSeq,sourceId=current?.id;
   const host=$("translationList"),notice=$("translationStatus"),button=$("translateArticle");
   if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;return}
   // Approved/published articles may receive new reviewed translations without
@@ -121,7 +141,8 @@
   const translateAllowed=["draft","changes_requested","in_review","approved","scheduled","published"].includes(current.status);
   button.disabled=!providerReady||busy||!translateAllowed||dirty;
   $("translateAll").disabled=!providerReady||busy||!translateAllowed||dirty;
-  const r=await request("/translations?post_id="+encodeURIComponent(current.id));
+  const r=await request("/translations?post_id="+encodeURIComponent(sourceId),"GET",undefined,{timeoutMs:20000});
+  if(sequence!==translationRefreshSeq||sourceId!==current?.id)return;
   translations=r.translations||[];
   const rows=translations.map(x=>{
    const stale=x.source_revision!==currentSourceRevision();
