@@ -62,8 +62,16 @@ async function loadData(){
  window.StudioTopics?.render?.();
 }
 function statusTag(s){return '<span class="chip '+(["in_review","scheduled"].includes(s)?"amber":s==="published"?"":"gray")+'">'+esc(statuses[s]||s)+'</span>'}
+function canDeletePost(p){
+ if(!p||!project)return false;
+ if(chiefRole())return true;
+ return ["author","editor"].includes(project.role) &&
+   ["draft","changes_requested"].includes(p.status) &&
+   p.owner_user_id===session?.user?.id;
+}
 function listEntry(p){
- return '<div class="listItem"><div><strong>'+esc(p.title||"Без названия")+'</strong><div class="muted">'+esc(p.locale)+" · "+esc(p.updated_at?.slice(0,10)||"")+' · версия '+Number(p.revision||1)+'</div></div><div class="btns">'+statusTag(p.status)+'<button data-open-post="'+esc(p.id)+'">Открыть ↗</button></div></div>'
+ return '<div class="listItem"><div><strong>'+esc(p.title||"Без названия")+'</strong><div class="muted">'+esc(p.locale)+" · "+esc(p.updated_at?.slice(0,10)||"")+' · версия '+Number(p.revision||1)+'</div></div><div class="btns">'+statusTag(p.status)+'<button data-open-post="'+esc(p.id)+'">Открыть ↗</button>'+
+ (canDeletePost(p)?'<button type="button" data-delete-post="'+esc(p.id)+'" title="Удалить материал из редакции и приложения">Удалить</button>':"")+'</div></div>'
 }
 function authorMini(a){
  return '<div class="authorCard"><span class="authorAvatar">'+esc((a.name||"A").slice(0,1))+'</span><div style="min-width:0;flex:1"><strong>'+esc(a.name)+'</strong><div class="muted small">'+(a.kind==="ai"?"ИИ-персонаж":"Приглашённый автор")+(a.kind==="partner"?" · "+esc(a.consent_status):"")+'</div></div><span class="chip">'+(a.kind==="ai"?"AI":"Автор")+'</span></div>';
@@ -94,7 +102,7 @@ async function refreshPosts(){
 }
 function paintPublication(){
  const ready=posts.filter(p=>["approved","scheduled","published"].includes(p.status));
- $("readyPosts").innerHTML=ready.length?ready.map(p=>'<div class="listItem"><div><b>'+esc(p.title)+'</b><div class="muted">'+esc(statuses[p.status])+'</div></div><button data-delivery="'+esc(p.id)+'">Проверить</button></div>').join(""):'<div class="empty"><span class="emptyIcon">↗</span><b>Готовых материалов пока нет</b><p>Утверждённые статьи появятся здесь.</p></div>';
+ $("readyPosts").innerHTML=ready.length?ready.map(p=>'<div class="listItem"><div><b>'+esc(p.title)+'</b><div class="muted">'+esc(statuses[p.status])+'</div></div><div class="btns"><button data-delivery="'+esc(p.id)+'">Проверить</button>'+(canDeletePost(p)?'<button data-delete-post="'+esc(p.id)+'">Удалить</button>':'')+'</div></div>').join(""):'<div class="empty"><span class="emptyIcon">↗</span><b>Готовых материалов пока нет</b><p>Утверждённые статьи появятся здесь.</p></div>';
 }
 async function viewDelivery(id){
  const data=await call("/deliveries?post_id="+encodeURIComponent(id));
@@ -123,6 +131,29 @@ function resetDraft(){
  blocks=draft.blocks;assets={};placements=[];dirty=false;
 }
 async function createPost(){resetDraft();await showTab("editor",true);}
+async function deletePost(id){
+ const article=posts.find(p=>p.id===id);
+ if(!article)throw Error("Статья не найдена в текущем проекте. Обновите материалы.");
+ if(!canDeletePost(article))throw Error("Недостаточно прав на удаление статьи.");
+ if(dirty && current?.id===id) {
+   if(!confirm("В статье есть несохранённые изменения. Удалить текущую версию без их сохранения?"))return;
+ }
+ const warning=article.status==="published"?
+   "Опубликованная статья исчезнет из приложения и публичных ссылок после обновления. Общие изображения сохранятся.":
+   "Материал будет убран из редакции. Общие изображения в медиатеке сохранятся.";
+ if(!confirm("Удалить статью «"+article.title+"»?\n\n"+warning))return;
+ const confirmation=prompt("Для подтверждения введите полное название статьи:\n"+article.title);
+ if(confirmation===null)return;
+ if(confirmation!==article.title)throw Error("Название не совпадает. Удаление отменено.");
+ const result=await call("/posts/"+encodeURIComponent(id),"DELETE",{
+   expected_revision:article.revision,confirm_title:confirmation
+ });
+ if(!result.ok||result.deleted_id!==id)throw Error("Сервер не подтвердил удаление.");
+ if(current?.id===id){resetDraft();await showTab("library",true);}
+ await refreshPosts();
+ if(tab==="publish")paintPublication();
+ toast("Статья удалена из редакции и снята с публикации в приложении.");
+}
 async function openPost(id){
  const x=(await call("/posts/"+encodeURIComponent(id))).post;
  current=x;draft=structuredClone(x);blocks=draft.blocks||[];assets={};dirty=false;
@@ -184,6 +215,7 @@ function renderEditor(){
  $("editTools").hidden=!edit;
  const s=current?.status||"draft";
  $("save").hidden=!edit;$("submit").hidden=!current||!edit;
+ $("deletePost").hidden=!current||!canDeletePost(current);
  $("return").hidden=!current||s!=="in_review"||!editorRole();
  $("approve").hidden=!current||s!=="in_review"||!chiefRole();
  $("publish").hidden=!current||s!=="approved"||!chiefRole();
@@ -365,6 +397,7 @@ document.addEventListener("click",e=>{
  if(b.dataset.openTab)return void run(()=>showTab(b.dataset.openTab));
  if(b.dataset.create!==undefined)return void run(createPost);
  if(b.dataset.openPost)return void run(()=>openPost(b.dataset.openPost));
+ if(b.dataset.deletePost)return void run(()=>deletePost(b.dataset.deletePost));
  if(b.dataset.delivery)return void run(()=>viewDelivery(b.dataset.delivery));
  if(b.dataset.authorApprove)return void run(()=>approveAuthor(b.dataset.authorApprove));
  if(b.dataset.add)return void run(async()=>addBlock(b.dataset.add));
@@ -382,6 +415,7 @@ $("login").onclick=()=>run(login);$("register").onclick=()=>run(signup);$("activ
 $("logout").onclick=signout;
 $("backLibrary").onclick=()=>run(()=>showTab("library"));
 $("save").onclick=()=>run(savePost);
+$("deletePost").onclick=()=>run(()=>current&&deletePost(current.id));
 $("publishedTopicSave").onclick=()=>run(async()=>{
  if(!current||!chiefRole()||!["approved","scheduled","published"].includes(current.status))throw Error("Недоступно для данной статьи");
  const id=$("topicSelect").value||null;
