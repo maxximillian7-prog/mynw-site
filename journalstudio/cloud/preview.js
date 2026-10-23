@@ -21,7 +21,7 @@ function imageStyle(c,id){
 function imageFrame(c,id,src,alt,caption){
  const v=cropData(c,id);
  const css=v.aspect?' style="aspect-ratio:'+v.aspect+'"':'';
- return '<figure><div class="jp-crop-frame"'+css+'><img loading="lazy" src="'+E(src)+'" alt="'+E(alt)+'" style="'+imageStyle(c,id)+'"></div>'+(caption?'<figcaption>'+E(caption)+'</figcaption>':'')+'</figure>';
+ return '<figure><div class="jp-crop-frame"'+css+'><img data-media-id="'+E(id)+'" loading="lazy" src="'+E(src)+'" alt="'+E(alt)+'" style="'+imageStyle(c,id)+'"></div>'+(caption?'<figcaption>'+E(caption)+'</figcaption>':'')+'</figure>';
 }
 function content(c){
 return (c.blocks||[]).map(b=>{
@@ -37,7 +37,7 @@ return (c.blocks||[]).map(b=>{
 }
 function articleTitle(c){return E(c.draft?.title||"Заголовок вашей будущей статьи")}
 function byline(c){const a=(c.authors||[]).find(x=>x.id===c.draft?.author_id);return E(a?.name||"Редакция MyNow")+(a?.kind==="ai"?" · ИИ-автор":"")}
-function imageOrPlaceholder(a,what,c){return a?'<img class="jp-cover-img" src="'+E(a.src)+'" alt="'+E(a.alt||what)+'" style="'+imageStyle(c,a.id)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Обложка статьи</small></div>'}
+function imageOrPlaceholder(a,what,c){return a?'<img data-media-id="'+E(a.id)+'" class="jp-cover-img" src="'+E(a.src)+'" alt="'+E(a.alt||what)+'" style="'+imageStyle(c,a.id)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Обложка статьи</small></div>'}
 function phone(c){
  const cv=cover(c);
  return '<div class="jp-phone-shell"><div class="jp-phone"><div class="jp-phone-top"><span>9:41</span><span>◉  ▂▃▅</span></div>'+
@@ -61,7 +61,7 @@ function insta(c){
  const short=caption.slice(0,2200);
  return '<div class="jp-insta-wrap"><div class="jp-instagram"><div class="jp-insta-header"><div class="jp-insta-logo">◎</div><strong>Instagram</strong><span>♡ &nbsp;➤</span></div>'+
  '<div class="jp-insta-user"><span class="jp-insta-avatar">✦</span><div><strong>mynow.apps</strong><small>Пример аккаунта издателя</small></div><span>···</span></div>'+
- '<div class="jp-insta-media '+(live.shape==="1:1"?"square":"portrait")+'">'+(a?'<img src="'+E(a.src)+'" alt="'+E(a.alt||"Фото публикации")+'" style="'+imageStyle(c,a.id)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Добавьте фото для Instagram</small></div>')+
+ '<div class="jp-insta-media '+(live.shape==="1:1"?"square":"portrait")+'">'+(a?'<img data-media-id="'+E(a.id)+'" src="'+E(a.src)+'" alt="'+E(a.alt||"Фото публикации")+'" style="'+imageStyle(c,a.id)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Добавьте фото для Instagram</small></div>')+
  (photos.length>1?'<button class="jp-photo-prev" data-jp-step="-1" title="Предыдущее фото">‹</button><button class="jp-photo-next" data-jp-step="1" title="Следующее фото">›</button><span class="jp-photo-count">'+(live.photo%photos.length+1)+' / '+photos.length+'</span>':'')+'</div>'+
  '<div class="jp-insta-actions">♡ &nbsp; ▢ &nbsp; ➤ <span>♧</span></div><p class="jp-insta-caption"><b>mynow.apps </b>'+E(short)+'</p><div class="jp-insta-muted">Предпросмотр · без отправки в Instagram</div></div>'+
  '<div class="jp-insta-guidance"><strong>Особенности Instagram</strong><p>Фото будет обрезано под выбранное соотношение. Прямые ссылки из текста статьи здесь не становятся кликабельными. Для этой площадки обычно нужна отдельная короткая подпись и подборка фотографий.</p>'+
