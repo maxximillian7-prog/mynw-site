@@ -82,12 +82,19 @@
  }
  function reset(){
   editing=null;$("studioTopicForm").reset();$("topicSlugInput").disabled=false;
+  $("topicTranslateConfirm").hidden=true;
+  const note=$("topicTranslateFeedback");
+  note.dataset.error="false";
+  note.textContent="После генерации проверьте все названия. Непроверенные переводы не публикуйте.";
   $("topicSave").textContent="+ Создать тему";$("topicCancel").hidden=true;
   $("topicFocusX").value=50;$("topicFocusY").value=50;updateCrop();
   fillMediaSelect(null);status("");
  }
  async function edit(id){
   const t=topics.find(item=>item.id===id);if(!t)return;
+  $("topicTranslateConfirm").hidden=true;
+  $("topicTranslateFeedback").dataset.error="false";
+  $("topicTranslateFeedback").textContent="Можно дополнить отсутствующие языки, не перезаписывая существующие.";
   editing=t;$("topicTitleInput").value=t.title;$("topicSlugInput").value=t.slug;
   $("topicSlugInput").disabled=true;$("topicTitlePt").value=t.translations?.["pt-PT"]||"";
   for(const [lang,input] of [["en","topicTitleEn"],["uk","topicTitleUk"],["fr","topicTitleFr"],["de","topicTitleDe"],["es","topicTitleEs"],["it","topicTitleIt"]]){
