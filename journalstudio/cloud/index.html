@@ -173,7 +173,7 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .ai-image-shortcut-controls button{white-space:nowrap}
 @media(max-width:1060px){.ai-image-shortcut{align-items:stretch;flex-direction:column}.ai-image-shortcut-controls{max-width:100%}}
 @media(max-width:570px){.ai-image-shortcut-controls{display:grid;grid-template-columns:1fr}.ai-image-shortcut-controls select{min-width:0}}
-</style>
+.studio-media-size{font-size:11px;line-height:1.55;margin:6px 0 10px;color:var(--studio-accent-contrast,#426a4b);background:var(--studio-soft-panel,#eff6f0);padding:8px 10px;border:1px solid var(--line);border-radius:9px}.studio-image-compress-note{font-size:11px;line-height:1.6;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--studio-soft-panel,#eff6ef);margin:9px 0 15px}</style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 </head><body>
 <div id="gate">
@@ -248,6 +248,7 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
   </div>
   <div class="editorFields"><div><label for="imageQuality">Качество</label><select id="imageQuality"><option value="low">Экономичное · для черновика</option><option value="medium">Среднее · для обложки</option></select></div>
   <div class="studio-img-spacer"><label>Лимиты безопасности</label><p class="small muted">До 5 изображений на пользователя за 24 часа и 40 на проект за месяц.</p></div></div>
+  <p class="studio-image-compress-note"><strong>Автооптимизация WebP включена.</strong> При загрузке создаются версии 640 / 1400 / 1600 px. Оригинал хранится только до публикации и удаляется после проверки копий, если больше не нужен другим черновикам.</p>
   <div class="studio-ai-legal">ИИ-иллюстрация может неверно изображать сорт, признаки заболевания или устройство растения. Проверяйте её до публикации. Генерация платная — запрос отправляется только после подтверждения.</div>
   <button type="button" id="imageGenerate" class="primary">✦ Сгенерировать изображение</button>
   <div id="imageGenerateStatus" role="status" class="small muted" style="margin-top:10px">Сначала сохраните черновик статьи.</div>
@@ -305,13 +306,14 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <section class="view" data-view="settings"><div class="card"><h2>Настройки редакции</h2><p>Выбранный проект: <strong id="settingsProject">—</strong></p><p>Роль аккаунта: <strong id="settingsRole">—</strong></p><p class="muted">Авторизация: Supabase Auth. Данные хранятся в выделенной базе Journal Studio.</p><div class="tip"><b>Подтверждение email</b><p>Чтобы письма вели обратно в редакцию, в Supabase → Authentication → URL Configuration укажите Site URL и Redirect URL: <code>https://mynw.app/journalstudio/cloud/</code></p></div><p class="small muted">ИИ-генерация и внешние публикации будут включены после настройки соответствующих ключей.</p></div></section>
 </main></div>
 <div id="status" role="status" aria-live="polite"></div>
-<script defer src="./preview.js?v=20261023-16"></script>
+<script defer src="./preview.js?v=20261023-18"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261023-16"></script>
-<script defer src="./studio-features.js?v=20261023-16"></script>
+<script defer src="./client.js?v=20261023-18"></script>
+<script defer src="./media-optimizer.js?v=20261023-18"></script>
+<script defer src="./studio-features.js?v=20261023-18"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
 <script defer src="./author-profiles.js?v=20261023-14"></script>
 <script defer src="./ai-studio.js?v=20261023-15"></script>
-<script defer src="./studio-images.js?v=20261023-15"></script>
-<script defer src="./media-recovery.js?v=20261023-16"></script>
+<script defer src="./studio-images.js?v=20261023-18"></script>
+<script defer src="./media-recovery.js?v=20261023-18"></script>
 </body></html>
