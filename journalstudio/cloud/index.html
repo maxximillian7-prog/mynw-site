@@ -189,14 +189,14 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-media-meta{font-size:10px;color:var(--muted);margin:4px 2px 8px}
 @media(max-width:540px){.studio-media-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.studio-media-actions button{font-size:10px;padding:6px 4px}}
 
-.studio-lang-switch{position:fixed;right:15px;bottom:15px;z-index:500;display:flex;align-items:center;gap:6px;
- padding:6px 9px;border:1px solid var(--line);border-radius:14px;background:var(--paper,#fff);
- box-shadow:0 4px 20px #19322222;max-width:180px}
-.studio-lang-switch label{color:var(--ink);font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px}
-.studio-lang-switch select{min-width:85px;max-width:110px;border:0;background:transparent;font-size:12px;color:var(--ink);padding:4px}
-#workspace:not([hidden]) ~ .studio-lang-switch{bottom:15px}
+/* Studio interface language is part of the main top-right header. */
+.topControls .studio-lang-switch{position:static;z-index:auto;display:inline-flex;align-items:center;gap:6px;
+ padding:6px 9px;border:1px solid var(--line);border-radius:12px;background:var(--paper,#fff);
+ box-shadow:none;max-width:none;min-height:42px;flex-shrink:0}
+.topControls .studio-lang-switch label{color:var(--ink);font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;margin:0}
+.topControls .studio-lang-switch select{min-width:96px;max-width:146px;border:0;background:transparent;font-size:12px;color:var(--ink);padding:4px;margin:0}
 .studio-group-index{color:var(--green);font-weight:800;background:var(--mint);padding:2px 6px;margin-right:5px;border-radius:6px}
-@media(max-width:700px){.studio-lang-switch{bottom:8px;right:8px;padding:4px 6px}.studio-lang-switch label span:last-child{display:none}.studio-lang-switch select{font-size:11px}}
+@media(max-width:700px){.topControls .studio-lang-switch{padding:4px 7px}.topControls .studio-lang-switch label span:last-child{display:none}.topControls .studio-lang-switch select{font-size:11px;min-width:85px;max-width:112px}}
 
 .studio-cover-indicator{padding:12px;margin:0 0 17px;background:var(--mint);border:1px solid var(--line);border-radius:14px}
 .studio-cover-indicator .row{align-items:center}
@@ -256,6 +256,12 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
  .studio-translation-heading .studio-language-top{flex:1 1 100%;margin-left:0}
  .studio-topic-assignment-controls button{width:100%}
 }
+
+.studio-topic-translation-confirm{flex-basis:100%;padding:12px 14px;margin:5px 0;background:var(--mint,#ecf6ef);border:1px solid var(--line);border-radius:12px}
+.studio-topic-translation-confirm[hidden]{display:none!important}
+.studio-topic-translation-confirm p{font-size:12px;margin:0 0 9px}
+#topicTranslateFeedback{flex-basis:100%;margin:6px 0;color:var(--green,#27664b)}
+#topicTranslateFeedback[data-error="true"]{color:#9f4d37;font-weight:650}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 </head><body>
@@ -285,7 +291,15 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 </aside>
 <main class="main">
 <header class="topbar"><div class="topTitle"><div class="eyebrow" id="crumb">Journal Studio / Обзор</div><h1 id="headline">Редакционная панель</h1><div class="muted small" id="subtitle">Работа со статьями и авторами</div></div>
-<div class="topControls"><select id="project" aria-label="Выбор приложения"></select><button id="invite">+ Автор</button><button id="create" class="primary">+ Новая статья</button><span class="avatar" id="avatar">JS</span></div></header>
+<div class="topControls"><select id="project" aria-label="Выбор приложения"></select><div id="studioUILangControl" class="studio-lang-switch" role="group" aria-label="Язык интерфейса">
+  <label for="studioUILanguage"><span>🌐</span> <span id="studioUILangLabel">Язык</span></label>
+  <select id="studioUILanguage" aria-label="Язык интерфейса">
+    <option value="ru">Русский</option><option value="en">English</option>
+    <option value="pt-PT">Português (PT)</option><option value="uk">Українська</option>
+    <option value="fr">Français</option><option value="de">Deutsch</option>
+    <option value="es">Español</option><option value="it">Italiano</option>
+  </select>
+</div><button id="invite">+ Автор</button><button id="create" class="primary">+ Новая статья</button><span class="avatar" id="avatar">JS</span></div></header>
 <section class="view active" data-view="home">
 <div id="authorHomeHint" class="card" hidden><span class="eyebrow">ЛИЧНЫЙ КАБИНЕТ АВТОРА</span><h2 style="margin:6px 0">Ваши материалы и редакционные решения</h2><p class="muted">Здесь отображаются только ваши статьи. Вы можете создавать, исправлять и отправлять материалы на проверку. Публикацию утверждает редактор.</p></div><div class="hero" id="studioHero"><div><div class="eyebrow" style="color:#c5e5cc">MYNOW · EDITORIAL WORKSPACE</div><h2>Хорошие идеи становятся публикациями.</h2><p>Создавайте материалы, собирайте иллюстрации и ссылки. Все черновики проходят через главного редактора.</p><button id="heroCreate">Создать материал ↗</button></div><div class="heroArtwork">✦</div></div>
 <div class="metrics">
@@ -332,7 +346,14 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
       </select>
     </label>
     <button type="button" id="topicTranslateAll">✦ Предложить переводы на 8 языков (ИИ)</button>
-    <p class="muted small">После генерации проверьте все названия. Непроверенные машинные переводы не следует публиковать.</p>
+    <div id="topicTranslateConfirm" class="studio-topic-translation-confirm" hidden>
+      <p>Сгенерировать варианты названия на 8 языках? Это один платный запрос к ИИ. Существующие названия не будут перезаписаны.</p>
+      <div class="btns">
+        <button type="button" class="primary" id="topicTranslateConfirmYes">✓ Сгенерировать переводы</button>
+        <button type="button" id="topicTranslateConfirmNo">Отмена</button>
+      </div>
+    </div>
+    <p id="topicTranslateFeedback" class="muted small" role="status" aria-live="polite">После генерации проверьте все названия. Непроверенные машинные переводы не следует публиковать.</p>
   </div>
   <div class="btns"><button type="button" id="topicMediaRefresh">↻ Загрузить медиатеку</button><button class="primary" type="submit" id="topicSave">+ Создать тему</button><button type="button" id="topicCancel" hidden>Отмена</button></div>
   <div class="studio-topic-upload"><label for="topicNewImage">Загрузить изображение темы (JPG, PNG, WebP, до 8 МБ)</label><input type="file" id="topicNewImage" accept="image/png,image/jpeg,image/webp">
@@ -480,17 +501,9 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <section class="view" data-view="publish"><div class="sectionHeading"><div><h2>Центр публикаций</h2><p>Отслеживание публикаций по каналам</p></div></div><div class="grid2"><div class="card"><h2>Готовые статьи</h2><div id="readyPosts"></div><div id="deliveryDetails"></div></div><div class="card"><h2>Подключённые направления</h2><div class="channelCard"><span>❧ &nbsp; Журнал приложения</span><span class="chip">Studio Feed активен</span></div><div class="channelCard"><span>◎ &nbsp; Instagram</span><span class="chip amber">Нужен Meta API</span></div><div class="channelCard"><span>◈ &nbsp; Веб-сайт / блог</span><span class="chip amber">Нужно подключить</span></div><div class="tip">Публикация статьи в Studio Feed не равна появлению статьи в установленном мобильном приложении, пока клиент NowGreen не подключён к новому API.</div></div></div></section>
 <section class="view" data-view="settings"><div class="card"><h2>Настройки редакции</h2><p>Выбранный проект: <strong id="settingsProject">—</strong></p><p>Роль аккаунта: <strong id="settingsRole">—</strong></p><p class="muted">Авторизация: Supabase Auth. Данные хранятся в выделенной базе Journal Studio.</p><div class="tip"><b>Подтверждение email</b><p>Чтобы письма вели обратно в редакцию, в Supabase → Authentication → URL Configuration укажите Site URL и Redirect URL: <code>https://mynw.app/journalstudio/cloud/</code></p></div><p class="small muted">ИИ-генерация и внешние публикации будут включены после настройки соответствующих ключей.</p></div></section>
 </main></div>
-<div id="studioUILangControl" class="studio-lang-switch" role="group" aria-label="Язык интерфейса">
-  <label for="studioUILanguage"><span>🌐</span> <span id="studioUILangLabel">Язык</span></label>
-  <select id="studioUILanguage" aria-label="Язык интерфейса">
-    <option value="ru">Русский</option><option value="en">English</option>
-    <option value="pt-PT">Português (PT)</option><option value="uk">Українська</option>
-    <option value="fr">Français</option><option value="de">Deutsch</option>
-    <option value="es">Español</option><option value="it">Italiano</option>
-  </select>
-</div>
+
 <div id="status" role="status" aria-live="polite"></div>
-<script defer src="./studio-i18n.js?v=20261023-25"></script>
+<script defer src="./studio-i18n.js?v=20261023-51"></script>
 <script defer src="./preview.js?v=20261023-25"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
 <script defer src="./client.js?v=20261023-50"></script>
@@ -501,5 +514,5 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./ai-studio.js?v=20261023-50"></script>
 <script defer src="./studio-images.js?v=20261023-23"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
-<script defer src="./journal-topics.js?v=20261023-46"></script>
+<script defer src="./journal-topics.js?v=20261023-51"></script>
 </body></html>
