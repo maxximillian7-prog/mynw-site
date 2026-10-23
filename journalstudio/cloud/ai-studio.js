@@ -7,7 +7,7 @@
  const chiefRoleAi=()=>["owner","chief_editor"].includes(project?.role||"");
  const locales={ru:"Русский","pt-PT":"Português (PT)",en:"English",uk:"Українська",es:"Español",fr:"Français",de:"Deutsch",it:"Italiano"};
  let selected=null,schedules=[],jobs=[],translations=[],busy=false,providerReady=false,lastPhotoCache=new Map();
- let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0;
+ let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null;
  async function request(path,method="GET",body,options={}){
   if(!session?.access_token)throw Error("Войдите в редакцию");
   const signal=options.timeoutMs?{signal:AbortSignal.timeout(options.timeoutMs)}:{};
@@ -135,7 +135,7 @@
  async function translationsForCurrent(){
    const sequence=++translationRefreshSeq,sourceId=current?.id;
   const host=$("translationList"),notice=$("translationStatus"),button=$("translateArticle");
-  if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;return}
+  if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;$("translateAll").disabled=true;return}
   // Approved/published articles may receive new reviewed translations without
   // editing or mutating their frozen original content.
   const translateAllowed=["draft","changes_requested","in_review","approved","scheduled","published"].includes(current.status);
@@ -171,30 +171,113 @@
    toast("Перевод на "+(locales[locale]||locale)+" сохранён как черновик.");
   }finally{busy=false;$("translateArticle").textContent="✦ Перевести статью";$("translateArticle").disabled=!providerReady}
  }
- async function translateAll(){
-  if(!current?.id)throw Error("Сначала сохраните оригинал статьи");
-  if(dirty)throw Error("Сохраните изменения перед переводом");
-  if(!providerReady)throw Error("Подключите AI-провайдера");
+ function validBulkStatus(){
+  return !!current?.id && ["draft","changes_requested","in_review","approved","scheduled","published"].includes(current.status)
+    && !dirty && providerReady;
+ }
+ function clearBulk(){
+  pendingBulkPlan=null;
+  $("translateAllConfirm").hidden=true;
+ }
+ function bulkMessage(message,error=false){
+  const el=$("translationStatus");
+  el.textContent=message;el.dataset.error=error?"true":"false";
+ }
+ function missingBulk(){
+  const revision=currentSourceRevision();
+  return Object.keys(locales).filter(locale=>locale!==current.locale &&
+    !translations.some(t=>t.locale===locale&&t.source_revision===revision));
+ }
+ async function prepareTranslateAll(){
   if(busy)return;
-  const all=Object.keys(locales).filter(lang=>lang!==current.locale);
-  const expectedRevision=currentSourceRevision();
-  const todo=all.filter(locale=>!translations.some(t=>t.locale===locale&&t.source_revision===expectedRevision));
-  if(!todo.length){toast("Все доступные языки уже переведены для текущей версии статьи.");return}
-  if(!confirm("Создать "+todo.length+" переводов? Каждый язык — отдельный платный запрос ИИ. Результаты останутся черновиками для проверки."))return;
-  busy=true;$("translateAll").disabled=true;$("translateArticle").disabled=true;
-  const errors=[];let done=0;
+  clearBulk();
+  if(!current?.id){bulkMessage("Сначала сохраните исходную статью.",true);return}
+  if(dirty){bulkMessage("Сначала сохраните несохранённые изменения статьи.",true);return}
+  if(!providerReady){bulkMessage("ИИ-провайдер не подключён. Проверьте статус в ИИ-редакции.",true);return}
+  if(!validBulkStatus()){bulkMessage("Для статьи с таким статусом перевод недоступен.",true);return}
+  const postId=current.id,projectSlug=project.slug;
+  try{await translationsForCurrent()}
+  catch(error){bulkMessage("Не удалось проверить готовые переводы: "+error.message,true);return}
+  if(current?.id!==postId||project?.slug!==projectSlug)return;
+  const todo=missingBulk();
+  if(!todo.length){
+   bulkMessage("Все остальные языки уже переведены для этой версии статьи. Проверяйте готовые переводы, повторно платить не нужно.");
+   return;
+  }
+  pendingBulkPlan={postId,projectSlug,revision:currentSourceRevision(),languages:todo};
+  $("translateAllConfirmDetails").textContent=
+   "Нужно перевести ("+todo.length+"): "+todo.map(key=>locales[key]).join(", ")+
+   ". Каждый язык — отдельный платный запрос ИИ. Уже созданные переводы сохранятся, новые потребуют проверки редактором.";
+  $("translateAllConfirm").hidden=false;
+  bulkMessage("Проверьте языки и подтвердите платную генерацию ниже. Запросы ещё не отправлены.");
+  $("translateAllConfirm").scrollIntoView({behavior:"smooth",block:"nearest"});
+ }
+ function bulkError(error){
+  const message=String(error?.message||error||"Неизвестная ошибка");
+  if(/ожидания ответа|AbortError|TimeoutError|Failed to fetch/i.test(message))
+    return "Не получено подтверждение результата. Проверьте статусы переводов до повторной генерации.";
+  if(/AI_PROVIDER_NOT_CONFIGURED|AI provider is not yet configured/i.test(message))
+    return "На сервере не настроен AI-провайдер.";
+  if(/429|rate limit|quota/i.test(message))return "Достигнут лимит ИИ.";
+  return message;
+ }
+ async function translateAll(){
+  if(busy||!pendingBulkPlan)return;
+  const plan=pendingBulkPlan;
+  if(!validBulkStatus()||current?.id!==plan.postId||project?.slug!==plan.projectSlug||
+      currentSourceRevision()!==plan.revision){
+    clearBulk();bulkMessage("Статья изменилась. Повторно проверьте список языков.",true);return;
+  }
+  // A second browser tab might have translated some languages while this
+  // confirmation was open. Never duplicate a paid translation blindly.
+  try{await translationsForCurrent()}
+  catch(error){clearBulk();bulkMessage("Не удалось проверить сервер: "+error.message,true);return}
+  if(JSON.stringify(missingBulk())!==JSON.stringify(plan.languages)){
+    clearBulk();bulkMessage("Список языков изменился. Подтвердите перевод заново.",true);return;
+  }
+  clearBulk();
+  busy=true;
+  $("translateAll").disabled=true;$("translateArticle").disabled=true;
+  $("translateAllConfirmYes").disabled=true;
+  $("translateAll").textContent="⌛ Создаём переводы…";
+  let done=0;
+  const errors=[];
   try{
-   for(let i=0;i<todo.length;i++){
-    const locale=todo[i];
-    $("translationStatus").textContent="Перевод "+(i+1)+" / "+todo.length+": "+locales[locale]+"…";
-    try{const x=await request("/translate","POST",{post_id:current.id,locale});if(!x.translated)throw Error(x.error||"Перевод не завершён");done++}
-    catch(e){errors.push(locales[locale]+": "+e.message);if(/key|provider|401|403/i.test(e.message))break}
-   }
-   await translationsForCurrent();
-   toast("Готово переводов: "+done+". "+(errors.length?"Ошибки: "+errors.join("; "):"Откройте переводы для проверки."),errors.length>0);
-  }finally{busy=false;$("translateAll").disabled=!providerReady;$("translateArticle").disabled=!providerReady}
-}
-function showTranslation(locale,offerApproval=false){
+    for(let i=0;i<plan.languages.length;i++){
+      const locale=plan.languages[i];
+      if(current?.id!==plan.postId||project?.slug!==plan.projectSlug||
+          currentSourceRevision()!==plan.revision||dirty){
+        errors.push("Статья изменилась во время перевода. Оставшиеся запросы отменены.");
+        break;
+      }
+      bulkMessage("Перевод "+(i+1)+" / "+plan.languages.length+" — "+locales[locale]+". Готово: "+done+".");
+      try{
+        const response=await request("/translate","POST",{post_id:plan.postId,locale},{timeoutMs:120000});
+        if(!response.translated)throw Error(response.error||"Перевод не завершён");
+        done++;
+      }catch(error){
+        errors.push(locales[locale]+": "+bulkError(error));
+        // An unknown timeout may still complete and bill on the server.
+        // Do not automatically retry or continue after uncertain failures.
+        if(/ожидания|соединение|Failed to fetch|AbortError|provider|key|ключ|401|403|429|quota/i.test(String(error.message||error)))break;
+      }
+    }
+    try{await translationsForCurrent()}catch(error){
+      errors.push("Не удалось обновить итоговый список: "+error.message);
+    }
+    const message="Новых переводов: "+done+" из "+plan.languages.length+". "+
+      (errors.length?"Проблемы: "+errors.join("; "):"Откройте каждый перевод для редакторской проверки.");
+    bulkMessage(message,errors.length>0);
+    toast(message,errors.length>0);
+  }finally{
+    busy=false;
+    $("translateAllConfirmYes").disabled=false;
+    $("translateAll").textContent="Перевести на все остальные языки";
+    $("translateAll").disabled=!validBulkStatus();
+    $("translateArticle").disabled=!validBulkStatus();
+  }
+ }
+ function showTranslation(locale,offerApproval=false){
   const t=translations.find(x=>x.locale===locale);if(!t)return;
   const area=$("translationPreview");area.hidden=false;
   const stale=t.source_revision!==currentSourceRevision();
@@ -258,11 +341,11 @@ function showTranslation(locale,offerApproval=false){
  const prevRefresh=refreshPosts;
  refreshPosts=async function(...args){const result=await prevRefresh(...args);if(tab==="ai-studio"&&aiRole())await refreshAI();return result};
  const prevOpen=openPost;
- openPost=async function(id){await prevOpen(id);await translationsForCurrent()};
+ openPost=async function(id){clearBulk();await prevOpen(id);await translationsForCurrent()};
  const prevCreate=createPost;
- createPost=async function(...args){await prevCreate(...args);translations=[];$("translationList").innerHTML="";$("translationPreview").hidden=true;await translationsForCurrent()};
+ createPost=async function(...args){clearBulk();await prevCreate(...args);translations=[];$("translationList").innerHTML="";$("translationPreview").hidden=true;await translationsForCurrent()};
  const prevSave=savePost;
- savePost=async function(...args){await prevSave(...args);await translationsForCurrent()};
+ savePost=async function(...args){clearBulk();await prevSave(...args);await translationsForCurrent()};
  const prevShow=showTab;
  showTab=async function(target,...args){
   if(target==="ai-studio"&&!aiRole()){toast("ИИ-редакция доступна только редакторам.",true);return}
@@ -271,7 +354,7 @@ function showTranslation(locale,offerApproval=false){
   if(target==="editor")await translationsForCurrent();
  };
  const prevChange=changeProject;
- changeProject=async function(...args){selected=null;jobs=[];schedules=[];translations=[];await prevChange(...args);if(aiRole())await refreshAI()};
+ changeProject=async function(...args){clearBulk();selected=null;jobs=[];schedules=[];translations=[];await prevChange(...args);if(aiRole())await refreshAI()};
  document.addEventListener("click",event=>{
   const b=event.target.closest("button");if(!b)return;
   if(b.dataset.aiPersona!==undefined){selected=b.dataset.aiPersona;personas()}
@@ -305,7 +388,12 @@ function showTranslation(locale,offerApproval=false){
    toast("Статусы переводов обновлены с сервера.");
  });
  $("translateArticle").onclick=()=>run(translate);
- $("translateAll").onclick=()=>run(translateAll);
+ $("translateAll").onclick=()=>run(prepareTranslateAll);
+ $("translateAllConfirmYes").onclick=()=>run(translateAll);
+ $("translateAllConfirmNo").onclick=()=>{
+   clearBulk();
+   bulkMessage("Перевод отменён до отправки платных запросов.");
+ };
  $("aiScheduleEnabled").onchange=()=>{$("aiScheduleInfo").textContent=$("aiScheduleEnabled").checked?"Новые материалы будут создаваться по расписанию, только если сохраните настройки.":"Автогенерация выключена. Сохраните настройки.";$("aiSaveSchedule").disabled=!selected||busy||(!providerReady&&$("aiScheduleEnabled").checked);};
  window.StudioAI={refresh:refreshAI,translations:translationsForCurrent,health};
 })();
