@@ -200,7 +200,7 @@ async function workflow(action){
  if(!current)throw Error("Сохраните материал");
  if(dirty)throw Error("Есть изменения: сначала нажмите «Сохранить»");
  const payload={action};
- if(action==="request_changes"){const note=prompt("Комментарий автору:");if(note===null)return;payload.note=note}
+ if(action==="request_changes"){const note=prompt("Что автору нужно исправить? Комментарий обязателен:");if(note===null)return;if(!note.trim())throw Error("Укажите причину возврата на доработку");payload.note=note.trim()}
  if(action==="schedule"){
  const value=prompt("Время выпуска в ISO 8601 (включая часовой пояс)",new Date(Date.now()+86400000).toISOString());if(!value)return;payload.scheduled_at=value;
  }
