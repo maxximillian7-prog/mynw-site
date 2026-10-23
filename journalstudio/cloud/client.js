@@ -62,6 +62,7 @@ async function loadData(){
  window.StudioTopics?.render?.();
 }
 function statusTag(s){return '<span class="chip '+(["in_review","scheduled"].includes(s)?"amber":s==="published"?"":"gray")+'">'+esc(statuses[s]||s)+'</span>'}
+function canManagePost(p){return !!p&&chiefRole()&&p.status!=='archived'}
 function canDeletePost(p){
  if(!p||!project)return false;
  if(chiefRole())return true;
@@ -70,9 +71,17 @@ function canDeletePost(p){
    p.owner_user_id===session?.user?.id;
 }
 function listEntry(p){
- return '<div class="listItem"><div><strong>'+esc(p.title||"Без названия")+'</strong><div class="muted">'+esc(p.locale)+" · "+esc(p.updated_at?.slice(0,10)||"")+' · версия '+Number(p.revision||1)+'</div></div><div class="btns">'+statusTag(p.status)+'<button data-open-post="'+esc(p.id)+'">Открыть ↗</button>'+
- (canDeletePost(p)?'<button type="button" data-delete-post="'+esc(p.id)+'" title="Удалить материал из редакции и приложения">Удалить</button>':"")+'</div></div>'
+ const id=esc(p.id),man=canManagePost(p);
+ return '<div class="listItem"><div><strong>'+esc(p.title||"Без названия")+'</strong><div class="muted">'+
+ esc(p.locale)+' · '+esc(p.updated_at?.slice(0,10)||'')+' · версия '+Number(p.revision||1)+
+ '</div></div><div class="btns">'+statusTag(p.status)+
+ (p.is_hidden?'<span class="chip amber">Скрыта</span>':'')+
+ '<button data-open-post="'+id+'">Открыть ↗</button>'+
+ (man?'<button data-edit-post="'+id+'">Изменить</button><button data-article-translations="'+id+'">Переводы (8)</button>'+
+ '<button data-toggle-post-hidden="'+id+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
+ (canDeletePost(p)?'<button data-delete-post="'+id+'">Удалить</button>':'')+'</div></div>'
 }
+
 function authorMini(a){
  return '<div class="authorCard"><span class="authorAvatar">'+esc((a.name||"A").slice(0,1))+'</span><div style="min-width:0;flex:1"><strong>'+esc(a.name)+'</strong><div class="muted small">'+(a.kind==="ai"?"ИИ-персонаж":"Приглашённый автор")+(a.kind==="partner"?" · "+esc(a.consent_status):"")+'</div></div><span class="chip">'+(a.kind==="ai"?"AI":"Автор")+'</span></div>';
 }
