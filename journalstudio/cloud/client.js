@@ -272,13 +272,23 @@ async function upload(){
  let photoStatus=null;
  try{photoStatus=await window.StudioOptimizer.fromPrepared(r.asset.id,renditions,f.size)}
  catch(e){toast("Оригинал загружен, но WebP-оптимизация не завершена: "+e.message,true)}
- capture();const b={type:"image",asset_id:r.asset.id,caption:"",alt};
- blocks.push(b);draft.blocks=blocks;
- if(!draft.cover_path)draft.cover_path=b.asset_id;
- dirty=true;
- try{const media=await call("/media/"+r.asset.id);assets[r.asset.id]=media.url}catch{}
+ const destination=$("uploadPlacement").value;
+ if(!["library","cover","inline"].includes(destination))throw Error("Некорректный выбор размещения");
+ if(destination!=="library"){
+  capture();
+  if(destination==="cover")draft.cover_path=r.asset.id;
+  if(destination==="inline"){
+   if(!blocks.some(b=>b.type==="image"&&b.asset_id===r.asset.id))
+    blocks.push({type:"image",asset_id:r.asset.id,caption:"",alt});
+   draft.blocks=blocks;
+  }
+  dirty=true;
+ }
+ try{const media=await call("/media/"+encodeURIComponent(r.asset.id));assets[r.asset.id]=media.url}catch{}
  $("file").value="";$("imageAlt").value="";$("imageSourceUrl").value="";$("imageRights").checked=false;
- renderEditor();toast("Фото добавлено. При необходимости выберите другое фото в качестве обложки, затем сохраните статью.");
+ renderEditor();
+ if(window.StudioImages?.showLibrary)await window.StudioImages.showLibrary("all");
+ toast(destination==="library"?"Изображение сохранено в медиатеке. Его можно выбрать позднее без повторной загрузки.":destination==="cover"?"Фото назначено обложкой без дублирования в тексте. Нажмите «Сохранить».":"Фото добавлено в текст. Нажмите «Сохранить».");
 }
 async function saveInstagramCaption(){
  if(!draft||!current)throw Error("Сначала сохраните статью");
