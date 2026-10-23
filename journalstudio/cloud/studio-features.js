@@ -234,6 +234,7 @@ document.addEventListener("drop",e=>{
 });
 document.addEventListener("dragend",()=>{dragIndex=null;$all("#blocks .block").forEach(x=>x.classList.remove("dragging","drop-target"))});
 window.StudioFeatures={
+ setDraftCaption:function(caption){if(activeChannel==="instagram"&&draft&&editable()){draft.caption=String(caption||"").slice(0,2200);dirty=true;}},
  saveCaptionForActiveVersion:async function(caption){
    if(activeChannel!=="instagram")return false;
    if(!current||!editable())throw Error("После согласования изменить подпись нельзя");
