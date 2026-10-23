@@ -162,6 +162,17 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-image-result p{margin:8px 0}
 .studio-stock-links{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
 .studio-stock-links a{border-radius:9px;border:1px solid var(--line);padding:9px 12px;background:var(--mint);color:var(--studio-accent-contrast);font-weight:700;text-decoration:none;font-size:12px}
+
+.ai-image-shortcut{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:17px;border-color:var(--line);background:var(--paper)}
+.ai-image-shortcut h2{margin:0 0 5px}.ai-image-shortcut p{margin:0;max-width:610px}
+.ai-image-shortcut-text{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0}
+.ai-image-shortcut .iconbox{flex:none}
+.ai-image-shortcut-controls{display:flex;align-items:end;gap:8px;flex-wrap:wrap;min-width:280px;max-width:600px}
+.ai-image-shortcut-controls label{flex-basis:100%;margin:0}
+.ai-image-shortcut-controls select{flex:1;min-width:200px}
+.ai-image-shortcut-controls button{white-space:nowrap}
+@media(max-width:1060px){.ai-image-shortcut{align-items:stretch;flex-direction:column}.ai-image-shortcut-controls{max-width:100%}}
+@media(max-width:570px){.ai-image-shortcut-controls{display:grid;grid-template-columns:1fr}.ai-image-shortcut-controls select{min-width:0}}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 </head><body>
@@ -263,6 +274,10 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 </section>
 <section class="view" data-view="ai-studio">
 <div class="sectionHeading"><div><div class="eyebrow">MYNOW AI EDITORIAL</div><h2>ИИ-редакция</h2><p class="muted">Создавайте черновики по теме или автоматически от лица выбранного ИИ-автора</p></div><span class="chip" id="aiProviderStatus">Проверка провайдера…</span></div>
+<div class="card ai-image-shortcut">
+  <div class="ai-image-shortcut-text"><span class="iconbox">▧</span><div><h2>Генерация фотографий и обложек</h2><p class="muted small">Введите описание изображения в конструкторе. Выберите статью, и я открою её прямо на генераторе изображений. Каждый платный запрос требует отдельного подтверждения.</p></div></div>
+  <div class="ai-image-shortcut-controls"><label for="aiImagePost">Сохранённая статья</label><select id="aiImagePost" aria-label="Выберите черновик для изображения"><option value="">Выберите сохранённый черновик</option></select><button type="button" id="aiOpenImage" class="primary">✦ Перейти к генерации фото</button><button type="button" id="aiNewForImage">+ Новая статья</button></div>
+</div>
 <div class="ai-grid">
 <div class="stack"><div class="card">
 <h2>1. Выберите автора</h2><div class="ai-personas" id="aiPersonaCards"></div>
