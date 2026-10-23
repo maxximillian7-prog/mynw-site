@@ -77,7 +77,7 @@ function listEntry(p){
  '</div></div><div class="btns">'+statusTag(p.status)+
  (p.is_hidden?'<span class="chip amber">Скрыта</span>':'')+
  '<button data-open-post="'+id+'">Открыть ↗</button>'+
- (man?'<button data-edit-post="'+id+'">Изменить</button><button data-article-translations="'+id+'">Переводы (8)</button>'+
+ (man?'<button data-article-topic="'+id+'">Тема журнала</button><button data-edit-post="'+id+'">Изменить</button><button data-article-translations="'+id+'">Переводы (8)</button>'+
  '<button data-toggle-post-hidden="'+id+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
  (canDeletePost(p)?'<button data-delete-post="'+id+'">Удалить</button>':'')+'</div></div>'
 }
@@ -112,7 +112,7 @@ async function refreshPosts(){
 function paintPublication(){
  const ready=posts.filter(p=>["approved","scheduled","published"].includes(p.status));
  $("readyPosts").innerHTML=ready.length?ready.map(p=>'<div class="listItem"><div><b>'+esc(p.title)+'</b><div class="muted">'+esc(statuses[p.status])+(p.is_hidden?' · Скрыта':'')+'</div></div><div class="btns"><button data-delivery="'+esc(p.id)+'">Проверить</button>'+
- (canManagePost(p)?'<button data-edit-post="'+esc(p.id)+'">Изменить</button><button data-article-translations="'+esc(p.id)+'">Переводы (8)</button><button data-toggle-post-hidden="'+esc(p.id)+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
+ (canManagePost(p)?'<button data-article-topic="'+esc(p.id)+'">Тема журнала</button><button data-edit-post="'+esc(p.id)+'">Изменить</button><button data-article-translations="'+esc(p.id)+'">Переводы (8)</button><button data-toggle-post-hidden="'+esc(p.id)+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
  (canDeletePost(p)?'<button data-delete-post="'+esc(p.id)+'">Удалить</button>':'')+'</div></div>').join(""):'<div class="empty"><span class="emptyIcon">↗</span><b>Готовых материалов пока нет</b><p>Утверждённые статьи появятся здесь.</p></div>';
 }
 async function viewDelivery(id){
@@ -171,6 +171,15 @@ async function editArticle(id){
  }
  await openPost(id);
  toast("Внесите изменения, сохраните статью и отправьте её на повторное согласование.");
+}
+async function openArticleTopic(id){
+ const post=posts.find(x=>x.id===id);
+ if(!post)throw Error("Обновите список статей");
+ await openPost(id);
+ $("topicSelect").scrollIntoView({behavior:"smooth",block:"center"});
+ toast(["approved","scheduled","published"].includes(post.status)
+  ?"Выберите тему и нажмите «Перенести в выбранную тему». Публикация и переводы сохранятся."
+  :"Выберите тему и нажмите «Сохранить».");
 }
 async function openArticleTranslations(id){
  await openPost(id);
@@ -249,11 +258,17 @@ function renderEditor(){
  const edit=editable();$("workTitle").textContent=current?.title||"Новый материал";
  $("statusLine").innerHTML=statusTag(current?.status||"draft")+" · "+(current?"Версия "+current.revision:"Материал ещё не сохранён");
  for(const k of ["title","summary","locale","category"]){$(k).value=draft[k]||"";$(k).disabled=!edit}
- $("topicSelect").innerHTML='<option value="">Без темы</option>'+topics.filter(t=>t.is_active).map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title)+'</option>').join("");
+ const topicChoices=topics.filter(t=>t.is_active||t.id===draft.topic_id);
+ $("topicSelect").innerHTML='<option value="">Без темы</option>'+topicChoices.map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title)+(t.is_active?"":" · скрыта")+'</option>').join("");
  $("topicSelect").value=draft.topic_id||"";
  const canReassign=!!current&&["approved","scheduled","published"].includes(current.status)&&chiefRole();
  $("topicSelect").disabled=!(edit||canReassign);
  $("publishedTopicSave").hidden=!canReassign;
+ $("publishedTopicSave").disabled=canReassign&&((draft.topic_id||null)===(current.topic_id||null));
+ $("topicHelp").textContent=canReassign
+  ?"Выберите тему и нажмите «Перенести в выбранную тему». Опубликованная статья и все переводы сохранятся."
+  :edit?"Выберите тему и нажмите «Сохранить». Создать новую тему можно в разделе «Материалы»."
+  :"Назначение темы опубликованной статье доступно главному редактору.";
  $("authorSelect").innerHTML='<option value="">Редакция</option>'+authors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.kind==="ai"?" · ИИ":"")+'</option>').join("");
  $("authorSelect").value=draft.author_id||"";$("authorSelect").disabled=!edit;
  $("blocks").innerHTML=blocks.map((b,i)=>blockHtml(b,i,edit)).join("")||'<div class="empty">Добавьте первый текстовый блок, заголовок или фотографию.</div>';
@@ -448,6 +463,7 @@ document.addEventListener("click",e=>{
  if(b.dataset.create!==undefined)return void run(createPost);
  if(b.dataset.openPost)return void run(()=>openPost(b.dataset.openPost));
  if(b.dataset.editPost)return void run(()=>editArticle(b.dataset.editPost));
+ if(b.dataset.articleTopic)return void run(()=>openArticleTopic(b.dataset.articleTopic));
  if(b.dataset.articleTranslations)return void run(()=>openArticleTranslations(b.dataset.articleTranslations));
  if(b.dataset.togglePostHidden)return void run(()=>toggleArticleHidden(b.dataset.togglePostHidden));
  if(b.dataset.deletePost)return void run(()=>deletePost(b.dataset.deletePost));
@@ -474,12 +490,17 @@ $("editPublishedPost").onclick=()=>run(()=>current&&editArticle(current.id));
 $("publishedTopicSave").onclick=()=>run(async()=>{
  if(!current||!chiefRole()||!["approved","scheduled","published"].includes(current.status))throw Error("Недоступно для данной статьи");
  const id=$("topicSelect").value||null;
- const result=await call("/posts/"+encodeURIComponent(current.id)+"/topic","PATCH",{
-  topic_id:id,expected_revision:current.revision
- });
- current=result.post;draft.topic_id=id;
- await refreshPosts();renderEditor();
- toast("Тема опубликованной статьи обновлена. Основное содержание не менялось.");
+ if(id===(current.topic_id||null)){toast("Статья уже в выбранной теме.");return}
+ $("publishedTopicSave").disabled=true;
+ try{
+  const result=await call("/posts/"+encodeURIComponent(current.id)+"/topic","PATCH",{
+   topic_id:id,expected_revision:current.revision
+  });
+  if(!result.post||result.post.topic_id!==id)throw Error("Сервер не подтвердил смену темы");
+  current=result.post;draft.topic_id=id;
+  await refreshPosts();renderEditor();
+  toast("Статья перенесена в тему: "+(topics.find(t=>t.id===id)?.title||"Без темы")+". Текст и переводы сохранены.");
+ }catch(e){$("publishedTopicSave").disabled=false;throw e}
 });
 for(const x of ["submit","return","approve","publish","schedule"]){const action={submit:"submit",return:"request_changes",approve:"approve",publish:"publish",schedule:"schedule"}[x];$(x).onclick=()=>run(()=>workflow(action))}
 $("uploadImage").onclick=()=>run(upload);
@@ -497,7 +518,11 @@ document.addEventListener("change",e=>{
  if(!draft||tab!=="editor"||!editable())return;
  const t=e.target;if(t.id==="authorSelect"){draft.author_id=t.value||null;dirty=true;renderPreview()}
  else if(t.id==="locale"){draft.locale=t.value;dirty=true;renderPreview()}
- else if(t.id==="topicSelect"){draft.topic_id=t.value||null;dirty=true;renderPreview()}
+ else if(t.id==="topicSelect"){
+  draft.topic_id=t.value||null;
+  if(editable()){dirty=true;renderPreview()}
+  else if(current)$("publishedTopicSave").disabled=(draft.topic_id||null)===(current.topic_id||null);
+}
 });
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 (async()=>{
