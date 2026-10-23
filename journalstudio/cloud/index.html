@@ -159,6 +159,11 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-image-panel{background:white;border-radius:11px;padding:15px;border:1px solid var(--line)}
 .studio-image-panel .row{align-items:flex-start}.studio-image-panel .row p{margin:4px 0}
 .studio-image-panel textarea{min-height:96px}
+.studio-image-confirm{margin-top:12px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--mint,#edf5ed)}
+.studio-image-confirm[hidden]{display:none!important}
+.studio-image-confirm strong{display:block;font-size:13px;margin-bottom:7px}
+.studio-image-confirm p{margin:0 0 12px;font-size:12px;line-height:1.5;white-space:pre-line}
+.studio-image-confirm .btns{display:flex;flex-wrap:wrap;gap:9px}
 .studio-img-spacer{padding:0 6px}.studio-img-spacer p{margin:10px 0}
 .studio-ai-legal{font-size:11px;color:var(--studio-accent-contrast,#4e7154);padding:11px 12px;background:var(--studio-warm-panel,#fff8e6);border-radius:9px;margin:16px 0}
 .studio-image-result{margin:15px 0 0;padding:12px;background:var(--studio-soft-panel,#f4f8f3);border-radius:12px}
@@ -425,7 +430,15 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
   <p class="studio-image-compress-note"><strong>Автооптимизация WebP включена.</strong> При загрузке создаются версии 640 / 1400 / 1600 px. Оригинал хранится только до публикации и удаляется после проверки копий, если больше не нужен другим черновикам.</p>
   <div class="studio-ai-legal">ИИ-иллюстрация может неверно изображать сорт, признаки заболевания или устройство растения. Проверяйте её до публикации. Генерация платная — запрос отправляется только после подтверждения.</div>
   <button type="button" id="imageGenerate" class="primary">✦ Сгенерировать изображение</button>
-  <div id="imageGenerateStatus" role="status" class="small muted" style="margin-top:10px">Сначала сохраните черновик статьи.</div>
+  <div id="imageGenerateConfirm" class="studio-image-confirm" hidden role="group" aria-label="Подтверждение платной генерации изображения">
+    <strong>Подтверждение платной генерации</strong>
+    <p id="imageGenerateConfirmDetails" class="small"></p>
+    <div class="btns">
+      <button type="button" id="imageGenerateConfirmYes" class="primary">✓ Создать одно изображение</button>
+      <button type="button" id="imageGenerateConfirmNo">Отмена</button>
+    </div>
+  </div>
+  <div id="imageGenerateStatus" role="status" aria-live="polite" class="small muted" style="margin-top:10px">Сначала сохраните черновик статьи.</div>
   <div id="imageGeneratedPreview" hidden class="studio-image-result"><img id="imageGeneratedImg" alt="Предварительный просмотр сгенерированной иллюстрации"><p class="small muted" id="imageGeneratedAlt"></p><div class="btns">
    <button type="button" id="imageAccept" class="primary">✓ Добавить в статью</button>
    <button type="button" id="imageAcceptCover">✓ Сделать обложкой</button>
@@ -512,7 +525,7 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./review-workflow.js?v=20261023-14"></script>
 <script defer src="./author-profiles.js?v=20261023-14"></script>
 <script defer src="./ai-studio.js?v=20261023-50"></script>
-<script defer src="./studio-images.js?v=20261023-23"></script>
+<script defer src="./studio-images.js?v=20261023-53"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
 </body></html>
