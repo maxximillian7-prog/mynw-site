@@ -62,6 +62,8 @@
   $("mediaLibraryMore").hidden=!libraryMore;
   $("mediaLibraryMore").disabled=libraryBusy;
   $("mediaLibraryRefresh").disabled=libraryBusy;
+  const tail=blocks?.[blocks.length-1];
+  $("mediaRemoveCoverDuplicate").hidden=!(editablePost()&&tail?.type==="image"&&tail.asset_id===draft?.cover_path);
  }
  async function loadLibrary({reset=false}={}){
   if(!project?.slug)return;
@@ -82,6 +84,17 @@
   }catch(e){
    if(token===libraryRequest)$("mediaLibraryStatus").textContent="Не удалось загрузить медиатеку: "+e.message;
   }finally{if(token===libraryRequest){libraryBusy=false;renderLibrary();}}
+ }
+ function removeLegacyDuplicate(){
+  if(!editablePost())throw Error("Нужен редактируемый черновик");
+  capture();
+  const last=blocks[blocks.length-1];
+  if(!last||last.type!=="image"||last.asset_id!==draft.cover_path)return;
+  blocks.pop();
+  draft.blocks=blocks;
+  dirty=true;
+  renderEditor();renderLibrary();
+  toast("Повтор убран только из конца текста. Обложка и изображение в медиатеке сохранены. Сохраните статью.");
  }
  async function useLibraryItem(id,asCover){
   if(!editablePost())throw Error("Откройте редактируемую статью");
@@ -197,6 +210,7 @@
  $("mediaLibraryRefresh").onclick=()=>run(()=>loadLibrary({reset:true}));
  $("mediaLibraryMore").onclick=()=>run(()=>loadLibrary());
  $("mediaLibraryFilter").onchange=()=>run(()=>loadLibrary({reset:true}));
+ $("mediaRemoveCoverDuplicate").onclick=()=>run(removeLegacyDuplicate);
  const oldShow=showTab;
  showTab=async function(target,...args){const data=await oldShow(target,...args);if(target==="editor"&&project?.slug)void loadLibrary({reset:true});return data};
  setSource("ai");refreshControls();
