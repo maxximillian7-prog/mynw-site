@@ -98,6 +98,35 @@
   if(activeProject!==project?.slug)await loadMedia();fillMediaSelect(t.image_asset_id);
   $("studioTopicForm").scrollIntoView({behavior:"smooth",block:"center"});
  }
+ async function translateAllTopics(){
+  if(!isEditor())throw Error("Переводы доступны редактору");
+  const source=$("topicTitleInput").value.trim(),locale=$("topicSourceLocale").value;
+  if(!source)throw Error("Сначала введите название темы");
+  if(!confirm("Сгенерировать 8 вариантов названия с помощью ИИ? Могут применяться расходы на API. Все переводы нужно проверить перед сохранением."))return;
+  const button=$("topicTranslateAll");button.disabled=true;
+  status("Генерируем варианты на 8 языков. После получения проверьте каждый перевод.");
+  try{
+   const endpoint=API_ROOT+"/functions/v1/studio-ai/translate-topic";
+   const doRequest=()=>fetch(endpoint,{method:"POST",headers:{
+     apikey:PUBLIC_KEY,Authorization:"Bearer "+session.access_token,
+     "Content-Type":"application/json"},body:JSON.stringify({
+       project:project.slug,title:source,locale})});
+   let response=await doRequest();
+   if(response.status===401&&session.refresh_token){
+    session=await auth("token?grant_type=refresh_token","POST",{refresh_token:session.refresh_token});
+    sessionStorage.setItem("journal_session",JSON.stringify(session));response=await doRequest();
+   }
+   const result=await response.json().catch(()=>({}));
+   if(!response.ok)throw Error(result.error||"Сервис перевода недоступен");
+   const t=result.translations||{};
+   if(!["ru","en","pt-PT","uk","fr","de","es","it"].every(k=>typeof t[k]==="string"&&t[k].trim()))throw Error("Переводы неполные");
+   $("topicTitleInput").value=t.ru;
+   $("topicTitlePt").value=t["pt-PT"];
+   for(const [lang,id] of [["en","topicTitleEn"],["uk","topicTitleUk"],["fr","topicTitleFr"],["de","topicTitleDe"],["es","topicTitleEs"],["it","topicTitleIt"]])$(id).value=t[lang];
+   $("topicSourceLocale").value="ru";
+   status("Варианты для восьми языков заполнены. Проверьте каждый текст перед сохранением.");
+  } finally {button.disabled=false}
+ }
  async function save(){
   if(!isEditor())throw Error("Создавать темы может только редактор");
   const title=$("topicTitleInput").value.trim(),slug=$("topicSlugInput").value.trim().toLowerCase();
@@ -109,6 +138,8 @@
     const value=$(input).value.trim();
     if(value)translations[lang]=value;else delete translations[lang];
   }
+  const missing=["en","pt-PT","uk","es","fr","de","it"].filter(k=>!translations[k]?.trim());
+  if(missing.length)throw Error("Добавьте проверенные переводы для всех 8 языков: "+missing.join(", "));
   const payload={project:project.slug,title,slug,translations,image_asset_id:$("topicImageSelect").value||null,
     focus_x:Number($("topicFocusX").value),focus_y:Number($("topicFocusY").value)};
   status("Сохраняю тему...");
@@ -157,6 +188,7 @@
  $("topicMediaRefresh").onclick=()=>run(async()=>{await loadMedia();render()});
  $("topicCancel").onclick=reset;
  $("topicUploadImage").onclick=()=>run(uploadImage);
+ $("topicTranslateAll").onclick=()=>run(translateAllTopics);
  $("topicImageSelect").onchange=()=>run(previewMedia);
  for(const id of ["topicFocusX","topicFocusY"]){$(id).oninput=()=>{updateCrop();if(editing)status("Кадрирование изменено. Нажмите «Сохранить тему».");}}
  $("topicImagePreviewImg").onerror=()=>{status("Изображение недоступно по временной ссылке. Обновите медиатеку.");};
