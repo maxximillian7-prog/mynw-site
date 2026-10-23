@@ -21,12 +21,12 @@
   if(!allowed)status("Сначала сохраните черновик статьи. Генерация доступна только для редактируемых материалов.");
   else if(!busy&&result===null)status("Изображение будет генерироваться только после подтверждения платного запроса.");
  }
- function setSource(id){
+ function setSource(id,autoload=true){
   document.querySelectorAll("[data-image-source]").forEach(b=>b.classList.toggle("active",b.dataset.imageSource===id));
   $("studioImageAi").hidden=id!=="ai";
   $("studioImageStock").hidden=id!=="stock";
   $("studioImageLibrary").hidden=id!=="library";
-  if(id==="library")void loadLibrary({reset:libraryProject!==project?.slug});
+  if(id==="library"&&autoload)void loadLibrary({reset:libraryProject!==project?.slug});
   if(id==="own"){document.querySelector(".jp-upload-area")?.scrollIntoView({behavior:"smooth",block:"center"});}
  }
  const isEditor=()=>["owner","chief_editor","editor"].includes(project?.role||"");
@@ -121,7 +121,7 @@
  }
  async function showLibrary(source){
   if(source&&["ai","all","stock","upload"].includes(source))$("mediaLibraryFilter").value=source;
-  setSource("library");
+  setSource("library",false);
   await loadLibrary({reset:true});
  }
  async function api(method,payload){
