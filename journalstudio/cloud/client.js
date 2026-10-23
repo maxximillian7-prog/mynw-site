@@ -515,8 +515,16 @@ document.addEventListener("input",e=>{
  }
 });
 document.addEventListener("change",e=>{
- if(!draft||tab!=="editor"||!editable())return;
- const t=e.target;if(t.id==="authorSelect"){draft.author_id=t.value||null;dirty=true;renderPreview()}
+ if(!draft||tab!=="editor")return;
+ const t=e.target;
+ // A published story's topic may be reclassified without reopening or
+ // editing its approved text; the normal editable() guard must not block it.
+ if(t.id==="topicSelect"&&!editable()){
+  draft.topic_id=t.value||null;
+  if(current)$("publishedTopicSave").disabled=(draft.topic_id||null)===(current.topic_id||null);
+  return;
+ }
+ if(!editable())return;if(t.id==="authorSelect"){draft.author_id=t.value||null;dirty=true;renderPreview()}
  else if(t.id==="locale"){draft.locale=t.value;dirty=true;renderPreview()}
  else if(t.id==="topicSelect"){
   draft.topic_id=t.value||null;
