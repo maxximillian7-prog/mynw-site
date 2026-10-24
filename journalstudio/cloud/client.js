@@ -99,11 +99,13 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
  $("studioEditorActionTitle").textContent=title;
  $("studioEditorActionText").textContent=message;
  yes.textContent=confirmLabel;
- input.hidden=!["title","datetime","email"].includes(kind);
+ input.hidden=!["title","datetime","email","consent"].includes(kind);
  note.hidden=kind!=="note";
  label.hidden=input.hidden;
  input.type=kind==="datetime"?"datetime-local":kind==="email"?"email":"text";
- label.textContent=kind==="datetime"?"Дата и время публикации":kind==="email"?"Email нового автора":"Для подтверждения введите полное название статьи";
+ input.maxLength=kind==="consent"?350:kind==="email"?250:524288;
+ input.placeholder=kind==="consent"?"Ссылка на согласие или номер договора":"";
+ label.textContent=kind==="consent"?"Документальное основание согласия автора":kind==="datetime"?"Дата и время публикации":kind==="email"?"Email нового автора":"Для подтверждения введите полное название статьи";
  input.value=kind==="title"?"":initialValue;
  note.value="";
  note.placeholder="Обязательный комментарий автору";
@@ -112,6 +114,7 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
   const valid=kind==="title"?input.value===exactTitle:
     kind==="note"?!!note.value.trim():
     kind==="email"?/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.value.trim())&&input.value.trim().length<=250:
+    kind==="consent"?!!input.value.trim()&&input.value.trim().length<=350:
     kind==="datetime"?!!input.value&&Number.isFinite(+new Date(input.value)):true;
   yes.disabled=!valid;
   return valid;
@@ -142,7 +145,7 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
   yes.onclick=()=>{
    if(!validate())return;
    if(kind==="title")finish(input.value);
-   else if(kind==="email")finish(input.value.trim());
+   else if(kind==="email"||kind==="consent")finish(input.value.trim());
    else if(kind==="note")finish(note.value.trim());
    else if(kind==="datetime")finish(new Date(input.value).toISOString());
    else finish(true);
@@ -634,10 +637,29 @@ async function saveAuthor(){
  $("authorName").value="";$("authorBio").value="";$("authorSocial").value="";
  await refreshPosts();toast("Профиль автора создан");
 }
+let authorApprovalPending=false;
 async function approveAuthor(id){
- const ref=prompt("Ссылка на согласие автора или номер договора:");
- if(!ref)return;
- await call("/authors/"+id+"/approve","POST",{consent_ref:ref});await refreshPosts();toast("Согласие автора подтверждено");
+ if(authorApprovalPending)return;
+ if(!chiefRole())throw Error("Подтверждение согласия доступно только главному редактору");
+ const author=authors.find(a=>a.id===id&&a.kind==="partner");
+ if(!author)throw Error("Автор не найден. Обновите список авторов.");
+ if(author.consent_status==="approved"){toast("Согласие этого автора уже подтверждено.");return}
+ const sourceProject=project.slug;
+ authorApprovalPending=true;
+ try{
+  const ref=await editorialDecision({
+   title:"Подтвердить согласие автора",
+   message:"Автор: "+author.name+"\n\nУкажите ссылку на документальное согласие автора или номер договора, подтверждающий право редакции публиковать его материалы. Без основания подтвердить согласие нельзя.",
+   confirmLabel:"✓ Подтвердить согласие",
+   kind:"consent"
+  });
+  if(ref===null)return;
+  if(project?.slug!==sourceProject)throw Error("Проект изменился. Откройте автора заново.");
+  const result=await call("/authors/"+encodeURIComponent(id)+"/approve","POST",{consent_ref:ref});
+  if(result?.author?.consent_status!=="approved")throw Error("Сервер не подтвердил согласие автора.");
+  await refreshPosts();
+  toast("Согласие автора подтверждено. Публикация его материалов разрешена.");
+ }finally{authorApprovalPending=false}
 }
 async function changeProject(slug){
  if(dirty&&!confirm("Несохранённые изменения будут потеряны. Продолжить?")){$("project").value=project.slug;return}
