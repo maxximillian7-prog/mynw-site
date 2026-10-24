@@ -201,7 +201,11 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 #aiFullProgressFill{height:100%;width:0;background:var(--green,#216843);transition:width .15s}
 body[data-studio-role="author"] #translationPanel,
 body[data-studio-role="author"] [data-image-source="ai"],
-body[data-studio-role="author"] #studioImageAi{display:none!important}
+body[data-studio-role="author"] #studioImageAi,
+body[data-studio-role="author"] label[for="authorFocus"],
+body[data-studio-role="author"] #authorFocus,
+body[data-studio-role="author"] label[for="authorVoice"],
+body[data-studio-role="author"] #authorVoice{display:none!important}
 .ai-image-shortcut{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:17px;border-color:var(--line);background:var(--paper)}
 .ai-image-shortcut h2{margin:0 0 5px}.ai-image-shortcut p{margin:0;max-width:610px}
 .ai-image-shortcut-text{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0}
