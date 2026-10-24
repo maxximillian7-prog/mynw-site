@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#173d31">
+<title>You're invited · Journal Studio by MyNow</title>
+<link rel="icon" href="/assets/mynow-main-logo.webp">
+<style>
+:root{color-scheme:light;--forest:#183f31;--sage:#426b51;--ink:#23372c;--muted:#69786b;--paper:#fffefa;--cream:#f5f4eb;--line:#e2e8dd;--gold:#d7b97d}
+*{box-sizing:border-box}html{min-height:100%}body{margin:0;min-height:100vh;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.55}
+a{color:inherit}button,input{font:inherit}button{cursor:pointer}
+.wrap{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(380px,.92fr)}
+.visual{background:radial-gradient(circle at 88% 10%,#4a7854 0,transparent 36%),radial-gradient(circle at 8% 90%,#2d6047 0,transparent 40%),linear-gradient(138deg,#18392f,#204c37);color:#fff;position:relative;overflow:hidden;padding:clamp(32px,5vw,72px);display:flex;flex-direction:column;justify-content:space-between;isolation:isolate}
+.visual:before{content:"";position:absolute;top:16%;right:-21%;height:530px;width:530px;border:1px solid #ffffff21;border-radius:50%;box-shadow:0 0 0 55px #ffffff09,0 0 0 112px #ffffff08;pointer-events:none;z-index:-1}
+.brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:760;letter-spacing:-.7px}.brand .star{display:grid;place-items:center;width:43px;height:43px;background:#f6eccf;border-radius:14px;color:#397256;font-family:Georgia,serif;font-size:29px}.brand small{display:block;font-size:9px;letter-spacing:2.3px;font-weight:700;color:#b8d1bf}
+.kicker{letter-spacing:2.7px;font-size:11px;text-transform:uppercase;color:#dfceaa;font-weight:750;margin-bottom:21px}.hero h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-2.5px;font-size:clamp(43px,5vw,77px);line-height:1.07;margin:0 0 21px;max-width:700px}.hero h1 em{color:#ead5a7;font-style:italic}.hero p{font-size:16px;color:#d4e4d6;max-width:480px;margin:0}
+.art{height:245px;position:relative;max-width:580px;margin:28px 0 0}.sheet{position:absolute;background:#fffaf0;border:1px solid #ffffffb8;box-shadow:0 16px 48px #071d1850;border-radius:11px;width:205px;height:234px;padding:24px 20px;transform:rotate(-10deg);left:4%;bottom:-55px;color:#2a4d3c}.sheet::after{content:"";display:block;height:44px;margin-top:15px;background:linear-gradient(115deg,#b2cbb2,#dde7be);border-radius:5px}.sheet:nth-child(2){left:38%;bottom:-73px;transform:rotate(8deg);background:#fcf8eb}.sheet:nth-child(2)::after{background:linear-gradient(120deg,#cbac7f,#e5d9b6)}.sheet .mini{font:9px Georgia,serif;letter-spacing:2px}.sheet .head{font:italic 26px/1.05 Georgia,serif;margin:17px 0}.sheet .rule{height:4px;background:#d5ddce;border-radius:8px;margin:7px 0;width:88%}.sheet .rule.short{width:64%}.visual-foot{font-size:12px;color:#c3d3c8;letter-spacing:.3px;position:relative;z-index:2;margin-top:25px}
+.panel{padding:clamp(26px,6vw,88px);display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(circle at 100% 0%,#e8edda,transparent 43%),#f7f6ef}
+.panelinner{max-width:470px;width:100%}.label{display:inline-flex;align-items:center;gap:8px;letter-spacing:1.2px;font-size:11px;font-weight:790;color:#537658;text-transform:uppercase}.label::before{content:"";display:block;width:19px;height:1px;background:#8ba98c}
+.panel h2{font-family:Georgia,serif;font-size:clamp(36px,3.7vw,54px);font-weight:400;letter-spacing:-1.4px;line-height:1.12;margin:14px 0 18px}.lead{color:var(--muted);font-size:15px;line-height:1.7;margin:0 0 25px}
+.benefits{padding:0;margin:26px 0;list-style:none;display:grid;gap:14px}.benefits li{display:flex;gap:12px;align-items:flex-start;color:#475b4c}.benefits .check{flex:none;display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#e4ede0;color:#2f7350;font-size:12px;font-weight:900}
+.box{border:1px solid #dce5d7;background:#fffefa;border-radius:19px;padding:24px;box-shadow:0 14px 45px #2039240b;margin-top:25px}
+.box h3{margin:0 0 8px;font-size:20px;letter-spacing:-.35px}.box p{font-size:13px;color:var(--muted);margin:0 0 15px}
+.field{display:block;margin:16px 0 5px;color:#45604e;font-size:12px;font-weight:750}.input{width:100%;border:1px solid #d3dfd2;background:#fff;border-radius:11px;padding:13px 14px;outline:0;transition:.2s}.input:focus{border-color:#518769;box-shadow:0 0 0 3px #a4c5aa50}.input:disabled{background:#f3f6f1}
+.action{display:block;width:100%;padding:15px 22px;background:#245f43;border:1px solid #245f43;color:#fff;font-weight:760;border-radius:11px;margin-top:23px;transition:.15s}.action:hover{background:#194a34}.action:disabled{opacity:.5;cursor:wait}
+.error{color:#ab483a!important;font-size:13px!important;background:#fdf0ec;border:1px solid #f2d4cb;border-radius:9px;padding:10px 12px;margin:14px 0!important}.success{color:#2b6243!important;background:#ecf6ec;border:1px solid #d3e9d1;border-radius:9px;padding:12px;margin:14px 0!important}
+.foot{margin:28px 0 0;color:#879388;font-size:12px;text-align:center}.foot a{text-decoration:none;border-bottom:1px solid #becfc0}.note{font-size:12px;color:#839084;margin-top:12px}
+.spin{width:17px;height:17px;border:2px solid #dee8de;border-top-color:#38724f;border-radius:50%;display:inline-block;vertical-align:middle;animation:spin .7s linear infinite;margin-right:8px}@keyframes spin{to{transform:rotate(360deg)}}
+[hidden]{display:none!important}
+@media(max-width:850px){.wrap{grid-template-columns:1fr}.visual{min-height:390px;padding:33px}.hero h1{max-width:480px;font-size:49px}.art{display:none}.visual-foot{margin-top:45px}.panel{padding:46px 24px 70px}.panelinner{max-width:510px}}
+@media(max-width:480px){.visual{min-height:305px}.hero h1{font-size:39px}.hero p{font-size:14px}.visual-foot{margin-top:25px}.box{padding:19px}.panel h2{font-size:38px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="visual" aria-label="Journal Studio editorial welcome">
+ <div class="brand"><span class="star">✦</span><span>Journal Studio<small>MYNOW EDITORIAL</small></span></div>
+ <div class="hero"><div class="kicker">Your invitation to create</div><h1>Every great story <em>starts somewhere.</em></h1><p>Bring your perspective, your expertise and your voice to a growing collection of stories across MyNow Apps.</p>
+ <div class="art" aria-hidden="true"><div class="sheet"><div class="mini">MYNOW · JOURNAL</div><div class="head">Ideas worth sharing</div><div class="rule"></div><div class="rule short"></div><div class="rule"></div></div><div class="sheet"><div class="mini">THE EDITORIAL</div><div class="head">Grow with us.</div><div class="rule"></div><div class="rule"></div><div class="rule short"></div></div></div></div>
+ <div class="visual-foot">Thoughtful stories. Real voices. One creative space.</div>
+</section>
+<section class="panel">
+ <div class="panelinner">
+  <div class="label">An invitation from MyNow</div>
+  <h2>Welcome to the editorial team.</h2>
+  <p class="lead">You've been invited to contribute as an author at <strong>Journal Studio</strong>, a collaborative space to write, create and share meaningful content.</p>
+  <ul class="benefits">
+    <li><span class="check">✓</span><span>Craft and save your own articles and drafts.</span></li>
+    <li><span class="check">✓</span><span>Work with editors and receive thoughtful feedback.</span></li>
+    <li><span class="check">✓</span><span>Submit stories for editorial review and publication.</span></li>
+  </ul>
+  <div class="box">
+   <h3 id="formHeading">Set up your author account</h3>
+   <p id="formDescription">Confirm your invitation and choose a secure password to enter Journal Studio.</p>
+   <div id="loading" role="status"><span class="spin"></span>Checking your invitation…</div>
+   <form id="acceptForm" hidden>
+    <label class="field" for="inviteEmail">Invitation email</label>
+    <input class="input" id="inviteEmail" type="email" readonly autocomplete="email">
+    <label class="field" for="newPassword">Create password</label>
+    <input class="input" id="newPassword" type="password" required minlength="12" maxlength="72" autocomplete="new-password" placeholder="At least 12 characters">
+    <label class="field" for="confirmPassword">Confirm password</label>
+    <input class="input" id="confirmPassword" type="password" required minlength="12" maxlength="72" autocomplete="new-password" placeholder="Repeat your password">
+    <p class="note">Use a unique password with 12 or more characters.</p>
+    <button class="action" id="acceptButton" type="submit">Accept invitation &amp; enter studio →</button>
+   </form>
+   <p id="feedback" role="alert" aria-live="polite" hidden></p>
+   <a id="loginLink" class="action" style="text-align:center;text-decoration:none" hidden href="/journalstudio/cloud/">Go to Journal Studio →</a>
+  </div>
+  <p class="foot">Already an author? <a href="/journalstudio/cloud/">Sign in to Journal Studio</a><br>© MyNow Apps · Private editorial workspace</p>
+ </div>
+</section>
+</main>
+<script>
+(() => {
+ "use strict";
+ const AUTH="https://npsfaymjckcqhtyiafms.supabase.co/auth/v1";
+ const KEY="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
+ const $=id=>document.getElementById(id);
+ const hash=new URLSearchParams(location.hash.replace(/^#/,""));
+ const query=new URLSearchParams(location.search);
+ const feedback=$("feedback");
+ const show=(message,kind="error")=>{feedback.textContent=message;feedback.className=kind;feedback.hidden=false};
+ const fail=message=>{
+   $("loading").hidden=true;$("acceptForm").hidden=true;
+   $("formHeading").textContent="Let's get you connected.";
+   $("formDescription").textContent="Your invitation needs attention before you can finish setting up your account.";
+   show(message);$("loginLink").hidden=false;
+ };
+ async function request(path,method,token,body){
+   const resp=await fetch(AUTH+path,{method,headers:{"apikey":KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined,cache:"no-store"});
+   const data=await resp.json().catch(()=>({}));
+   if(!resp.ok)throw new Error(data.msg||data.error_description||data.message||data.error||"The invitation could not be verified.");
+   return data;
+ }
+ let authSession;
+ try{authSession=JSON.parse(sessionStorage.getItem("journal_invite_session")||"null")}catch{authSession=null}
+ if(hash.has("access_token")&&hash.get("type")==="invite"){
+   authSession={access_token:hash.get("access_token"),refresh_token:hash.get("refresh_token")||"",token_type:"bearer"};
+   sessionStorage.setItem("journal_invite_session",JSON.stringify(authSession));
+ }
+ history.replaceState(null,"",location.pathname);
+ const returnedError=hash.get("error_description")||hash.get("error")||query.get("error_description");
+ if(returnedError){sessionStorage.removeItem("journal_invite_session");fail(returnedError+" Ask your editor for a new invitation.");return}
+ if(!authSession?.access_token){
+   $("loading").hidden=true;
+   $("formHeading").textContent="You're invited to create.";
+   $("formDescription").textContent="Open the invitation link in your email to activate your author account.";
+   $("loginLink").hidden=false;
+   return;
+ }
+ (async()=>{
+   try{
+     const user=await request("/user","GET",authSession.access_token);
+     if(!user?.id||!user.email)throw new Error("We couldn't verify this invitation.");
+     authSession.user=user;
+     $("inviteEmail").value=user.email;
+     $("loading").hidden=true;$("acceptForm").hidden=false;
+     $("newPassword").focus();
+   }catch(e){sessionStorage.removeItem("journal_invite_session");fail(e.message||"This link may have expired. Ask your editor for a new invitation.")}
+ })();
+ $("acceptForm").addEventListener("submit",async e=>{
+   e.preventDefault();
+   const password=$("newPassword").value;
+   if(password.length<12){show("Please use at least 12 characters.");return}
+   if(password!==$("confirmPassword").value){show("Your passwords don't match.");return}
+   const button=$("acceptButton");button.disabled=true;button.textContent="Activating your account…";feedback.hidden=true;
+   try{
+     const user=await request("/user","PUT",authSession.access_token,{password});
+     if(user?.id)authSession.user=user;
+     if(!authSession.user?.id)throw new Error("Account activation wasn't confirmed.");
+     sessionStorage.setItem("journal_session",JSON.stringify(authSession));
+     sessionStorage.removeItem("journal_invite_session");
+     $("acceptForm").hidden=true;
+     $("formHeading").textContent="Welcome aboard!";
+     $("formDescription").textContent="Your account is ready. You're heading to your editorial workspace.";
+     show("Your author account has been activated successfully.","success");
+     $("loginLink").hidden=false;
+     $("loginLink").textContent="Enter Journal Studio →";
+     setTimeout(()=>location.replace("/journalstudio/cloud/"),750);
+   }catch(err){show(err.message||"We couldn't complete your account. Please try again.");button.disabled=false;button.textContent="Accept invitation & enter studio →"}
+ });
+})();
+</script>
+</body>
+</html>
