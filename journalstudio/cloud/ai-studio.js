@@ -103,6 +103,7 @@
   $("aiProviderStatus").className="chip"+(providerReady?"":" amber");
   personas();jobsList();imageArticleChoices();
   if(!providerReady)$("aiGenerateResult").textContent="Для генерации нужен OPENAI_API_KEY в Supabase → Edge Functions → Secrets. Никаких ключей в браузере хранить не нужно.";
+  window.StudioFullArticle?.restore?.();
  }
  async function generate(){
   if(!aiRole())throw Error("Генерация доступна редакции");
@@ -135,6 +136,7 @@
  async function translationsForCurrent(){
    const sequence=++translationRefreshSeq,sourceId=current?.id;
   const host=$("translationList"),notice=$("translationStatus"),button=$("translateArticle");
+  if(!aiRole()){translations=[];host.innerHTML="";notice.textContent="Переводы создаёт и проверяет редакция.";button.disabled=true;$("translateAll").disabled=true;return}
   if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;$("translateAll").disabled=true;return}
   // Approved/published articles may receive new reviewed translations without
   // editing or mutating their frozen original content.
@@ -157,6 +159,7 @@
     (providerReady?"Недостающие переводы можно создать здесь.":"Для автоперевода нужен AI-провайдер.");
  }
  async function translate(){
+  if(!aiRole())throw Error("Перевод доступен только редакции");
   if(!current?.id)throw Error("Сначала сохраните статью");
   if(dirty)throw Error("Сохраните изменения исходной статьи");
   if(!providerReady)throw Error("Сначала подключите API-ключ");
@@ -189,6 +192,7 @@
     !translations.some(t=>t.locale===locale&&t.source_revision===revision));
  }
  async function prepareTranslateAll(){
+  if(!aiRole())throw Error("Перевод доступен только редакции");
   if(busy||bulkStarting)return;
   clearBulk();
   if(!current?.id){bulkMessage("Сначала сохраните исходную статью.",true);return}
