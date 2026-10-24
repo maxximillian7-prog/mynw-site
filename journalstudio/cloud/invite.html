@@ -97,11 +97,16 @@ a{color:inherit}button,input{font:inherit}button{cursor:pointer}
  }
  let authSession;
  try{authSession=JSON.parse(sessionStorage.getItem("journal_invite_session")||"null")}catch{authSession=null}
- if(hash.has("access_token")&&hash.get("type")==="invite"){
+ if(hash.has("access_token")&&["invite","recovery"].includes(hash.get("type"))){
    authSession={access_token:hash.get("access_token"),refresh_token:hash.get("refresh_token")||"",token_type:"bearer"};
    sessionStorage.setItem("journal_invite_session",JSON.stringify(authSession));
  }
  history.replaceState(null,"",location.pathname);
+ const isRecovery=hash.get("type")==="recovery";
+ if(isRecovery){
+   $("formHeading").textContent="Choose your new password";
+   $("formDescription").textContent="Verify your email and create a secure password to access your editorial account.";
+ }
  const returnedError=hash.get("error_description")||hash.get("error")||query.get("error_description");
  if(returnedError){sessionStorage.removeItem("journal_invite_session");fail(returnedError+" Ask your editor for a new invitation.");return}
  if(!authSession?.access_token){
@@ -134,7 +139,7 @@ a{color:inherit}button,input{font:inherit}button{cursor:pointer}
      sessionStorage.setItem("journal_session",JSON.stringify(authSession));
      sessionStorage.removeItem("journal_invite_session");
      $("acceptForm").hidden=true;
-     $("formHeading").textContent="Welcome aboard!";
+     $("formHeading").textContent=isRecovery?"Password updated!":"Welcome aboard!";
      $("formDescription").textContent="Your account is ready. You're heading to your editorial workspace.";
      show("Your author account has been activated successfully.","success");
      $("loginLink").hidden=false;
