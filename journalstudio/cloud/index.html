@@ -304,6 +304,17 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 </head><body>
+<script>
+/* Supabase invite links carry a short-lived session in the fragment.
+   Send author onboarding to the English activation page before loading Studio. */
+(() => {
+  const fragment=new URLSearchParams(location.hash.slice(1));
+  if(fragment.get("type")==="invite" ||
+    (fragment.has("error") && fragment.has("error_description"))) {
+    location.replace("./invite.html"+location.search+location.hash);
+  }
+})();
+</script>
 <div id="gate">
 <div class="gateHero"><div class="brand"><span class="brandMark">✦</span><span>Journal Studio<small>MYNOW EDITORIAL</small></span></div><div><div class="eyebrow" style="color:#d3e6d8">Центр управления публикациями</div><h1>Истории, которые хочется читать.</h1><p>Создавайте статьи вместе с ИИ и реальными авторами. Редактируйте, утверждайте и публикуйте в своих приложениях и на сайтах — из одной редакции.</p><div class="gateList"><span>✎ Конструктор</span><span>◈ Авторы</span><span>✓ Согласование</span><span>↗ Публикации</span></div></div><div style="color:#c2dbc7;font-size:12px">MyNow Apps · закрытое рабочее пространство</div></div>
 <div class="gatePanel"><div class="loginCard"><div class="eyebrow">Добро пожаловать</div><h2 style="margin:7px 0">Войти в Journal Studio</h2><p class="muted">Редакционные материалы защищены. Для входа используйте свой аккаунт.</p>
