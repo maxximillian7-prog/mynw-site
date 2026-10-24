@@ -285,7 +285,7 @@ async function deletePost(id){
  });
  if(!confirmation)return;
  const result=await call("/posts/"+encodeURIComponent(id),"DELETE",{
-   expected_revision:article.revision,confirm_title:confirmation
+   expected_revision:article.revision,confirm_title:article.title
  });
  if(!result.ok||result.deleted_id!==id)throw Error("Сервер не подтвердил удаление.");
  if(current?.id===id){resetDraft();await showTab("library",true);}
