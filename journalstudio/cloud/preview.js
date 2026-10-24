@@ -42,7 +42,11 @@ return (c.blocks||[]).map(b=>{
  }).join("")||'<p class="jp-placeholder">Содержание появится здесь, когда автор добавит блоки.</p>';
 }
 function articleTitle(c){return E(c.draft?.title||"Заголовок вашей будущей статьи")}
-function byline(c){const a=(c.authors||[]).find(x=>x.id===c.draft?.author_id);return E(a?.name||"Редакция MyNow")+(a?.kind==="ai"?" · ИИ-автор":"")}
+function byline(c){
+ const a=(c.authors||[]).find(x=>x.id===c.draft?.author_id);
+ const name=a?.name||((c.viewerRole==="author"&&c.authors?.length===1)?c.authors[0].name:"Редакция MyNow");
+ return E(name)+(c.viewerRole==="author"?"":a?.kind==="ai"?" · ИИ-автор":"");
+}
 function imageOrPlaceholder(a,what,c){return a?'<img data-media-id="'+E(a.id)+'" class="jp-cover-img" src="'+E(a.src)+'" alt="'+E(a.alt||what)+'" style="'+imageStyle(c,a.id)+'">':'<div class="jp-cover-empty"><span>❧</span><small>Обложка статьи</small></div>'}
 function phone(c){
  const cv=cover(c);
