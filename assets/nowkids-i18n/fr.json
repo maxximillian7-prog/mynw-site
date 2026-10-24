@@ -51,7 +51,7 @@
             "Documents, photos, numérisations, textes et autres fichiers fournis pour les fonctions choisies. La version actuelle d’Android ne propose pas de saisie vocale.",
             "Contexte IA : demande, matière/sujet, historique d’apprentissage récent et uniquement les données de profil nécessaires pour adapter la difficulté : âge calculé, classe/niveau, langue d’étude et mode d’âge. NowStudy n’envoie pas à OpenAI le nom de l’enfant ni le nom de l’école. Une image n’est incluse que lorsque l’utilisateur choisit une fonction IA avec image.",
             "Données opérationnelles : compteurs, modèle/tokens IA, journaux d’erreur/sécurité et informations techniques.",
-            "Les autorisations facultatives concernent appareil photo/images, calendrier, notifications et authentification locale. La version 12 n'utilise pas l'enregistrement vocal.",
+            "Les autorisations facultatives concernent appareil photo/images, calendrier, notifications et authentification locale. La version Android actuelle n'utilise pas l'enregistrement vocal.",
             "Données d’abonnement et d’achat : identifiants de produit, état achat/renouvellement, état des droits (droits d’accès), métadonnées de transaction/reçu et identifiant utilisateur de l’application utilisé pour valider l’accès. NowKids ne reçoit pas les données complètes de carte bancaire de Google Play ou RevenueCat."
           ]
         },
@@ -283,7 +283,7 @@
           "items": [
             "Nom, naissance/âge, avatar, école, classe et langue.",
             "Emploi du temps, devoirs, tests, progrès, activités, livres, tâches et rappels.",
-            "Documents, photos, numérisations et conversations pédagogiques avec l'IA lorsqu'elles sont utilisées ; aucune saisie vocale dans la version 12."
+            "Documents, photos, numérisations et conversations pédagogiques avec l'IA lorsqu'elles sont utilisées ; aucune saisie vocale dans la version Android actuelle."
           ]
         },
         {
@@ -301,7 +301,7 @@
         {
           "h": "5. Permissions",
           "p": [
-            "Appareil photo/images, notifications, calendrier et authentification locale sont facultatifs selon les fonctions. Pas de saisie vocale en version 12."
+            "Appareil photo/images, notifications, calendrier et authentification locale sont facultatifs selon les fonctions. Pas de saisie vocale dans la version Android actuelle."
           ]
         },
         {
