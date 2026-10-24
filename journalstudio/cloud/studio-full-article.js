@@ -149,6 +149,15 @@
   const data=await api("/studio-ai/translations?post_id="+encodeURIComponent(post.id),"GET",undefined,25000);
   return data.translations||[];
  }
+ async function ensureNoPendingTranslation(state,post,language){
+  // Never double-bill when an earlier timed-out translation still runs.
+  const data=await api("/studio-ai/jobs?project="+encodeURIComponent(state.project),
+   "GET",undefined,20000);
+  if((data.jobs||[]).some(j=>
+   j.kind==="translate" && j.source_post_id===post.id &&
+   j.target_locale===language && ["pending","processing","running","in_progress"].includes(j.status)))
+   throw Error("Перевод "+LABELS[language]+" ещё обрабатывается на сервере. Повторная платная отправка заблокирована.");
+ }
  async function perform(state){
   if(active)return;
   if(!permitted())throw Error("Полная генерация доступна только редакторам.");
@@ -207,15 +216,16 @@
     const ready=(await translations(post)).some(t=>
       t.locale===language&&t.source_revision===expectedRevision);
     if(ready){completed++;continue}
-    notice("Перевод "+LABELS[language]+". "+(completed-4)+" / 7 языков…",completed);
+    await ensureNoPendingTranslation(state,post,language);
+    notice("Перевод "+LABELS[language]+". "+Math.max(0,completed-5)+" / 7 языков…",completed);
     const reply=await api("/studio-ai/translate","POST",{post_id:post.id,locale:language},120000);
     if(reply.translated!==true)throw Error("Перевод на "+LABELS[language]+" не подтверждён");
     completed++;
    }
-   clearSaved();
    notice("Готово: 1 текст, 4 фотографии и 7 переводов. Открываю редактируемый черновик. Переводы ожидают проверки редактором.",12);
    await refreshPosts();
    await openPost(state.postId);
+   clearSaved();
    toast("Полный черновик сохранён. Редактируйте как обычную статью; публикация только после утверждения.");
   }catch(error){
    notice("Приостановлено: "+(error?.message||error)+
