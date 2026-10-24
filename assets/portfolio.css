@@ -201,3 +201,11 @@ body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px
 .eco-qr-center{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:39px;height:39px;padding:4px;background:#fff;border-radius:11px;box-shadow:0 1px 5px rgba(0,0,0,.08)}
 .eco-qr-center img{width:31px;height:31px;object-fit:cover;border-radius:7px}
 @media(max-width:600px){.eco-download-note{grid-template-columns:1fr;text-align:center;justify-items:center}.eco-install{padding-bottom:45px}.eco-qr-link{order:2}.eco-download-note .eco-button{margin-bottom:12px}}
+
+
+/* 2026-10-24: each app tile on the homepage is one accessible link. */
+.eco-cards>a.eco-card{cursor:pointer;text-decoration:none!important;color:var(--portfolio-text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.eco-cards>a.eco-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 20px 48px rgba(30,48,76,.15)}
+.eco-cards>a.eco-card:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.eco-cards>a.eco-card:hover .eco-card-link span,.eco-cards>a.eco-card:focus-visible .eco-card-link span{transform:translateX(5px)}
+@media(prefers-reduced-motion:reduce){.eco-cards>a.eco-card{transition:none}.eco-cards>a.eco-card:hover{transform:none}.eco-cards>a.eco-card:hover .eco-card-link span{transform:none}}
