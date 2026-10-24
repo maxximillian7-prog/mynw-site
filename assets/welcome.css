@@ -77,3 +77,28 @@ img{display:block;max-width:100%}
 @media(max-width:920px){.hero{grid-template-columns:1fr;gap:8px;padding-top:56px;text-align:center}.hero h1,.lead{margin-left:auto;margin-right:auto}.eyebrow{justify-content:center}.actions{justify-content:center}.art{height:380px}.art:before{width:345px;height:345px}.art:after{width:415px;height:415px}.orbit{width:305px;height:305px}.visual-card{transform:rotate(-3deg) scale(.88)}.float-heart{left:calc(50% - 190px);bottom:45px}.float-star{right:calc(50% - 200px)}.letter{grid-template-columns:1fr;gap:16px}}
 @media(max-width:600px){.wrap{width:min(100% - 38px,520px)}.topbar{padding:20px 0 0}.brand{font-size:.98rem}.brand img{width:41px;height:41px}.brand small{font-size:.57rem}.top-controls>a{display:none}.language span{display:none}.language select{min-width:108px;font-size:.79rem;padding:8px 27px 8px 9px}.hero{padding:47px 0 28px}.hero h1{font-size:clamp(2.84rem,11.8vw,4rem);line-height:1.045;margin:20px 0}.lead{font-size:1.02rem;line-height:1.75}.actions{margin-top:25px}.btn{width:100%;min-height:49px}.hero-hint{font-size:.77rem}.art{height:322px}.art:before{width:280px;height:280px}.art:after{width:340px;height:340px}.orbit{width:262px;height:262px}.visual-card{transform:rotate(-4deg) scale(.72)}.float-heart{left:calc(50% - 148px);bottom:23px;width:52px;height:52px;border-radius:16px}.float-star{right:calc(50% - 147px);top:52px}.letter{padding:27px 24px 30px;border-radius:23px;gap:12px}.letter p{font-size:.95rem}.letter-side{font-size:.7rem}.bottom{padding-bottom:35px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}.btn:hover{transform:none}}
+
+/* Companion welcome pages share the NowWhat letter layout, with their own gentle palettes. */
+body[data-welcome-app="nowcook"]{--violet:#ab663d;--violet-2:#d28c54;--blue:#e9b27f;--ink:#463426;--muted:#806d5c;--line:rgba(148,96,48,.14);background:linear-gradient(180deg,#fff9f1 0%,#fff2e3 55%,#fffaf4 100%)}
+body[data-welcome-app="nowcook"] .page:before{background:radial-gradient(circle,rgba(250,201,149,.42),transparent 72%)}
+body[data-welcome-app="nowcook"] .page:after{background:radial-gradient(circle,rgba(245,215,186,.46),transparent 72%)}
+body[data-welcome-app="nowcook"] .art:before{background:radial-gradient(circle at 35% 25%,#fff5e9,#f8d9bd 63%,#f2b99a)}
+body[data-welcome-app="nowcook"] .btn-primary{background:#ae7048;box-shadow:0 15px 30px #ae704833}
+body[data-welcome-app="nowcook"] .btn-primary:hover{background:#9a5938}
+body[data-welcome-app="nowgreen"]{--violet:#2f7659;--violet-2:#62a580;--blue:#b8dac2;--ink:#293c30;--muted:#5a7866;--line:rgba(55,111,73,.13);background:linear-gradient(180deg,#fffdf5 0%,#f1f8ee 54%,#f9fdf8 100%)}
+body[data-welcome-app="nowgreen"] .page:before{background:radial-gradient(circle,rgba(189,229,164,.42),transparent 73%)}
+body[data-welcome-app="nowgreen"] .page:after{background:radial-gradient(circle,rgba(214,235,194,.37),transparent 74%)}
+body[data-welcome-app="nowgreen"] .art:before{background:radial-gradient(circle at 35% 25%,#fdffe5,#ddf2c2 65%,#bad9b5)}
+body[data-welcome-app="nowgreen"] .btn-primary{background:#32785c;box-shadow:0 15px 30px #32785c33}
+body[data-welcome-app="nowgreen"] .btn-primary:hover{background:#27684e}
+body[data-welcome-app="nowkids"]{--violet:#386fc6;--violet-2:#6494df;--blue:#ffd168;--ink:#213a60;--muted:#61728e;--line:rgba(55,111,198,.14);background:linear-gradient(180deg,#fffcf5 0%,#f0f7ff 55%,#fffdf8 100%)}
+body[data-welcome-app="nowkids"] .page:before{background:radial-gradient(circle,rgba(180,220,255,.48),transparent 72%)}
+body[data-welcome-app="nowkids"] .page:after{background:radial-gradient(circle,rgba(255,231,163,.36),transparent 74%)}
+body[data-welcome-app="nowkids"] .art:before{background:radial-gradient(circle at 35% 25%,#fffbe9,#dbeaff 61%,#b6d8ff)}
+body[data-welcome-app="nowkids"] .btn-primary{background:#4479cb;box-shadow:0 15px 30px #4479cb31}
+body[data-welcome-app="nowkids"] .btn-primary:hover{background:#356ab7}
+body[data-welcome-app] .letter{border-color:var(--line)}
+body[data-welcome-app] .letter .signature{color:var(--violet)}
+body[data-welcome-app] .hero .eyebrow:before{background:var(--violet-2);box-shadow:0 0 0 5px rgba(140,180,170,.15)}
+body[data-welcome-app] .visual-line:nth-child(2){background:rgba(238,237,234,.9)}
+body[data-welcome-app] .visual-line:nth-child(3){background:rgba(226,239,241,.75)}
