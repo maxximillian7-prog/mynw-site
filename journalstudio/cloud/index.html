@@ -305,6 +305,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 <link rel="stylesheet" href="./studio-author-guide.css?v=20261024-1">
 <link rel="stylesheet" href="./studio-member-admin.css?v=20261024-1">
+<link rel="stylesheet" href="./studio-publications.css?v=20261024-1">
 </head><body>
 <script>
 /* Supabase invite links carry a short-lived session in the fragment.
@@ -356,15 +357,15 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <section class="view active" data-view="home">
 <div id="authorHomeHint" class="card" hidden><span class="eyebrow">ЛИЧНЫЙ КАБИНЕТ АВТОРА</span><h2 style="margin:6px 0">Ваши материалы и редакционные решения</h2><p class="muted">Здесь отображаются только ваши статьи. Вы можете создавать, исправлять и отправлять материалы на проверку. Публикацию утверждает редактор.</p></div><div class="hero" id="studioHero"><div><div class="eyebrow" style="color:#c5e5cc">MYNOW · EDITORIAL WORKSPACE</div><h2>Хорошие идеи становятся публикациями.</h2><p>Создавайте материалы, собирайте иллюстрации и ссылки. Все черновики проходят через главного редактора.</p><button id="heroCreate">Создать материал ↗</button></div><div class="heroArtwork">✦</div></div>
 <div class="metrics">
-<div class="card metric"><div class="row"><span class="muted">Всего статей</span><span class="iconbox">▤</span></div><strong id="statAll">0</strong><small>В выбранном приложении</small></div>
-<div class="card metric"><div class="row"><span class="muted">Черновики</span><span class="iconbox">✎</span></div><strong id="statDraft">0</strong><small>В работе редакции</small></div>
-<div class="card metric"><div class="row"><span class="muted">Ожидают решения</span><span class="iconbox">◷</span></div><strong id="statReview">0</strong><small>Требуют согласования</small></div>
-<div class="card metric"><div class="row"><span class="muted">Опубликованы</span><span class="iconbox">↗</span></div><strong id="statPublished">0</strong><small>Доступны через Studio Feed</small></div></div>
+<button type="button" class="card metric studio-home-action" data-home-go="publish" data-home-filter="all" aria-label="Все статьи, открыть публикации"><div class="row"><span class="muted">Всего статей</span><span class="iconbox">▤</span></div><strong id="statAll">0</strong><small>Открыть все публикации ↗</small></button>
+<button type="button" class="card metric studio-home-action" data-home-go="publish" data-home-filter="drafts" aria-label="Черновики и правки, открыть публикации"><div class="row"><span class="muted">Черновики</span><span class="iconbox">✎</span></div><strong id="statDraft">0</strong><small>Черновики и правки ↗</small></button>
+<button type="button" class="card metric studio-home-action" data-home-go="publish" data-home-filter="in_review" aria-label="На проверке, открыть публикации"><div class="row"><span class="muted">Ожидают решения</span><span class="iconbox">◷</span></div><strong id="statReview">0</strong><small>Материалы на проверке ↗</small></button>
+<button type="button" class="card metric studio-home-action" data-home-go="publish" data-home-filter="published" aria-label="Опубликованные статьи, открыть публикации"><div class="row"><span class="muted">Опубликованы</span><span class="iconbox">↗</span></div><strong id="statPublished">0</strong><small>Посмотреть опубликованные ↗</small></button></div>
 <div class="dashboardGrid">
-<div class="stack"><div class="card"><div class="sectionHeading"><div><h2>Последние материалы</h2><p>История публикаций и черновиков</p></div><button data-open-tab="library">Все статьи ↗</button></div><div id="recentPosts"></div></div>
-<div class="card"><div class="sectionHeading"><div><h2>Редакционный маршрут</h2><p>Материал проходит три основных этапа</p></div></div><div class="pipeline"><div class="lane"><div class="eyebrow">01 · Подготовка</div><strong id="pipeDraft">0</strong><span>Черновики и правки</span></div><div class="lane"><div class="eyebrow">02 · Проверка</div><strong id="pipeReview">0</strong><span>Материалы на согласовании</span></div><div class="lane"><div class="eyebrow">03 · Выпуск</div><strong id="pipeReady">0</strong><span>Готово и опубликовано</span></div></div></div></div>
+<div class="stack"><div class="card"><div class="sectionHeading"><div><h2>Последние материалы</h2><p>История публикаций и черновиков</p></div><button data-open-tab="publish">Все статьи ↗</button></div><div id="recentPosts"></div></div>
+<div class="card"><div class="sectionHeading"><div><h2>Редакционный маршрут</h2><p>Материал проходит три основных этапа</p></div></div><div class="pipeline"><button type="button" class="lane" data-home-go="publish" data-home-filter="drafts" aria-label="Открыть черновики и правки"><div class="eyebrow">01 · Подготовка</div><strong id="pipeDraft">0</strong><span>Черновики и правки ↗</span></button><button type="button" class="lane" data-home-go="publish" data-home-filter="in_review" aria-label="Открыть материалы на согласовании"><div class="eyebrow">02 · Проверка</div><strong id="pipeReview">0</strong><span>Материалы на согласовании ↗</span></button><button type="button" class="lane" data-home-go="publish" data-home-filter="ready" aria-label="Открыть готовые к выпуску статьи"><div class="eyebrow">03 · Выпуск</div><strong id="pipeReady">0</strong><span>Готово к выпуску ↗</span></button></div></div></div>
 <div class="stack"><div class="card" id="journalAuthorsCard"><div class="sectionHeading"><div><h2>Авторы журнала</h2><p>ИИ-авторы и приглашённые эксперты</p></div><button data-open-tab="authors">Все ↗</button></div><div id="recentAuthors"></div></div>
-<div class="card"><h2>Каналы публикации</h2><div id="channelSummary"></div><p class="small muted" style="margin:16px 0 0">Публикации в приложение ожидают интеграции мобильного клиента; социальные сети требуют подключения.</p></div></div></div>
+<div class="card"><div class="sectionHeading"><div><h2>Каналы публикации</h2><p>Статус направлений доставки</p></div><button type="button" data-open-tab="publish">Посмотреть ↗</button></div><div id="channelSummary"></div><p class="small muted" style="margin:12px 0 0">Нажмите на направление, чтобы открыть центр публикаций и результаты доставки.</p></div></div></div>
 </section>
 <section class="view" data-view="library">
 <div class="card" id="studioTopicsPanel">
@@ -637,7 +638,47 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
   </div>
   <div id="teamAuthorsList"><div class="empty">Откройте раздел для загрузки списка авторов.</div></div>
 </div></section>
-<section class="view" data-view="publish"><div class="sectionHeading"><div><h2>Центр публикаций</h2><p>Отслеживание публикаций по каналам</p></div></div><div class="grid2"><div class="card"><h2>Готовые статьи</h2><div id="readyPosts"></div><div id="deliveryDetails"></div></div><div class="card"><h2>Подключённые направления</h2><div class="channelCard"><span>❧ &nbsp; Журнал приложения</span><span class="chip">Studio Feed активен</span></div><div class="channelCard"><span>◎ &nbsp; Instagram</span><span class="chip amber">Нужен Meta API</span></div><div class="channelCard"><span>◈ &nbsp; Веб-сайт / блог</span><span class="chip amber">Нужно подключить</span></div><div class="tip">Публикация статьи в Studio Feed не равна появлению статьи в установленном мобильном приложении, пока клиент NowGreen не подключён к новому API.</div></div></div></section>
+<section class="view" data-view="publish">
+ <div class="sectionHeading studio-pub-title">
+  <div><div class="eyebrow">MYNOW · ПУБЛИКАЦИИ</div><h2>Центр публикаций</h2>
+   <p>Полный каталог материалов: по темам или статьям, с поиском и быстрыми действиями.</p></div>
+  <div class="btns"><button type="button" id="publicationsRefresh">↻ Обновить</button>
+   <button type="button" class="primary" id="publicationsCreate">+ Новая статья</button></div>
+ </div>
+ <div class="studio-pub-top">
+  <div id="publicationStats" class="studio-pub-stats" aria-label="Фильтры по статусу"></div>
+  <details class="studio-pub-channels"><summary>↗ Подключённые направления</summary>
+   <div class="studio-pub-channel-list">
+    <div class="studio-pub-channel"><span>❧ Studio Feed</span><span class="chip">Активен</span></div>
+    <div class="studio-pub-channel"><span>◈ Веб-сайт / блог</span><span class="chip amber">По настройке</span></div>
+    <div class="studio-pub-channel"><span>◎ Instagram</span><span class="chip amber">Meta API</span></div>
+    <p class="studio-pub-channel-note">Статус доставки каждой статьи доступен по кнопке «Каналы / результаты».</p>
+   </div>
+  </details>
+ </div>
+ <div class="card studio-pub-catalog">
+  <div class="studio-pub-toolbar">
+   <div class="studio-pub-switch" role="group" aria-label="Отображение публикаций">
+    <button type="button" data-publication-view="articles" class="selected" aria-pressed="true">▤ По статьям</button>
+    <button type="button" data-publication-view="topics" aria-pressed="false">▦ По темам</button>
+   </div>
+   <div class="studio-pub-filters">
+    <label for="publicationSearch">Поиск<input type="search" id="publicationSearch" placeholder="Название, описание, тема…" autocomplete="off"></label>
+    <label for="publicationStatus">Статус<select id="publicationStatus">
+     <option value="all">Все статусы</option><option value="published">Опубликованы</option>
+     <option value="ready">Готовы к выпуску</option><option value="approved">Утверждены</option>
+     <option value="scheduled">Запланированы</option><option value="in_review">На проверке</option>
+     <option value="drafts">Черновики и правки</option><option value="draft">Черновики</option>
+     <option value="changes_requested">На доработке</option>
+    </select></label>
+    <label for="publicationTopic">Тема<select id="publicationTopic"><option value="all">Все темы</option><option value="none">Без темы</option></select></label>
+   </div>
+  </div>
+  <div id="publicationCount" class="studio-pub-count" role="status" aria-live="polite"></div>
+  <div id="readyPosts"></div>
+  <div id="deliveryDetails" class="studio-pub-delivery"></div>
+ </div>
+</section>
 <section class="view" data-view="settings"><div class="card"><h2>Настройки редакции</h2><p>Выбранный проект: <strong id="settingsProject">—</strong></p><p>Роль аккаунта: <strong id="settingsRole">—</strong></p><p class="muted">Авторизация: Supabase Auth. Данные хранятся в выделенной базе Journal Studio.</p><div class="tip"><b>Подтверждение email</b><p>Чтобы письма вели обратно в редакцию, в Supabase → Authentication → URL Configuration укажите Site URL и Redirect URL: <code>https://mynw.app/journalstudio/cloud/</code></p></div><p class="small muted">ИИ-генерация и внешние публикации будут включены после настройки соответствующих ключей.</p></div></section>
 </main></div>
 
@@ -675,4 +716,5 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./journal-topics.js?v=20261023-52"></script>
 <script defer src="./studio-author-guide.js?v=20261024-1"></script>
 <script defer src="./studio-member-admin.js?v=20261024-1"></script>
+<script defer src="./studio-publications.js?v=20261024-1"></script>
 </body></html>
