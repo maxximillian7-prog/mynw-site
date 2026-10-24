@@ -145,10 +145,10 @@ function listEntry(p){
  esc(p.locale)+' · '+esc(p.updated_at?.slice(0,10)||'')+' · версия '+Number(p.revision||1)+
  '</div></div><div class="btns">'+statusTag(p.status)+
  (p.is_hidden?'<span class="chip amber">Скрыта</span>':'')+
- '<button data-open-post="'+id+'">Открыть ↗</button>'+
- (man?'<button data-article-topic="'+id+'">Тема журнала</button><button data-edit-post="'+id+'">Изменить</button><button data-article-translations="'+id+'">Переводы (8)</button>'+
- '<button data-toggle-post-hidden="'+id+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
- (canDeletePost(p)?'<button data-delete-post="'+id+'">Удалить</button>':'')+'</div></div>'
+ '<button type="button" data-open-post="'+id+'">Открыть ↗</button>'+
+ (man?'<button type="button" data-article-topic="'+id+'">Тема журнала</button><button type="button" data-edit-post="'+id+'">Изменить</button><button type="button" data-article-translations="'+id+'">Переводы (8)</button>'+
+ '<button type="button" data-toggle-post-hidden="'+id+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
+ (canDeletePost(p)?'<button type="button" data-delete-post="'+id+'">Удалить</button>':'')+'</div></div>'
 }
 
 function authorMini(a){
@@ -182,9 +182,9 @@ async function refreshPosts(){
 }
 function paintPublication(){
  const ready=posts.filter(p=>["approved","scheduled","published"].includes(p.status));
- $("readyPosts").innerHTML=ready.length?ready.map(p=>'<div class="listItem"><div><b>'+esc(p.title)+'</b><div class="muted">'+esc(statuses[p.status])+(p.is_hidden?' · Скрыта':'')+'</div></div><div class="btns"><button data-delivery="'+esc(p.id)+'">Проверить</button>'+
- (canManagePost(p)?'<button data-article-topic="'+esc(p.id)+'">Тема журнала</button><button data-edit-post="'+esc(p.id)+'">Изменить</button><button data-article-translations="'+esc(p.id)+'">Переводы (8)</button><button data-toggle-post-hidden="'+esc(p.id)+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
- (canDeletePost(p)?'<button data-delete-post="'+esc(p.id)+'">Удалить</button>':'')+'</div></div>').join(""):'<div class="empty"><span class="emptyIcon">↗</span><b>Готовых материалов пока нет</b><p>Утверждённые статьи появятся здесь.</p></div>';
+ $("readyPosts").innerHTML=ready.length?ready.map(p=>'<div class="listItem"><div><b>'+esc(p.title)+'</b><div class="muted">'+esc(statuses[p.status])+(p.is_hidden?' · Скрыта':'')+'</div></div><div class="btns"><button type="button" data-delivery="'+esc(p.id)+'">Проверить</button>'+
+ (canManagePost(p)?'<button type="button" data-article-topic="'+esc(p.id)+'">Тема журнала</button><button type="button" data-edit-post="'+esc(p.id)+'">Изменить</button><button type="button" data-article-translations="'+esc(p.id)+'">Переводы (8)</button><button type="button" data-toggle-post-hidden="'+esc(p.id)+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
+ (canDeletePost(p)?'<button type="button" data-delete-post="'+esc(p.id)+'">Удалить</button>':'')+'</div></div>').join(""):'<div class="empty"><span class="emptyIcon">↗</span><b>Готовых материалов пока нет</b><p>Утверждённые статьи появятся здесь.</p></div>';
 }
 async function viewDelivery(id){
  const data=await call("/deliveries?post_id="+encodeURIComponent(id));
