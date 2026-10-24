@@ -589,8 +589,8 @@ body[data-studio-role="author"] #studioImageAi{display:none!important}
 </div>
 <div class="card"><h2>Недавние задания</h2><div id="aiJobs"><div class="empty">Пока нет заданий</div></div></div></div>
 <div class="stack"><div class="card"><h2>Автогенерация по расписанию</h2><p class="small muted">Каждый автор может самостоятельно выбирать темы внутри своей специализации. Новые материалы остаются черновиками.</p>
-<label for="aiScheduleCadence">Как часто</label><select id="aiScheduleCadence"><option value="7">Раз в неделю</option><option value="3">Раз в 3 дня</option><option value="14">Раз в две недели</option><option value="30">Раз в месяц</option></select>
-<label for="aiScheduleMax">Лимит статей за месяц</label><select id="aiScheduleMax"><option value="2">2 статьи</option><option value="4" selected>4 статьи</option><option value="8">8 статей</option><option value="12">12 статей</option></select>
+<label for="aiScheduleCadence">Как часто</label><select id="aiScheduleCadence"><option value="1">Ежедневно</option><option value="7">Раз в неделю</option><option value="3">Раз в 3 дня</option><option value="14">Раз в две недели</option><option value="30">Раз в месяц</option></select>
+<label for="aiScheduleMax">Лимит черновиков за месяц на одного ИИ-автора</label><input id="aiScheduleMax" type="number" min="1" max="31" step="1" value="4" inputmode="numeric"><p class="small muted">Любое целое значение от 1 до 31. Система создаёт не чаще одного черновика в день; все материалы остаются на проверке.</p>
 <label for="aiScheduleHint">Направление тем (необязательно)</label><textarea id="aiScheduleHint" maxlength="320" placeholder="Например: сезонные ошибки при уходе за растениями"></textarea>
 <label class="ai-check"><input type="checkbox" id="aiScheduleEnabled"> Включить автоматическое создание черновиков</label>
 <button id="aiSaveSchedule">Сохранить расписание</button><div id="aiScheduleInfo" class="small muted" style="margin-top:12px">Расписание применяется к выбранному ИИ-автору.</div>
@@ -634,7 +634,7 @@ body[data-studio-role="author"] #studioImageAi{display:none!important}
 <script defer src="./studio-features.js?v=20261023-20"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
 <script defer src="./author-profiles.js?v=20261023-55"></script>
-<script defer src="./ai-studio.js?v=20261024-58"></script>
+<script defer src="./ai-studio.js?v=20261024-61"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-60"></script>
 <script defer src="./studio-images.js?v=20261024-60"></script>
