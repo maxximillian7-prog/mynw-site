@@ -59,6 +59,15 @@
 
   function renderNav(){
     const c=data.common;
+    // Keep the direct parental notice visible on all localized legal pages.
+    const nav=document.querySelector('.site-header nav');
+    if(nav&&!nav.querySelector('[data-nk-nav="parentNotice"]')){
+      const anchor=document.createElement('a');
+      anchor.href='/nowkids/parental-notice/';
+      anchor.dataset.nkNav='parentNotice';
+      anchor.textContent=c.parentNotice||'Parental notice';
+      nav.appendChild(anchor);
+    }
     document.querySelectorAll('[data-nk-nav]').forEach(a=>{
       const k=a.dataset.nkNav;
       if(c[k]) a.textContent=c[k];
