@@ -10,8 +10,8 @@ variable `{{ .ConfirmationURL }}`. They contain no tracking pixels or credential
 - Port: `465` (SSL) or `587` (STARTTLS), depending on the form's encryption settings
 - Sender name: `Journal Studio · MyNow Apps`
 - Sender email: `support@mynw.app`
-- SMTP username: `support@mynw.app`
-- SMTP password: **The mailbox's master/app password. Enter only in the Supabase dashboard secret field; do not commit it to Git.**
+- SMTP username: `support@mynw.app` **if it is a dedicated mailbox**; if this address is an alias, use the provider-approved account that can send as this alias.
+- SMTP password: **The authorized mailbox's master/app password. Enter only in the Supabase dashboard secret field; do not commit it to Git.**
 
 The mailbox provider is Namecheap Private Email.
 
