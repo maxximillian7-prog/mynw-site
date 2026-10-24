@@ -303,6 +303,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 #topicTranslateFeedback[data-error="true"]{color:#9f4d37;font-weight:650}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
+<link rel="stylesheet" href="./studio-author-guide.css?v=20261024-1">
 </head><body>
 <script>
 /* Supabase invite links carry a short-lived session in the fragment.
@@ -361,7 +362,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <div class="dashboardGrid">
 <div class="stack"><div class="card"><div class="sectionHeading"><div><h2>Последние материалы</h2><p>История публикаций и черновиков</p></div><button data-open-tab="library">Все статьи ↗</button></div><div id="recentPosts"></div></div>
 <div class="card"><div class="sectionHeading"><div><h2>Редакционный маршрут</h2><p>Материал проходит три основных этапа</p></div></div><div class="pipeline"><div class="lane"><div class="eyebrow">01 · Подготовка</div><strong id="pipeDraft">0</strong><span>Черновики и правки</span></div><div class="lane"><div class="eyebrow">02 · Проверка</div><strong id="pipeReview">0</strong><span>Материалы на согласовании</span></div><div class="lane"><div class="eyebrow">03 · Выпуск</div><strong id="pipeReady">0</strong><span>Готово и опубликовано</span></div></div></div></div>
-<div class="stack"><div class="card"><div class="sectionHeading"><div><h2>Авторы журнала</h2><p>ИИ-авторы и приглашённые эксперты</p></div><button data-open-tab="authors">Все ↗</button></div><div id="recentAuthors"></div></div>
+<div class="stack"><div class="card" id="journalAuthorsCard"><div class="sectionHeading"><div><h2>Авторы журнала</h2><p>ИИ-авторы и приглашённые эксперты</p></div><button data-open-tab="authors">Все ↗</button></div><div id="recentAuthors"></div></div>
 <div class="card"><h2>Каналы публикации</h2><div id="channelSummary"></div><p class="small muted" style="margin:16px 0 0">Публикации в приложение ожидают интеграции мобильного клиента; социальные сети требуют подключения.</p></div></div></div>
 </section>
 <section class="view" data-view="library">
@@ -616,7 +617,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <button id="aiSaveSchedule">Сохранить расписание</button><div id="aiScheduleInfo" class="small muted" style="margin-top:12px">Расписание применяется к выбранному ИИ-автору.</div>
 </div><div class="card"><h2>Как работает редакция</h2><div class="ai-steps"><div><b>1 · Идея</b><p>ИИ-автор выбирает тему или следует запросу редактора.</p></div><div><b>2 · Черновик</b><p>Генерируется статья в индивидуальном стиле автора.</p></div><div><b>3 · Проверка</b><p>Редактор корректирует факты, фотографии и переводы.</p></div><div><b>4 · Утверждение</b><p>Только утверждённая версия допускается к публикации.</p></div></div></div></div></div></section>
 <section class="view" data-view="review-queue"><div class="sectionHeading"><div><div class="eyebrow">РЕДАКЦИОННЫЙ КОНТРОЛЬ</div><h2>Очередь согласования</h2><p class="muted small">Материалы, ожидающие проверки, и решения редакции</p></div><div class="btns"><button id="reviewRefresh">↻ Обновить очередь</button></div></div><div class="card"><div class="studio-review-toolbar"><label for="reviewFilter">Показать</label><select id="reviewFilter"><option value="in_review">На проверке</option><option value="changes_requested">На доработке</option><option value="approved">Утверждены</option><option value="scheduled">Запланированы</option><option value="published">Опубликованы</option><option value="all">Все материалы</option></select></div><div id="reviewQueueList"><div class="empty">Загрузка очереди…</div></div></div></section>
-<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2"><div class="card"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card"><h2 id="authorFormTitle">Профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorTagline">Краткое представление</label><input id="authorTagline" maxlength="160" placeholder="Один яркий слоган — кто и о чём пишет"><label for="authorBio">О себе / специализация</label><textarea id="authorBio"></textarea><div class="studio-ai-author-internal" hidden aria-hidden="true">
+<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2" id="authorWorkspaceGrid"><div class="card" id="authorsDirectoryCard"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card" id="authorEditorCard"><div id="authorOwnSummary" class="author-self-summary" hidden></div><h2 id="authorFormTitle">Профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorTagline">Краткое представление</label><input id="authorTagline" maxlength="160" placeholder="Один яркий слоган — кто и о чём пишет"><label for="authorBio">О себе / специализация</label><textarea id="authorBio"></textarea><div class="studio-ai-author-internal" hidden aria-hidden="true">
 <label for="authorFocus">Темы и специализация ИИ-автора</label><textarea id="authorFocus" maxlength="450"></textarea>
 <label for="authorVoice">Стиль и характер текста ИИ-автора</label><textarea id="authorVoice" maxlength="550"></textarea></div>
 <label for="authorLang">Основной язык</label><select id="authorLang"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option></select>
@@ -647,17 +648,18 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
   </section>
 </div>
 <script defer src="./studio-i18n.js?v=20261023-51"></script>
-<script defer src="./preview.js?v=20261023-25"></script>
+<script defer src="./preview.js?v=20261024-1"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261024-64"></script>
+<script defer src="./client.js?v=20261024-65"></script>
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
-<script defer src="./studio-features.js?v=20261023-20"></script>
+<script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
-<script defer src="./author-profiles.js?v=20261023-55"></script>
+<script defer src="./author-profiles.js?v=20261024-1"></script>
 <script defer src="./ai-studio.js?v=20261024-62"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-62"></script>
 <script defer src="./studio-images.js?v=20261024-60"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
+<script defer src="./studio-author-guide.js?v=20261024-1"></script>
 </body></html>
