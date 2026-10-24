@@ -233,7 +233,7 @@
    throw error;
   }finally{
    busy=false;
-   $("imageGenerate").disabled=!editablePost();
+   $("imageGenerate").disabled=!editablePost()||!imageEditor();
    $("imageGenerateConfirmYes").disabled=false;
    $("imageGenerate").textContent="✦ Сгенерировать изображение";
   }
