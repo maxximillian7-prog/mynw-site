@@ -46,6 +46,23 @@ async function signup(){
 }
 async function initialize(){
  const data=await call("/projects");projects=data.projects||[];
+ // A Supabase email callback can provide valid tokens without a user object.
+ // Author identity must be loaded before selecting their own profile.
+ if(!session?.user?.id&&session?.access_token){
+  try{
+   const response=await fetch(API_ROOT+"/auth/v1/user",{
+    headers:{"apikey":PUBLIC_KEY,"Authorization":"Bearer "+session.access_token},
+    cache:"no-store"
+   });
+   if(response.ok){
+    const user=await response.json();
+    if(user?.id){
+     session.user=user;
+     sessionStorage.setItem("journal_session",JSON.stringify(session));
+    }
+   }
+  }catch(error){console.warn("Journal Studio: user profile could not be loaded",String(error))}
+ }
  if(!projects.length){$("gate").hidden=false;$("workspace").hidden=true;$("setupZone").hidden=false;toast("Аккаунт подтверждён. Доступ выдаётся главным редактором; при первом запуске нужен одноразовый ключ.");return}
  $("gate").hidden=true;$("workspace").hidden=false;$("setupZone").hidden=true;
  const currentProject=project?.slug, savedProject=sessionStorage.getItem('journal_active_project');
