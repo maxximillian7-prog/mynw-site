@@ -1,0 +1,85 @@
+/* Journal Studio: focused author workspace and mobile-first onboarding */
+body[data-studio-role="author"] #journalAuthorsCard,
+body[data-studio-role="author"] #authorsDirectoryCard,
+body[data-studio-role="author"] #authorHomeHint,
+body[data-studio-role="author"] #authorProfileHint,
+body[data-studio-role="author"] #channelSummary,
+body[data-studio-role="author"] #channelSummary + p,
+body[data-studio-role="author"] #editTools [data-ai-nav] {display:none!important}
+body[data-studio-role="author"] [data-view="authors"] .grid2{display:block;max-width:900px}
+body[data-studio-role="author"] #authorEditorCard{width:100%;min-width:0}
+body[data-studio-role="author"] #authorKind{pointer-events:none;background:#f4f6f2}
+body[data-studio-role="author"] #authorEditorCard .studio-ai-author-internal{display:none!important}
+body[data-studio-role="author"] .author-guide{
+ border:1px solid #d9e7d8;border-radius:19px;background:linear-gradient(120deg,#fffefa,#f1f7ef);
+ box-shadow:0 8px 26px #1d463010;padding:23px 25px;margin:0 0 21px;overflow:hidden}
+.author-guide-top{display:flex;flex-direction:column;align-items:flex-start}
+.author-guide-label{font-size:11px;letter-spacing:.13em;font-weight:800;color:#64866c}
+.author-guide h2{font:normal 29px/1.17 Georgia,"Times New Roman",serif;letter-spacing:-.5px;color:#224534;margin:10px 0}
+.author-guide p{font-size:13px;max-width:760px;line-height:1.7;color:#657e6b;margin:0}
+.author-guide-action{color:white;border-color:#296748;background:#296748;border-radius:11px;margin-top:15px;padding:12px 18px;min-height:44px}
+.author-guide-action:hover{color:white;background:#1c5037}
+.author-guide-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;list-style:none;margin:21px 0 0;padding:0}
+.author-guide-steps li{display:flex;align-items:center;gap:8px;padding:12px 10px;border:1px solid #e3e8e0;border-radius:11px;background:#ffffffb4;color:#7e8b80;font-size:12px;font-weight:700;min-width:0}
+.author-guide-steps .is-current{border-color:#a5c7ac;background:#e9f2e5;color:#215e40}
+.author-guide-steps .is-done{color:#377252}
+.author-step-dot{width:25px;height:25px;display:grid;place-items:center;flex:none;border-radius:50%;background:#edf1eb;color:#6c8975;font-size:12px;font-weight:800}
+.is-current .author-step-dot,.is-done .author-step-dot{background:#286849;color:white}
+.author-self-summary{display:flex;align-items:center;gap:17px;border:1px solid #dde8d9;border-radius:15px;background:#f4f8f2;padding:17px 18px;margin:0 0 20px}
+.author-self-avatar{width:70px;height:70px;border-radius:20px;flex:none;background:#deedda;color:#2d6b47;display:grid;place-items:center;overflow:hidden;font:34px Georgia,serif}
+.author-self-avatar img{width:100%;height:100%;object-fit:cover}
+.author-self-info{min-width:0}.author-self-info h3{font:normal 26px Georgia,serif;margin:5px 0}
+.author-self-info p{color:#65786a;margin:0 0 8px;font-size:13px}
+.author-self-chip{font-size:12px;color:#45765c}.author-self-chip strong{color:#173f30}
+body[data-studio-role="author"] [data-view="authors"] .sectionHeading{margin-bottom:15px}
+body[data-studio-role="author"] [data-view="authors"] .sectionHeading h2{font-size:23px}
+body[data-studio-role="author"] #authorEditorCard .author-photo-editor{flex-wrap:wrap}
+body[data-studio-role="author"] .editorFields{grid-template-columns:repeat(2,minmax(0,1fr))}
+body[data-studio-role="author"] #authorSelect{background:#f1f5ed;border-color:#d6e5d4;color:#285b3f}
+body[data-studio-role="author"] #saveAuthor{min-height:46px}
+@media(max-width:900px){
+ body[data-studio-role="author"] .dashboardGrid,body[data-studio-role="author"] .editorGrid{grid-template-columns:1fr}
+ body[data-studio-role="author"] .main{padding:20px 17px 64px}
+ body[data-studio-role="author"] .card{min-width:0}
+ body[data-studio-role="author"] .editorPreview{position:static}
+}
+@media(max-width:760px){
+ body[data-studio-role="author"] .sidebar{padding:10px 12px 6px}
+ body[data-studio-role="author"] .sidebar .brand{font-size:17px;padding:2px 3px 8px}
+ body[data-studio-role="author"] .sidebar .nav{display:flex;gap:7px;scroll-snap-type:x proximity;overflow-x:auto;padding:3px 0 7px}
+ body[data-studio-role="author"] .sidebar .nav button{scroll-snap-align:start;min-height:46px;border-radius:12px;justify-content:center;padding:10px 13px;font-size:13px}
+ body[data-studio-role="author"] .sidebar .nav button b{font-size:17px}
+ body[data-studio-role="author"] .main{padding:15px 12px 62px}
+ body[data-studio-role="author"] .topbar{display:flex;align-items:flex-start;flex-direction:column;gap:12px;margin-bottom:18px}
+ body[data-studio-role="author"] .topTitle h1{font-size:25px}
+ body[data-studio-role="author"] .topControls{display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center}
+ body[data-studio-role="author"] .topControls #project{width:100%;min-width:0}
+ body[data-studio-role="author"] .topControls #create{min-height:44px;padding:10px 12px}
+ body[data-studio-role="author"] .topControls .avatar{display:none}
+ body[data-studio-role="author"] .topControls #studioUILangControl{grid-column:1/-1;width:100%}
+ body[data-studio-role="author"] .topControls #studioUILangControl select{max-width:none;width:100%}
+ body[data-studio-role="author"] .author-guide{padding:17px 15px;margin-bottom:15px;border-radius:16px}
+ body[data-studio-role="author"] .author-guide h2{font-size:25px}
+ body[data-studio-role="author"] .author-guide-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:16px}
+ body[data-studio-role="author"] .author-guide-steps li{padding:9px 7px;font-size:11px}
+ body[data-studio-role="author"] .author-guide-action{width:100%;text-align:center}
+ body[data-studio-role="author"] .card{padding:16px!important;border-radius:15px}
+ body[data-studio-role="author"] .metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ body[data-studio-role="author"] .metric strong{font-size:26px}
+ body[data-studio-role="author"] .editorFields,body[data-studio-role="author"] .grid2{grid-template-columns:1fr}
+ body[data-studio-role="author"] .sectionHeading{flex-wrap:wrap}
+ body[data-studio-role="author"] .block{padding:13px 10px}
+ body[data-studio-role="author"] .block>.row{align-items:flex-start;flex-wrap:wrap}
+ body[data-studio-role="author"] .block .btns{display:flex;gap:6px;width:100%}
+ body[data-studio-role="author"] .block .btns button{min-height:42px;flex:1;white-space:normal}
+ body[data-studio-role="author"] #editTools .btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body[data-studio-role="author"] #editTools .btns button{min-height:46px;white-space:normal}
+ body[data-studio-role="author"] .studio-editor-topactions{width:100%;display:flex;flex-wrap:wrap}
+ body[data-studio-role="author"] .studio-editor-topactions button{min-height:44px}
+ body[data-studio-role="author"] .studio-language-top{min-width:0}
+ body[data-studio-role="author"] .author-self-summary{padding:13px;gap:12px;align-items:flex-start}
+ body[data-studio-role="author"] .author-self-avatar{height:54px;width:54px;border-radius:16px;font-size:26px}
+ body[data-studio-role="author"] .author-self-info h3{font-size:22px}
+ body[data-studio-role="author"] input,body[data-studio-role="author"] select,body[data-studio-role="author"] textarea{font-size:16px;max-width:100%}
+ body[data-studio-role="author"] #status{left:12px;right:12px;bottom:14px;max-width:none}
+}
