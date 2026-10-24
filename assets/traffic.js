@@ -1,3 +1,12 @@
+/* Load shared feedback modal independently of optional, privacy-respecting traffic analytics. */
+(() => {
+  if (window.__mynwFeedbackScriptLoaded) return;
+  window.__mynwFeedbackScriptLoaded = true;
+  const script = document.createElement('script');
+  script.src = '/assets/contact-modal.js?v=20261024-1';
+  document.head.appendChild(script);
+})();
+
 /* Privacy-first MyNow Apps traffic. Counts page loads, not unique people. */
 (()=>{
  'use strict';
