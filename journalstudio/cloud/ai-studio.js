@@ -133,6 +133,8 @@
   const data={project:project.slug,author_id:p.id,enabled:$("aiScheduleEnabled").checked,
    topic_hint:$("aiScheduleHint").value.trim(),cadence_days:Number($("aiScheduleCadence").value),
    monthly_limit:Number($("aiScheduleMax").value),locale:$("aiLanguage").value};
+  if(!Number.isInteger(data.monthly_limit)||data.monthly_limit<1||data.monthly_limit>31)
+   throw Error("Укажите месячный лимит от 1 до 31 черновика.");
   const r=await request("/schedule","POST",data);
   schedules=schedules.filter(x=>x.author_id!==p.id).concat([r.schedule]);
   personas();toast(data.enabled?"Авторское расписание включено. Первый черновик — не раньше чем через сутки.":"Автогенерация для автора отключена.");
