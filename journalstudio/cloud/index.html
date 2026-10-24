@@ -190,6 +190,18 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-stock-links{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
 .studio-stock-links a{border-radius:9px;border:1px solid var(--line);padding:9px 12px;background:var(--mint);color:var(--studio-accent-contrast);font-weight:700;text-decoration:none;font-size:12px}
 
+.studio-full-article{border:1px solid var(--line);background:var(--paper,#fff);margin-bottom:17px}
+.studio-full-article h2{margin:6px 0 8px}
+.studio-full-confirm{padding:14px;border-radius:13px;border:1px solid var(--line);background:var(--mint,#eaf4eb);margin-top:14px}
+.studio-full-confirm[hidden]{display:none!important}
+.studio-full-confirm strong{display:block;margin-bottom:8px}
+.studio-full-confirm p{font-size:12px;white-space:pre-line;margin:0 0 12px}
+.studio-full-progress{height:8px;border-radius:99px;background:#deeadf;overflow:hidden;margin-top:10px}
+.studio-full-progress[hidden]{display:none!important}
+#aiFullProgressFill{height:100%;width:0;background:var(--green,#216843);transition:width .15s}
+body[data-studio-role="author"] #translationPanel,
+body[data-studio-role="author"] [data-image-source="ai"],
+body[data-studio-role="author"] #studioImageAi{display:none!important}
 .ai-image-shortcut{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:17px;border-color:var(--line);background:var(--paper)}
 .ai-image-shortcut h2{margin:0 0 5px}.ai-image-shortcut p{margin:0;max-width:610px}
 .ai-image-shortcut-text{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0}
@@ -507,6 +519,30 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 </section>
 <section class="view" data-view="ai-studio">
 <div class="sectionHeading"><div><div class="eyebrow">MYNOW AI EDITORIAL</div><h2>ИИ-редакция</h2><p class="muted">Создавайте черновики по теме или автоматически от лица выбранного ИИ-автора</p></div><span class="chip" id="aiProviderStatus">Проверка провайдера…</span></div>
+<div class="card studio-full-article">
+  <div class="row" style="align-items:flex-start;flex-wrap:wrap">
+    <div>
+      <span class="eyebrow">ОДНИМ ДЕЙСТВИЕМ · ПОЛНЫЙ ЧЕРНОВИК</span>
+      <h2>✦ Полная генерация статьи</h2>
+      <p class="small muted">Использует автора и тему из формы ниже: текст → обложка → три иллюстрации между абзацами → переводы на остальные 7 языков. Всё сохранится как редактируемый черновик, без публикации.</p>
+    </div>
+    <div class="btns">
+      <button id="aiFullGenerate" type="button" class="primary">✦ Полная генерация статьи</button>
+      <button id="aiFullOpenDraft" type="button" hidden>Открыть черновик ↗</button>
+    </div>
+  </div>
+  <div id="aiFullConfirm" class="studio-full-confirm" hidden role="group" aria-label="Подтверждение платной полной генерации">
+    <strong>Подтверждение расходов на генерацию</strong>
+    <p id="aiFullConfirmDetails"></p>
+    <div class="btns">
+      <button id="aiFullConfirmYes" type="button" class="primary">✓ Сгенерировать полный черновик</button>
+      <button id="aiFullConfirmNo" type="button">Отмена</button>
+    </div>
+  </div>
+  <p id="aiFullStatus" role="status" aria-live="polite" class="small muted" style="margin:12px 0 0">Выберите ИИ-автора и тему ниже. Отправка платных запросов произойдёт только после подтверждения.</p>
+  <div id="aiFullProgress" class="studio-full-progress" hidden><div id="aiFullProgressFill"></div></div>
+  <p class="small muted">Качество фото: экономичное, WebP. Результаты ИИ, права, факты и переводы требуют редакторской проверки. Уже сохранённые этапы можно продолжить без повторной генерации.</p>
+</div>
 <div class="card ai-image-shortcut">
   <div class="ai-image-shortcut-text"><span class="iconbox">▧</span><div><h2>Генерация фотографий и обложек</h2><p class="muted small">Введите описание изображения в конструкторе. Выберите статью, и я открою её прямо на генераторе изображений. Каждый платный запрос требует отдельного подтверждения.</p></div></div>
   <div class="ai-image-shortcut-controls"><label for="aiImagePost">Сохранённая статья</label><select id="aiImagePost" aria-label="Выберите черновик для изображения"><option value="">Выберите сохранённый черновик</option></select><button type="button" id="aiOpenImage" class="primary">✦ Перейти к генерации фото</button><button type="button" id="aiNewForImage">+ Новая статья</button></div>
@@ -559,12 +595,13 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 <script defer src="./studio-i18n.js?v=20261023-51"></script>
 <script defer src="./preview.js?v=20261023-25"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261024-56"></script>
+<script defer src="./client.js?v=20261024-58"></script>
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261023-20"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
 <script defer src="./author-profiles.js?v=20261023-55"></script>
-<script defer src="./ai-studio.js?v=20261023-54"></script>
+<script defer src="./ai-studio.js?v=20261024-58"></script>
+<script defer src="./studio-full-article.js?v=20261024-58"></script>
 <script defer src="./studio-images.js?v=20261023-53"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
