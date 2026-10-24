@@ -456,7 +456,7 @@ body[data-studio-role="author"] #studioImageAi{display:none!important}
     </select></div>
   </div>
   <div class="editorFields"><div><label for="imageQuality">Качество</label><select id="imageQuality"><option value="low">Экономичное · для черновика</option><option value="medium">Среднее · для обложки</option></select></div>
-  <div class="studio-img-spacer"><label>Лимиты безопасности</label><p class="small muted">До 12 изображений на пользователя за 24 часа и 40 на проект за месяц.</p></div></div>
+  <div class="studio-img-spacer"><label>Лимиты безопасности</label><p class="small muted">Настраиваются в «ИИ-редакция → Лимиты генерации изображений». <span id="studioImageLimitsInline"></span></p></div></div>
   <p class="studio-image-compress-note"><strong>Автооптимизация WebP включена.</strong> При загрузке создаются версии 640 / 1400 / 1600 px. Оригинал хранится только до публикации и удаляется после проверки копий, если больше не нужен другим черновикам.</p>
   <div class="studio-ai-legal">ИИ-иллюстрация может неверно изображать сорт, признаки заболевания или устройство растения. Проверяйте её до публикации. Генерация платная — запрос отправляется только после подтверждения.</div>
   <button type="button" id="imageGenerate" class="primary">✦ Сгенерировать изображение</button>
@@ -544,6 +544,28 @@ body[data-studio-role="author"] #studioImageAi{display:none!important}
   <div id="aiFullProgress" class="studio-full-progress" hidden><div id="aiFullProgressFill"></div></div>
   <p class="small muted">Качество фото: экономичное, WebP. Результаты ИИ, права, факты и переводы требуют редакторской проверки. Уже сохранённые этапы можно продолжить без повторной генерации.</p>
 </div>
+<div class="card" id="studioImageLimitsCard">
+  <div class="row" style="align-items:flex-start;flex-wrap:wrap;gap:14px">
+    <div><h2>Лимиты генерации изображений</h2>
+      <p class="small muted">Задайте свои лимиты для генерации одиночных изображений и полной статьи. Все изображения учитываются в одном серверном счётчике.</p>
+    </div>
+    <button type="button" id="studioImageLimitsRefresh">↻ Обновить</button>
+  </div>
+  <div class="editorFields">
+    <div><label for="studioImageDailyLimit">Изображений за 24 часа на пользователя</label>
+      <input id="studioImageDailyLimit" type="number" min="1" max="500" step="1" value="12" inputmode="numeric">
+      <p id="studioImageDailyUsage" class="small muted">Расход: загрузка…</p>
+    </div>
+    <div><label for="studioImageMonthlyLimit">Изображений за месяц на весь проект</label>
+      <input id="studioImageMonthlyLimit" type="number" min="1" max="10000" step="1" value="40" inputmode="numeric">
+      <p id="studioImageMonthlyUsage" class="small muted">Расход: загрузка…</p>
+    </div>
+  </div>
+  <div class="btns"><button id="studioImageLimitsSave" class="primary" type="button">Сохранить лимиты</button>
+    <span class="small muted">Менять может владелец или главный редактор; остальные могут просматривать значения.</span>
+  </div>
+  <p id="studioImageLimitsStatus" class="small muted" role="status" aria-live="polite">Получаем настройки сервера…</p>
+</div>
 <div class="card ai-image-shortcut">
   <div class="ai-image-shortcut-text"><span class="iconbox">▧</span><div><h2>Генерация фотографий и обложек</h2><p class="muted small">Введите описание изображения в конструкторе. Выберите статью, и я открою её прямо на генераторе изображений. Каждый платный запрос требует отдельного подтверждения.</p></div></div>
   <div class="ai-image-shortcut-controls"><label for="aiImagePost">Сохранённая статья</label><select id="aiImagePost" aria-label="Выберите черновик для изображения"><option value="">Выберите сохранённый черновик</option></select><button type="button" id="aiOpenImage" class="primary">✦ Перейти к генерации фото</button><button type="button" id="aiNewForImage">+ Новая статья</button></div>
@@ -613,8 +635,9 @@ body[data-studio-role="author"] #studioImageAi{display:none!important}
 <script defer src="./review-workflow.js?v=20261023-14"></script>
 <script defer src="./author-profiles.js?v=20261023-55"></script>
 <script defer src="./ai-studio.js?v=20261024-58"></script>
-<script defer src="./studio-full-article.js?v=20261024-59"></script>
-<script defer src="./studio-images.js?v=20261023-53"></script>
+<script defer src="./studio-image-limits.js?v=20261024-60"></script>
+<script defer src="./studio-full-article.js?v=20261024-60"></script>
+<script defer src="./studio-images.js?v=20261024-60"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
 </body></html>
