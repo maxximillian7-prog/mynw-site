@@ -279,14 +279,11 @@ async function deletePost(id){
  const pendingDirty=dirty&&current?.id===id?
    "\n\nЕсть несохранённые изменения: они не попадут в архив.":"";
  const confirmation=await editorialDecision({
-   title:"Удалить статью из редакции",
-   message:"«"+article.title+"»\n\n"+warning+pendingDirty+
-     "\n\nЧтобы подтвердить удаление, введите полное название статьи без изменений.",
-   confirmLabel:"Подтвердить удаление",
-   kind:"title",exactTitle:article.title
+   title:"Удалить статью",
+   message:"«"+article.title+"»\n\n"+warning+pendingDirty+"\n\nПодтвердите удаление. Материал будет архивирован и скрыт из журнала.",
+   confirmLabel:"Да, удалить"
  });
- if(confirmation===null)return;
- if(confirmation!==article.title)throw Error("Название не совпадает. Удаление отменено.");
+ if(!confirmation)return;
  const result=await call("/posts/"+encodeURIComponent(id),"DELETE",{
    expected_revision:article.revision,confirm_title:confirmation
  });
