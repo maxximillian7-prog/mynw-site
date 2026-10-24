@@ -9,6 +9,7 @@
  const url="https://npsfaymjckcqhtyiafms.supabase.co/functions/v1/studio-image";
  const status=(message,error=false)=>{const el=$("imageGenerateStatus");if(!el)return;el.textContent=message;el.style.color=error?"#9d453b":""};
  const editablePost=()=>Boolean(current?.id&&draft&&editable()&&project?.slug);
+ const imageEditor=()=>["owner","chief_editor","editor"].includes(project?.role||"");
  function clear(){
   result=null;pendingRequest=null;
   $("imageGenerateConfirm").hidden=true;
@@ -17,7 +18,7 @@
   $("imageGeneratedAlt").textContent="";
  }
  function refreshControls(){
-  const allowed=editablePost();
+  const allowed=editablePost()&&imageEditor();
   $("imageGenerate").disabled=!allowed||busy;
   if(!allowed&&!current?.id)status("Сначала создайте и сохраните черновик статьи: после сохранения генератор станет доступен.");
   else if(!allowed&&!editable())status("Статья сейчас недоступна для изменений (статус: "+({published:"Опубликована",approved:"Утверждена",scheduled:"Запланирована",in_review:"На проверке"}[current.status]||"Не редактируется")+"). Изображения можно генерировать для сохранённого черновика или материала на доработке. Возврат опубликованной статьи на доработку временно скрывает её в приложении.");
@@ -25,6 +26,7 @@
   else if(!busy&&result===null&&pendingRequest===null)status("Введите описание, выберите формат и нажмите «Сгенерировать изображение». Перед платным запросом будет отдельное подтверждение.");
  }
  function setSource(id,autoload=true){
+  if(id==="ai"&&!imageEditor())id="library";
   document.querySelectorAll("[data-image-source]").forEach(b=>b.classList.toggle("active",b.dataset.imageSource===id));
   $("studioImageAi").hidden=id!=="ai";
   $("studioImageStock").hidden=id!=="stock";
@@ -146,7 +148,7 @@
  }
  function prepareGeneration(){
   if(busy)return;
-  if(!editablePost()){
+  if(!editablePost()||!imageEditor()){
    refreshControls();
    return;
   }
@@ -193,7 +195,7 @@
  }
  async function generate(){
   if(busy||!pendingRequest)return;
-  if(!editablePost())throw Error("Статья больше недоступна для генерации. Откройте черновик.");
+  if(!editablePost()||!imageEditor())throw Error("Создание AI-изображений доступно только редакции.");
   const input={...pendingRequest};
   if(JSON.stringify(generationOptions())!==JSON.stringify(input)){
    pendingRequest=null;
@@ -267,7 +269,7 @@
   if(b.dataset.libraryInsert)run(()=>useLibraryItem(b.dataset.libraryInsert,false));
  });
  const originalRender=renderEditor;
- renderEditor=function(...args){originalRender(...args);refreshControls();if(library.length&&$("studioImageLibrary")&&!$("studioImageLibrary").hidden)renderLibrary()};
+ renderEditor=function(...args){originalRender(...args);if(!imageEditor()&&!$("studioImageAi").hidden)setSource("library");refreshControls();if(library.length&&$("studioImageLibrary")&&!$("studioImageLibrary").hidden)renderLibrary()};
  const originalChange=changeProject;
  changeProject=async function(...args){clear();library=[];libraryOffset=0;libraryProject=null;libraryRequest++;const r=await originalChange(...args);refreshControls();if(project?.slug&&tab==="editor")void loadLibrary({reset:true});return r};
  const originalOpen=openPost;
@@ -288,6 +290,6 @@
  $("mediaRemoveCoverDuplicate").onclick=()=>run(removeLegacyDuplicate);
  const oldShow=showTab;
  showTab=async function(target,...args){const data=await oldShow(target,...args);if(target==="editor"&&project?.slug)void loadLibrary({reset:true});return data};
- setSource("ai");refreshControls();
+ setSource(imageEditor()?"ai":"library");refreshControls();
  window.StudioImages={refreshControls,showLibrary,loadLibrary};
 })();
