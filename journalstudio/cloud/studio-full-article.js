@@ -304,6 +304,20 @@
   const state=getSaved();if(!postIdValid(state?.postId))return;
   await openPost(state.postId);
  });
+ // Re-check the resume pointer after login and when entering the AI editor.
+ // This module loads before the async Supabase authentication completes.
+ const previousShowTab=showTab;
+ showTab=async function(target,...args){
+  const value=await previousShowTab(target,...args);
+  if(target==="ai-studio"&&permitted())restore();
+  return value;
+ };
+ const previousInitialize=initialize;
+ initialize=async function(...args){
+  const value=await previousInitialize(...args);
+  if(permitted())restore();
+  return value;
+ };
  window.StudioFullArticle={restore};
  restore();
 })();
