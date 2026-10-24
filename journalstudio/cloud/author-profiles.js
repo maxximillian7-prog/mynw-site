@@ -103,6 +103,15 @@
     (["owner","chief_editor"].includes(project.role)&&a.kind==="partner"&&a.consent_status!=="approved"?'<button type="button" data-author-approve="'+E(a.id)+'">✓ Согласие</button>':"")+'</div></article>';
   }).join(""):'<div class="empty">Добавьте первого автора.</div>';
   if(editing&&!(authors||[]).some(a=>a.id===editing.id))reset();
+  if(project?.role==="author"){
+   const own=(authors||[]).find(a=>a.kind==="partner"&&a.owner_user_id===session?.user?.id);
+   if(own&&editing?.id!==own.id)fill(own,false);
+   if(!own&&editing)reset();
+   $("authorKind").value="partner";
+   $("authorKind").disabled=true;
+   $("authorFormTitle").textContent=own?"Мой профиль":"Создать мой профиль";
+   $("saveAuthor").textContent=own?"Сохранить мой профиль":"Создать профиль";
+  }
   for(const a of authors||[])if(a.photo_asset_id&&!photo(a.photo_asset_id))void signed(a.photo_asset_id);
   renderImages();
  }
@@ -113,7 +122,7 @@
   $("authorFormTitle").textContent="Новый профиль автора";$("saveAuthor").textContent="Добавить автора";
   $("authorKind").disabled=false;$("authorKind").value="partner";
  }
- function fill(author){
+ function fill(author,autofocus=true){
   editing=author;
   $("authorFormTitle").textContent="Редактирование: "+author.name;
   $("saveAuthor").textContent="Сохранить профиль";
@@ -128,7 +137,7 @@
   const url=photo(author.photo_asset_id);
   $("authorPhotoPreview").innerHTML=url?'<img src="'+E(url)+'" alt="Фото автора">':E(author.name.slice(0,1));
   if(author.photo_asset_id)void signed(author.photo_asset_id);
-  $("authorName").focus();
+  if(autofocus)$("authorName").focus();
  }
  function data(){
   const kind=editing?.kind||$("authorKind").value;
@@ -148,6 +157,11 @@
  const oldSave=saveAuthor;
  saveAuthor=async function(){
   const body=data();
+  if(project?.role==="author"){
+   const own=(authors||[]).find(a=>a.kind==="partner"&&a.owner_user_id===session?.user?.id);
+   if(own&&editing?.id!==own.id)throw Error("Нельзя создать второй профиль. Отредактируйте свой существующий профиль.");
+   if(editing&&editing.owner_user_id!==session?.user?.id)throw Error("Можно изменять только свой профиль.");
+  }
   if(body.kind==="ai"&&!["owner","chief_editor"].includes(project.role))throw Error("ИИ-профилем управляет главный редактор");
   if(editing)await call("/authors/"+editing.id,"PATCH",body);
   else await call("/authors","POST",{...body,project:project.slug});
