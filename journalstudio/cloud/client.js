@@ -618,6 +618,7 @@ async function invite(){
  try{
   const result=await call("/invite","POST",{project:sourceProject,email,role:"author"});
   if(result?.invited!==true)throw Error("Сервер не подтвердил отправку приглашения.");
+  await window.StudioMemberAdmin?.refresh?.();
   toast("Приглашение отправлено на "+email+". Автор получит доступ после принятия приглашения.");
  }finally{
   invitationPending=false;
