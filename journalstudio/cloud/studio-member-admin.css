@@ -1,0 +1,25 @@
+/* Author access management: only shown in the authenticated chief-editor workspace. */
+#teamAuthorsCard{margin-top:18px;min-width:0}
+#teamAuthorsCard[hidden]{display:none!important}
+#teamAuthorsList{display:grid;gap:10px;margin-top:14px}
+.studio-team-author{display:flex;align-items:center;gap:14px;padding:14px 15px;background:#fcfdfb;border:1px solid #e0e9e0;border-radius:14px;min-width:0}
+.studio-team-icon{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:15px;background:#e4f0e3;color:#296548;font:25px Georgia,serif}
+.studio-team-info{flex:1;min-width:0}
+.studio-team-info strong{font-weight:770;color:#214533;overflow-wrap:anywhere}
+.studio-team-email{overflow-wrap:anywhere;margin-top:4px}
+.studio-team-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.studio-team-delete,button.studio-editor-remove-profile{flex:none;border:1px solid #eac9c4;background:#fff7f5;color:#a13c34;min-height:41px;border-radius:10px;font-weight:700}
+.studio-team-delete:hover,button.studio-editor-remove-profile:hover{border-color:#d89a8d;background:#fff0ed}
+.studio-team-delete[disabled]{opacity:.5;cursor:wait}
+body[data-studio-role="author"] #teamAuthorsCard{display:none!important}
+@media(max-width:760px){
+ #teamAuthorsCard{margin-top:13px}
+ .studio-team-author{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px 12px;padding:13px}
+ .studio-team-icon{grid-row:1}
+ .studio-team-info{grid-column:2}
+ .studio-team-delete{grid-column:1 / -1;width:100%;min-height:46px}
+ #teamAuthorsCard .sectionHeading{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+ #teamAuthorsCard .sectionHeading button{width:100%;min-height:45px}
+ .ai-author-item .btns{display:flex;flex-wrap:wrap}
+ .ai-author-item .btns button{min-height:43px;flex:1}
+}
