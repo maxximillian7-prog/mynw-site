@@ -5,8 +5,10 @@
       "permissions": "Permissions & data safety",
       "cards": {
         "childSafety": "Published standards for protecting children and reporting child-safety concerns.",
-        "permissions": "Why NowKids requests device permissions and how each permission is used."
-      }
+        "permissions": "Why NowKids requests device permissions and how each permission is used.",
+        "parentNotice": "Read what happens to your child’s data before authorizing online learning."
+      },
+      "parentNotice": "Parental notice"
     },
     "pages": {
       "childSafety": {
@@ -62,13 +64,13 @@
           {
             "h": "Camera & photos",
             "p": [
-              "Used when the user chooses to scan school material, attach an image, set an avatar or use another image feature. NowKids does not continuously access the camera."
+              "Children cannot independently upload school photos in the protected child flow. An adult masks or crops identifying details on-device, reviews a flattened image and checks two separate confirmations before server-checked transmission to OpenAI. A privacy filter reviews text on the NowKids server before an external safety/AI provider, but cannot guarantee detection of every identifier."
             ]
           },
           {
             "h": "Microphone",
             "p": [
-              "Microphone access is not requested or used for voice input in Android build 12. The app may read answers aloud using text-to-speech, which does not require microphone access."
+              "The current Android release does not provide voice input; text-to-speech playback does not require microphone access."
             ]
           },
           {
@@ -114,6 +116,48 @@
             ]
           }
         ]
+      },
+      "parentNotice": {
+        "title": "Direct notice for parents and guardians",
+        "intro": "Please read this information BEFORE you authorize a child’s online account or AI features. This public notice provides information but is not, by itself, verifiable parental consent.",
+        "sections": [
+          {
+            "h": "Who operates NowKids",
+            "p": [
+              "NowKids / NowApps, developed by Maksym Smyrnov in Portugal; privacy and parental contact: support@mynw.app. The service supports parent-managed family profiles and children's learning."
+            ]
+          },
+          {
+            "h": "What may be collected and why",
+            "p": [
+              "Child profile (name or nickname, age/date of birth, class, school if provided), account/family identifiers, subjects, homework, study history and prompts, messages, saved files, technical/push identifiers and service/AI usage are processed to provide family and school features, protect accounts and operate subscriptions. Do not add unnecessary personal information."
+            ]
+          },
+          {
+            "h": "Where information goes",
+            "p": [
+              "Supabase processes the account/database/storage and receives user-entered text first. IONOS AI Model Hub performs input/output moderation and some study processing. OpenAI may generate permitted learning answers and process separately reviewed adult-submitted images. Google/Firebase supports sign-in, push and Play billing; RevenueCat handles purchase status; book lookups may use Open Library/Google Books. Some processors may process data outside the EEA. OpenAI Zero Data Retention is not confirmed for NowKids; identifying child data must not be sent there."
+            ]
+          },
+          {
+            "h": "Your choice, verification and rights",
+            "p": [
+              "Parents can refuse optional processing, stop further use, withdraw consent and request review or deletion of data at support@mynw.app. The account owner must use a legally adequate authorization method for the child’s country. Email confirmation and checking 'I am a parent' do not independently verify guardianship and are not a universal COPPA VPC method. Additional checks may be needed before certain US/other market functions can operate."
+            ]
+          },
+          {
+            "h": "Photographs and AI safety",
+            "p": [
+              "Children cannot independently upload school photos in the protected child flow. An adult masks or crops identifying details on-device, reviews a flattened image and checks two separate confirmations before server-checked transmission to OpenAI. A privacy filter reviews text on the NowKids server before an external safety/AI provider, but cannot guarantee detection of every identifier."
+            ]
+          },
+          {
+            "h": "Contact and further information",
+            "p": [
+              "To ask about your child’s information, withdrawal, deletion, access, a processor or international safeguards, email support@mynw.app. Read the complete Privacy Policy at https://mynw.app/nowkids/privacy/ and the data-rights and deletion pages. The notice must be delivered to the parent through an appropriate app/email consent workflow before regulated data collection; publishing this page alone does not complete that workflow."
+            ]
+          }
+        ]
       }
     }
   },
@@ -123,8 +167,10 @@
       "permissions": "Permissões e segurança de dados",
       "cards": {
         "childSafety": "Normas publicadas para proteger crianças e comunicar preocupações de segurança.",
-        "permissions": "Porque o NowKids pede permissões do dispositivo e como cada uma é utilizada."
-      }
+        "permissions": "Porque o NowKids pede permissões do dispositivo e como cada uma é utilizada.",
+        "parentNotice": "Informação essencial antes de autorizar a aprendizagem na nuvem."
+      },
+      "parentNotice": "Aviso parental"
     },
     "pages": {
       "childSafety": {
@@ -180,13 +226,13 @@
           {
             "h": "Câmara e fotografias",
             "p": [
-              "Usadas apenas para digitalização, imagem, avatar ou outra função de imagem escolhida pelo utilizador; não existe acesso contínuo à câmara."
+              "A criança não envia autonomamente fotos escolares no modo protegido. O adulto recorta/tapa identificadores localmente, revê a imagem exportada e confirma duas opções antes do envio a OpenAI, com verificação no servidor. O filtro de texto opera no servidor NowKids antes de prestadores externos, mas não deteta necessariamente todos os identificadores."
             ]
           },
           {
             "h": "Microfone",
             "p": [
-              "A versão Android 12 não solicita nem utiliza o microfone para entrada de voz. A leitura em voz alta através de síntese de voz não requer acesso ao microfone."
+              "A versão atual para Android não oferece entrada de voz; a leitura de texto em voz alta não exige acesso ao microfone."
             ]
           },
           {
@@ -232,6 +278,48 @@
             ]
           }
         ]
+      },
+      "parentNotice": {
+        "title": "Aviso direto a pais e encarregados",
+        "intro": "Leia antes de autorizar a conta online ou a IA de uma criança. Esta página informa, mas não constitui, por si só, consentimento parental verificável.",
+        "sections": [
+          {
+            "h": "Responsável pelo NowKids",
+            "p": [
+              "NowKids / NowApps, desenvolvido por Maksym Smyrnov em Portugal. Contacto de privacidade e pais: support@mynw.app. O serviço apoia perfis familiares geridos por adultos e aprendizagem infantil."
+            ]
+          },
+          {
+            "h": "Dados recolhidos e finalidades",
+            "p": [
+              "Podem ser tratados nome ou alcunha, idade/nascimento, ano, escola se indicada, IDs da família/conta, disciplinas, TPC, histórico e perguntas de estudo, mensagens, ficheiros, identificadores técnicos/push e dados de uso/IA para prestar o serviço, proteger contas e gerir subscrições. Evite dados pessoais desnecessários."
+            ]
+          },
+          {
+            "h": "Destinatários e prestadores",
+            "p": [
+              "O Supabase recebe primeiro os textos e assegura contas, base de dados e ficheiros. IONOS AI Model Hub modera pedidos/respostas e certas funções educativas. A OpenAI pode gerar respostas e analisar imagens autorizadas pelo adulto. Google/Firebase fornece autenticação, push e faturação Play; RevenueCat valida subscrições; Open Library/Google Books podem receber pesquisas. Alguns prestadores operam fora do EEE. Não está confirmado Zero Data Retention OpenAI; dados identificáveis da criança não devem ser enviados à OpenAI."
+            ]
+          },
+          {
+            "h": "Decisão, verificação e direitos",
+            "p": [
+              "Pode recusar tratamentos opcionais, retirar autorização, impedir recolha futura e solicitar consulta ou eliminação pelo support@mynw.app. O método de autorização deve cumprir as regras do país. Email confirmado e declaração de ser pai/mãe não verificam, por si, a responsabilidade parental nem constituem um método universal COPPA. Podem ser necessárias verificações adicionais."
+            ]
+          },
+          {
+            "h": "Fotografias e segurança da IA",
+            "p": [
+              "A criança não envia autonomamente fotos escolares no modo protegido. O adulto recorta/tapa identificadores localmente, revê a imagem exportada e confirma duas opções antes do envio a OpenAI, com verificação no servidor. O filtro de texto opera no servidor NowKids antes de prestadores externos, mas não deteta necessariamente todos os identificadores."
+            ]
+          },
+          {
+            "h": "Contacto e informação completa",
+            "p": [
+              "Questões sobre dados, direitos, fornecedores e transferências: support@mynw.app. Leia https://mynw.app/nowkids/privacy/ e as páginas de direitos e eliminação. Este aviso também deve chegar diretamente ao adulto antes da recolha regulada; a sua publicação no site não substitui esse processo."
+            ]
+          }
+        ]
       }
     }
   },
@@ -241,8 +329,10 @@
       "permissions": "Разрешения и безопасность данных",
       "cards": {
         "childSafety": "Опубликованные правила защиты детей и порядок сообщения об угрозах.",
-        "permissions": "Зачем NowKids запрашивает разрешения устройства и как они используются."
-      }
+        "permissions": "Зачем NowKids запрашивает разрешения устройства и как они используются.",
+        "parentNotice": "Что происходит с данными ребёнка перед подключением облачного обучения."
+      },
+      "parentNotice": "Уведомление родителям"
     },
     "pages": {
       "childSafety": {
@@ -298,13 +388,13 @@
           {
             "h": "Камера и фотографии",
             "p": [
-              "Используются только для явно выбранного сканирования, изображения, аватара или другой функции с изображением; постоянного доступа к камере нет."
+              "Ребёнок не может самостоятельно отправить школьное фото в защищённом режиме. Взрослый на устройстве обрезает/непрозрачно закрывает идентификаторы, проверяет итог и ставит две отдельные галочки; сервер повторно проверяет полномочия перед OpenAI. Текстовый фильтр работает в Supabase до внешних поставщиков, но не даёт полной гарантии обнаружения личных данных."
             ]
           },
           {
             "h": "Микрофон",
             "p": [
-              "В Android-сборке 12 доступ к микрофону не запрашивается и голосовой ввод не используется. Чтение ответа вслух (синтез речи) не требует разрешения микрофона."
+              "В текущем выпуске Android голосовой ввод отключён; для озвучивания используется синтез речи, не требующий микрофона."
             ]
           },
           {
@@ -350,6 +440,48 @@
             ]
           }
         ]
+      },
+      "parentNotice": {
+        "title": "Прямое уведомление для родителей и опекунов",
+        "intro": "Прочитайте это ДО разрешения детского онлайн-аккаунта и ИИ. Публикация уведомления не является сама по себе юридически проверяемым согласием.",
+        "sections": [
+          {
+            "h": "Кто отвечает за NowKids",
+            "p": [
+              "NowKids / NowApps разработан Maksym Smyrnov в Португалии. Контакт по приватности и детям: support@mynw.app. Приложение предназначено для семейных аккаунтов под контролем взрослых и обучения детей."
+            ]
+          },
+          {
+            "h": "Какие данные собираются и зачем",
+            "p": [
+              "Для семейных и учебных функций, защиты аккаунтов и подписок могут обрабатываться имя/псевдоним, возраст или дата рождения, класс, школа (если указана), ID аккаунта/семьи, предметы, задания, учебная история и тексты запросов, сообщения, файлы, технические/push-идентификаторы и статистика ИИ. Не вводите лишние персональные сведения."
+            ]
+          },
+          {
+            "h": "Каким поставщикам передаются данные",
+            "p": [
+              "Supabase первым получает введённый текст и обеспечивает аккаунты, базу и файлы. IONOS AI Model Hub выполняет модерацию запросов/ответов и часть учебной обработки. OpenAI может генерировать учебные ответы и анализировать отдельно одобренные взрослым изображения. Google/Firebase обеспечивает вход, push и оплату через Play; RevenueCat — подписки; книжный поиск — Open Library/Google Books. Некоторые поставщики могут обрабатывать данные вне ЕЭЗ. Режим OpenAI Zero Data Retention не подтверждён; идентифицируемые данные детей нельзя передавать в OpenAI."
+            ]
+          },
+          {
+            "h": "Ваше решение, проверка и права",
+            "p": [
+              "Родитель может отказаться от необязательной обработки, запретить дальнейший сбор, отозвать согласие, запросить просмотр и удаление через support@mynw.app. Способ разрешения должен соответствовать стране ребёнка. Подтверждение email и галочка «Я родитель» не доказывают полномочия и не являются универсальным VPC по COPPA. Для некоторых стран потребуется дополнительная проверка."
+            ]
+          },
+          {
+            "h": "Фотографии и безопасность ИИ",
+            "p": [
+              "Ребёнок не может самостоятельно отправить школьное фото в защищённом режиме. Взрослый на устройстве обрезает/непрозрачно закрывает идентификаторы, проверяет итог и ставит две отдельные галочки; сервер повторно проверяет полномочия перед OpenAI. Текстовый фильтр работает в Supabase до внешних поставщиков, но не даёт полной гарантии обнаружения личных данных."
+            ]
+          },
+          {
+            "h": "Контакты и полные условия",
+            "p": [
+              "Вопросы об обработке данных, правах, поставщиках и международных передачах: support@mynw.app. Полная политика: https://mynw.app/nowkids/privacy/; также см. права на данные и удаление. Это уведомление необходимо доставлять родителю через надлежащий сценарий приложения/письма до регулируемого сбора данных; одной веб-страницы недостаточно."
+            ]
+          }
+        ]
       }
     }
   },
@@ -359,8 +491,10 @@
       "permissions": "Дозволи та безпека даних",
       "cards": {
         "childSafety": "Опубліковані правила захисту дітей і порядок повідомлення про загрози.",
-        "permissions": "Навіщо NowKids запитує дозволи пристрою та як вони використовуються."
-      }
+        "permissions": "Навіщо NowKids запитує дозволи пристрою та як вони використовуються.",
+        "parentNotice": "Що потрібно знати перед увімкненням хмарного навчання дитини."
+      },
+      "parentNotice": "Повідомлення батькам"
     },
     "pages": {
       "childSafety": {
@@ -416,13 +550,13 @@
           {
             "h": "Камера й фото",
             "p": [
-              "Використовуються лише для явно обраного сканування, зображення, аватара або іншої функції із зображенням; постійного доступу до камери немає."
+              "Дитина не надсилає шкільних фото сама. Дорослий редагує та перевіряє зображення, підтверджує дві окремі умови, а сервер перевіряє права перед OpenAI. Текст проходить фільтр Supabase до зовнішнього ШІ, але фільтр може помилятися."
             ]
           },
           {
             "h": "Мікрофон",
             "p": [
-              "Android-збірка 12 не запитує доступу до мікрофона й не використовує голосового введення. Озвучування відповіді синтезом мовлення не потребує дозволу мікрофона."
+              "У поточній Android-версії голосове введення вимкнено; озвучення відповідей не потребує доступу до мікрофона."
             ]
           },
           {
@@ -468,6 +602,48 @@
             ]
           }
         ]
+      },
+      "parentNotice": {
+        "title": "Пряме повідомлення батькам та опікунам",
+        "intro": "Прочитайте ДО дозволу на дитячий акаунт або ШІ. Публікація сторінки не є сама по собі перевіреною згодою.",
+        "sections": [
+          {
+            "h": "Хто керує NowKids",
+            "p": [
+              "NowKids / NowApps розробляє Maksym Smyrnov у Португалії. Звернення щодо дітей та приватності: support@mynw.app. Застосунок підтримує сімейні акаунти під контролем дорослих."
+            ]
+          },
+          {
+            "h": "Які дані та навіщо",
+            "p": [
+              "Для навчання, організації сім'ї, безпеки й підписок можуть оброблятися ім'я/псевдонім, вік/дата народження, клас, школа за бажанням, ID сім'ї/акаунта, завдання, історія та тексти запитів, повідомлення, файли, технічні/push-ідентифікатори та використання ШІ. Не вводьте зайвих особистих даних."
+            ]
+          },
+          {
+            "h": "Кому надходять дані",
+            "p": [
+              "Supabase першим отримує текст, веде акаунти, базу й сховище. IONOS AI Model Hub модерує запити та частину навчання. OpenAI може формувати відповіді та аналізувати окремо дозволені дорослим фото. Google/Firebase підтримує вхід, push і Play, RevenueCat — підписки, Open Library/Google Books — книжкові запити. Обробка може відбуватися поза ЄЕЗ. ZDR OpenAI не підтверджено; ідентифіковані дані дітей не можна надсилати OpenAI."
+            ]
+          },
+          {
+            "h": "Вибір, перевірка та права",
+            "p": [
+              "Батьки можуть відмовитися від додаткової обробки, відкликати дозвіл і запросити перегляд/видалення через support@mynw.app. Спосіб підтвердження визначається місцевим законом. Email і галочка не доводять повноважень та не є універсальною перевіркою COPPA. Можливі додаткові кроки."
+            ]
+          },
+          {
+            "h": "Фото і безпека ШІ",
+            "p": [
+              "Дитина не надсилає шкільних фото сама. Дорослий редагує та перевіряє зображення, підтверджує дві окремі умови, а сервер перевіряє права перед OpenAI. Текст проходить фільтр Supabase до зовнішнього ШІ, але фільтр може помилятися."
+            ]
+          },
+          {
+            "h": "Контакт і повні правила",
+            "p": [
+              "Звернення: support@mynw.app. Повна політика: https://mynw.app/nowkids/privacy/; також дивіться права й видалення. Це повідомлення потрібно надати батькам через належний механізм до регульованого збору даних; сам сайт цього не забезпечує."
+            ]
+          }
+        ]
       }
     }
   },
@@ -477,8 +653,10 @@
       "permissions": "Berechtigungen & Datensicherheit",
       "cards": {
         "childSafety": "Veröffentlichte Standards zum Schutz von Kindern und zur Meldung von Sicherheitsbedenken.",
-        "permissions": "Warum NowKids Geräteberechtigungen anfordert und wie sie genutzt werden."
-      }
+        "permissions": "Warum NowKids Geräteberechtigungen anfordert und wie sie genutzt werden.",
+        "parentNotice": "Informationen vor der Freigabe des Online-Lernens Ihres Kindes."
+      },
+      "parentNotice": "Elternhinweis"
     },
     "pages": {
       "childSafety": {
@@ -534,13 +712,13 @@
           {
             "h": "Kamera & Fotos",
             "p": [
-              "Für ausdrücklich gewählte Digitalisierungs-, Bild-, Avatar- oder ähnliche Funktionen; kein dauerhafter Kamerazugriff."
+              "Das Kind kann im geschützten Modus keine Schulfotos selbst hochladen. Erwachsene verdecken/beschneiden Daten lokal, prüfen das neue Bild und bestätigen zwei Angaben vor der servergeprüften Übertragung an OpenAI. Der Textfilter arbeitet vor externen Modellen in Supabase, kann aber Identifikatoren übersehen."
             ]
           },
           {
             "h": "Mikrofon",
             "p": [
-              "Android-Version 12 fordert keinen Mikrofonzugriff für Spracheingabe an und verwendet ihn nicht. Vorlesen mit Text-zu-Sprache erfordert kein Mikrofon."
+              "Die aktuelle Android-Version bietet keine Spracheingabe; Vorlesen per Sprachsynthese benötigt kein Mikrofon."
             ]
           },
           {
@@ -586,6 +764,48 @@
             ]
           }
         ]
+      },
+      "parentNotice": {
+        "title": "Direkthinweis für Eltern und Sorgeberechtigte",
+        "intro": "Bitte VOR der Freigabe des Kinderkontos oder der KI lesen. Diese Website allein ist keine überprüfbare elterliche Einwilligung.",
+        "sections": [
+          {
+            "h": "Verantwortliche Stelle",
+            "p": [
+              "NowKids / NowApps wird von Maksym Smyrnov in Portugal entwickelt. Kontakt für Eltern/Datenschutz: support@mynw.app. Der Dienst bietet elternverwaltete Familien- und Kinderkonten."
+            ]
+          },
+          {
+            "h": "Daten und Zwecke",
+            "p": [
+              "Verarbeitet werden können Name/Pseudonym, Alter/Geburt, Klasse und ggf. Schule, Familien-/Konto-IDs, Aufgaben, Lernhistorie samt Anfrageinhalten, Nachrichten, Dateien, technische/Push-Kennungen und KI-Nutzung zur Bereitstellung des Dienstes, Kontosicherheit und Abo-Verwaltung. Bitte keine unnötigen Angaben eingeben."
+            ]
+          },
+          {
+            "h": "Empfänger und Dienstleister",
+            "p": [
+              "Supabase empfängt Texte zuerst und betreibt Konten, Datenbank und Dateien. IONOS AI Model Hub moderiert und verarbeitet einzelne Lernanfragen. OpenAI kann Antworten erzeugen und von Erwachsenen gesondert freigegebene Bilder analysieren. Google/Firebase liefert Anmeldung, Push und Play; RevenueCat Abo-Status und Open Library/Google Books Buchsuchen. Verarbeitung kann außerhalb des EWR erfolgen. ZDR bei OpenAI ist nicht bestätigt; identifizierbare Kinderdaten dürfen nicht an OpenAI gesendet werden."
+            ]
+          },
+          {
+            "h": "Wahl, Prüfung und Rechte",
+            "p": [
+              "Eltern können optionale Verarbeitung ablehnen, weitere Erhebung stoppen, Zustimmungen widerrufen und Einsicht/Löschung per support@mynw.app beantragen. Die Prüfung muss lokal geltendem Recht entsprechen. Bestätigte E-Mail und Eltern-Checkbox belegen allein weder elterliche Befugnis noch allgemeines COPPA-VPC. Weitere Prüfungen können nötig sein."
+            ]
+          },
+          {
+            "h": "Fotos und KI-Sicherheit",
+            "p": [
+              "Das Kind kann im geschützten Modus keine Schulfotos selbst hochladen. Erwachsene verdecken/beschneiden Daten lokal, prüfen das neue Bild und bestätigen zwei Angaben vor der servergeprüften Übertragung an OpenAI. Der Textfilter arbeitet vor externen Modellen in Supabase, kann aber Identifikatoren übersehen."
+            ]
+          },
+          {
+            "h": "Kontakt und weitere Hinweise",
+            "p": [
+              "Kontakt: support@mynw.app. Vollständige Erklärung: https://mynw.app/nowkids/privacy/; außerdem Auskunft und Löschung. Dieser Hinweis muss den Eltern vor regulierter Datenerhebung direkt zugestellt werden; die Veröffentlichung der Seite reicht dafür nicht aus."
+            ]
+          }
+        ]
       }
     }
   },
@@ -595,8 +815,10 @@
       "permissions": "Permessi e sicurezza dei dati",
       "cards": {
         "childSafety": "Standard pubblicati per proteggere i minori e segnalare problemi di sicurezza.",
-        "permissions": "Perché NowKids richiede permessi del dispositivo e come vengono usati."
-      }
+        "permissions": "Perché NowKids richiede permessi del dispositivo e come vengono usati.",
+        "parentNotice": "Informazioni prima di autorizzare l'apprendimento online del minore."
+      },
+      "parentNotice": "Avviso ai genitori"
     },
     "pages": {
       "childSafety": {
@@ -652,13 +874,13 @@
           {
             "h": "Fotocamera e foto",
             "p": [
-              "Usate solo per digitalizzazione, immagine, avatar o altra funzione visiva scelta dall’utente; non c’è accesso continuo alla fotocamera."
+              "Il minore non invia autonomamente foto scolastiche nella modalità protetta. L'adulto maschera/ritaglia in locale, verifica l'immagine finale e conferma due caselle prima dell'invio a OpenAI, con controllo del server. Il filtro testuale opera in Supabase prima di fornitori esterni, ma può non rilevare tutto."
             ]
           },
           {
             "h": "Microfono",
             "p": [
-              "La versione Android 12 non richiede né usa il microfono per l'input vocale. La lettura ad alta voce con sintesi vocale non richiede l'accesso al microfono."
+              "La versione Android attuale non offre input vocale; la sintesi vocale non richiede il microfono."
             ]
           },
           {
@@ -704,6 +926,48 @@
             ]
           }
         ]
+      },
+      "parentNotice": {
+        "title": "Informativa diretta per genitori e tutori",
+        "intro": "Leggere PRIMA di autorizzare l'account o l'IA del minore. La sola pagina non costituisce consenso parentale verificabile.",
+        "sections": [
+          {
+            "h": "Titolare di NowKids",
+            "p": [
+              "NowKids / NowApps, sviluppato da Maksym Smyrnov in Portogallo. Contatto privacy e minori: support@mynw.app. Servizio educativo con account familiari gestiti da adulti."
+            ]
+          },
+          {
+            "h": "Dati raccolti e finalità",
+            "p": [
+              "Possono essere trattati nome/pseudonimo, età/nascita, classe e scuola se indicate, ID famiglia/account, compiti, cronologia e testi di studio, messaggi, file, identificativi tecnici/push e utilizzo IA per fornire funzioni, tutelare account e gestire abbonamenti. Evitare dati non necessari."
+            ]
+          },
+          {
+            "h": "Destinatari e fornitori",
+            "p": [
+              "Supabase riceve prima il testo e gestisce account, database e file. IONOS AI Model Hub modera e svolge alcune elaborazioni di studio. OpenAI può generare risposte e analizzare immagini autorizzate separatamente dall'adulto. Google/Firebase supporta accesso, push e Play, RevenueCat gli abbonamenti, Open Library/Google Books ricerche di libri. Parte del trattamento può avvenire fuori SEE. ZDR OpenAI non è confermato; dati identificabili dei minori non devono essere inviati a OpenAI."
+            ]
+          },
+          {
+            "h": "Scelta, verifica e diritti",
+            "p": [
+              "Il genitore può rifiutare usi facoltativi, fermare ulteriori raccolte, revocare l'assenso e chiedere accesso/cancellazione scrivendo a support@mynw.app. Il metodo deve rispettare la legge nazionale. Email verificata e spunta genitore non dimostrano da sole l'autorità né il VPC COPPA universale. Possono servire altre verifiche."
+            ]
+          },
+          {
+            "h": "Foto e sicurezza IA",
+            "p": [
+              "Il minore non invia autonomamente foto scolastiche nella modalità protetta. L'adulto maschera/ritaglia in locale, verifica l'immagine finale e conferma due caselle prima dell'invio a OpenAI, con controllo del server. Il filtro testuale opera in Supabase prima di fornitori esterni, ma può non rilevare tutto."
+            ]
+          },
+          {
+            "h": "Contatti e informazioni",
+            "p": [
+              "Contatti: support@mynw.app. Testo completo: https://mynw.app/nowkids/privacy/; leggere anche diritti e cancellazione. L'avviso deve essere recapitato direttamente ai genitori prima della raccolta regolata; la sola pagina web non è sufficiente."
+            ]
+          }
+        ]
       }
     }
   },
@@ -713,8 +977,10 @@
       "permissions": "Autorisations et sécurité des données",
       "cards": {
         "childSafety": "Normes publiées pour protéger les enfants et signaler les risques.",
-        "permissions": "Pourquoi NowKids demande des autorisations et comment elles sont utilisées."
-      }
+        "permissions": "Pourquoi NowKids demande des autorisations et comment elles sont utilisées.",
+        "parentNotice": "Informations avant d'autoriser l'apprentissage en ligne de votre enfant."
+      },
+      "parentNotice": "Avis aux parents"
     },
     "pages": {
       "childSafety": {
@@ -770,13 +1036,13 @@
           {
             "h": "Caméra et photos",
             "p": [
-              "Utilisées uniquement pour une numérisation, une image, un avatar ou une autre fonction visuelle choisie par l’utilisateur ; aucun accès continu à l’appareil photo."
+              "L'enfant ne peut pas envoyer seul des photos scolaires dans le parcours protégé. L'adulte masque/recadre localement, vérifie la nouvelle image et confirme deux options avant transmission à OpenAI, après contrôle serveur. Le filtre de texte agit dans Supabase avant les prestataires, sans garantie parfaite."
             ]
           },
           {
             "h": "Microphone",
             "p": [
-              "La version Android 12 ne demande ni n'utilise l'accès au microphone pour la saisie vocale. La lecture à voix haute par synthèse vocale ne nécessite pas ce droit."
+              "La version Android actuelle ne propose pas de saisie vocale; la synthèse vocale ne nécessite pas de microphone."
             ]
           },
           {
@@ -822,6 +1088,48 @@
             ]
           }
         ]
+      },
+      "parentNotice": {
+        "title": "Notification directe aux parents et représentants légaux",
+        "intro": "À lire AVANT d'autoriser le compte ou l'IA de l'enfant. Cette page seule ne constitue pas un consentement parental vérifiable.",
+        "sections": [
+          {
+            "h": "Responsable du service",
+            "p": [
+              "NowKids / NowApps, développé par Maksym Smyrnov au Portugal. Contact vie privée et enfants : support@mynw.app. Service éducatif avec comptes familiaux gérés par des adultes."
+            ]
+          },
+          {
+            "h": "Données et finalités",
+            "p": [
+              "Le service peut traiter nom/pseudonyme, âge/naissance, classe et établissement si renseignés, identifiants de famille/compte, devoirs, historique et textes d'étude, messages, fichiers, identifiants techniques/push et métriques IA, pour fournir les fonctions, sécuriser les comptes et gérer les abonnements. Évitez les renseignements superflus."
+            ]
+          },
+          {
+            "h": "Destinataires et prestataires",
+            "p": [
+              "Supabase reçoit d'abord les textes, héberge comptes, base et fichiers. IONOS AI Model Hub assure la modération et certains traitements éducatifs. OpenAI peut produire des réponses et analyser des images distinctement autorisées par l'adulte. Google/Firebase prend en charge connexion, push et Play; RevenueCat les abonnements, Open Library/Google Books les recherches. Certains traitements peuvent être hors EEE. Zero Data Retention OpenAI n'est pas confirmé : ne transmettez pas de données identifiantes d'enfants à OpenAI."
+            ]
+          },
+          {
+            "h": "Choix, contrôle et droits",
+            "p": [
+              "Le parent peut refuser les traitements facultatifs, s'opposer à de nouvelles collectes, retirer son accord et demander accès ou suppression via support@mynw.app. La méthode d'autorisation doit respecter la loi locale. Courriel validé et case 'je suis parent' ne suffisent pas à prouver l'autorité parentale ou à assurer un VPC COPPA universel. Des vérifications peuvent être nécessaires."
+            ]
+          },
+          {
+            "h": "Photos et sécurité de l'IA",
+            "p": [
+              "L'enfant ne peut pas envoyer seul des photos scolaires dans le parcours protégé. L'adulte masque/recadre localement, vérifie la nouvelle image et confirme deux options avant transmission à OpenAI, après contrôle serveur. Le filtre de texte agit dans Supabase avant les prestataires, sans garantie parfaite."
+            ]
+          },
+          {
+            "h": "Contact et informations complètes",
+            "p": [
+              "Contact : support@mynw.app. Politique complète : https://mynw.app/nowkids/privacy/ ; voir aussi les pages droits et suppression. Cet avis doit aussi être remis directement au parent avant la collecte réglementée ; sa publication sur le site ne remplace pas cette procédure."
+            ]
+          }
+        ]
       }
     }
   },
@@ -831,8 +1139,10 @@
       "permissions": "Permisos y seguridad de datos",
       "cards": {
         "childSafety": "Estándares publicados para proteger a menores y denunciar riesgos.",
-        "permissions": "Por qué NowKids solicita permisos y cómo se utiliza cada uno."
-      }
+        "permissions": "Por qué NowKids solicita permisos y cómo se utiliza cada uno.",
+        "parentNotice": "Información antes de permitir el aprendizaje en línea del menor."
+      },
+      "parentNotice": "Aviso para padres"
     },
     "pages": {
       "childSafety": {
@@ -888,13 +1198,13 @@
           {
             "h": "Cámara y fotos",
             "p": [
-              "Se usan solo para escanear, añadir una imagen, establecer un avatar u otra función visual elegida por el usuario; no hay acceso continuo a la cámara."
+              "El menor no puede subir por sí mismo fotos escolares desde el modo protegido. El adulto edita localmente, revisa el resultado y marca dos confirmaciones antes del envío a OpenAI, sujeto a control en servidor. El filtro de texto actúa en Supabase antes de proveedores externos, sin garantía total."
             ]
           },
           {
             "h": "Micrófono",
             "p": [
-              "La versión Android 12 no solicita ni utiliza acceso al micrófono para la entrada de voz. La lectura en voz alta mediante síntesis no necesita permiso de micrófono."
+              "La versión Android actual no ofrece entrada por voz; leer respuestas en voz alta no necesita el micrófono."
             ]
           },
           {
@@ -937,6 +1247,48 @@
             "h": "Seguridad de los datos",
             "p": [
               "Las respuestas de seguridad de los datos en Play Console deben coincidir con la versión de producción y las bibliotecas realmente utilizadas. Esta página explica el tratamiento de datos al usuario, pero no sustituye la declaración de Play Console."
+            ]
+          }
+        ]
+      },
+      "parentNotice": {
+        "title": "Aviso directo para padres y tutores",
+        "intro": "Lea esto ANTES de autorizar la cuenta o la IA infantil. La página por sí sola no constituye consentimiento parental verificable.",
+        "sections": [
+          {
+            "h": "Responsable de NowKids",
+            "p": [
+              "NowKids / NowApps, desarrollado por Maksym Smyrnov en Portugal. Contacto de privacidad y menores: support@mynw.app. Servicio educativo con cuentas familiares gestionadas por adultos."
+            ]
+          },
+          {
+            "h": "Datos tratados y motivos",
+            "p": [
+              "Se pueden procesar nombre/alias, edad/nacimiento, curso y escuela si se indican, IDs de cuenta/familia, tareas, historial y textos de estudio, mensajes, archivos, identificadores técnicos/push y registros de uso de IA para prestar funciones, proteger cuentas y gestionar suscripciones. No facilite datos innecesarios."
+            ]
+          },
+          {
+            "h": "Destinatarios y proveedores",
+            "p": [
+              "Supabase recibe primero el texto y gestiona cuentas, base y archivos. IONOS AI Model Hub modera y procesa ciertas solicitudes educativas. OpenAI puede generar respuestas y analizar imágenes autorizadas por el adulto. Google/Firebase ofrece inicio de sesión, push y Play; RevenueCat gestiona suscripciones y Open Library/Google Books búsquedas. Algunos tratamientos pueden ser fuera del EEE. No se ha confirmado ZDR de OpenAI; no se deben enviar datos infantiles identificables a OpenAI."
+            ]
+          },
+          {
+            "h": "Decisión, verificación y derechos",
+            "p": [
+              "Puede rechazar operaciones opcionales, detener nuevas recogidas, revocar permisos y solicitar acceso o eliminación en support@mynw.app. La verificación debe cumplir la legislación del país. Email confirmado y casilla de padre no demuestran por sí solos autoridad parental ni COPPA VPC universal. Puede necesitarse verificación adicional."
+            ]
+          },
+          {
+            "h": "Fotografías y seguridad de IA",
+            "p": [
+              "El menor no puede subir por sí mismo fotos escolares desde el modo protegido. El adulto edita localmente, revisa el resultado y marca dos confirmaciones antes del envío a OpenAI, sujeto a control en servidor. El filtro de texto actúa en Supabase antes de proveedores externos, sin garantía total."
+            ]
+          },
+          {
+            "h": "Contacto e información adicional",
+            "p": [
+              "Contacto: support@mynw.app. Política completa: https://mynw.app/nowkids/privacy/; también derechos y eliminación. Este aviso debe entregarse directamente al padre antes de la recogida regulada; publicarlo en la web no sustituye esa entrega."
             ]
           }
         ]
