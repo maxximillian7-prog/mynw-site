@@ -618,8 +618,10 @@ async function invite(){
  try{
   const result=await call("/invite","POST",{project:sourceProject,email,role:"author"});
   if(result?.invited!==true)throw Error("Сервер не подтвердил отправку приглашения.");
-  await window.StudioMemberAdmin?.refresh?.();
-  toast("Приглашение отправлено на "+email+". Автор получит доступ после принятия приглашения.");
+  try{await window.StudioMemberAdmin?.refresh?.()}catch(error){console.warn("Не удалось обновить список приглашений:",error)}
+  toast(result.mode==="existing_account"
+   ?"На "+email+" отправлена новая ссылка для установки пароля и возвращения доступа к журналу."
+   :"Приглашение отправлено на "+email+". Автор получит доступ после принятия приглашения.");
  }finally{
   invitationPending=false;
   $("authorsInvite").disabled=false;$("invite").disabled=false;
