@@ -29,6 +29,13 @@ async function login(){
  sessionStorage.setItem("journal_session",JSON.stringify(session));
  await initialize();
 }
+async function recoverPassword(){
+ const email=$("email").value.trim();
+ if(!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email))throw Error("Введите email аккаунта, чтобы получить ссылку для установки пароля.");
+ const redirect="https://mynw.app/journalstudio/cloud/";
+ await auth("recover?redirect_to="+encodeURIComponent(redirect),"POST",{email});
+ toast("Если аккаунт существует, на "+email+" придёт письмо для установки нового пароля.");
+}
 async function signup(){
  const password=$("password").value,email=$("email").value.trim();
  if(password.length<12)throw Error("Пароль должен содержать не меньше 12 символов");
@@ -628,7 +635,7 @@ $("invite").onclick=()=>run(newAuthorProfile);
 $("authorsInvite").onclick=()=>run(invite);
 $("saveAuthor").onclick=()=>run(saveAuthor);
 $("project").onchange=e=>run(()=>changeProject(e.target.value));
-$("login").onclick=()=>run(login);$("register").onclick=()=>run(signup);$("activate").onclick=()=>run(claimOwner);
+$("login").onclick=()=>run(login);$("register").onclick=()=>run(signup);$("recoverPassword").onclick=()=>run(recoverPassword);$("activate").onclick=()=>run(claimOwner);
 $("logout").onclick=signout;
 $("backLibrary").onclick=()=>run(()=>showTab("library"));
 $("save").onclick=()=>run(savePost);
