@@ -189,3 +189,15 @@ body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px
 /* 2026-10-15: show full MyNow Apps wordmark and legible NW-branded Play QR. */
 .eco-play-qr{display:block;width:150px;height:150px;max-width:100%;object-fit:contain;padding:5px;border:1px solid #e3e9f3;border-radius:15px;background:#fff;box-shadow:0 6px 20px rgba(27,39,89,.08)}
 @media(max-width:480px){.eco-play-qr{width:126px;height:126px;padding:3px}}
+
+/* Per-app Google Play install card; QR logo is above an offline high-ECC QR matrix. */
+.eco-install{padding-top:32px;padding-bottom:75px}
+.eco-download-note{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:36px}
+.eco-download-note .eco-button{display:inline-flex;margin-top:14px}
+.eco-qr-link{display:flex;flex-shrink:0;align-items:center;justify-content:center;padding:10px;background:#fff;border:1px solid rgba(35,47,69,.12);border-radius:20px;box-shadow:0 12px 30px rgba(30,45,70,.09)}
+.eco-qr-link:focus-visible{outline:3px solid #4271d7;outline-offset:4px}
+.eco-qr-composite,.eco-qr-composite svg,.eco-play-qr{display:block;width:170px;height:170px;max-width:none;flex-shrink:0}
+.eco-qr-composite{position:relative;background:#fff}
+.eco-qr-center{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:39px;height:39px;padding:4px;background:#fff;border-radius:11px;box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.eco-qr-center img{width:31px;height:31px;object-fit:cover;border-radius:7px}
+@media(max-width:600px){.eco-download-note{grid-template-columns:1fr;text-align:center;justify-items:center}.eco-install{padding-bottom:45px}.eco-qr-link{order:2}.eco-download-note .eco-button{margin-bottom:12px}}
