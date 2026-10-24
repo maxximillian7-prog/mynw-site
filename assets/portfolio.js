@@ -35,10 +35,10 @@
   function tags(values){return '<div class="eco-tags">'+values.map(x=>'<span class="eco-tag">'+E(x)+'</span>').join('')+'</div>';}
   function homeCard(app,t){
     const d=t[app],u=URLS[app];
-    return '<article class="eco-card eco-card-'+app+'">'+
+    return '<a class="eco-card eco-card-'+app+'" href="'+u.home+'" aria-label="'+E(TITLES[app]+' — '+t.open)+'">'+
       '<div class="eco-card-top"><div class="eco-card-logo">'+logo(app)+'</div><div><div class="eco-kind">'+E(d.tag)+'</div><h3>'+TITLES[app]+'</h3></div></div>'+
       '<p>'+E(d.summary)+'</p>'+tags(d.chips)+visual(app,'card')+
-      '<a class="eco-card-link" href="'+u.home+'">'+E(t.open)+' <span>→</span></a></article>';
+      '<span class="eco-card-link">'+E(t.open)+' <span aria-hidden="true">→</span></span></a>';
   }
   function footer(t,app){
     const links=app&&app!=='home'?[['home','/'],['privacy',URLS[app].privacy],['terms',URLS[app].terms],['delete',URLS[app].delete],['support',URLS[app].support]]:[['navHome','/'],['navApps','/#apps'],['navDocs','/#documentation'],['navContact','mailto:support@mynw.app']];
@@ -46,8 +46,9 @@
   }
   const WELCOME_LABELS={en:'A welcome note',pt:'Mensagem de boas-vindas',ru:'Приветственное письмо',uk:'Привітальне повідомлення',fr:'Un mot de bienvenue',es:'Carta de bienvenida',de:'Willkommensgruß',it:'Un messaggio di benvenuto'};
   function qrGraphic(app){
-    if(app==='nowwhat')return '<img class="eco-play-qr" src="/assets/nowwhat-google-play-qr.svg?v=20261015-1" width="170" height="170" loading="lazy" decoding="async" alt="NowWhat Google Play QR with NW logo">';
-    return window.MyNowStoreQR?window.MyNowStoreQR(app,LOGOS[app],TITLES[app]+' Google Play QR'):'';
+    const path='/assets/'+app+'-google-play-qr.svg';
+    const version=app==='nowwhat'?'20261015-1':'20261024-1';
+    return '<img class="eco-play-qr" src="'+path+'?v='+version+'" width="170" height="170" loading="lazy" decoding="async" alt="'+E(TITLES[app])+' Google Play QR with app logo">';
   }
   function downloadPanel(app,t){
     const u=URLS[app];if(!u.play)return '';
