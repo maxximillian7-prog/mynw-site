@@ -51,7 +51,7 @@
             "Documentos, fotos, escaneos, textos y otros archivos aportados para las funciones elegidas. La versión actual de Android no ofrece entrada de voz.",
             "Contexto de IA: solicitud, materia/tema, historial de aprendizaje reciente y solo los datos de perfil necesarios para adaptar la dificultad: edad derivada, curso/clase, lengua de estudio y modo de edad. NowStudy no envía a OpenAI el nombre del menor ni el nombre de la escuela. Las imágenes solo se incluyen cuando el usuario elige una función de IA basada en imágenes.",
             "Datos operativos: contadores, modelo/tokens IA, registros de error/seguridad e información técnica.",
-            "Los permisos opcionales incluyen cámara/fotos, calendario, notificaciones y autenticación local. La versión 12 no utiliza grabación de voz.",
+            "Los permisos opcionales incluyen cámara/fotos, calendario, notificaciones y autenticación local. La versión Android actual no utiliza grabación de voz.",
             "Datos de suscripción y compra: identificadores de producto, estado de compra/renovación, estado de derecho de acceso, metadatos de transacción/recibo y un identificador de usuario de la aplicación usado para validar el acceso. NowKids no recibe los datos completos de la tarjeta de pago de Google Play o RevenueCat."
           ]
         },
@@ -283,7 +283,7 @@
           "items": [
             "Nombre, nacimiento/edad, avatar, escuela, curso y lengua.",
             "Horario, deberes, pruebas, progreso, actividades, libros, tareas y recordatorios.",
-            "Documentos, fotos, escaneos y conversaciones educativas con IA cuando se utilizan; sin entrada de voz en la versión 12."
+            "Documentos, fotos, escaneos y conversaciones educativas con IA cuando se utilizan; sin entrada de voz en la versión Android actual."
           ]
         },
         {
@@ -301,7 +301,7 @@
         {
           "h": "5. Permisos",
           "p": [
-            "Cámara/fotos, notificaciones, calendario y autenticación local son opcionales según la función. La versión 12 no tiene entrada de voz."
+            "Cámara/fotos, notificaciones, calendario y autenticación local son opcionales según la función. La versión Android actual no tiene entrada de voz."
           ]
         },
         {
