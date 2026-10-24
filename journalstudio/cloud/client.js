@@ -6,7 +6,7 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const statuses={draft:"Черновик",in_review:"На проверке",changes_requested:"На доработке",approved:"Утверждена",scheduled:"Запланирована",published:"Опубликована",archived:"Архив"};
 const roles={owner:"Владелец",chief_editor:"Главный редактор",editor:"Редактор",author:"Автор",reviewer:"Рецензент"};
 const channels={nowgreen:"NowGreen",nowcook:"NowCook",nowwhat:"NowWhat",nowkids:"NowKids",website:"Сайт",wordpress:"WordPress",instagram:"Instagram"};
-let session=null,projects=[],project=null,posts=[],authors=[],topics=[],current=null,draft=null,placements=[],deliveries=[],assets={},tab="home",dirty=false,toastTimer=null,flashError=false;
+let session=null,projects=[],project=null,posts=[],authors=[],topics=[],current=null,draft=null,blocks=[],placements=[],deliveries=[],assets={},tab="home",dirty=false,toastTimer=null,flashError=false;
 const editorRole=()=>["owner","chief_editor","editor"].includes(project?.role);
 const chiefRole=()=>["owner","chief_editor"].includes(project?.role);
 const editable=()=>!current||["draft","changes_requested"].includes(current.status);
@@ -218,10 +218,17 @@ async function showTab(target,force=false){
  window.scrollTo({top:0,behavior:"instant"});
 }
 function resetDraft(){
- current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",topic_id:null,blocks:[],author_id:null,cover_path:null,template_id:"editorial"};
+ current=null;draft={title:"",summary:"",locale:project.default_locale||"ru",category:"",topic_id:null,blocks:[],author_id:project?.role==="author"?(authors.find(a=>a.kind==="partner"&&a.owner_user_id===session?.user?.id)?.id||null):null,cover_path:null,template_id:"editorial"};
  blocks=draft.blocks;assets={};placements=[];dirty=false;
 }
-async function createPost(){resetDraft();await showTab("editor",true);}
+async function createPost(){
+ if(project?.role==="author"&&!authors.some(a=>a.kind==="partner"&&a.owner_user_id===session?.user?.id)){
+  await showTab("authors",true);
+  toast("Сначала создайте свой профиль автора, а затем первую статью.");
+  return;
+ }
+ resetDraft();await showTab("editor",true);
+}
 async function toggleArticleHidden(id){
  const p=posts.find(item=>item.id===id);
  if(!canManagePost(p))throw Error("Только главный редактор может скрывать материалы.");
@@ -362,8 +369,16 @@ function renderEditor(){
   ?"Выберите тему и нажмите «Перенести в выбранную тему». Опубликованная статья и все переводы сохранятся."
   :edit?"Выберите тему и нажмите «Сохранить». Создать новую тему можно в разделе «Материалы»."
   :"Назначение темы опубликованной статье доступно главному редактору.";
- $("authorSelect").innerHTML='<option value="">Редакция</option>'+authors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.kind==="ai"?" · ИИ":"")+'</option>').join("");
- $("authorSelect").value=draft.author_id||"";$("authorSelect").disabled=!edit;
+ const ownAuthor=project?.role==="author"?authors.find(a=>a.kind==="partner"&&a.owner_user_id===session?.user?.id):null;
+ if(project?.role==="author"){
+  $("authorSelect").innerHTML=ownAuthor?'<option value="'+esc(ownAuthor.id)+'">'+esc(ownAuthor.name)+'</option>':'<option value="">Сначала создайте профиль</option>';
+  if(ownAuthor&&draft.author_id!==ownAuthor.id)draft.author_id=ownAuthor.id;
+  $("authorSelect").value=ownAuthor?.id||"";
+  $("authorSelect").disabled=true;
+ }else{
+  $("authorSelect").innerHTML='<option value="">Редакция</option>'+authors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.kind==="ai"?" · ИИ":"")+'</option>').join("");
+  $("authorSelect").value=draft.author_id||"";$("authorSelect").disabled=!edit;
+ }
  $("blocks").innerHTML=blocks.map((b,i)=>blockHtml(b,i,edit)).join("")||'<div class="empty">Добавьте первый текстовый блок, заголовок или фотографию.</div>';
  renderCoverIndicator(edit);
  $("editTools").hidden=!edit;
@@ -383,7 +398,7 @@ function renderEditor(){
 function renderPreview(){
  if(!draft)return;
  if(window.JournalPreview && typeof window.JournalPreview.render==="function"){
-   window.JournalPreview.render({draft,blocks,assets,authors,projectName:project?.name||"NowGreen",postId:current?.id||null,postKey:current?.id||draft,canEdit:editable(),instagramCaption:draft?.caption||placements.find(p=>p.channel==="instagram"&&p.locale===draft.locale)?.settings?.caption||""});
+   window.JournalPreview.render({draft,blocks,assets,authors,viewerRole:project?.role||"",projectName:project?.name||"NowGreen",postId:current?.id||null,postKey:current?.id||draft,canEdit:editable(),instagramCaption:draft?.caption||placements.find(p=>p.channel==="instagram"&&p.locale===draft.locale)?.settings?.caption||""});
    return;
  }
  $("preview").textContent="Предпросмотр загружается…";
@@ -427,6 +442,11 @@ async function fetchMedia(){
 async function savePost(){
  if(!draft)throw Error("Откройте конструктор");
  capture();if(!draft.title?.trim())throw Error("Укажите заголовок");
+ if(project?.role==="author"){
+  const own=authors.find(a=>a.kind==="partner"&&a.owner_user_id===session?.user?.id);
+  if(!own)throw Error("Сначала создайте свой профиль автора.");
+  draft.author_id=own.id;
+ }
  const data={title:draft.title.trim(),summary:draft.summary,locale:draft.locale,category:draft.category,topic_id:draft.topic_id||null,blocks,cover_path:draft.cover_path||null,template_id:draft.template_id||"editorial"};
  let r;
  if(current){r=await call("/posts/"+current.id,"PATCH",{...data,expected_revision:current.revision,author_id:draft.author_id||undefined})}
