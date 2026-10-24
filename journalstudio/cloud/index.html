@@ -309,7 +309,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
    Send author onboarding to the English activation page before loading Studio. */
 (() => {
   const fragment=new URLSearchParams(location.hash.slice(1));
-  if(fragment.get("type")==="invite" ||
+  if(["invite","recovery"].includes(fragment.get("type")) ||
     (fragment.has("error") && fragment.has("error_description"))) {
     location.replace("./invite.html"+location.search+location.hash);
   }
@@ -321,6 +321,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <label for="email">Электронная почта</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email">
 <label for="password">Пароль</label><input id="password" type="password" placeholder="Ваш пароль" autocomplete="current-password">
 <div class="btns" style="margin-top:17px"><button class="primary" id="login">Войти в редакцию →</button><button id="register">Регистрация</button></div>
+<button type="button" id="recoverPassword" style="margin-top:9px;font-size:12px;border:0;padding:6px;color:var(--green)">Не получается войти? Установить / восстановить пароль ↗</button>
 <div id="setupZone" class="tip" hidden style="margin-top:18px"><b>Первичная активация</b><p>После подтверждения почты введите одноразовый ключ владельца.</p><input id="setup" type="password" placeholder="Ключ активации"><button id="activate" style="margin-top:9px">Активировать</button></div>
 <div class="loginNote"><b>Подтверждение почты.</b> Если после перехода из письма открылась недоступная страница, вернитесь сюда: подтверждение уже могло пройти. Попробуйте войти обычным способом.</div>
 <p class="tiny muted" style="margin:18px 0 0">Для приглашённых авторов регистрация и доступ согласуются с редакцией.</p></div></div></div>
