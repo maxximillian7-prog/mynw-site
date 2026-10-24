@@ -48,7 +48,7 @@ async function initialize(){
  $("project").value=project.slug;
  $("avatar").textContent=(session.user?.email||"JS").slice(0,2).toUpperCase();
  $("userDisplay").textContent=session.user?.email||roles[project.role]||"Редактор";
- $("invite").hidden=!chiefRole();
+ $("invite").hidden=!editorRole();
  $("authorsInvite").hidden=!chiefRole();
  await loadData();showTab("home",true);
 }
@@ -75,11 +75,11 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
  $("studioEditorActionTitle").textContent=title;
  $("studioEditorActionText").textContent=message;
  yes.textContent=confirmLabel;
- input.hidden=!["title","datetime"].includes(kind);
+ input.hidden=!["title","datetime","email"].includes(kind);
  note.hidden=kind!=="note";
  label.hidden=input.hidden;
- input.type=kind==="datetime"?"datetime-local":"text";
- label.textContent=kind==="datetime"?"Дата и время публикации":"Для подтверждения введите полное название статьи";
+ input.type=kind==="datetime"?"datetime-local":kind==="email"?"email":"text";
+ label.textContent=kind==="datetime"?"Дата и время публикации":kind==="email"?"Email нового автора":"Для подтверждения введите полное название статьи";
  input.value=kind==="title"?"":initialValue;
  note.value="";
  note.placeholder="Обязательный комментарий автору";
@@ -87,6 +87,7 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
  const validate=()=>{
   const valid=kind==="title"?input.value===exactTitle:
     kind==="note"?!!note.value.trim():
+    kind==="email"?/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.value.trim())&&input.value.trim().length<=250:
     kind==="datetime"?!!input.value&&Number.isFinite(+new Date(input.value)):true;
   yes.disabled=!valid;
   return valid;
@@ -110,13 +111,14 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
   };
   const onKey=e=>{
    if(e.key==="Escape"){e.preventDefault();finish(null)}
-   if(e.key==="Enter"&&kind==="title"&&document.activeElement===input&&validate()){
+   if(e.key==="Enter"&&["title","email"].includes(kind)&&document.activeElement===input&&validate()){
     e.preventDefault();finish(input.value);
    }
   };
   yes.onclick=()=>{
    if(!validate())return;
    if(kind==="title")finish(input.value);
+   else if(kind==="email")finish(input.value.trim());
    else if(kind==="note")finish(note.value.trim());
    else if(kind==="datetime")finish(new Date(input.value).toISOString());
    else finish(true);
@@ -537,10 +539,46 @@ async function saveInstagramCaption(){
  window.JournalPreview?.setSavedCaption?.(caption);
  renderEditorChannels();toast("Подпись Instagram сохранена отдельно от статьи");
 }
+// Profile creation and email invitation are two independent workflows.
+async function newAuthorProfile(){
+ if(!editorRole())throw Error("Создание профиля доступно редакции");
+ if(dirty){
+  const ok=await editorialDecision({
+   title:"Открыть создание автора",
+   message:"В текущей статье есть несохранённые изменения. Перейти в раздел авторов без их сохранения?",
+   confirmLabel:"Открыть авторов"
+  });
+  if(!ok)return;
+ }
+ await showTab("authors",true);
+ window.StudioProfiles?.reset?.();
+ $("authorKind").value="partner";
+ $("authorFormTitle").scrollIntoView({behavior:"smooth",block:"center"});
+ $("authorName").focus();
+ toast("Заполните профиль и нажмите «Добавить автора». Email-приглашение оформляется отдельно.");
+}
+let invitationPending=false;
 async function invite(){
  if(!chiefRole())throw Error("Приглашать авторов может только главный редактор");
- const email=prompt("Email автора:");if(!email)return;
- await call("/invite","POST",{project:project.slug,email,role:"author"});toast("Приглашение отправлено на "+email);
+ if(invitationPending)return;
+ const sourceProject=project.slug;
+ const email=await editorialDecision({
+  title:"Пригласить автора",
+  message:"Введите email нового автора Journal Studio для проекта «"+project.name+"». Подтверждение отправит приглашение и предоставит доступ автора к выбранному проекту.",
+  confirmLabel:"Отправить приглашение",kind:"email"
+ });
+ if(email===null)return;
+ if(project?.slug!==sourceProject)throw Error("Проект изменился. Откройте приглашение заново.");
+ invitationPending=true;
+ $("authorsInvite").disabled=true;$("invite").disabled=true;
+ try{
+  const result=await call("/invite","POST",{project:sourceProject,email,role:"author"});
+  if(result?.invited!==true)throw Error("Сервер не подтвердил отправку приглашения.");
+  toast("Приглашение отправлено на "+email+". Автор получит доступ после принятия приглашения.");
+ }finally{
+  invitationPending=false;
+  $("authorsInvite").disabled=false;$("invite").disabled=false;
+ }
 }
 async function saveAuthor(){
  const name=$("authorName").value.trim();if(!name)throw Error("Введите имя");
@@ -559,7 +597,7 @@ async function changeProject(slug){
  const target=projects.find(p=>p.slug===slug);if(!target)return;
  project=target;window.StudioTheme?.apply(project.slug);sessionStorage.setItem('journal_active_project',project.slug);
  current=null;draft=null;placements=[];assets={};dirty=false;
- $("invite").hidden=!chiefRole();$("authorsInvite").hidden=!chiefRole();
+ $("invite").hidden=!editorRole();$("authorsInvite").hidden=!chiefRole();
  await loadData();await showTab("home",true);
 }
 async function run(f){
@@ -586,7 +624,8 @@ document.addEventListener("click",e=>{
  if(b.dataset.blockDown!==undefined)return void run(async()=>modifyBlock(+b.dataset.blockDown,"down"));
 });
 for(const id of ["create","heroCreate","libraryCreate","editorCreate"])$(id).onclick=()=>run(createPost);
-for(const id of ["invite","authorsInvite"])$(id).onclick=()=>run(invite);
+$("invite").onclick=()=>run(newAuthorProfile);
+$("authorsInvite").onclick=()=>run(invite);
 $("saveAuthor").onclick=()=>run(saveAuthor);
 $("project").onchange=e=>run(()=>changeProject(e.target.value));
 $("login").onclick=()=>run(login);$("register").onclick=()=>run(signup);$("activate").onclick=()=>run(claimOwner);
