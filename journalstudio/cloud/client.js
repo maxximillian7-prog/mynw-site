@@ -61,6 +61,75 @@ async function loadData(){
  posts=result[0].posts||[];authors=result[1].authors||[];topics=result[2].topics||[];
  window.StudioTopics?.render?.();
 }
+// Native confirm()/prompt() dialogs can be suppressed by mobile browsers,
+// extensions and embedded WebViews. Editorial actions use this visible,
+// accessible, single-use confirmation with explicit human approval instead.
+let editorialDialogActive=false;
+function editorialDecision({title,message,confirmLabel="Подтвердить",kind="confirm",exactTitle=null,initialValue=""}){
+ if(editorialDialogActive)throw Error("Завершите предыдущее подтверждение редакционного действия.");
+ const overlay=$("studioEditorActionOverlay");
+ if(!overlay)throw Error("Панель подтверждения не загружена. Обновите страницу Ctrl+F5.");
+ const yes=$("studioEditorActionYes"),no=$("studioEditorActionNo"),close=$("studioEditorActionClose");
+ const input=$("studioEditorActionInput"),note=$("studioEditorActionNote"),label=$("studioEditorActionInputLabel");
+ const error=$("studioEditorActionError");
+ $("studioEditorActionTitle").textContent=title;
+ $("studioEditorActionText").textContent=message;
+ yes.textContent=confirmLabel;
+ input.hidden=!["title","datetime"].includes(kind);
+ note.hidden=kind!=="note";
+ label.hidden=input.hidden;
+ input.type=kind==="datetime"?"datetime-local":"text";
+ label.textContent=kind==="datetime"?"Дата и время публикации":"Для подтверждения введите полное название статьи";
+ input.value=kind==="title"?"":initialValue;
+ note.value="";
+ note.placeholder="Обязательный комментарий автору";
+ error.hidden=true;error.textContent="";
+ const validate=()=>{
+  const valid=kind==="title"?input.value===exactTitle:
+    kind==="note"?!!note.value.trim():
+    kind==="datetime"?!!input.value&&Number.isFinite(+new Date(input.value)):true;
+  yes.disabled=!valid;
+  return valid;
+ };
+ validate();
+ const focusBefore=document.activeElement;
+ overlay.hidden=false;
+ editorialDialogActive=true;
+ return new Promise(resolve=>{
+  let settled=false;
+  const finish=value=>{
+   if(settled)return;
+   settled=true;
+   overlay.hidden=true;editorialDialogActive=false;
+   yes.onclick=null;no.onclick=null;close.onclick=null;
+   input.oninput=null;note.oninput=null;
+   overlay.onclick=null;
+   document.removeEventListener("keydown",onKey);
+   try{focusBefore?.focus?.({preventScroll:true})}catch{}
+   resolve(value);
+  };
+  const onKey=e=>{
+   if(e.key==="Escape"){e.preventDefault();finish(null)}
+   if(e.key==="Enter"&&kind==="title"&&document.activeElement===input&&validate()){
+    e.preventDefault();finish(input.value);
+   }
+  };
+  yes.onclick=()=>{
+   if(!validate())return;
+   if(kind==="title")finish(input.value);
+   else if(kind==="note")finish(note.value.trim());
+   else if(kind==="datetime")finish(new Date(input.value).toISOString());
+   else finish(true);
+  };
+  no.onclick=close.onclick=()=>finish(null);
+  input.oninput=note.oninput=validate;
+  overlay.onclick=e=>{if(e.target===overlay)finish(null)};
+  document.addEventListener("keydown",onKey);
+  if(!input.hidden)input.focus({preventScroll:true});
+  else if(!note.hidden)note.focus({preventScroll:true});
+  else yes.focus({preventScroll:true});
+ });
+}
 function statusTag(s){return '<span class="chip '+(["in_review","scheduled"].includes(s)?"amber":s==="published"?"":"gray")+'">'+esc(statuses[s]||s)+'</span>'}
 function canManagePost(p){return !!p&&chiefRole()&&p.status!=='archived'}
 function canDeletePost(p){
@@ -148,7 +217,14 @@ async function toggleArticleHidden(id){
  const p=posts.find(item=>item.id===id);
  if(!canManagePost(p))throw Error("Только главный редактор может скрывать материалы.");
  const hide=!p.is_hidden;
- if(hide&&!confirm("Скрыть статью во всех языках? Текст, переводы и изображения сохранятся."))return;
+ if(hide){
+   const ok=await editorialDecision({
+    title:"Скрыть статью",
+    message:"«"+p.title+"»\\n\\nСтатья перестанет отображаться в приложении на всех языках. Текст, переводы и фотографии сохранятся; её можно будет показать снова.",
+    confirmLabel:"Скрыть во всех языках"
+   });
+   if(!ok)return;
+  }
  const result=await call("/posts/"+encodeURIComponent(id)+"/visibility","PATCH",{
    expected_revision:p.revision,is_hidden:hide
  });
@@ -164,7 +240,12 @@ async function editArticle(id){
  if(!p)throw Error("Обновите список статей.");
  if(["published","approved","scheduled","in_review"].includes(p.status)){
    if(!canManagePost(p))throw Error("Изменение опубликованного текста доступно главному редактору.");
-   if(!confirm("Вернуть статью на доработку? Она будет скрыта в приложении до повторной публикации. Все фотографии и переводы сохранятся."))return;
+   const ok=await editorialDecision({
+     title:"Открыть для редактирования",
+     message:"«"+p.title+"»\\n\\nМатериал будет снят с публикации и возвращён на доработку. Все фотографии, переводы и предыдущие редакции сохранятся. Для публикации изменённой статьи потребуется повторное согласование.",
+     confirmLabel:"Вернуть на доработку"
+    });
+    if(!ok)return;
    const result=await call("/posts/"+encodeURIComponent(id)+"/reopen","PATCH",{
      expected_revision:p.revision
    });
@@ -192,14 +273,18 @@ async function deletePost(id){
  const article=posts.find(p=>p.id===id);
  if(!article)throw Error("Статья не найдена в текущем проекте. Обновите материалы.");
  if(!canDeletePost(article))throw Error("Недостаточно прав на удаление статьи.");
- if(dirty && current?.id===id) {
-   if(!confirm("В статье есть несохранённые изменения. Удалить текущую версию без их сохранения?"))return;
- }
  const warning=article.status==="published"?
-   "Опубликованная статья исчезнет из приложения и публичных ссылок после обновления. Общие изображения сохранятся.":
-   "Материал будет убран из редакции. Общие изображения в медиатеке сохранятся.";
- if(!confirm("Удалить статью «"+article.title+"»?\n\n"+warning))return;
- const confirmation=prompt("Для подтверждения введите полное название статьи:\n"+article.title);
+   "Опубликованная статья будет снята с публикации и перестанет открываться в приложении. Сохранённые фотографии останутся в медиатеке.":
+   "Статья будет отправлена в архив и убрана из списка. Общие фотографии и медиатека сохранятся.";
+ const pendingDirty=dirty&&current?.id===id?
+   "\\n\\nЕсть несохранённые изменения: они не попадут в архив.":"";
+ const confirmation=await editorialDecision({
+   title:"Удалить статью из редакции",
+   message:"«"+article.title+"»\\n\\n"+warning+pendingDirty+
+     "\\n\\nЧтобы подтвердить удаление, введите полное название статьи без изменений.",
+   confirmLabel:"Подтвердить удаление",
+   kind:"title",exactTitle:article.title
+ });
  if(confirmation===null)return;
  if(confirmation!==article.title)throw Error("Название не совпадает. Удаление отменено.");
  const result=await call("/posts/"+encodeURIComponent(id),"DELETE",{
@@ -361,9 +446,34 @@ async function workflow(action){
  }
  const payload={action,expected_revision:current.revision};
  if(action==="submit")payload.submitted_channel=window.StudioFeatures?.activeVersion?.()||"base";
- if(action==="request_changes"){const note=prompt("Что автору нужно исправить? Комментарий обязателен:");if(note===null)return;if(!note.trim())throw Error("Укажите причину возврата на доработку");payload.note=note.trim()}
+ if(action==="request_changes"){
+  const note=await editorialDecision({
+   title:"Вернуть статью на доработку",
+   message:"Укажите, что автор должен исправить. Комментарий сохранится в истории редакционного процесса.",
+   confirmLabel:"Вернуть с комментарием",kind:"note"
+  });
+  if(note===null)return;
+  if(!note)throw Error("Укажите причину возврата на доработку");
+  payload.note=note;
+ }
  if(action==="schedule"){
- const value=prompt("Время выпуска в ISO 8601 (включая часовой пояс)",new Date(Date.now()+86400000).toISOString());if(!value)return;payload.scheduled_at=value;
+  const tomorrow=new Date(Date.now()+86400000);
+  const local=new Date(tomorrow.getTime()-tomorrow.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  const value=await editorialDecision({
+   title:"Запланировать публикацию",
+   message:"Выберите дату и время в часовом поясе вашего устройства. Материал будет опубликован только при соблюдении условий редакционного процесса.",
+   confirmLabel:"Запланировать",kind:"datetime",initialValue:local
+  });
+  if(value===null)return;
+  payload.scheduled_at=value;
+ }
+ if(action==="publish"){
+  const ok=await editorialDecision({
+   title:"Опубликовать статью",
+   message:"«"+current.title+"»\\n\\nСтатья станет доступна читателям в выбранных каналах. Проверьте, что текст, фотографии, права и переводы утверждены.",
+   confirmLabel:"Опубликовать"
+  });
+  if(!ok)return;
  }
  const expectedPostId=current.id,expectedRevision=current.revision;
  const remote=(await call("/posts/"+encodeURIComponent(expectedPostId))).post;
