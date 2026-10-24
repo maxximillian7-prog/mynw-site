@@ -576,7 +576,11 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 </div>
 <div class="ai-grid">
 <div class="stack"><div class="card">
-<h2>1. Выберите автора</h2><div class="ai-personas" id="aiPersonaCards"></div>
+<h2>1. Выберите автора</h2>
+<label for="aiAuthorSelect">Автор для генерации статьи</label>
+<select id="aiAuthorSelect" aria-label="Выберите ИИ-автора для статьи"><option value="">Загрузка авторов…</option></select>
+<div class="ai-personas" id="aiPersonaCards"></div>
+<p id="aiAuthorSelectStatus" class="small muted" role="status" aria-live="polite">Выбранный автор будет использован при создании черновика.</p>
 <label for="aiTopic">2. Тема статьи (необязательно)</label><textarea id="aiTopic" maxlength="450" rows="3" placeholder="Например: почему желтеют листья спатифиллума. Оставьте пустым — автор предложит тему сам."></textarea>
 <div class="editorFields"><div><label for="aiLanguage">Язык материала</label><select id="aiLanguage"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option></select></div><div><label>Режим</label><div class="ai-mode-text">✎ По запросу или ✦ авторская идея</div></div></div>
 <div class="btns" style="margin-top:20px"><button id="aiGenerate" class="primary">✦ Создать черновик</button><button id="aiRefresh">↻ Обновить историю</button></div>
@@ -633,14 +637,14 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./studio-i18n.js?v=20261023-51"></script>
 <script defer src="./preview.js?v=20261023-25"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261024-58"></script>
+<script defer src="./client.js?v=20261024-62"></script>
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261023-20"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
 <script defer src="./author-profiles.js?v=20261023-55"></script>
-<script defer src="./ai-studio.js?v=20261024-61"></script>
+<script defer src="./ai-studio.js?v=20261024-62"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
-<script defer src="./studio-full-article.js?v=20261024-60"></script>
+<script defer src="./studio-full-article.js?v=20261024-62"></script>
 <script defer src="./studio-images.js?v=20261024-60"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
