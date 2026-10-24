@@ -31,7 +31,7 @@ async function login(){
 }
 async function recoverPassword(){
  const email=$("email").value.trim();
- if(!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email))throw Error("Введите email аккаунта, чтобы получить ссылку для установки пароля.");
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))throw Error("Введите email аккаунта, чтобы получить ссылку для установки пароля.");
  const redirect="https://mynw.app/journalstudio/cloud/";
  await auth("recover?redirect_to="+encodeURIComponent(redirect),"POST",{email});
  toast("Если аккаунт существует, на "+email+" придёт письмо для установки нового пароля.");
