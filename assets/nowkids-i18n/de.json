@@ -51,7 +51,7 @@
             "Vom Nutzer bereitgestellte Dokumente, Fotos, Scans, Texte und andere funktionsbezogene Dateien. Die aktuellen Android-Version bietet keine Spracheingabe.",
             "KI-Kontext: Anfrage, Fach/Thema, jüngerer Lernverlauf und nur die Profildaten, die zur Anpassung der Schwierigkeit nötig sind: berechnetes Alter, Klasse/Jahrgang, Lernsprache und Altersmodus. Name des Kindes und Schulname werden von NowStudy nicht an OpenAI gesendet. Bilder werden nur bei ausdrücklich gewählter Bildfunktion einbezogen.",
             "Betriebsdaten: Nutzungszähler, KI-Modell-/Token-Nutzung, Fehler-/Sicherheitsprotokolle und technische Daten.",
-            "Optionale Berechtigungen betreffen Kamera/Fotos, Kalender, Benachrichtigungen und lokale Authentifizierung. Version 12 verwendet keine Sprachaufzeichnung.",
+            "Optionale Berechtigungen betreffen Kamera/Fotos, Kalender, Benachrichtigungen und lokale Authentifizierung. Die aktuelle Android-Version verwendet keine Sprachaufzeichnung.",
             "Abonnement- und Kaufdaten: Produktkennungen, Kauf-/Verlängerungsstatus, Zugriffsrecht-Status, Transaktions-/Belegmetadaten und eine Benutzerkennung der Anwendung zur Zugriffsprüfung. NowKids erhält keine vollständigen Zahlungskartendaten von Google Play oder RevenueCat."
           ]
         },
@@ -283,7 +283,7 @@
           "items": [
             "Name, Geburtsdatum/Alter, Avatar, Schule, Klasse, Lernsprache.",
             "Stundenplan, Hausaufgaben, Tests, Fortschritt, Aktivitäten, Bücher, Aufgaben und Erinnerungen.",
-            "Dokumente, Fotos, Scans und KI-Lerngespräche, wenn diese Funktionen verwendet werden; keine Spracheingabe in Version 12."
+            "Dokumente, Fotos, Scans und KI-Lerngespräche, wenn diese Funktionen verwendet werden; keine Spracheingabe in der aktuellen Android-Version."
           ]
         },
         {
@@ -301,7 +301,7 @@
         {
           "h": "5. Berechtigungen",
           "p": [
-            "Kamera/Fotos, Benachrichtigungen, Kalender und lokale Authentifizierung sind für die jeweiligen Funktionen optional. Version 12 bietet keine Spracheingabe."
+            "Kamera/Fotos, Benachrichtigungen, Kalender und lokale Authentifizierung sind für die jeweiligen Funktionen optional. Die aktuelle Android-Version bietet keine Spracheingabe."
           ]
         },
         {
