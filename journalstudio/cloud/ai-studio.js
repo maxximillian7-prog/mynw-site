@@ -45,6 +45,14 @@
   $("aiPersonaCards").innerHTML=a.length?a.map(p=>'<button type="button" class="ai-persona '+(p.id===selected?"selected":"")+'" data-ai-persona="'+E(p.id)+'"><span class="ai-face">'+avatar(p)+'</span><b>'+E(p.name)+'</b><p>'+E(p.tagline||p.focus||"")+'</p></button>').join(""):'<div class="empty">В этом приложении пока нет ИИ-авторов. Создайте профиль во вкладке «Авторы».</div>';
   $("aiGenerate").disabled=!providerReady||!selected||busy;
   $("aiSaveSchedule").disabled=!selected||busy||(!providerReady&&$("aiScheduleEnabled").checked);
+  const author=a.find(p=>p.id===selected),box=$("aiPersonaEditor");
+  if(box){
+   box.hidden=!chiefRoleAi()||!author;
+   if(author&&chiefRoleAi()){
+    $("aiPersonaFocus").value=author.focus||"";
+    $("aiPersonaVoice").value=author.voice_style||"";
+   }
+  }
   scheduleControls();
  }
  function scheduleControls(){
@@ -128,6 +136,29 @@
   const r=await request("/schedule","POST",data);
   schedules=schedules.filter(x=>x.author_id!==p.id).concat([r.schedule]);
   personas();toast(data.enabled?"Авторское расписание включено. Первый черновик — не раньше чем через сутки.":"Автогенерация для автора отключена.");
+ }
+ async function savePersonaWritingSettings(){
+  if(!chiefRoleAi())throw Error("Настройки ИИ-автора доступны только главному редактору.");
+  const a=aiAuthors().find(p=>p.id===selected);
+  if(!a)throw Error("Выберите ИИ-автора.");
+  const btn=$("aiPersonaSave"),notice=$("aiPersonaSaveStatus");btn.disabled=true;
+  notice.textContent="Сохраняем стиль ИИ-автора…";
+  try{
+   const changes={
+    name:a.name,bio:a.bio||"",tagline:a.tagline||"",preferred_locale:a.preferred_locale||"ru",
+    focus:$("aiPersonaFocus").value.slice(0,450),
+    voice_style:$("aiPersonaVoice").value.slice(0,550),
+    social_url:a.social_links?.website||"",
+    instagram:a.social_links?.instagram||"",
+    youtube:a.social_links?.youtube||""
+   };
+   const result=await call("/authors/"+encodeURIComponent(a.id),"PATCH",changes);
+   if(result.author?.id!==a.id)throw Error("Сервер не подтвердил сохранение.");
+   Object.assign(a,result.author);
+   notice.textContent="Настройки сохранены. Следующий черновик использует новый стиль.";
+   toast("Настройки ИИ-автора сохранены.");
+  }catch(error){notice.textContent="Ошибка: "+error.message;throw error}
+  finally{btn.disabled=false}
  }
  function currentSourceRevision(){
   return ["published","approved","scheduled"].includes(current?.status)
@@ -368,6 +399,7 @@
  $("aiGenerate").onclick=()=>run(generate);
  $("aiRefresh").onclick=()=>run(refreshAI);
  $("aiSaveSchedule").onclick=()=>run(saveSchedule);
+ $("aiPersonaSave").onclick=()=>run(savePersonaWritingSettings);
  $("aiOpenImage").onclick=()=>run(openImageForDraft);
  $("aiNewForImage").onclick=()=>run(newArticleForImage);
  $("aiImagePost").onchange=()=>{$("aiOpenImage").disabled=!$("aiImagePost").value};
