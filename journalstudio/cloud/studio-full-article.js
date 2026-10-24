@@ -17,17 +17,29 @@
  function getSaved(){
   const key=stageKey();if(!key)return null;
   try{
-   const state=JSON.parse(sessionStorage.getItem(key)||"null");
+   const state=JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||"null");
+   if(state?.startedAt&&Date.now()-new Date(state.startedAt).getTime()>14*86400000)return null;
    return state?.project===project.slug && state.userId===session.user.id &&
     (state.postId===null||postIdValid(state.postId))?state:null;
   }catch{return null}
  }
  function remember(state){
-  const key=stageKey();if(key)sessionStorage.setItem(key,JSON.stringify(state));
+  const key=stageKey();
+  if(key){
+   const saved=JSON.stringify(state);
+   sessionStorage.setItem(key,saved);
+   try{localStorage.setItem(key,saved)}catch{}
+  }
   $("aiFullOpenDraft").hidden=!postIdValid(state?.postId);
+  $("aiFullReset").hidden=!state;
  }
  function clearSaved(){
-  const key=stageKey();if(key)sessionStorage.removeItem(key);
+  const key=stageKey();
+  if(key){
+   sessionStorage.removeItem(key);
+   try{localStorage.removeItem(key)}catch{}
+  }
+  $("aiFullReset").hidden=true;
  }
  function notice(message,done=0,error=false){
   const el=$("aiFullStatus");
@@ -226,6 +238,7 @@
   const state=getSaved();
   $("aiFullGenerate").textContent=state?"↻ Продолжить полную генерацию":"✦ Полная генерация статьи";
   $("aiFullOpenDraft").hidden=!postIdValid(state?.postId);
+  $("aiFullReset").hidden=!state;
   if(state)notice("Незавершённая генерация: "+(state.postId?"черновик уже сохранён. ":"проверим создание текста. ")+
    "Нажмите «Продолжить» и подтвердите оставшиеся платные этапы.",progressEstimate());
  }
@@ -240,7 +253,7 @@
   if(!stored&&!LANGS.includes(locale)){notice("Выберите язык статьи.",0,true);return}
   const plan=stored||{
    project:project.slug,userId:session.user.id,postId:null,
-   authorId,topic:topic.slice(0,450),locale,assetBySlot:{},textRequestedAt:null
+   authorId,topic:topic.slice(0,450),locale,assetBySlot:{},textRequestedAt:null,startedAt:new Date().toISOString()
   };
   pendingPlan=plan;
   $("aiFullConfirmDetails").textContent=(stored?
@@ -267,6 +280,15 @@
   void perform(plan).catch(error=>{
    console.warn("Journal Studio full draft interrupted",String(error));
   });
+ };
+ $("aiFullReset").onclick=()=>{
+  if(active)return;
+  // No server data is deleted; only the local resume pointer is cleared.
+  clearSaved();pendingPlan=null;
+  $("aiFullConfirm").hidden=true;
+  $("aiFullGenerate").textContent="✦ Полная генерация статьи";
+  $("aiFullOpenDraft").hidden=true;
+  notice("Режим новой статьи. Предыдущий черновик и его фотографии сохранены в редакции и медиатеке.",0);
  };
  $("aiFullOpenDraft").onclick=()=>run(async()=>{
   const state=getSaved();if(!postIdValid(state?.postId))return;
