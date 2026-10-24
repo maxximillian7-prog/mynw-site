@@ -304,6 +304,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 <link rel="stylesheet" href="./studio-author-guide.css?v=20261024-1">
+<link rel="stylesheet" href="./studio-member-admin.css?v=20261024-1">
 </head><body>
 <script>
 /* Supabase invite links carry a short-lived session in the fragment.
@@ -624,7 +625,18 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <div class="author-photo-editor"><div id="authorPhotoPreview" class="author-photo-placeholder">♙</div><div><label for="authorPhoto">Фотография или аватар</label><input id="authorPhoto" type="file" accept="image/png,image/jpeg,image/webp"><div class="small muted">Фото — своё или с подтверждёнными правами. До 8 МБ.</div><label class="ai-check"><input id="authorPhotoRights" type="checkbox"> Подтверждаю право публикации</label><input type="hidden" id="authorPhotoId"><button type="button" id="authorUploadPhoto">Загрузить фото</button></div></div>
 <label for="authorSocial">Сайт или личная страница</label><input id="authorSocial" type="url" placeholder="https://">
 <label for="authorInstagram">Instagram</label><input id="authorInstagram" type="url" placeholder="https://www.instagram.com/...">
-<label for="authorYoutube">YouTube</label><input id="authorYoutube" type="url" placeholder="https://www.youtube.com/..."><button id="saveAuthor" class="primary" style="margin-top:15px">Добавить автора</button><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div></section>
+<label for="authorYoutube">YouTube</label><input id="authorYoutube" type="url" placeholder="https://www.youtube.com/..."><button id="saveAuthor" class="primary" style="margin-top:15px">Добавить автора</button><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div>
+<div class="card" id="teamAuthorsCard" hidden>
+  <div class="sectionHeading">
+    <div>
+      <div class="eyebrow">УПРАВЛЕНИЕ ДОСТУПОМ</div>
+      <h2>Приглашённые авторы</h2>
+      <p>Удаление автора отзывает его доступ к выбранному журналу. Материалы и учётные записи других проектов сохраняются.</p>
+    </div>
+    <button type="button" data-team-refresh>↻ Обновить</button>
+  </div>
+  <div id="teamAuthorsList"><div class="empty">Откройте раздел для загрузки списка авторов.</div></div>
+</div></section>
 <section class="view" data-view="publish"><div class="sectionHeading"><div><h2>Центр публикаций</h2><p>Отслеживание публикаций по каналам</p></div></div><div class="grid2"><div class="card"><h2>Готовые статьи</h2><div id="readyPosts"></div><div id="deliveryDetails"></div></div><div class="card"><h2>Подключённые направления</h2><div class="channelCard"><span>❧ &nbsp; Журнал приложения</span><span class="chip">Studio Feed активен</span></div><div class="channelCard"><span>◎ &nbsp; Instagram</span><span class="chip amber">Нужен Meta API</span></div><div class="channelCard"><span>◈ &nbsp; Веб-сайт / блог</span><span class="chip amber">Нужно подключить</span></div><div class="tip">Публикация статьи в Studio Feed не равна появлению статьи в установленном мобильном приложении, пока клиент NowGreen не подключён к новому API.</div></div></div></section>
 <section class="view" data-view="settings"><div class="card"><h2>Настройки редакции</h2><p>Выбранный проект: <strong id="settingsProject">—</strong></p><p>Роль аккаунта: <strong id="settingsRole">—</strong></p><p class="muted">Авторизация: Supabase Auth. Данные хранятся в выделенной базе Journal Studio.</p><div class="tip"><b>Подтверждение email</b><p>Чтобы письма вели обратно в редакцию, в Supabase → Authentication → URL Configuration укажите Site URL и Redirect URL: <code>https://mynw.app/journalstudio/cloud/</code></p></div><p class="small muted">ИИ-генерация и внешние публикации будут включены после настройки соответствующих ключей.</p></div></section>
 </main></div>
@@ -654,7 +666,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
-<script defer src="./author-profiles.js?v=20261024-1"></script>
+<script defer src="./author-profiles.js?v=20261024-2"></script>
 <script defer src="./ai-studio.js?v=20261024-62"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-62"></script>
@@ -662,4 +674,5 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
 <script defer src="./studio-author-guide.js?v=20261024-1"></script>
+<script defer src="./studio-member-admin.js?v=20261024-1"></script>
 </body></html>
