@@ -10,7 +10,7 @@
     "rights": "Diritti sui dati",
     "deletion": "Elimina account",
     "support": "Assistenza",
-    "updated": "Ultimo aggiornamento: 15 ottobre 2026",
+    "updated": "Ultimo aggiornamento: 24 ottobre 2026",
     "back": "Tutti i documenti NowKids",
     "footer": "© 2026 NowKids / NowApps.",
     "developer": "Sviluppatore e titolare del trattamento",
@@ -48,7 +48,7 @@
             "Account genitore/tutore: ID, e-mail, nome visualizzato, provider di accesso, lingua, fuso orario e impostazioni.",
             "Famiglia/minore: nome, ruolo, etichetta di relazione, data di nascita/età, avatar, scuola, classe e lingua di studio.",
             "Dati scolastici/familiari: materie, orario, compiti, preparazione ai test, piani, attività, libri, eventi, promemoria, liste e note.",
-            "Documenti, foto, scansioni, testi e altri file forniti per le funzioni selezionate. La versione Android 12 non offre input vocale.",
+            "Documenti, foto, scansioni, testi e altri file forniti per le funzioni selezionate. La versione Android attuale non offre input vocale.",
             "Contesto IA: richiesta, materia/argomento, cronologia di studio recente e solo i dati di profilo necessari ad adattare la difficoltà: età derivata, classe/anno, lingua di studio e modalità di età. NowStudy non invia a OpenAI il nome del minore né il nome della scuola. Le immagini sono incluse solo quando l’utente sceglie una funzione IA basata su immagini.",
             "Dati operativi: contatori, modello/token IA, log di errore/sicurezza e informazioni tecniche.",
             "Le autorizzazioni opzionali riguardano fotocamera/foto, calendario, notifiche e autenticazione locale. La versione 12 non registra la voce.",
@@ -69,25 +69,19 @@
         {
           "h": "4. Minori e autorizzazione",
           "p": [
-            "Un genitore/tutore deve creare o autorizzare l’uso del minore. Quando la legge richiede consenso parentale, deve essere fornito. L’età del consenso digitale varia per paese."
+            "Un adulto crea o autorizza l'account bambino collegato, gestisce l'accesso e può revocarlo. Sotto l'età applicabile per il consenso digitale serve l'autorizzazione del rappresentante legale. Email verificata e ruolo di amministratore familiare non dimostrano da soli l'identità del genitore né il consenso verificabile richiesto dalla COPPA statunitense. Paesi e funzioni possono richiedere ulteriori verifiche."
           ]
         },
         {
           "h": "5. IA",
           "p": [
-            "NowStudy usa IA lato server. OpenAI è il fornitore standard. Un progetto pilota limitato al titolare e ai tester può usare GPT-OSS 120B per il tutoraggio e Mistral Small 24B per i controlli di sicurezza tramite IONOS AI Model Hub in Germania. Non è una distribuzione generale. Altre funzioni IA possono continuare con OpenAI. L'IA può sbagliare."
+            "Le risposte educative di NoKi possono essere generate da OpenAI (Luna) dopo controlli di sicurezza e riservatezza. IONOS AI Model Hub è usato anche per la moderazione dei testi e alcune modalità di studio limitate. La richiesta raggiunge prima il server Supabase. I filtri automatici non sono infallibili: non inserire nomi, indirizzi, scuole o altri identificativi personali."
           ]
         },
         {
           "h": "6. Fornitori",
           "items": [
-            "Supabase — autenticazione, banca dati, archiviazione, sincronizzazione in tempo reale e funzioni lato server.",
-            "OpenAI — elaborazione tramite IA per NowStudy e funzioni correlate.",
-            "IONOS AI Model Hub — test interni limitati di GPT-OSS 120B per il tutoraggio e Mistral Small 24B per la moderazione; nessuna scelta pubblica del fornitore.",
-            "Google — accesso con Google quando scelto, distribuzione Android/Google Play, fatturazione delle funzioni a pagamento tramite Google Play e servizi della piattaforma selezionati dall’utente.",
-            "RevenueCat — verifica di abbonamenti e acquisti, identificatore utente dell’applicazione, informazioni sull’acquisto e stato di accesso per sbloccare funzioni a pagamento.",
-            "Firebase Cloud Messaging — consegna di notifiche funzionali Android tramite un identificatore tecnico di installazione.",
-            "Open Library e, se configurato, Google Books — ricerche di libri avviate dall’utente per titolo, autore o ISBN. La richiesta al catalogo non include l’identificatore dell’account NowKids, l’indirizzo e-mail, l’identificatore della famiglia o i dati del profilo del bambino."
+            "Supabase gestisce autenticazione, database familiare, archiviazione privata e funzioni server. IONOS AI Model Hub effettua moderazione e alcune elaborazioni didattiche; OpenAI fornisce determinate risposte e analisi/generazione di immagini dopo i controlli. Firebase Cloud Messaging gestisce token push, Google Play e RevenueCat acquisti e abbonamenti, Open Library/Google Books alcune ricerche libri. Contratti, sedi, subfornitori e periodi di conservazione richiedono verifiche distinte."
           ]
         },
         {
@@ -105,13 +99,13 @@
         {
           "h": "9. Conservazione",
           "p": [
-            "I dati restano finché necessari e fino alla cancellazione. Account: https://mynw.app/nowkids/delete-account/. Conservazioni limitate possono essere richieste da legge o sicurezza."
+            "Dati familiari e scolastici, sessioni di studio, parte delle domande/risposte, identificativi tecnici e push e registri di uso/fatturazione possono essere conservati in Supabase o presso fornitori per gestire il servizio. I contenuti attivi restano normalmente fino alla rimozione o cancellazione dell'account; obblighi legali e di sicurezza possono richiedere periodi diversi. Le cache IA scadute vengono eliminate da un processo programmato, ma la cronologia salvata non scompare automaticamente dopo 14 o 30 giorni. I periodi specifici sono ancora in fase di documentazione."
           ]
         },
         {
           "h": "10. Sicurezza e trasferimenti",
           "p": [
-            "HTTPS, autenticazione, RLS e autorizzazione server proteggono l’accesso. Fornitori possono trattare dati fuori SEE con garanzie adeguate."
+            "Sono usate connessioni cifrate, autorizzazioni sul server e regole di accesso per riga, ma nessun filtro garantisce anonimizzazione completa. I fornitori possono elaborare dati tecnici o contenuti nello SEE o altrove a seconda della configurazione. Non si deve presumere l'esistenza di accordi, garanzie per trasferimenti o Zero Data Retention senza verifica. Scrivi a support@mynw.app."
           ]
         },
         {
@@ -142,7 +136,7 @@
         {
           "h": "15. Riutilizzo IA, cache e dati tecnici di utilizzo",
           "p": [
-            "Per ridurre elaborazioni IA ripetute, NowKids può conservare temporaneamente estrazioni o risultati generati associati a famiglia/bambino. La stessa scansione scolastica viene riconosciuta una volta quando possibile; le estrazioni possono restare in cache fino a 30 giorni e altri risultati IA fino a 14 giorni. Piani, scheda di studio e brevi test salvati restano finché non vengono eliminati. registro tecnico contiene campi tecnici e non il contenuto dei richieste del bambino."
+            "Dati familiari e scolastici, sessioni di studio, parte delle domande/risposte, identificativi tecnici e push e registri di uso/fatturazione possono essere conservati in Supabase o presso fornitori per gestire il servizio. I contenuti attivi restano normalmente fino alla rimozione o cancellazione dell'account; obblighi legali e di sicurezza possono richiedere periodi diversi. Le cache IA scadute vengono eliminate da un processo programmato, ma la cronologia salvata non scompare automaticamente dopo 14 o 30 giorni. I periodi specifici sono ancora in fase di documentazione."
           ]
         },
         {
@@ -154,7 +148,28 @@
         {
           "h": "17. Fornitori IA, protezioni e trattamento dei dati",
           "p": [
-            "NoKi è l'assistente didattico, non un operatore umano. Un filtro privacy controlla i messaggi digitati prima dell'IA esterna; i dati identificativi possono essere bloccati e le immagini rifiutate senza garanzie adeguate. Richieste ripulite e risultati possono essere salvati nella cronologia di studio, mentre il registro tecnico ai_usage non conserva i testi originali. I fornitori esterni trattano dati operativi secondo le rispettive condizioni; la conservazione zero non va presunta senza conferma. Restano valide le pagine sui diritti e sulla cancellazione."
+            "Il filtro privacy opera in Supabase prima del modello esterno di moderazione, ma il testo originale del bambino arriva prima al server NowKids. Le richieste rischiose possono essere bloccate. Il testo ritenuto non identificativo può essere inviato a IONOS e poi a OpenAI secondo la funzione. Zero Data Retention OpenAI non è confermato per il progetto: non devono esservi inviati dati personali identificabili dei bambini. Il filtro può non riconoscere identificativi indiretti."
+          ]
+        },
+        {
+          "h": "Consenso, prove e norme locali",
+          "p": [
+            "Le autorizzazioni degli account bambino e le revoche sono registrate nel database protetto; un registro aggiuntivo conserva evento, collegamento familiare e stato storico di verifica. Le vecchie autorizzazioni non sono considerate prove di identità. Un blocco server per il consenso separato all'IA cloud è pronto ma non ancora obbligatorio per tutte le famiglie. L'accettazione iniziale di Termini/Privacy può essere memorizzata soltanto sul dispositivo nella versione attuale; il processo è in miglioramento.",
+            "Un adulto crea o autorizza l'account bambino collegato, gestisce l'accesso e può revocarlo. Sotto l'età applicabile per il consenso digitale serve l'autorizzazione del rappresentante legale. Email verificata e ruolo di amministratore familiare non dimostrano da soli l'identità del genitore né il consenso verificabile richiesto dalla COPPA statunitense. Paesi e funzioni possono richiedere ulteriori verifiche."
+          ]
+        },
+        {
+          "h": "Richieste IA e immagini approvate",
+          "p": [
+            "Il bambino non può caricare autonomamente foto scolastiche nel percorso protetto. L'adulto usa la propria sessione, ritaglia o copre in modo opaco gli identificativi, controlla l'immagine finale e conferma separatamente l'assenza di dati identificativi e l'invio a OpenAI. Il server ricontrolla il ruolo adulto e registra l'impronta digitale e il consenso prima dell'invio. Ciò non garantisce anonimizzazione perfetta.",
+            "Il filtro privacy opera in Supabase prima del modello esterno di moderazione, ma il testo originale del bambino arriva prima al server NowKids. Le richieste rischiose possono essere bloccate. Il testo ritenuto non identificativo può essere inviato a IONOS e poi a OpenAI secondo la funzione. Zero Data Retention OpenAI non è confermato per il progetto: non devono esservi inviati dati personali identificabili dei bambini. Il filtro può non riconoscere identificativi indiretti."
+          ]
+        },
+        {
+          "h": "Conservazione, cancellazione e limiti",
+          "p": [
+            "Dati familiari e scolastici, sessioni di studio, parte delle domande/risposte, identificativi tecnici e push e registri di uso/fatturazione possono essere conservati in Supabase o presso fornitori per gestire il servizio. I contenuti attivi restano normalmente fino alla rimozione o cancellazione dell'account; obblighi legali e di sicurezza possono richiedere periodi diversi. Le cache IA scadute vengono eliminate da un processo programmato, ma la cronologia salvata non scompare automaticamente dopo 14 o 30 giorni. I periodi specifici sono ancora in fase di documentazione.",
+            "Sono usate connessioni cifrate, autorizzazioni sul server e regole di accesso per riga, ma nessun filtro garantisce anonimizzazione completa. I fornitori possono elaborare dati tecnici o contenuti nello SEE o altrove a seconda della configurazione. Non si deve presumere l'esistenza di accordi, garanzie per trasferimenti o Zero Data Retention senza verifica. Scrivi a support@mynw.app."
           ]
         }
       ]
@@ -172,7 +187,7 @@
         {
           "h": "2. Account minori",
           "p": [
-            "Il minore usa l’esperienza collegata solo dopo autorizzazione; i suoi poteri di modifica possono essere ridotti."
+            "Un adulto crea o autorizza l'account bambino collegato, gestisce l'accesso e può revocarlo. Sotto l'età applicabile per il consenso digitale serve l'autorizzazione del rappresentante legale. Email verificata e ruolo di amministratore familiare non dimostrano da soli l'identità del genitore né il consenso verificabile richiesto dalla COPPA statunitense. Paesi e funzioni possono richiedere ulteriori verifiche."
           ]
         },
         {
@@ -241,7 +256,14 @@
         {
           "h": "13. Fornitori IA e misure di sicurezza",
           "p": [
-            "NowStudy usa fornitori IA esterni sotto controllo del server. OpenAI è il percorso standard; modelli IONOS possono essere impiegati in test limitati. I controlli automatici possono bloccare richieste per errore o produrre decisioni inesatte. I genitori possono contattare l'assistenza ed esercitare i diritti sui dati."
+            "Le risposte educative di NoKi possono essere generate da OpenAI (Luna) dopo controlli di sicurezza e riservatezza. IONOS AI Model Hub è usato anche per la moderazione dei testi e alcune modalità di studio limitate. La richiesta raggiunge prima il server Supabase. I filtri automatici non sono infallibili: non inserire nomi, indirizzi, scuole o altri identificativi personali.",
+            "Prima di abilitare il trattamento interessato, il genitore deve ricevere una spiegazione chiara di dati, scopi, fornitori, IA e immagini facoltative, revoca e cancellazione. Una casella spuntata e il ruolo familiare non verificano autonomamente l'identità né soddisfano tutti i requisiti nazionali. Alcuni mercati o funzioni possono richiedere controlli maggiori."
+          ]
+        },
+        {
+          "h": "Autorizzazione, disponibilità e modifiche",
+          "p": [
+            "Prima di abilitare il trattamento interessato, il genitore deve ricevere una spiegazione chiara di dati, scopi, fornitori, IA e immagini facoltative, revoca e cancellazione. Una casella spuntata e il ruolo familiare non verificano autonomamente l'identità né soddisfano tutti i requisiti nazionali. Alcuni mercati o funzioni possono richiedere controlli maggiori."
           ]
         }
       ]
@@ -267,7 +289,7 @@
         {
           "h": "3. Contesto IA",
           "p": [
-            "NowStudy utilizza materia, classe generica e contesto didattico recente dopo controlli privacy. Evitare dati identificativi del minore. Un pilota IONOS può essere riservato ai tester; il percorso standard usa OpenAI."
+            "Il filtro privacy opera in Supabase prima del modello esterno di moderazione, ma il testo originale del bambino arriva prima al server NowKids. Le richieste rischiose possono essere bloccate. Il testo ritenuto non identificativo può essere inviato a IONOS e poi a OpenAI secondo la funzione. Zero Data Retention OpenAI non è confermato per il progetto: non devono esservi inviati dati personali identificabili dei bambini. Il filtro può non riconoscere identificativi indiretti."
           ]
         },
         {
@@ -291,7 +313,7 @@
         {
           "h": "7. Età e consenso",
           "p": [
-            "L’art. 8 GDPR consente età nazionali tra 13 e 16; NowKids richiede autorizzazione parentale quando il minore non può consentire validamente da solo."
+            "Un adulto crea o autorizza l'account bambino collegato, gestisce l'accesso e può revocarlo. Sotto l'età applicabile per il consenso digitale serve l'autorizzazione del rappresentante legale. Email verificata e ruolo di amministratore familiare non dimostrano da soli l'identità del genitore né il consenso verificabile richiesto dalla COPPA statunitense. Paesi e funzioni possono richiedere ulteriori verifiche."
           ]
         },
         {
@@ -321,7 +343,15 @@
         {
           "h": "12. Supervisione IA e fornitori in prova",
           "p": [
-            "Il fornitore abituale è OpenAI; IONOS/GPT-OSS e Mistral sono test limitati sul server, non una funzione generale per i minori. I genitori dovrebbero controllare le richieste e segnalare blocchi errati o risposte non sicure. La versione 12 non ha input vocale."
+            "Le risposte educative di NoKi possono essere generate da OpenAI (Luna) dopo controlli di sicurezza e riservatezza. IONOS AI Model Hub è usato anche per la moderazione dei testi e alcune modalità di studio limitate. La richiesta raggiunge prima il server Supabase. I filtri automatici non sono infallibili: non inserire nomi, indirizzi, scuole o altri identificativi personali."
+          ]
+        },
+        {
+          "h": "Prima di attivare l'IA cloud del minore",
+          "p": [
+            "Prima di abilitare il trattamento interessato, il genitore deve ricevere una spiegazione chiara di dati, scopi, fornitori, IA e immagini facoltative, revoca e cancellazione. Una casella spuntata e il ruolo familiare non verificano autonomamente l'identità né soddisfano tutti i requisiti nazionali. Alcuni mercati o funzioni possono richiedere controlli maggiori.",
+            "Il bambino non può caricare autonomamente foto scolastiche nel percorso protetto. L'adulto usa la propria sessione, ritaglia o copre in modo opaco gli identificativi, controlla l'immagine finale e conferma separatamente l'assenza di dati identificativi e l'invio a OpenAI. Il server ricontrolla il ruolo adulto e registra l'impronta digitale e il consenso prima dell'invio. Ciò non garantisce anonimizzazione perfetta.",
+            "Il filtro privacy opera in Supabase prima del modello esterno di moderazione, ma il testo originale del bambino arriva prima al server NowKids. Le richieste rischiose possono essere bloccate. Il testo ritenuto non identificativo può essere inviato a IONOS e poi a OpenAI secondo la funzione. Zero Data Retention OpenAI non è confermato per il progetto: non devono esservi inviati dati personali identificabili dei bambini. Il filtro può non riconoscere identificativi indiretti."
           ]
         }
       ]
@@ -343,7 +373,7 @@
         {
           "h": "2. Dati IA",
           "p": [
-            "L'ultimo messaggio, il tema, la classe generica e il contesto recente possono essere inviati tramite il server protetto dopo il controllo privacy. Nome e scuola del minore non dovrebbero essere inclusi nelle richieste IA NowStudy. Le immagini possono essere bloccate in assenza di garanzie confermate. Le chiavi API restano sul server."
+            "Il filtro privacy opera in Supabase prima del modello esterno di moderazione, ma il testo originale del bambino arriva prima al server NowKids. Le richieste rischiose possono essere bloccate. Il testo ritenuto non identificativo può essere inviato a IONOS e poi a OpenAI secondo la funzione. Zero Data Retention OpenAI non è confermato per il progetto: non devono esservi inviati dati personali identificabili dei bambini. Il filtro può non riconoscere identificativi indiretti."
           ]
         },
         {
@@ -371,7 +401,7 @@
         {
           "h": "6. Supervisione",
           "p": [
-            "Per minori più giovani è consigliata supervisione periodica."
+            "Il bambino non può caricare autonomamente foto scolastiche nel percorso protetto. L'adulto usa la propria sessione, ritaglia o copre in modo opaco gli identificativi, controlla l'immagine finale e conferma separatamente l'assenza di dati identificativi e l'invio a OpenAI. Il server ricontrolla il ruolo adulto e registra l'impronta digitale e il consenso prima dell'invio. Ciò non garantisce anonimizzazione perfetta."
           ]
         },
         {
@@ -389,7 +419,14 @@
         {
           "h": "9. NoKi e i ruoli dei modelli IA",
           "p": [
-            "NoKi spiega, guida e verifica l'apprendimento. OpenAI è il percorso IA standard. Solo in test limitati, IONOS ospita GPT-OSS 120B per il tutoraggio e Mistral Small 24B per la moderazione di input e output. Sono ruoli di modelli, non persone o contatti con i minori. La moderazione può bloccare per errore risposte innocue; non inviare nomi, indirizzi, password o documenti personali reali."
+            "Le risposte educative di NoKi possono essere generate da OpenAI (Luna) dopo controlli di sicurezza e riservatezza. IONOS AI Model Hub è usato anche per la moderazione dei testi e alcune modalità di studio limitate. La richiesta raggiunge prima il server Supabase. I filtri automatici non sono infallibili: non inserire nomi, indirizzi, scuole o altri identificativi personali.",
+            "Il filtro privacy opera in Supabase prima del modello esterno di moderazione, ma il testo originale del bambino arriva prima al server NowKids. Le richieste rischiose possono essere bloccate. Il testo ritenuto non identificativo può essere inviato a IONOS e poi a OpenAI secondo la funzione. Zero Data Retention OpenAI non è confermato per il progetto: non devono esservi inviati dati personali identificabili dei bambini. Il filtro può non riconoscere identificativi indiretti."
+          ]
+        },
+        {
+          "h": "Foto controllate dai genitori e moderazione",
+          "p": [
+            "Il bambino non può caricare autonomamente foto scolastiche nel percorso protetto. L'adulto usa la propria sessione, ritaglia o copre in modo opaco gli identificativi, controlla l'immagine finale e conferma separatamente l'assenza di dati identificativi e l'invio a OpenAI. Il server ricontrolla il ruolo adulto e registra l'impronta digitale e il consenso prima dell'invio. Ciò non garantisce anonimizzazione perfetta."
           ]
         }
       ]
@@ -472,7 +509,7 @@
         {
           "h": "4. Limiti",
           "p": [
-            "Applicazione secondo legge e diritti altrui/sicurezza."
+            "Per le richieste ai sensi del GDPR rispondiamo di norma senza ingiustificato ritardo ed entro un mese; le proroghe ammesse saranno comunicate. Prima di divulgare o cancellare dati possiamo verificare proporzionalmente l'accesso all'account o l'autorità genitoriale. Contatto: support@mynw.app. Il consenso si può revocare e chiedere la cancellazione, salvi gli obblighi legali."
           ]
         },
         {
@@ -485,6 +522,12 @@
           "h": "6. Cancellazione",
           "p": [
             "https://mynw.app/nowkids/delete-account/."
+          ]
+        },
+        {
+          "h": "Tempi di risposta e verifica",
+          "p": [
+            "Per le richieste ai sensi del GDPR rispondiamo di norma senza ingiustificato ritardo ed entro un mese; le proroghe ammesse saranno comunicate. Prima di divulgare o cancellare dati possiamo verificare proporzionalmente l'accesso all'account o l'autorità genitoriale. Contatto: support@mynw.app. Il consenso si può revocare e chiedere la cancellazione, salvi gli obblighi legali."
           ]
         }
       ]
@@ -511,13 +554,13 @@
         {
           "h": "3. Cosa viene eliminato",
           "p": [
-            "Account e dati server associati sono eliminati o anonimizzati, salvo regole familiari e conservazione legale."
+            "La cancellazione del profilo bambino da parte di un adulto autorizzato avvia la rimozione dei dati cloud e dei file associati, salvo limiti tecnici e obblighi legali. Il registro dei consensi relativo al bambino viene eliminato col profilo. La revoca senza cancellazione blocca l'accesso interessato ma può conservare la prova dell'evento. L'abbonamento Google Play va cancellato a parte. Per dubbi: support@mynw.app."
           ]
         },
         {
           "h": "4. Profilo minore",
           "p": [
-            "Può essere richiesto separatamente dal genitore/tutore se supportato."
+            "La cancellazione del profilo bambino da parte di un adulto autorizzato avvia la rimozione dei dati cloud e dei file associati, salvo limiti tecnici e obblighi legali. Il registro dei consensi relativo al bambino viene eliminato col profilo. La revoca senza cancellazione blocca l'accesso interessato ma può conservare la prova dell'evento. L'abbonamento Google Play va cancellato a parte. Per dubbi: support@mynw.app."
           ]
         },
         {
@@ -529,7 +572,7 @@
         {
           "h": "6. Conservazione",
           "p": [
-            "Conservazione limitata per legge/sicurezza, non pubblicità."
+            "La cancellazione del profilo bambino da parte di un adulto autorizzato avvia la rimozione dei dati cloud e dei file associati, salvo limiti tecnici e obblighi legali. Il registro dei consensi relativo al bambino viene eliminato col profilo. La revoca senza cancellazione blocca l'accesso interessato ma può conservare la prova dell'evento. L'abbonamento Google Play va cancellato a parte. Per dubbi: support@mynw.app."
           ]
         },
         {
@@ -542,6 +585,12 @@
           "h": "8. Account bambino collegati",
           "p": [
             "I controlli distruttivi per account/dati non sono mostrati in un account bambino collegato. Genitore o tutore gestisce l’eliminazione del profilo/dati del bambino."
+          ]
+        },
+        {
+          "h": "Revoca e cancellazione sono diverse",
+          "p": [
+            "La cancellazione del profilo bambino da parte di un adulto autorizzato avvia la rimozione dei dati cloud e dei file associati, salvo limiti tecnici e obblighi legali. Il registro dei consensi relativo al bambino viene eliminato col profilo. La revoca senza cancellazione blocca l'accesso interessato ma può conservare la prova dell'evento. L'abbonamento Google Play va cancellato a parte. Per dubbi: support@mynw.app."
           ]
         }
       ]
@@ -601,7 +650,7 @@
         {
           "h": "Famiglia e account bambino",
           "p": [
-            "Gli adulti gestiscono lo spazio familiare. L’accesso del bambino è collegato a un profilo autorizzato. Il bambino non vede i controlli di eliminazione account/dati."
+            "Un adulto crea o autorizza l'account bambino collegato, gestisce l'accesso e può revocarlo. Sotto l'età applicabile per il consenso digitale serve l'autorizzazione del rappresentante legale. Email verificata e ruolo di amministratore familiare non dimostrano da soli l'identità del genitore né il consenso verificabile richiesto dalla COPPA statunitense. Paesi e funzioni possono richiedere ulteriori verifiche."
           ]
         },
         {
@@ -653,7 +702,7 @@
         {
           "h": "Tutor IA e avvisi sulla privacy",
           "p": [
-            "NoKi è il tutor dell'app. Il percorso standard usa OpenAI; tester selezionati possono usare GPT-OSS e Mistral tramite IONOS. Non inserire dati personali reali. La versione 12 può mostrare un errore generico; l'aggiornamento Android previsto mostrerà avvisi comprensibili in otto lingue."
+            "Il filtro privacy opera in Supabase prima del modello esterno di moderazione, ma il testo originale del bambino arriva prima al server NowKids. Le richieste rischiose possono essere bloccate. Il testo ritenuto non identificativo può essere inviato a IONOS e poi a OpenAI secondo la funzione. Zero Data Retention OpenAI non è confermato per il progetto: non devono esservi inviati dati personali identificabili dei bambini. Il filtro può non riconoscere identificativi indiretti."
           ]
         }
       ]
