@@ -64,7 +64,16 @@
    response=await fetchOnce();
   }
   const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw Error(data.error||"Ошибка сервера "+response.status);
+  if(!response.ok){
+   const raw=data?.error||"Ошибка сервера "+response.status;
+   const description=typeof raw==="string"?raw:
+    (typeof raw?.message==="string"?raw.message:JSON.stringify(raw));
+   if(/Daily image limit reached/i.test(description))
+    throw Error("Достигнут суточный лимит 12 фото за 24 часа. Уже готовые изображения и текст сохранены. Продолжите позже, когда освободится лимит.");
+   if(/Monthly project image limit reached/i.test(description))
+    throw Error("Достигнут месячный лимит 40 фото для проекта. Черновик сохранён и остаётся доступен для редактирования.");
+   throw Error(description);
+  }
   return data;
  }
  async function postInfo(id){
@@ -127,7 +136,7 @@
   }
   // Pending processing means a request may still bill. Never double-send.
   if((history.items||[]).some(j=>j.prompt===prompt&&
-    ["pending","processing","running"].includes(j.status)))
+    ["reserved","pending","processing","running"].includes(j.status)))
    throw Error("Изображение ещё обрабатывается на сервере. Продолжайте после проверки его статуса.");
   return null;
  }
@@ -270,7 +279,7 @@
    "Продолжить сохранённый черновик с его темой и автором. Готовые этапы будут пропущены. ":
    "Новая статья по теме: "+(plan.topic||"авторская идея")+". ")+
    "Процесс может выполнить до 12 платных AI-запросов: 1 текст, 4 изображения и 7 переводов. "+
-   "Фотографии: 1536×1024, экономичное качество. На сервере действует лимит 5 фото в сутки на пользователя и 40 в месяц на проект. "+
+   "Фотографии: 1536×1024, экономичное качество. На сервере действует лимит 12 фото за 24 часа на пользователя и 40 в месяц на проект. "+
    "Каждый результат сохраняется в медиатеке/черновике. Переводы не публикуются без редакторской проверки. "+
    "Закрытие вкладки остановит последующие этапы, но сохранённый черновик можно продолжить позже.";
   $("aiFullConfirm").hidden=false;
