@@ -192,10 +192,6 @@ renderAuthors=function(...args){
  const heading=$s('[data-view="authors"] h2');if(heading)heading.textContent="Мой профиль";
  const inviteBtn=document.getElementById("authorsInvite");if(inviteBtn)inviteBtn.hidden=true;
  const note=document.getElementById("authorProfileHint");if(note)note.hidden=false;
- if(pane&&authors.length&&!pane.querySelector("[data-edit-own-author]")){
-   const items=authors.filter(a=>a.kind==="partner");
-   pane.insertAdjacentHTML("beforeend",'<div class="btns">'+items.map(a=>'<button type="button" data-edit-own-author="'+escape(a.id)+'">✎ Изменить профиль: '+escape(a.name)+'</button>').join("")+'</div>');
- }
  const save=document.getElementById("saveAuthor");
  if(save)save.textContent=editAuthorId?"Сохранить изменения":"Создать профиль";
 };
