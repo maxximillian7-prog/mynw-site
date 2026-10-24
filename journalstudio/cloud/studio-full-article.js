@@ -69,9 +69,9 @@
    const description=typeof raw==="string"?raw:
     (typeof raw?.message==="string"?raw.message:JSON.stringify(raw));
    if(/Daily image limit reached/i.test(description))
-    throw Error("Достигнут суточный лимит 12 фото за 24 часа. Уже готовые изображения и текст сохранены. Продолжите позже, когда освободится лимит.");
+    throw Error("Достигнут лимит изображений за 24 часа. Измените его в «ИИ-редакция → Лимиты генерации». Уже сохранённые этапы не потеряны.");
    if(/Monthly project image limit reached/i.test(description))
-    throw Error("Достигнут месячный лимит 40 фото для проекта. Черновик сохранён и остаётся доступен для редактирования.");
+    throw Error("Достигнут месячный лимит изображений проекта. Его можно изменить в «ИИ-редакция → Лимиты генерации». Черновик сохранён.");
    throw Error(description);
   }
   return data;
@@ -261,7 +261,7 @@
   if(state)notice("Незавершённая генерация: "+(state.postId?"черновик уже сохранён. ":"проверим создание текста. ")+
    "Нажмите «Продолжить» и подтвердите оставшиеся платные этапы.",progressEstimate());
  }
- function prepare(){
+ async function prepare(){
   if(active)return;
   if(!permitted()){notice("Функция доступна только редактору.",0,true);return}
   const stored=getSaved(),authorId=selectedAuthor();
@@ -274,12 +274,24 @@
    project:project.slug,userId:session.user.id,postId:null,
    authorId,topic:topic.slice(0,450),locale,assetBySlot:{},textRequestedAt:null,startedAt:new Date().toISOString()
   };
+  let budget=null;
+  try{budget=await window.StudioImageLimits?.refresh?.()}
+  catch(error){notice("Не удалось проверить серверные лимиты: "+error.message,progressEstimate(),true);return}
+  if(!budget?.limits||budget.project!==plan.project){
+   notice("Сначала загрузите текущие лимиты выбранного проекта.",0,true);return;
+  }
   pendingPlan=plan;
+  const leftDay=Math.max(0,budget.limits.daily_per_user-Number(budget.usage?.daily_per_user||0));
+  const leftMonth=Math.max(0,budget.limits.monthly_per_project-Number(budget.usage?.monthly_per_project||0));
+  const warning=leftDay<4||leftMonth<4?
+    " Текущего остатка может не хватить на четыре фотографии; готовые этапы сохранятся.":"";
   $("aiFullConfirmDetails").textContent=(stored?
    "Продолжить сохранённый черновик с его темой и автором. Готовые этапы будут пропущены. ":
    "Новая статья по теме: "+(plan.topic||"авторская идея")+". ")+
    "Процесс может выполнить до 12 платных AI-запросов: 1 текст, 4 изображения и 7 переводов. "+
-   "Фотографии: 1536×1024, экономичное качество. На сервере действует лимит 12 фото за 24 часа на пользователя и 40 в месяц на проект. "+
+   "Фотографии: 1536×1024, экономичное качество. Установленный лимит — "+
+   budget.limits.daily_per_user+" на пользователя за 24 часа (осталось "+leftDay+
+   "), "+budget.limits.monthly_per_project+" на проект за месяц (осталось "+leftMonth+"). "+warning+
    "Каждый результат сохраняется в медиатеке/черновике. Переводы не публикуются без редакторской проверки. "+
    "Закрытие вкладки остановит последующие этапы, но сохранённый черновик можно продолжить позже.";
   $("aiFullConfirm").hidden=false;
