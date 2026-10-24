@@ -51,7 +51,7 @@
             "Documenti, foto, scansioni, testi e altri file forniti per le funzioni selezionate. La versione Android attuale non offre input vocale.",
             "Contesto IA: richiesta, materia/argomento, cronologia di studio recente e solo i dati di profilo necessari ad adattare la difficoltà: età derivata, classe/anno, lingua di studio e modalità di età. NowStudy non invia a OpenAI il nome del minore né il nome della scuola. Le immagini sono incluse solo quando l’utente sceglie una funzione IA basata su immagini.",
             "Dati operativi: contatori, modello/token IA, log di errore/sicurezza e informazioni tecniche.",
-            "Le autorizzazioni opzionali riguardano fotocamera/foto, calendario, notifiche e autenticazione locale. La versione 12 non registra la voce.",
+            "Le autorizzazioni opzionali riguardano fotocamera/foto, calendario, notifiche e autenticazione locale. La versione Android attuale non registra la voce.",
             "Dati di abbonamento e acquisto: identificatori prodotto, stato acquisto/rinnovo, stato diritto di accesso, metadati di transazione/ricevuta e un identificatore utente dell’applicazione usato per validare l’accesso. NowKids non riceve i dati completi della carta di pagamento da Google Play o RevenueCat."
           ]
         },
@@ -283,7 +283,7 @@
           "items": [
             "Nome, nascita/età, avatar, scuola, classe e lingua.",
             "Orario, compiti, test, progresso, attività, libri, promemoria e note.",
-            "Documenti, foto, scansioni e conversazioni didattiche con l'IA quando usate; nessun input vocale nella versione 12."
+            "Documenti, foto, scansioni e conversazioni didattiche con l'IA quando usate; nessun input vocale nella versione Android attuale."
           ]
         },
         {
@@ -301,7 +301,7 @@
         {
           "h": "5. Permessi",
           "p": [
-            "Fotocamera/foto, notifiche, calendario e autenticazione locale sono facoltativi per le rispettive funzioni. Nessun input vocale nella versione 12."
+            "Fotocamera/foto, notifiche, calendario e autenticazione locale sono facoltativi per le rispettive funzioni. Nessun input vocale nella versione Android attuale."
           ]
         },
         {
