@@ -6,9 +6,9 @@
   const LABELS={en:'English',pt:'Português',ru:'Русский',uk:'Українська',fr:'Français',es:'Español',de:'Deutsch',it:'Italiano'};
   const URLS={
     nowwhat:{home:'/nowwhat/',guide:'/manual/',privacy:'/privacy/',terms:'/terms/',delete:'/delete-account/',support:'/support/',play:'https://play.google.com/store/apps/details?id=com.nowwhatapp.app'},
-    nowcook:{home:'/nowcook/',guide:'/nowcook/manual/',privacy:'/nowcook/privacy/',terms:'/nowcook/terms/',delete:'/nowcook/delete-account/',support:'/nowcook/support/'},
-    nowgreen:{home:'/nowgreen/',guide:'/nowgreen/manual/',privacy:'/nowgreen/privacy/',terms:'/nowgreen/terms/',delete:'/nowgreen/delete-account/',support:'/nowgreen/support/',ai:'/nowgreen/ai-data/',rights:'/nowgreen/data-rights/'},
-    nowkids:{home:'/nowkids/',guide:'/nowkids/manual/',privacy:'/nowkids/privacy/',terms:'/nowkids/terms/',delete:'/nowkids/delete-account/',support:'/nowkids/support/',ai:'/nowkids/ai-safety/',rights:'/nowkids/data-rights/',parents:'/nowkids/parents/',safety:'/nowkids/child-safety/',community:'/nowkids/community/',permissions:'/nowkids/permissions/'}
+    nowcook:{home:'/nowcook/',play:'https://play.google.com/store/apps/details?id=com.nowapps.nowcook',guide:'/nowcook/manual/',privacy:'/nowcook/privacy/',terms:'/nowcook/terms/',delete:'/nowcook/delete-account/',support:'/nowcook/support/'},
+    nowgreen:{home:'/nowgreen/',play:'https://play.google.com/store/apps/details?id=com.nowapps.nowgreen',guide:'/nowgreen/manual/',privacy:'/nowgreen/privacy/',terms:'/nowgreen/terms/',delete:'/nowgreen/delete-account/',support:'/nowgreen/support/',ai:'/nowgreen/ai-data/',rights:'/nowgreen/data-rights/'},
+    nowkids:{home:'/nowkids/',play:'https://play.google.com/store/apps/details?id=com.nowapps.nowkids',guide:'/nowkids/manual/',privacy:'/nowkids/privacy/',terms:'/nowkids/terms/',delete:'/nowkids/delete-account/',support:'/nowkids/support/',ai:'/nowkids/ai-safety/',rights:'/nowkids/data-rights/',parents:'/nowkids/parents/',safety:'/nowkids/child-safety/',community:'/nowkids/community/',permissions:'/nowkids/permissions/'}
   };
   const LOGOS={nowwhat:'/assets/brand/nowwhat-logo.webp',nowcook:'/assets/brand/nowcook-logo.webp',nowgreen:'/assets/brand/nowgreen-logo.webp?v=20261022-1',nowkids:'/assets/brand/nowkids-logo.webp'};
   const FALLBACK_LOGOS={nowwhat:'/assets/nowwhat-qr-icon.png',nowcook:'/assets/nowcook-home-logo.webp',nowgreen:'/assets/nowgreen-icon.svg',nowkids:'/assets/nowkids-home-logo.png'};
@@ -44,6 +44,15 @@
     const links=app&&app!=='home'?[['home','/'],['privacy',URLS[app].privacy],['terms',URLS[app].terms],['delete',URLS[app].delete],['support',URLS[app].support]]:[['navHome','/'],['navApps','/#apps'],['navDocs','/#documentation'],['navContact','mailto:support@mynw.app']];
     return '<footer class="eco-footer"><div class="eco-container eco-footer-flex"><div>© 2026 MyNow Apps · '+E(t.footer)+'</div><div class="eco-footer-links">'+links.map(([key,url])=>'<a href="'+url+'">'+E(t[key]||t.home)+'</a>').join('')+'</div></div></footer>';
   }
+  const WELCOME_LABELS={en:'A welcome note',pt:'Mensagem de boas-vindas',ru:'Приветственное письмо',uk:'Привітальне повідомлення',fr:'Un mot de bienvenue',es:'Carta de bienvenida',de:'Willkommensgruß',it:'Un messaggio di benvenuto'};
+  function qrGraphic(app){
+    if(app==='nowwhat')return '<img class="eco-play-qr" src="/assets/nowwhat-google-play-qr.svg?v=20261015-1" width="170" height="170" loading="lazy" decoding="async" alt="NowWhat Google Play QR with NW logo">';
+    return window.MyNowStoreQR?window.MyNowStoreQR(app,LOGOS[app],TITLES[app]+' Google Play QR'):'';
+  }
+  function downloadPanel(app,t){
+    const u=URLS[app];if(!u.play)return '';
+    return '<section class="eco-section eco-install" id="download"><div class="eco-container"><div class="eco-note eco-download-note"><div><div class="eco-section-eyebrow">'+TITLES[app]+' · Android</div><h2>'+E(t.play)+'</h2><p>'+E(t[app].summary)+'</p><a class="eco-button" href="'+u.play+'" target="_blank" rel="noopener noreferrer">'+E(t.play)+' ↗</a></div><a class="eco-qr-link" href="'+u.play+'" target="_blank" rel="noopener noreferrer" aria-label="'+TITLES[app]+' Google Play QR">'+qrGraphic(app)+'</a></div></div></section>';
+  }
   function home(t){
     const stage=APP_IDS.map(a=>'<a href="'+URLS[a].home+'" class="eco-stage-tile">'+logo(a)+'<strong>'+TITLES[a]+'</strong></a>').join('');
     root.innerHTML='<section class="eco-hero"><div class="eco-container eco-hero-grid"><div>'+
@@ -56,18 +65,14 @@
       '<section class="eco-section" id="documentation"><div class="eco-container"><div class="eco-note"><div><div class="eco-section-eyebrow">'+E(t.docsKicker)+'</div><h2>'+E(t.helpTitle)+'</h2><p>'+E(t.helpText)+'</p></div><a href="/nowwhat/" class="eco-button">'+E(t.explore)+' →</a></div></div></section>'+
       /* Retain old deep-link hash targets used in Google Play descriptions and documentation. */
       '<div id="features"></div><div id="documents"></div><div id="vault"></div><div id="saved"></div><div id="finance"></div><div id="calendar"></div><div id="briefing"></div>'+
-      '<section class="eco-section" id="download"><div class="eco-container"><div class="eco-note">'+
-      '<div><div class="eco-section-eyebrow">NowWhat · Android</div><h2>'+E(t.play)+'</h2><p>'+E(t.nowwhat.summary)+'</p></div>'+
-      '<div class="eco-actions"><a class="eco-button" href="https://play.google.com/store/apps/details?id=com.nowwhatapp.app" target="_blank" rel="noopener noreferrer">'+E(t.play)+' ↗</a>'+
-      '<a href="https://play.google.com/store/apps/details?id=com.nowwhatapp.app" target="_blank" rel="noopener noreferrer" aria-label="NowWhat Google Play QR"><img class="eco-play-qr" src="/assets/nowwhat-google-play-qr.svg?v=20261015-1" alt="Scan to install NowWhat from Google Play, with NW logo in the centre" width="150" height="150" loading="lazy" decoding="async"></a></div>'+
-      '</div></div></section><div id="privacy"></div>'+footer(t,'home');
+      '<div id="download" hidden></div><div id="privacy"></div>'+footer(t,'home');
     document.title='MyNow Apps — NowWhat, NowCook, NowGreen & NowKids';
     setMeta(t.lead);
   }
   function resources(app,t){
-    const u=URLS[app],keys=['guide','privacy','terms','delete','support',...(['nowgreen','nowkids'].includes(app)?['ai','rights']:[]),...(app==='nowkids'?['parents','safety','community','permissions']:[])];
-    const glyph={guide:'📘',privacy:'🛡️',terms:'📜',delete:'🗑️',support:'✉️',ai:'✨',rights:'🗂️',parents:'👨‍👩‍👧',safety:'🔒',community:'🤝',permissions:'⚙️'};
-    return keys.filter(k=>u[k]).map(k=>'<a class="eco-resource" href="'+u[k]+'"><span class="eco-resource-icon">'+glyph[k]+'</span><span>'+E(t[k]||k)+'</span><span class="eco-resource-arrow">↗</span></a>').join('');
+    const u=URLS[app],keys=['welcome','guide','privacy','terms','delete','support',...(['nowgreen','nowkids'].includes(app)?['ai','rights']:[]),...(app==='nowkids'?['parents','safety','community','permissions']:[])];
+    const glyph={welcome:'💌',guide:'📘',privacy:'🛡️',terms:'📜',delete:'🗑️',support:'✉️',ai:'✨',rights:'🗂️',parents:'👨‍👩‍👧',safety:'🔒',community:'🤝',permissions:'⚙️'};
+    return keys.filter(k=>u[k]||k==='welcome').map(k=>'<a class="eco-resource" href="'+(u[k]||('/'+app+'/welcome/'))+'"><span class="eco-resource-icon">'+glyph[k]+'</span><span>'+E(k==='welcome'?WELCOME_LABELS[locale]:(t[k]||k))+'</span><span class="eco-resource-arrow">↗</span></a>').join('');
   }
   function appPage(app,t){
     const d=t[app],u=URLS[app];
@@ -91,7 +96,7 @@
       '<h2>'+E(t.resources)+'</h2><p class="eco-section-lead">'+E(t.resourcesLead)+'</p>'+
       '<div class="eco-resource-grid">'+resources(app,t)+'</div></div></section>'+
       '<section class="eco-section"><div class="eco-container"><div class="eco-section-eyebrow">'+E(t.related)+'</div>'+
-      '<div class="eco-related">'+related+'</div></div></section></div>'+footer(t,app);
+      '<div class="eco-related">'+related+'</div></div></section>'+downloadPanel(app,t)+'</div>'+footer(t,app);
     document.title=TITLES[app]+' — MyNow Apps';
     setMeta(d.summary);
   }
