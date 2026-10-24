@@ -80,9 +80,23 @@ async function claimOwner(){
  const key=$("setup").value;if(!key)throw Error("Введите ключ активации");
  await call("/bootstrap","POST",{setup_key:key});$("setup").value="";await initialize();toast("Главный редактор активирован");
 }
+async function fetchAllPosts(slug){
+ // The API returns at most 100 records per page. Keep the entire catalog
+ // available as the journal grows, without relying on a single truncated page.
+ const all=[];
+ for(let offset=0;offset<=10000;offset+=100){
+  const result=await call("/posts?project="+encodeURIComponent(slug)+"&offset="+offset);
+  const batch=Array.isArray(result.posts)?result.posts:[];
+  all.push(...batch);
+  if(batch.length<100)return all;
+ }
+ throw Error("Слишком много материалов для одной загрузки. Свяжитесь с редактором.");
+}
 async function loadData(){
- const result=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug)),call("/topics?project="+encodeURIComponent(project.slug))]);
- posts=result[0].posts||[];authors=result[1].authors||[];topics=result[2].topics||[];
+ const slug=project.slug;
+ const result=await Promise.all([fetchAllPosts(slug),call("/authors?project="+encodeURIComponent(slug)),call("/topics?project="+encodeURIComponent(slug))]);
+ if(project?.slug!==slug)return;
+ posts=result[0];authors=result[1].authors||[];topics=result[2].topics||[];
  window.StudioTopics?.render?.();
 }
 // Native confirm()/prompt() dialogs can be suppressed by mobile browsers,
@@ -206,8 +220,10 @@ function renderAuthors(){
  $("authorKind").querySelector('option[value="ai"]').disabled=!chiefRole();
 }
 async function refreshPosts(){
- const [ps,au,t]=await Promise.all([call("/posts?project="+encodeURIComponent(project.slug)),call("/authors?project="+encodeURIComponent(project.slug)),call("/topics?project="+encodeURIComponent(project.slug))]);
- posts=ps.posts||[];authors=au.authors||[];topics=t.topics||[];renderDashboard();renderLibrary();renderAuthors();window.StudioTopics?.render?.();
+ const slug=project.slug;
+ const [ps,au,t]=await Promise.all([fetchAllPosts(slug),call("/authors?project="+encodeURIComponent(slug)),call("/topics?project="+encodeURIComponent(slug))]);
+ if(project?.slug!==slug)return;
+ posts=ps;authors=au.authors||[];topics=t.topics||[];renderDashboard();renderLibrary();renderAuthors();window.StudioTopics?.render?.();
 }
 function paintPublication(){
  const ready=posts.filter(p=>["approved","scheduled","published"].includes(p.status));
