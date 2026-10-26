@@ -572,42 +572,84 @@ function modifyBlock(index,operation){
  else{const to=index+(operation==="up"?-1:1);if(to<0||to>=blocks.length)return;[blocks[index],blocks[to]]=[blocks[to],blocks[index]]}
  dirty=true;renderEditor();
 }
+let imageUploadPending=false;
+const imageUploadMessage=(message,error=false)=>{
+ const area=$("imageUploadStatus");
+ if(area){area.textContent=message;area.dataset.error=error?"true":"false";}
+};
 async function upload(){
- const f=$("file").files?.[0];
- if(!f)throw Error("Выберите фотографию");
- if(!draft||!editable())throw Error("Материал не открыт для редактирования");
- if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>8*1024*1024)throw Error("Нужен JPG, PNG или WebP до 8 МБ");
- if(!$("imageRights").checked)throw Error("Подтвердите право публикации фото");
+ if(imageUploadPending)return;
+ const input=$("file"),f=input.files?.[0];
+ if(!f){
+  imageUploadMessage("Сначала выберите фотографию в открывшемся окне. Затем подтвердите права и нажмите «Загрузить фото».");
+  input.scrollIntoView({behavior:"smooth",block:"center"});input.click();return;
+ }
+ const fail=message=>{imageUploadMessage(message,true);throw Error(message)};
+ if(!draft||!editable())fail("Статья недоступна для изменений. Для присланного материала выберите «Редактировать фотографии» и подтвердите переход к правке.");
+ if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>8*1024*1024)
+  fail("Нужен JPG, PNG или WebP размером до 8 МБ.");
+ if(!$("imageRights").checked)
+  fail("Подтвердите права на использование фото, поставив галочку под формой.");
  const copyright=$("imageCopyright").value.trim();
- if(!copyright)throw Error("Введите имя фотографа или правообладателя");
+ if(!copyright)fail("Введите имя фотографа или правообладателя.");
  const license=$("imageLicense").value;
  const alt=$("imageAlt").value.trim()||f.name;
- if(!window.StudioOptimizer)throw Error("Обновите страницу: модуль оптимизации изображений не загружен");
- const renditions=await window.StudioOptimizer.renderVersions(f);
- const base64=await new Promise((ok,no)=>{const reader=new FileReader();reader.onload=()=>ok(String(reader.result).split(",")[1]);reader.onerror=no;reader.readAsDataURL(f)});
- const sourceUrl=$("imageSourceUrl").value.trim();
- if(sourceUrl&&!/^https:\/\//i.test(sourceUrl))throw Error("Источник должен начинаться с https://");
- const r=await call("/media","POST",{project:project.slug,mime:f.type,base64,alt_text:alt,copyright_holder:copyright,license,source_url:sourceUrl,rights_confirmed:true});
- let photoStatus=null;
- try{photoStatus=await window.StudioOptimizer.fromPrepared(r.asset.id,renditions,f.size)}
- catch(e){toast("Оригинал загружен, но WebP-оптимизация не завершена: "+e.message,true)}
+ if(!window.StudioOptimizer)fail("Не загрузился модуль подготовки фото. Обновите страницу Ctrl+F5.");
  const destination=$("uploadPlacement").value;
- if(!["library","cover","inline"].includes(destination))throw Error("Некорректный выбор размещения");
- capture(); // Preserve any unsaved editor fields even when only saving media.
- if(destination!=="library"){
-  if(destination==="cover")draft.cover_path=r.asset.id;
-  if(destination==="inline"){
-   if(!blocks.some(b=>b.type==="image"&&b.asset_id===r.asset.id))
-    blocks.push({type:"image",asset_id:r.asset.id,caption:"",alt});
-   draft.blocks=blocks;
+ if(!["library","cover","inline"].includes(destination))fail("Укажите место размещения фото.");
+ const sourceUrl=$("imageSourceUrl").value.trim();
+ if(sourceUrl&&!/^https:\/\//i.test(sourceUrl))fail("Ссылка на источник должна начинаться с https://");
+ const sourceProject=project.slug,sourcePost=current?.id||null;
+ const sourceRevision=current?.revision??null;
+ imageUploadPending=true;$("uploadImage").disabled=true;
+ $("uploadImage").textContent="⌛ Загрузка фотографии…";
+ imageUploadMessage("Подготавливаем изображение и загружаем его в медиатеку. Не нажимайте повторно.");
+ try{
+  const renditions=await window.StudioOptimizer.renderVersions(f);
+  const base64=await new Promise((ok,no)=>{
+   const reader=new FileReader();
+   reader.onload=()=>ok(String(reader.result).split(",")[1]);
+   reader.onerror=()=>no(Error("Не удалось прочитать выбранный файл."));
+   reader.readAsDataURL(f);
+  });
+  const r=await call("/media","POST",{
+   project:sourceProject,mime:f.type,base64,alt_text:alt,
+   copyright_holder:copyright,license,source_url:sourceUrl,rights_confirmed:true
+  });
+  if(!r?.asset?.id)throw Error("Сервер не подтвердил сохранение фотографии.");
+  try{await window.StudioOptimizer.fromPrepared(r.asset.id,renditions,f.size)}
+  catch(e){imageUploadMessage("Фото загружено, но оптимизация WebP требует повторной проверки: "+e.message,true)}
+  if(project?.slug!==sourceProject||current?.id!==sourcePost||
+    (sourcePost&&current?.revision!==sourceRevision)||!editable())
+   throw Error("Фото сохранено в медиатеке, но статья изменилась. Откройте статью заново и выберите фото в медиатеке.");
+  let inserted=false;
+  const replacementIndex=window.StudioPhotoTools?.activeReplacementIndex?.();
+  if(replacementIndex!==null&&replacementIndex!==undefined){
+   await window.StudioPhotoTools.applyReplacement(r.asset.id,{id:r.asset.id,available:true,alt});
+   inserted=true;
+  }else{
+   capture();
+   if(destination==="cover"){draft.cover_path=r.asset.id;inserted=true;}
+   if(destination==="inline"){
+    blocks.push({type:"image",asset_id:r.asset.id,caption:"",alt,crop:{x:50,y:50,zoom:100,aspect:"auto"}});
+    draft.blocks=blocks;inserted=true;
+   }
+   if(inserted)dirty=true;
+   try{const media=await call("/media/"+encodeURIComponent(r.asset.id));assets[r.asset.id]=media.url}catch{}
+   renderEditor();
   }
-  dirty=true;
+  input.value="";$("imageAlt").value="";$("imageSourceUrl").value="";$("imageRights").checked=false;
+  imageUploadMessage(inserted?"Фото добавлено в редактируемую статью. Нажмите «Сохранить».":"Фото сохранено в медиатеке. Его можно вставить в текст или установить обложкой.");
+  try{if(window.StudioImages?.showLibrary)await window.StudioImages.showLibrary("all")}
+  catch(e){console.warn("Journal Studio media refresh deferred",String(e))}
+  toast(inserted?"Фото готово. Проверьте положение и сохраните статью.":"Фотография загружена в медиатеку.");
+ }catch(e){
+  imageUploadMessage("Не удалось завершить загрузку: "+e.message,true);throw e;
+ }finally{
+  imageUploadPending=false;
+  $("uploadImage").disabled=false;
+  $("uploadImage").textContent="↑ Загрузить фото";
  }
- try{const media=await call("/media/"+encodeURIComponent(r.asset.id));assets[r.asset.id]=media.url}catch{}
- $("file").value="";$("imageAlt").value="";$("imageSourceUrl").value="";$("imageRights").checked=false;
- renderEditor();
- if(window.StudioImages?.showLibrary)await window.StudioImages.showLibrary("all");
- toast(destination==="library"?"Изображение сохранено в медиатеке. Его можно выбрать позднее без повторной загрузки.":destination==="cover"?"Фото назначено обложкой без дублирования в тексте. Нажмите «Сохранить».":"Фото добавлено в текст. Нажмите «Сохранить».");
 }
 async function saveInstagramCaption(){
  if(!draft||!current)throw Error("Сначала сохраните статью");
