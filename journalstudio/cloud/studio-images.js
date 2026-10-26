@@ -50,9 +50,12 @@
    container.innerHTML='<div class="empty">'+(libraryBusy?"Загрузка изображений…":"Пока нет изображений. Сгенерируйте или загрузите первое.")+'</div>';
   }else{
    container.innerHTML=library.map(item=>{
+    const replacementIndex=window.StudioPhotoTools?.activeReplacementIndex?.();
     const buttons=editablePost()&&item.available?
+     (replacementIndex!==null&&replacementIndex!==undefined?
+       '<div class="studio-media-actions"><button type="button" data-library-replace="'+esc(item.id)+'">✓ Заменить выбранное фото</button></div>':
      '<div class="studio-media-actions"><button type="button" data-library-cover="'+esc(item.id)+'"'+(draft.cover_path===item.id?' disabled':'')+'>Обложка</button>'+
-     '<button type="button" data-library-insert="'+esc(item.id)+'"'+(blocks.some(b=>b.type==="image"&&b.asset_id===item.id)?' disabled':'')+'>В текст</button></div>':
+     '<button type="button" data-library-insert="'+esc(item.id)+'"'+(blocks.some(b=>b.type==="image"&&b.asset_id===item.id)?' disabled':'')+'>В текст</button></div>):
      '<p class="small muted">'+(item.available?"Для использования откройте редактируемый черновик":"Изображение временно недоступно")+'</p>';
     const label=item.source_type==="ai"?"ИИ":item.source_type==="stock"?"Фотобанк":"Загружено";
     return '<article class="studio-media-card" data-media-id="'+esc(item.id)+'">'+
@@ -267,6 +270,7 @@
   if(b.dataset.imageSource){setSource(b.dataset.imageSource);}
   if(b.dataset.libraryCover)run(()=>useLibraryItem(b.dataset.libraryCover,true));
   if(b.dataset.libraryInsert)run(()=>useLibraryItem(b.dataset.libraryInsert,false));
+  if(b.dataset.libraryReplace)run(()=>window.StudioPhotoTools.applyReplacement(b.dataset.libraryReplace,library.find(x=>x.id===b.dataset.libraryReplace)));
  });
  const originalRender=renderEditor;
  renderEditor=function(...args){originalRender(...args);if(!imageEditor()&&!$("studioImageAi").hidden)setSource("library");refreshControls();if(library.length&&$("studioImageLibrary")&&!$("studioImageLibrary").hidden)renderLibrary()};
