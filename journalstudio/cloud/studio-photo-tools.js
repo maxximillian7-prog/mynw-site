@@ -132,12 +132,16 @@
   renderEditor();
   toast("Фотография заменена. Проверьте подпись и кадрирование, затем сохраните статью.");
  }
+ function selectImage(index,scroll=false){
+  const block=blocks[index];
+  if(block?.type!=="image")return;
+  selectedBlock=block;replacement=null;
+  notice="Выбрана фотография. Используйте стрелки в панели для её перемещения.";
+  render();
+  if(scroll)document.getElementById("studioPhotoPanel")?.scrollIntoView({behavior:"smooth",block:"center"});
+ }
  async function act(action,index){
-  if(action==="select"){
-   const block=blocks[index];
-   if(block?.type!=="image")return;
-   selectedBlock=block;replacement=null;notice="Выбрана фотография. Для перемещения используйте верхние стрелки.";render();return;
-  }
+  if(action==="select"){selectImage(index);return;}
   if(action==="edit"){
    const el=document.querySelector('#blocks [data-block="'+index+'"]')?.closest(".block");
    el?.scrollIntoView({behavior:"smooth",block:"center"});
@@ -188,6 +192,6 @@
  });
  const original=renderEditor;
  renderEditor=function(...args){const value=original(...args);render();return value};
- window.StudioPhotoTools={activeReplacementIndex,applyReplacement,render};
+ window.StudioPhotoTools={activeReplacementIndex,applyReplacement,render,selectImage};
  render();
 })();
