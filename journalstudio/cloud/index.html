@@ -320,6 +320,13 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 .studio-photo-replacement button{margin-left:8px}
 .studio-photo-notice{font-size:12px;color:var(--studio-accent-contrast,#346a4f);font-weight:700}
 @media(max-width:550px){.studio-photo-item{grid-template-columns:78px minmax(0,1fr);gap:8px}.studio-photo-thumb{width:78px}.studio-photo-buttons button{font-size:10px;padding:6px}.studio-photo-panel{padding:10px}}
+
+.studio-photo-toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:12px 0 15px}
+.studio-photo-toolbar button{padding:10px 13px;font-size:12px}
+#imageUploadStatus[data-error="true"]{color:#a44335!important;font-weight:700}
+#imageUploadStatus{line-height:1.6;white-space:pre-wrap}
+.studio-image-panel[hidden],#studioPhotoPanel[hidden]{display:none!important}
+@media(max-width:550px){.studio-photo-toolbar{display:grid;grid-template-columns:1fr}.studio-photo-toolbar button{width:100%}}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 <link rel="stylesheet" href="./studio-author-guide.css?v=20261024-1">
@@ -517,7 +524,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <div id="studioImageLibrary" class="studio-image-panel" hidden>
  <div class="row"><div><strong>Медиатека Journal Studio</strong><p class="muted small">Генерированные и загруженные изображения сохраняются здесь независимо от текста статьи. Повторное использование бесплатно.</p></div><button type="button" id="mediaLibraryRefresh" title="Обновить изображения">↻ Обновить</button></div>
  <div class="editorFields"><div><label for="mediaLibraryFilter">Показывать</label>
- <select id="mediaLibraryFilter"><option value="ai">Изображения ИИ</option><option value="all">Все изображения</option><option value="stock">Фото из фотобанков</option><option value="upload">Свои загрузки</option></select></div>
+ <select id="mediaLibraryFilter"><option value="all" selected>Все изображения, включая фото авторов</option><option value="ai">Изображения ИИ</option><option value="stock">Фото из фотобанков</option><option value="upload">Свои загрузки</option></select></div>
  <div class="studio-img-spacer"><label>Использование</label><p class="small muted">«Обложка» — только главное фото; «В текст» — отдельное изображение внутри статьи. Никаких дубликатов автоматически.</p></div></div>
  <div class="studio-media-grid" id="mediaLibraryGrid"><div class="empty">Медиатека загружается…</div></div>
  <div class="btns" style="margin-top:13px"><button type="button" id="mediaLibraryMore" hidden>Показать ещё</button><button type="button" id="mediaRemoveCoverDuplicate" hidden>Убрать повтор обложки из конца статьи</button></div>
@@ -533,7 +540,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <option value="library">Только сохранить в медиатеку</option>
 <option value="cover">Только главная обложка</option>
 <option value="inline">Добавить изображение в текст</option>
-</select><label class="jp-check"><input id="imageRights" type="checkbox"> Я подтверждаю, что имею право опубликовать это изображение</label><button type="button" class="primary" id="uploadImage">↑ Загрузить фото</button></div></div>
+</select><label class="jp-check"><input id="imageRights" type="checkbox"> Я подтверждаю, что имею право опубликовать это изображение</label><button type="button" class="primary" id="uploadImage">↑ Загрузить фото</button><p class="small muted" id="imageUploadStatus" role="status" aria-live="polite" style="margin:9px 0 0">Порядок: выбрать файл → указать автора фото → подтвердить права → загрузить. Первое нажатие без выбранного файла откроет выбор изображения.</p></div></div>
 <div class="workflow"><div class="eyebrow">РЕДАКЦИОННЫЙ ПРОЦЕСС</div><div class="btns" style="margin-top:9px"><button id="save" class="primary">Сохранить</button><button id="submit">На проверку</button><button id="return">На доработку</button><button id="approve">✓ Утвердить</button><button id="publish" class="primary">↗ Опубликовать</button><button id="schedule">◷ Запланировать</button><button id="hidePost" type="button" hidden>Скрыть статью</button><button id="editPublishedPost" type="button" hidden>Изменить содержание</button><button id="deletePost" type="button" hidden title="Удалить статью из Journal Studio и убрать из приложений">Удалить статью</button></div></div>
 </div></div>
 <div class="stack editorPreview"><div class="card"><div class="sectionHeading"><div><h2>Предпросмотр публикации</h2><p>Выберите площадку до утверждения статьи</p></div><span class="chip">Live preview</span></div><div class="jp-mode-switch" role="group" aria-label="Формат предпросмотра"><button type="button" data-preview-mode="phone" class="selected">▯ Телефон</button><button type="button" data-preview-mode="site">▤ Сайт</button><button type="button" data-preview-mode="instagram">◎ Instagram</button></div><div id="jpShape" class="jp-shape-row" hidden><label for="jpAspect">Формат фото</label><select id="jpAspect"><option value="4:5">Вертикальный 4:5</option><option value="1:1">Квадрат 1:1</option></select></div><div id="jpCaptionFields" class="jp-caption-fields" hidden><label for="jpCaptionText">Подпись для Instagram (необязательно)</label><textarea id="jpCaptionText" maxlength="2200" rows="4" placeholder="Здесь можно написать отдельный текст для Instagram. Если оставить пустым, будет создан краткий вариант из статьи."></textarea><div class="row"><span id="jpCaptionLength" class="small muted">0 / 2200</span><button type="button" id="jpSaveCaption">Сохранить подпись</button></div><div class="small muted" style="margin-top:7px">Сохраняется отдельно от основного текста статьи. Без подключения Meta пост не отправляется.</div></div><div id="preview" class="jp-preview-window" aria-live="polite"><div class="empty">Добавьте заголовок и блоки, чтобы увидеть статью.</div></div><div id="jpNotice" class="jp-preview-note">Предварительный макет без публикации.</div></div>
@@ -729,7 +736,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./studio-i18n.js?v=20261023-51"></script>
 <script defer src="./preview.js?v=20261024-1"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261026-photo1"></script>
+<script defer src="./client.js?v=20261026-photo2"></script>
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
@@ -737,8 +744,8 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./ai-studio.js?v=20261026-2"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-62"></script>
-<script defer src="./studio-images.js?v=20261026-photo1"></script>
-<script defer src="./studio-photo-tools.js?v=20261026-photo1"></script>
+<script defer src="./studio-images.js?v=20261026-photo2"></script>
+<script defer src="./studio-photo-tools.js?v=20261026-photo2"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
 <script defer src="./studio-author-guide.js?v=20261024-1"></script>
