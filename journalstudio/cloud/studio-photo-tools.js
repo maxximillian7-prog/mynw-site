@@ -22,6 +22,17 @@
   const count=photos.length;
   let html='<div class="row studio-photo-heading"><div><strong>📷 Фотографии в статье · '+count+'</strong>'+
    '<p class="small muted">Порядок снимков, кадрирование, подписи и обложка. Изменения вступят в силу после сохранения и согласования.</p></div></div>';
+  if(canEdit){
+   html+='<div class="studio-photo-toolbar">'+
+    '<button type="button" class="primary" data-photo-tool="library">▦ Выбрать из медиатеки</button>'+
+    '<button type="button" data-photo-tool="upload">↑ Загрузить фотографию</button>'+
+    '<button type="button" data-photo-tool="add">+ Вставить фото в текст</button></div>';
+  }else if(current?.status==="in_review"&&editorRole()){
+   html+='<div class="studio-photo-replacement">Материал отправлен на проверку. Для замены или загрузки фото сначала откройте редакторскую правку. '+
+    '<button type="button" class="primary" data-photo-tool="unlock">✎ Редактировать фотографии</button></div>';
+  }else if(current?.status==="in_review"){
+   html+='<p class="small muted">Материал уже отправлен на проверку. Изменения фотографий доступны после возвращения редакцией на доработку.</p>';
+  }
   if(replacement&&canEdit){
    html+='<div class="studio-photo-replacement" role="status">Выберите изображение в медиатеке ниже, чтобы заменить фото №'+
     (photos.findIndex(x=>x.index===replacement.index)+1)+
@@ -53,14 +64,14 @@
   [blocks[index],blocks[other.index]]=[blocks[other.index],blocks[index]];
   draft.blocks=blocks;dirty=true;notice="Порядок фотографий изменён. Нажмите «Сохранить».";renderEditor();
  }
- function beginReplace(index){
+ async function beginReplace(index){
   if(!current?.id)throw Error("Сначала сохраните статью.");
   const block=blocks[index];if(!allowed()||block?.type!=="image")return;
   capture();
   replacement={postId:current.id,project:project.slug,channel:window.StudioFeatures?.activeVersion?.()||"base",index,assetId:block.asset_id};
   notice="Выберите новое фото в медиатеке; замена не удаляет исходный файл.";
   render();
-  void window.StudioImages.showLibrary("all");
+  await window.StudioImages.showLibrary("all");
   document.getElementById("studioImageLibrary")?.scrollIntoView({behavior:"smooth",block:"start"});
  }
  async function applyReplacement(id,item){
@@ -73,8 +84,11 @@
   if(!validTarget())throw Error("Статья изменилась во время загрузки. Повторите выбор.");
   capture();
   const b=blocks[replacement.index];
-  b.asset_id=id;b.alt=String(item.alt||item.prompt||"").slice(0,350);
-  b.caption="";b.crop={x:50,y:50,zoom:100,aspect:"auto"};
+  b.asset_id=id;
+  // Keep the author's intentional caption, while refreshing alternative text
+  // only when the selected image has its own description.
+  if(item.alt||item.prompt)b.alt=String(item.alt||item.prompt).slice(0,350);
+  b.crop={x:50,y:50,zoom:100,aspect:"auto"};
   assets[id]=data.url;draft.blocks=blocks;dirty=true;
   replacement=null;notice="Фото заменено в этой статье. Старый оригинал остался в медиатеке. Сохраните материал.";
   renderEditor();
@@ -104,11 +118,32 @@
    modifyBlock(index,"remove");notice="Фото убрано из текста, но сохранено в медиатеке. Сохраните статью.";render();return;
   }
  }
+ async function tool(action){
+  if(action==="unlock"){
+   if(!current?.id||!editorRole()||current.status!=="in_review")throw Error("Редакторская правка недоступна");
+   return editArticle(current.id);
+  }
+  if(!allowed())throw Error("Сначала откройте редактируемый черновик или верните статью с проверки.");
+  if(action==="upload"){
+   const upload=document.querySelector(".jp-upload-area");
+   upload?.scrollIntoView({behavior:"smooth",block:"center"});
+   const choose=document.getElementById("file");
+   if(choose){choose.click();}
+   return;
+  }
+  if(action==="library"||action==="add"){
+   if(!window.StudioImages?.showLibrary)throw Error("Модуль медиатеки не загрузился. Обновите страницу Ctrl+F5");
+   replacement=null;render();
+   await window.StudioImages.showLibrary("all");
+   document.getElementById("studioImageLibrary")?.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+ }
  host.addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
   if(b.dataset.photoCancel!==undefined){
-   replacement=null;notice="Замена отменена.";render();window.StudioImages?.showLibrary?.("all");return;
+   replacement=null;notice="Замена отменена.";render();run(()=>window.StudioImages?.showLibrary?.("all"));return;
   }
+  if(b.dataset.photoTool)run(()=>tool(b.dataset.photoTool));
   if(b.dataset.photoAction)run(()=>act(b.dataset.photoAction,Number(b.dataset.photoIndex)));
  });
  const original=renderEditor;
