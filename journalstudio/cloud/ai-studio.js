@@ -7,7 +7,7 @@
  const chiefRoleAi=()=>["owner","chief_editor"].includes(project?.role||"");
  const locales={ru:"Русский","pt-PT":"Português (PT)",en:"English",uk:"Українська",es:"Español",fr:"Français",de:"Deutsch",it:"Italiano"};
  let selected=null,schedules=[],jobs=[],translations=[],busy=false,providerReady=false,lastPhotoCache=new Map();
- let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null,bulkStarting=false;
+ let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null,bulkStarting=false,bulkApproving=false;
  async function request(path,method="GET",body,options={}){
   if(!session?.access_token)throw Error("Войдите в редакцию");
   const signal=options.timeoutMs?{signal:AbortSignal.timeout(options.timeoutMs)}:{};
@@ -166,11 +166,80 @@
   return ["published","approved","scheduled"].includes(current?.status)
    ? (current.approved_revision||current.revision) : current.revision;
  }
+
+ function approvalReadiness(){
+  const rev=currentSourceRevision();
+  const needed=Object.keys(locales).filter(k=>k!==current?.locale);
+  const valid=k=>translations.find(t=>t.locale===k&&t.source_revision===rev&&
+    ["draft","reviewed"].includes(t.status)&&String(t.title||"").trim()&&
+    Array.isArray(t.blocks)&&t.blocks.length>0);
+  return {missing:needed.filter(k=>!valid(k)),pending:needed.filter(k=>valid(k)?.status==="draft"),
+    count:needed.length};
+ }
+ function updateApprovalUI(){
+  const status=approvalReadiness();
+  const b=$("translationApproveAll"),hint=$("translationApproveAllHint");
+  if(b){
+   b.disabled=!chiefRoleAi()||!current?.id||busy||bulkApproving||dirty||
+     status.count!==7||status.missing.length>0||status.pending.length===0;
+   b.title=status.missing.length?
+      "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", "):
+      "Подтвердить переводы, которые вы проверили";
+  }
+  if(hint)hint.textContent=status.missing.length?
+    "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", "):
+    status.pending.length?"Можно проверить языки по отдельности или утвердить "+
+      status.pending.length+" переводов одной кнопкой.":"Все 8 языков утверждены.";
+  for(const id of ["publish","schedule"]){
+   const button=$(id);
+   if(button&&!button.hidden){
+    button.disabled=status.count!==7||status.missing.length>0||status.pending.length>0||dirty;
+    button.title=button.disabled?"Для публикации необходимы все 7 актуальных утверждённых переводов.":"";
+   }
+  }
+ }
+ async function approveAllTranslations(){
+  if(bulkApproving||busy)return;
+  if(!chiefRoleAi())throw Error("Только главный редактор может подтверждать переводы.");
+  if(!current?.id||dirty)throw Error("Сохраните статью перед подтверждением.");
+  bulkApproving=true;
+  const article=current.id,slug=project.slug,rev=currentSourceRevision(),b=$("translationApproveAll");
+  try{
+   await translationsForCurrent();
+   if(current?.id!==article||project?.slug!==slug||currentSourceRevision()!==rev)
+     throw Error("Статья изменилась. Обновите статусы.");
+   const check=approvalReadiness();
+   if(check.count!==7||check.missing.length)
+     throw Error("Отсутствуют актуальные переводы: "+check.missing.map(k=>locales[k]).join(", "));
+   if(!check.pending.length){toast("Все переводы уже утверждены.");return}
+   const ok=await editorialDecision({
+    title:"Утвердить все переводы",
+    message:"Подтвердите, что проверили перевод каждого языка.\n\nДля утверждения: "+
+     check.pending.map(k=>locales[k]).join(", ")+
+     ".\n\nНовых запросов ИИ не будет; ранее утверждённые переводы сохранятся.",
+    confirmLabel:"✓ Утвердить "+check.pending.length+" переводов"
+   });
+   if(!ok)return;
+   if(current?.id!==article||project?.slug!==slug||currentSourceRevision()!==rev||dirty)
+     throw Error("Статья изменилась до подтверждения.");
+   b.disabled=true;b.textContent="⌛ Утверждаем…";
+   const result=await request("/review-all-translations","POST",{post_id:article,source_revision:rev},{timeoutMs:30000});
+   if(result.reviewed!==true||result.languages_ready!==8)
+     throw Error("Сервер не подтвердил все языки.");
+   await translationsForCurrent();
+   toast("Утверждено переводов: "+result.newly_approved+". Все 8 языков готовы к публикации.");
+  }catch(error){
+   try{if(current?.id===article)await translationsForCurrent()}catch(_){}
+   throw error;
+  }finally{
+   bulkApproving=false;b.textContent="✓ Утвердить все переводы";updateApprovalUI();
+  }
+ }
  async function translationsForCurrent(){
    const sequence=++translationRefreshSeq,sourceId=current?.id;
   const host=$("translationList"),notice=$("translationStatus"),button=$("translateArticle");
-  if(!aiRole()){translations=[];host.innerHTML="";notice.textContent="Переводы создаёт и проверяет редакция.";button.disabled=true;$("translateAll").disabled=true;return}
-  if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;$("translateAll").disabled=true;return}
+  if(!aiRole()){translations=[];host.innerHTML="";notice.textContent="Переводы создаёт и проверяет редакция.";button.disabled=true;$("translateAll").disabled=true;updateApprovalUI();return}
+  if(!current?.id){translations=[];host.innerHTML="";notice.textContent="Сначала сохраните статью.";button.disabled=true;$("translateAll").disabled=true;updateApprovalUI();return}
   // Approved/published articles may receive new reviewed translations without
   // editing or mutating their frozen original content.
   const translateAllowed=["draft","changes_requested","in_review","approved","scheduled","published"].includes(current.status);
@@ -190,6 +259,7 @@
   notice.textContent="Проверено языков: "+(1+verified.length)+" / 8. "+
     (missing.length?"Нужно проверить: "+missing.map(x=>locales[x]||x).join(", ")+". ":"Все языки проверены. ")+
     (providerReady?"Недостающие переводы можно создать здесь.":"Для автоперевода нужен AI-провайдер.");
+  updateApprovalUI();
  }
  async function translate(){
   if(!aiRole())throw Error("Перевод доступен только редакции");
@@ -205,7 +275,7 @@
    if(!res.translated)throw Error(res.error||"Перевод не завершён");
    await translationsForCurrent();
    toast("Перевод на "+(locales[locale]||locale)+" сохранён как черновик.");
-  }finally{busy=false;$("translateArticle").textContent="✦ Перевести статью";$("translateArticle").disabled=!providerReady}
+  }finally{busy=false;$("translateArticle").textContent="✦ Перевести статью";$("translateArticle").disabled=!providerReady;updateApprovalUI();}
  }
  function validBulkStatus(){
   return !!current?.id && ["draft","changes_requested","in_review","approved","scheduled","published"].includes(current.status)
@@ -312,6 +382,7 @@
     $("translateAll").textContent="Перевести на все остальные языки";
     $("translateAll").disabled=!validBulkStatus();
     $("translateArticle").disabled=!validBulkStatus();
+    updateApprovalUI();
   }
  }
  function showTranslation(locale,offerApproval=false){
@@ -421,6 +492,7 @@
     pendingReviewLocale=null;$("translationPreview").hidden=true;
   }
  });
+ $("translationApproveAll").onclick=()=>run(approveAllTranslations);
  $("translationRefresh").onclick=()=>run(async()=>{
    await translationsForCurrent();
    toast("Статусы переводов обновлены с сервера.");
