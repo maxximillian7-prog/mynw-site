@@ -175,6 +175,7 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
 }
 function statusTag(s){return '<span class="chip '+(["in_review","scheduled"].includes(s)?"amber":s==="published"?"":"gray")+'">'+esc(statuses[s]||s)+'</span>'}
 function canManagePost(p){return !!p&&chiefRole()&&p.status!=='archived'}
+function canEditSubmittedPhotos(p){return !!p&&p.status==='in_review'&&editorRole()}
 function canDeletePost(p){
  if(!p||!project)return false;
  if(chiefRole())return true;
@@ -191,6 +192,7 @@ function listEntry(p){
  '<button type="button" data-open-post="'+id+'">Открыть ↗</button>'+
  (man?'<button type="button" data-article-topic="'+id+'">Тема журнала</button><button type="button" data-edit-post="'+id+'">Изменить</button><button type="button" data-article-translations="'+id+'">Переводы (8)</button>'+
  '<button type="button" data-toggle-post-hidden="'+id+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
+ (canEditSubmittedPhotos(p)&&!man?'<button type="button" data-edit-post="'+id+'">Редактировать фото</button>':'')+
  (canDeletePost(p)?'<button type="button" data-delete-post="'+id+'">Удалить</button>':'')+'</div></div>'
 }
 
@@ -290,7 +292,21 @@ async function toggleArticleHidden(id){
 async function editArticle(id){
  const p=posts.find(item=>item.id===id);
  if(!p)throw Error("Обновите список статей.");
- if(["published","approved","scheduled","in_review"].includes(p.status)){
+ if(p.status==="in_review"&&editorRole()){
+   const ok=await editorialDecision({
+     title:"Редактировать фотографии присланной статьи",
+     message:"«"+p.title+"»\\n\\nМатериал будет переведён в режим редакторской правки. Оригинальные фотографии останутся в медиатеке. После сохранения необходимо повторное согласование.",
+     confirmLabel:"Редактировать фотографии"
+   });
+   if(!ok)return;
+   const result=await call("/posts/"+encodeURIComponent(id)+"/action","POST",{
+     action:"request_changes",expected_revision:p.revision,
+     note:"Редакторская корректировка фотографий и расположения иллюстраций."
+   });
+   if(result.post?.id!==id||result.post.status!=="changes_requested")
+     throw Error("Не удалось открыть статью для редакторской правки.");
+   await refreshPosts();
+ }else if(["published","approved","scheduled"].includes(p.status)){
    if(!canManagePost(p))throw Error("Изменение опубликованного текста доступно главному редактору.");
    const ok=await editorialDecision({
      title:"Открыть для редактирования",
@@ -423,8 +439,10 @@ function renderEditor(){
  $("deletePost").hidden=!current||!canDeletePost(current);
  $("hidePost").hidden=!current||!canManagePost(current);
  $("hidePost").textContent=current?.is_hidden?"Показать статью":"Скрыть статью";
- $("editPublishedPost").hidden=!current||!canManagePost(current)||
-  !["published","approved","scheduled","in_review"].includes(current.status);
+ $("editPublishedPost").hidden=!current||!(
+  canEditSubmittedPhotos(current)||
+  (canManagePost(current)&&["published","approved","scheduled"].includes(current.status)));
+ $("editPublishedPost").textContent=current?.status==="in_review"?"✎ Редактировать фотографии":"Изменить содержание";
  $("return").hidden=!current||s!=="in_review"||!editorRole();
  $("approve").hidden=!current||s!=="in_review"||!chiefRole();
  $("publish").hidden=!current||s!=="approved"||!chiefRole();
