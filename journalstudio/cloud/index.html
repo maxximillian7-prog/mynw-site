@@ -301,6 +301,25 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 .studio-topic-translation-confirm p{font-size:12px;margin:0 0 9px}
 #topicTranslateFeedback{flex-basis:100%;margin:6px 0;color:var(--green,#27664b)}
 #topicTranslateFeedback[data-error="true"]{color:#9f4d37;font-weight:650}
+
+/* Editorial photo management: thumbnails, stable ordering and inline replacement. */
+.studio-photo-panel{padding:15px;margin:12px 0 18px;border:1px solid var(--line);border-radius:15px;background:var(--studio-soft-panel,#f7faf7)}
+.studio-photo-panel[hidden]{display:none!important}
+.studio-photo-heading{align-items:flex-start;margin-bottom:12px}.studio-photo-heading strong{font-size:15px}
+.studio-photo-heading p{margin:5px 0 0;line-height:1.55}
+.studio-photo-list{display:grid;gap:11px;margin:12px 0}
+.studio-photo-item{display:grid;grid-template-columns:116px minmax(0,1fr);gap:12px;background:var(--paper,#fff);padding:10px;border:1px solid var(--line);border-radius:13px;min-width:0}
+.studio-photo-thumb{width:116px;aspect-ratio:4/3;overflow:hidden;border-radius:9px;background:var(--mint,#eaf3eb);display:grid;place-items:center}
+.studio-photo-thumb img{width:100%;height:100%;object-fit:cover}
+.studio-photo-details{display:flex;flex-direction:column;gap:5px;min-width:0}
+.studio-photo-details>b{font-size:13px}.studio-photo-details>span{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.studio-photo-buttons{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
+.studio-photo-buttons button{font-size:11px;padding:6px 9px;line-height:1.3}
+.studio-photo-buttons button:disabled{opacity:.35;cursor:not-allowed}
+.studio-photo-replacement{background:var(--mint,#eaf4ea);padding:11px;border-radius:9px;margin:10px 0;color:var(--ink);font-size:12px;line-height:1.6}
+.studio-photo-replacement button{margin-left:8px}
+.studio-photo-notice{font-size:12px;color:var(--studio-accent-contrast,#346a4f);font-weight:700}
+@media(max-width:550px){.studio-photo-item{grid-template-columns:78px minmax(0,1fr);gap:8px}.studio-photo-thumb{width:78px}.studio-photo-buttons button{font-size:10px;padding:6px}.studio-photo-panel{padding:10px}}
 </style>
 <link rel="stylesheet" href="./studio-themes.css?v=20261023-14">
 <link rel="stylesheet" href="./studio-author-guide.css?v=20261024-1">
@@ -453,6 +472,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <div><label for="authorSelect">Автор статьи</label><select id="authorSelect"><option value="">Редакция</option></select></div><div class="studio-template-picker"><label for="templateSelect">Шаблон оформления</label><select id="templateSelect"><option value="editorial">Журнал — классическая статья</option><option value="guide">Пошаговая инструкция</option><option value="story">История автора</option><option value="gallery">Фотогалерея</option><option value="minimal">Минималистичный</option></select><p class="small muted">Шаблон можно менять отдельно для каждой площадки.</p></div></div>
 <div class="card"><div class="sectionHeading"><div><h2>Содержание статьи</h2><p>Располагайте изображения и текст в нужном порядке</p></div></div>
 <p class="small muted">Перетаскивайте блоки за значок ⠿, либо используйте стрелки ↑↓ на телефоне. Перемещение не публикует материал автоматически.</p><div id="studioCoverIndicator" class="studio-cover-indicator" aria-live="polite"></div>
+<div id="studioPhotoPanel" class="studio-photo-panel" hidden aria-label="Управление фотографиями статьи"></div>
 <div id="blocks" aria-label="Блоки статьи"></div><div id="editTools"><div class="btns">
 <button data-add="heading">+ Заголовок</button><button data-add="text">+ Текст</button><button data-add="quote">+ Цитата</button><button data-add="link">+ Ссылка</button></div>
 <div class="studio-images-menu">
@@ -709,7 +729,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./studio-i18n.js?v=20261023-51"></script>
 <script defer src="./preview.js?v=20261024-1"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261024-69"></script>
+<script defer src="./client.js?v=20261026-photo1"></script>
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261023-14"></script>
@@ -717,7 +737,8 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./ai-studio.js?v=20261026-2"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-62"></script>
-<script defer src="./studio-images.js?v=20261024-60"></script>
+<script defer src="./studio-images.js?v=20261026-photo1"></script>
+<script defer src="./studio-photo-tools.js?v=20261026-photo1"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
 <script defer src="./journal-topics.js?v=20261023-52"></script>
 <script defer src="./studio-author-guide.js?v=20261024-1"></script>
