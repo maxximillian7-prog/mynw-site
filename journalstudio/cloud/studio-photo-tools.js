@@ -29,7 +29,7 @@
   }
   if(!count)html+='<p class="small muted">В этой версии статьи ещё нет фотографий. Их можно добавить ниже через медиатеку или загрузку.</p>';
   else html+='<div class="studio-photo-list">'+photos.map((x,i)=>{
-   const b=x.block,src=assets[b.asset_id]||"",title=(b.caption||b.alt||"Фото "+(i+1));
+   const b=x.block,src=assets[b.asset_id]||"",title=String(b.caption||b.alt||"Фото "+(i+1));
    const btn=(label,action,disabled=false)=>'<button type="button" data-photo-action="'+action+'" data-photo-index="'+x.index+'"'+(disabled?' disabled':'')+'>'+label+'</button>';
    return '<div class="studio-photo-item" data-photo-item="'+x.index+'">'+
     '<div class="studio-photo-thumb">'+(src?'<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="lazy">':'<span>Изображение</span>')+'</div>'+
