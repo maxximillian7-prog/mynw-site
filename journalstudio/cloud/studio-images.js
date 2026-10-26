@@ -31,8 +31,10 @@
   $("studioImageAi").hidden=id!=="ai";
   $("studioImageStock").hidden=id!=="stock";
   $("studioImageLibrary").hidden=id!=="library";
-  if(id==="library"&&autoload)void loadLibrary({reset:libraryProject!==project?.slug});
-  if(id==="own"){document.querySelector(".jp-upload-area")?.scrollIntoView({behavior:"smooth",block:"center"});}
+  if(id==="library"&&autoload)void loadLibrary({reset:true});
+  if(id==="own"){
+   document.querySelector(".jp-upload-area")?.scrollIntoView({behavior:"smooth",block:"center"});
+  }
  }
  const isEditor=()=>["owner","chief_editor","editor"].includes(project?.role||"");
  function mediaState(){
@@ -47,7 +49,7 @@
   const container=$("mediaLibraryGrid");
   if(!container)return;
   if(!library.length){
-   container.innerHTML='<div class="empty">'+(libraryBusy?"Загрузка изображений…":"Пока нет изображений. Сгенерируйте или загрузите первое.")+'</div>';
+   container.innerHTML='<div class="empty">'+(libraryBusy?"Загрузка изображений…":"Фотографий в выбранном фильтре нет. Попробуйте «Все изображения» или загрузите фото.")+'</div>';
   }else{
    container.innerHTML=library.map(item=>{
     const replacementIndex=window.StudioPhotoTools?.activeReplacementIndex?.();
@@ -267,10 +269,15 @@
  }
  document.addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
-  if(b.dataset.imageSource){setSource(b.dataset.imageSource);}
-  if(b.dataset.libraryCover)run(()=>useLibraryItem(b.dataset.libraryCover,true));
-  if(b.dataset.libraryInsert)run(()=>useLibraryItem(b.dataset.libraryInsert,false));
-  if(b.dataset.libraryReplace)run(()=>window.StudioPhotoTools.applyReplacement(b.dataset.libraryReplace,library.find(x=>x.id===b.dataset.libraryReplace)));
+  if(b.dataset.imageSource){
+   e.preventDefault();
+   if(b.dataset.imageSource==="library")run(()=>showLibrary("all"));
+   else setSource(b.dataset.imageSource);
+   return;
+  }
+  if(b.dataset.libraryCover){e.preventDefault();run(()=>useLibraryItem(b.dataset.libraryCover,true));}
+  if(b.dataset.libraryInsert){e.preventDefault();run(()=>useLibraryItem(b.dataset.libraryInsert,false));}
+  if(b.dataset.libraryReplace){e.preventDefault();run(()=>window.StudioPhotoTools.applyReplacement(b.dataset.libraryReplace,library.find(x=>x.id===b.dataset.libraryReplace)));}
  });
  const originalRender=renderEditor;
  renderEditor=function(...args){originalRender(...args);if(!imageEditor()&&!$("studioImageAi").hidden)setSource("library");refreshControls();if(library.length&&$("studioImageLibrary")&&!$("studioImageLibrary").hidden)renderLibrary()};
@@ -294,6 +301,6 @@
  $("mediaRemoveCoverDuplicate").onclick=()=>run(removeLegacyDuplicate);
  const oldShow=showTab;
  showTab=async function(target,...args){const data=await oldShow(target,...args);if(target==="editor"&&project?.slug)void loadLibrary({reset:true});return data};
- setSource(imageEditor()?"ai":"library");refreshControls();
+ setSource("library",false);refreshControls();
  window.StudioImages={refreshControls,showLibrary,loadLibrary};
 })();
