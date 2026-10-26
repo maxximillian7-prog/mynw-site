@@ -187,7 +187,7 @@
       "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", "):
       "Подтвердить переводы, которые вы проверили";
   }
-  if(hint)hint.textContent=status.missing.length?
+  if(hint)hint.textContent=!current?.id?"Сначала сохраните статью.":status.missing.length?
     "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", "):
     status.pending.length?"Можно проверить языки по отдельности или утвердить "+
       status.pending.length+" переводов одной кнопкой.":"Все 8 языков утверждены.";
