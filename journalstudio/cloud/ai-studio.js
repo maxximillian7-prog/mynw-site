@@ -168,6 +168,7 @@
  }
 
  function approvalReadiness(){
+  if(!current?.id)return {missing:[],pending:[],count:0};
   const rev=currentSourceRevision();
   const needed=Object.keys(locales).filter(k=>k!==current?.locale);
   const valid=k=>translations.find(t=>t.locale===k&&t.source_revision===rev&&
