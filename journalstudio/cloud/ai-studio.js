@@ -7,7 +7,7 @@
  const chiefRoleAi=()=>["owner","chief_editor"].includes(project?.role||"");
  const locales={ru:"Русский","pt-PT":"Português (PT)",en:"English",uk:"Українська",es:"Español",fr:"Français",de:"Deutsch",it:"Italiano"};
  let selected=null,schedules=[],jobs=[],translations=[],busy=false,providerReady=false,lastPhotoCache=new Map();
- let pendingReviewLocale=null,pendingReviewRevision=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null,bulkStarting=false,bulkApproving=false;
+ let pendingReviewLocale=null,pendingReviewRevision=null,pendingReviewPostId=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null,bulkStarting=false,bulkApproving=false;
  async function request(path,method="GET",body,options={}){
   if(!session?.access_token)throw Error("Войдите в редакцию");
   const signal=options.timeoutMs?{signal:AbortSignal.timeout(options.timeoutMs)}:{};
@@ -259,7 +259,8 @@
   const missing=Object.keys(locales).filter(k=>k!==current.locale&&!verified.includes(k));
   notice.textContent="Проверено языков: "+(1+verified.length)+" / 8. "+
     (missing.length?"Нужно проверить: "+missing.map(x=>locales[x]||x).join(", ")+". ":"Все языки проверены. ")+
-    (providerReady?"Недостающие переводы можно создать здесь.":"Для автоперевода нужен AI-провайдер.");
+    (translations.some(t=>t.source_revision<currentSourceRevision())?"Устаревшие переводы можно повторно утвердить после проверки — без ИИ. ":"")+
+    (providerReady?"При необходимости можно создать новый перевод.":"Генерация недоступна без AI-провайдера.");
   updateApprovalUI();
  }
  async function translate(){
@@ -391,7 +392,7 @@
   const area=$("translationPreview");area.hidden=false;
   const stale=t.source_revision!==currentSourceRevision();
   const canApprove=offerApproval&&chiefRoleAi()&&!dirty&&(stale?t.source_revision<currentSourceRevision():t.status!=="reviewed");
-  pendingReviewLocale=canApprove?locale:null;pendingReviewRevision=canApprove?currentSourceRevision():null;
+  pendingReviewLocale=canApprove?locale:null;pendingReviewRevision=canApprove?currentSourceRevision():null;pendingReviewPostId=canApprove?current?.id:null;
   area.innerHTML='<div class="studio-translation-preview-content"><div class="eyebrow">'+E(locales[locale]||locale)+' · '+
    (stale?"Перевод предыдущей редакции "+t.source_revision:t.status==="reviewed"?"Проверено редакцией":"Черновик перевода")+
    '</div><h3>'+E(t.title)+'</h3><p>'+E(t.summary)+'</p>'+
@@ -407,14 +408,14 @@
  }
  async function reviewTranslation(locale){
   if(!chiefRoleAi())throw Error("Только главный редактор подтверждает переводы");
-  if(locale!==pendingReviewLocale)throw Error("Откройте перевод и проверьте его перед подтверждением");
+  if(locale!==pendingReviewLocale||current?.id!==pendingReviewPostId)throw Error("Откройте перевод этой статьи и проверьте его перед подтверждением");
   if(approvingLocale)return;
   const t=translations.find(x=>x.locale===locale);
   if(!t||!Number.isInteger(t.source_revision))throw Error("Перевод отсутствует. Обновите список.");
   const targetRevision=currentSourceRevision(),stale=t.source_revision!==targetRevision;
   if(dirty||pendingReviewRevision!==targetRevision)throw Error("Исходная статья изменилась. Сохраните её и проверьте перевод снова.");
   if(stale&&t.source_revision>=targetRevision)throw Error("Некорректная версия перевода. Обновите список.");
-  if(!stale&&t.status==="reviewed"){pendingReviewLocale=null;pendingReviewRevision=null;await translationsForCurrent();return}
+  if(!stale&&t.status==="reviewed"){pendingReviewLocale=null;pendingReviewRevision=null;pendingReviewPostId=null;await translationsForCurrent();return}
   const postId=current.id;
   approvingLocale=locale;
   const approveButton=$("translationPreview").querySelector("[data-ai-translation-confirm]");
@@ -425,7 +426,7 @@
     if(stale&&result.reused!==true)throw Error("Сервер не подтвердил повторное утверждение.");
     if(result.reviewed!==true)throw Error("Сервер не подтвердил перевод");
     await translationsForCurrent();
-    pendingReviewLocale=null;pendingReviewRevision=null;
+    pendingReviewLocale=null;pendingReviewRevision=null;pendingReviewPostId=null;
     $("translationPreview").hidden=true;
     toast("Перевод на "+(locales[locale]||locale)+(stale?" повторно утверждён без генерации ИИ.":" подтверждён редакцией."));
   }catch(e){
@@ -435,7 +436,7 @@
     const updated=translations.find(x=>x.locale===locale);
     if(current?.id===postId && updated?.status==="reviewed" &&
        updated.source_revision===currentSourceRevision()){
-      pendingReviewLocale=null;pendingReviewRevision=null;
+      pendingReviewLocale=null;pendingReviewRevision=null;pendingReviewPostId=null;
       $("translationPreview").hidden=true;
       toast("Проверка на "+(locales[locale]||locale)+" подтверждена сервером.");
       return;
@@ -494,7 +495,7 @@
     run(()=>reviewTranslation(b.dataset.aiTranslationConfirm));
   }else if(b.dataset.aiTranslationCancel!==undefined){
     e.preventDefault();e.stopPropagation();
-    pendingReviewLocale=null;pendingReviewRevision=null;$("translationPreview").hidden=true;
+    pendingReviewLocale=null;pendingReviewRevision=null;pendingReviewPostId=null;$("translationPreview").hidden=true;
   }
  });
  $("translationApproveAll").onclick=()=>run(approveAllTranslations);
