@@ -7,7 +7,7 @@
  const chiefRoleAi=()=>["owner","chief_editor"].includes(project?.role||"");
  const locales={ru:"Русский","pt-PT":"Português (PT)",en:"English",uk:"Українська",es:"Español",fr:"Français",de:"Deutsch",it:"Italiano"};
  let selected=null,schedules=[],jobs=[],translations=[],busy=false,providerReady=false,lastPhotoCache=new Map();
- let pendingReviewLocale=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null,bulkStarting=false,bulkApproving=false;
+ let pendingReviewLocale=null,pendingReviewRevision=null,approvingLocale=null,translationRefreshSeq=0,pendingBulkPlan=null,bulkStarting=false,bulkApproving=false;
  async function request(path,method="GET",body,options={}){
   if(!session?.access_token)throw Error("Войдите в редакцию");
   const signal=options.timeoutMs?{signal:AbortSignal.timeout(options.timeoutMs)}:{};
@@ -184,11 +184,11 @@
    b.disabled=!chiefRoleAi()||!current?.id||busy||bulkApproving||dirty||
      status.count!==7||status.missing.length>0||status.pending.length===0;
    b.title=status.missing.length?
-      "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", "):
+      "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", ")+". Устаревшие переводы можно повторно утвердить после проверки без ИИ.":
       "Подтвердить переводы, которые вы проверили";
   }
   if(hint)hint.textContent=!current?.id?"Сначала сохраните статью.":status.missing.length?
-    "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", "):
+    "Нет актуальных переводов: "+status.missing.map(k=>locales[k]).join(", ")+". Устаревшие переводы можно повторно утвердить после проверки без ИИ.":
     status.pending.length?"Можно проверить языки по отдельности или утвердить "+
       status.pending.length+" переводов одной кнопкой.":"Все 8 языков утверждены.";
   for(const id of ["publish","schedule"]){
@@ -252,7 +252,7 @@
   const rows=translations.map(x=>{
    const stale=x.source_revision!==currentSourceRevision();
    return '<div class="ai-translation-item"><div><b>'+E(locales[x.locale]||x.locale)+'</b> <span class="chip '+(stale?"amber":x.status==="reviewed"?"":"gray")+'">'+(stale?"Устарел":x.status==="reviewed"?"Проверен":"Ожидает редактора")+'</span><div class="small muted">'+E(x.title)+'</div></div><div class="btns"><button type="button" data-ai-translation-view="'+E(x.locale)+'">Просмотр</button>'+
-   (chiefRoleAi()&&!stale&&x.status!=="reviewed"?'<button type="button" data-ai-translation-approve="'+E(x.locale)+'">✓ Проверить</button>':"")+'</div></div>'
+   (chiefRoleAi()&&(stale?x.source_revision<currentSourceRevision():x.status!=="reviewed")?'<button type="button" data-ai-translation-approve="'+E(x.locale)+'">'+(stale?"↻ Повторно утвердить":"✓ Проверить")+'</button>':"")+'</div></div>'
   }).join("");
   host.innerHTML=rows||'<p class="small muted">Переводов пока нет. Выберите язык и нажмите «Перевести статью».</p>';
   const verified=translations.filter(x=>x.status==="reviewed"&&x.source_revision===currentSourceRevision()).map(x=>x.locale);
@@ -390,18 +390,18 @@
   const t=translations.find(x=>x.locale===locale);if(!t)return;
   const area=$("translationPreview");area.hidden=false;
   const stale=t.source_revision!==currentSourceRevision();
-  const canApprove=offerApproval&&chiefRoleAi()&&!stale&&t.status!=="reviewed";
-  pendingReviewLocale=canApprove?locale:null;
+  const canApprove=offerApproval&&chiefRoleAi()&&!dirty&&(stale?t.source_revision<currentSourceRevision():t.status!=="reviewed");
+  pendingReviewLocale=canApprove?locale:null;pendingReviewRevision=canApprove?currentSourceRevision():null;
   area.innerHTML='<div class="studio-translation-preview-content"><div class="eyebrow">'+E(locales[locale]||locale)+' · '+
-   (t.status==="reviewed"?"Проверено редакцией":"Черновик перевода")+
+   (stale?"Перевод предыдущей редакции "+t.source_revision:t.status==="reviewed"?"Проверено редакцией":"Черновик перевода")+
    '</div><h3>'+E(t.title)+'</h3><p>'+E(t.summary)+'</p>'+
    (t.blocks||[]).map(b=>b.type==="heading"?'<h3>'+E(b.text)+'</h3>':
     b.type==="text"||b.type==="quote"?'<p>'+E(b.text)+'</p>':
     b.type==="image"?'<p class="muted small">📷 '+E(b.caption||b.alt||"Фото сохранено")+'</p>':
     b.type==="link"?'<p class="muted small">↗ '+E(b.label||"Ссылка")+'</p>':"").join("")+'</div>'+
    (canApprove?'<div class="studio-translation-approval">'+
-    '<p><b>Проверьте весь перевод.</b> Подтверждение сделает языковую версию доступной читателям опубликованной статьи.</p>'+
-    '<div class="btns"><button type="button" class="primary" data-ai-translation-confirm="'+E(locale)+'">✓ Подтвердить проверку</button>'+
+    (stale?'<p><b>Перевод редакции '+Number(t.source_revision)+' → '+Number(currentSourceRevision())+'.</b> Сравните его с актуальным оригиналом. Повторное утверждение сохранит текст без генерации ИИ. Если смысл статьи изменился, вместо этого создайте новый перевод.</p>':'<p><b>Проверьте весь перевод.</b> Подтверждение сделает языковую версию доступной читателям опубликованной статьи.</p>')+
+    '<div class="btns"><button type="button" class="primary" data-ai-translation-confirm="'+E(locale)+'">'+(stale?"↻ Повторно утвердить без ИИ":"✓ Подтвердить проверку")+'</button>'+
     '<button type="button" data-ai-translation-cancel>Отмена</button></div></div>':"");
   if(offerApproval)area.scrollIntoView({behavior:"smooth",block:"center"});
  }
@@ -410,20 +410,24 @@
   if(locale!==pendingReviewLocale)throw Error("Откройте перевод и проверьте его перед подтверждением");
   if(approvingLocale)return;
   const t=translations.find(x=>x.locale===locale);
-  if(!t||t.source_revision!==currentSourceRevision())throw Error("Перевод устарел. Обновите список.");
-  if(t.status==="reviewed"){pendingReviewLocale=null;await translationsForCurrent();return}
+  if(!t||!Number.isInteger(t.source_revision))throw Error("Перевод отсутствует. Обновите список.");
+  const targetRevision=currentSourceRevision(),stale=t.source_revision!==targetRevision;
+  if(dirty||pendingReviewRevision!==targetRevision)throw Error("Исходная статья изменилась. Сохраните её и проверьте перевод снова.");
+  if(stale&&t.source_revision>=targetRevision)throw Error("Некорректная версия перевода. Обновите список.");
+  if(!stale&&t.status==="reviewed"){pendingReviewLocale=null;pendingReviewRevision=null;await translationsForCurrent();return}
   const postId=current.id;
   approvingLocale=locale;
   const approveButton=$("translationPreview").querySelector("[data-ai-translation-confirm]");
   if(approveButton){approveButton.disabled=true;approveButton.textContent="⌛ Подтверждаю…"}
   $("translationStatus").textContent="Подтверждаю перевод "+(locales[locale]||locale)+"…";
   try{
-    const result=await request("/review-translation","POST",{post_id:postId,locale},{timeoutMs:20000});
+    const result=await request("/review-translation","POST",{post_id:postId,locale,...(stale?{reuse_existing:true,source_revision:targetRevision,previous_source_revision:t.source_revision}:{})},{timeoutMs:20000});
+    if(stale&&result.reused!==true)throw Error("Сервер не подтвердил повторное утверждение.");
     if(result.reviewed!==true)throw Error("Сервер не подтвердил перевод");
     await translationsForCurrent();
-    pendingReviewLocale=null;
+    pendingReviewLocale=null;pendingReviewRevision=null;
     $("translationPreview").hidden=true;
-    toast("Перевод на "+(locales[locale]||locale)+" подтверждён редакцией.");
+    toast("Перевод на "+(locales[locale]||locale)+(stale?" повторно утверждён без генерации ИИ.":" подтверждён редакцией."));
   }catch(e){
     // The connection may fail after the server has already committed approval.
     // Re-read the authoritative status rather than doing an unsafe blind retry.
@@ -431,7 +435,7 @@
     const updated=translations.find(x=>x.locale===locale);
     if(current?.id===postId && updated?.status==="reviewed" &&
        updated.source_revision===currentSourceRevision()){
-      pendingReviewLocale=null;
+      pendingReviewLocale=null;pendingReviewRevision=null;
       $("translationPreview").hidden=true;
       toast("Проверка на "+(locales[locale]||locale)+" подтверждена сервером.");
       return;
@@ -490,7 +494,7 @@
     run(()=>reviewTranslation(b.dataset.aiTranslationConfirm));
   }else if(b.dataset.aiTranslationCancel!==undefined){
     e.preventDefault();e.stopPropagation();
-    pendingReviewLocale=null;$("translationPreview").hidden=true;
+    pendingReviewLocale=null;pendingReviewRevision=null;$("translationPreview").hidden=true;
   }
  });
  $("translationApproveAll").onclick=()=>run(approveAllTranslations);
