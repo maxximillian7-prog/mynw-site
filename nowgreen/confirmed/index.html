@@ -1,90 +1,14 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#184731">
-<title>Email confirmed — NowGreen</title>
-<meta name="description" content="NowGreen email confirmation. Return to the app and sign in.">
-<link rel="icon" type="image/webp" href="/assets/brand/nowgreen-logo.webp">
-<style>
-*{box-sizing:border-box}html{color-scheme:light}
-body{margin:0;color:#233b2d;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(ellipse at 5% 5%,#daf2d1,transparent 44%),radial-gradient(ellipse at 95% 100%,#deefce,transparent 43%),#f6faf4;-webkit-font-smoothing:antialiased}
-a{color:inherit}a:focus-visible,select:focus-visible{outline:3px solid #64b987;outline-offset:3px}
-.shell{width:min(1080px,calc(100% - 36px));margin:auto;min-height:100svh;display:flex;flex-direction:column}
-header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:26px 0}
-.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.18rem;letter-spacing:-.025em;text-decoration:none}
-.brand img{width:47px;height:47px;object-fit:contain;border-radius:14px}.brand small{display:block;font-size:.63rem;text-transform:uppercase;letter-spacing:.14em;color:#809588;font-weight:720}
-select{border:1px solid #cedecf;border-radius:12px;padding:10px 13px;background:#fff;color:#33533d;font-weight:650;max-width:160px}
-main{flex:1;display:grid;grid-template-columns:1.09fr .91fr;margin:28px 0 36px;background:#fff;border-radius:32px;overflow:hidden;box-shadow:0 24px 85px #1e552114;border:1px solid #d7e8d761}
-.content{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(34px,6vw,77px)}
-.check{width:77px;height:77px;border-radius:22px;background:#e6f6e8;color:#317d51;display:grid;place-items:center;margin-bottom:30px;border:1px solid #c8e5cf}
-.check svg{width:40px;height:40px}.eyebrow{margin:0 0 13px;font-size:.76rem;text-transform:uppercase;letter-spacing:.14em;color:#6a987a;font-weight:800}
-h1{font-size:clamp(2rem,4vw,3.55rem);line-height:1.12;letter-spacing:-.05em;color:#245039;margin:0;max-width:600px}
-.lead{font-size:clamp(1.14rem,1.7vw,1.32rem);font-weight:650;margin:22px 0 12px;color:#3d6149}
-.instructions{font-size:1.06rem;color:#617467;line-height:1.75;max-width:480px;margin:0}.hint{font-size:.86rem;color:#889c8a;margin:22px 0}
-.actions{display:flex;align-items:center;flex-wrap:wrap;gap:20px;margin-top:8px}
-.btn{display:inline-flex;padding:12px 19px;border-radius:13px;background:#275f43;color:#fff;text-decoration:none;font-weight:720;font-size:.92rem}
-.btn:hover{background:#174a32}.help{font-size:.9rem;color:#4b7b61;text-underline-offset:3px;font-weight:600}
-.art{position:relative;min-height:490px;background:linear-gradient(115deg,#123a2b33,#123a2b55),url('/assets/brand/nowgreen-banner.webp') center/cover no-repeat,#2b5b3e}
-.art:before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,transparent 35%,#153d2a88)}
-.art:after{content:"";position:absolute;right:-120px;top:-110px;border:1px solid #fffffe35;border-radius:50%;width:350px;height:350px;box-shadow:0 0 0 72px #ffffff10}
-.art-note{position:absolute;z-index:1;bottom:27px;left:29px;right:29px;max-width:390px;padding:23px 25px;background:#f9fff1ed;box-shadow:0 15px 50px #173d2d30;border-radius:22px}
-.art-note span{display:block;color:#53825e;font-size:.73rem;letter-spacing:.15em;font-weight:800;text-transform:uppercase}
-.art-note strong{display:block;color:#31563c;font-size:clamp(1.4rem,2.6vw,1.95rem);letter-spacing:-.04em;line-height:1.22;margin-top:9px}
-footer{display:flex;justify-content:space-between;gap:10px;padding:0 4px 23px;font-size:.82rem;color:#7b9281}footer a{text-decoration:none}
-.has-error .check{color:#a36242;background:#fff0e8;border-color:#f4d6ca}.has-error h1{color:#85503a}
-@media(max-width:800px){main{grid-template-columns:1fr;margin:12px 0 26px}.art{order:-1;min-height:270px}.content{padding:35px 31px 42px}.art-note{padding:16px 20px;max-width:320px;left:18px;bottom:17px}.art-note strong{font-size:1.3rem}}
-@media(max-width:540px){.shell{width:calc(100% - 22px)}header{padding:17px 5px}.brand{font-size:1rem;gap:8px}.brand img{width:39px;height:39px}select{max-width:122px;padding:8px;font-size:.82rem}main{border-radius:23px;margin:5px 0 23px}.art{min-height:200px}.art-note{padding:12px 16px;border-radius:15px;bottom:11px;left:12px;right:12px}.art-note strong{font-size:1.13rem;margin-top:5px}.content{padding:29px 23px 34px}.check{width:66px;height:66px;margin-bottom:22px}h1{font-size:2.13rem}.instructions{font-size:1rem}footer{flex-wrap:wrap;padding-bottom:18px}}
-</style>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>MyNow Apps — Email confirmation</title>
+<link rel="canonical" href="https://mynw.app/confirmed/?app=nowgreen">
 <script>
-const confirmationError=(()=>{
- const q=new URLSearchParams(location.search);
- const f=new URLSearchParams(location.hash.replace(/^#/,''));
- const failed=['error','error_code','error_description'].some(k=>q.has(k)||f.has(k));
- if(location.hash)history.replaceState(null,'',location.pathname+location.search);
- return failed;
+(function(){
+ var url = '/confirmed/?app=nowgreen';
+ var qs = location.search.replace(/^\?/,'');
+ if(qs)url += '&'+qs;
+ location.replace(url+location.hash);
 })();
 </script>
-</head>
-<body>
-<div class="shell">
-<header>
-<a class="brand" href="/nowgreen/" aria-label="NowGreen"><img alt="" src="/assets/brand/nowgreen-logo.webp"><span>NowGreen<small>MyNow Apps</small></span></a>
-<label for="language"><select id="language" aria-label="Language">
-<option value="en">English</option><option value="pt">Português</option><option value="ru">Русский</option><option value="uk">Українська</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option>
-</select></label></header>
-<main>
-<section class="content" aria-labelledby="headline">
-<div class="check" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path id="status" d="m10 25 9 9 19-20"/></svg></div>
-<p id="eyebrow" class="eyebrow">Email confirmation</p>
-<h1 id="headline">Your email is confirmed!</h1>
-<p id="lead" class="lead">Your NowGreen account is ready.</p>
-<p id="instructions" class="instructions">Return to the NowGreen app and sign in using your email and password.</p>
-<p id="hint" class="hint">You can close this page and return to the app.</p>
-<div class="actions"><a id="about" class="btn" href="/nowgreen/">About NowGreen ↗</a><a id="help" class="help" href="mailto:support@mynw.app">Need help?</a></div>
-</section>
-<aside class="art" aria-hidden="true"><div class="art-note"><span>NowGreen</span><strong id="tagline">Where plants and ideas grow.</strong></div></aside>
-</main>
-<footer><span>© 2026 MyNow Apps</span><a href="/nowgreen/privacy/">Privacy · NowGreen</a></footer>
-</div>
-<script>
-(()=>{'use strict';
-const T={"en":["Email confirmation","Your email is confirmed!","Your NowGreen account is ready.","Return to the NowGreen app and sign in using your email and password.","You can close this page and return to the app.","About NowGreen","Need help?","We couldn't confirm your email","The link may have expired or already been used. Open NowGreen and request a new confirmation email if needed.","Where plants and ideas grow."],"pt":["Confirmação de email","O seu email foi confirmado!","A sua conta NowGreen está pronta.","Volte à aplicação NowGreen e inicie sessão com o seu email e palavra-passe.","Pode fechar esta página e regressar à aplicação.","Sobre o NowGreen","Precisa de ajuda?","Não foi possível confirmar o email","A ligação pode ter expirado ou já ter sido usada. Abra o NowGreen e peça um novo email de confirmação, se necessário.","Onde as plantas e as ideias crescem."],"ru":["Подтверждение почты","Email успешно подтверждён!","Ваш аккаунт NowGreen готов.","Вернитесь в приложение NowGreen и войдите, используя свой email и пароль.","Эту страницу можно закрыть и вернуться в приложение.","О NowGreen","Нужна помощь?","Не удалось подтвердить email","Ссылка могла устареть или уже быть использована. Откройте NowGreen и при необходимости запросите новое письмо.","Там, где растут растения и идеи."],"uk":["Підтвердження пошти","Email успішно підтверджено!","Ваш обліковий запис NowGreen готовий.","Поверніться до застосунку NowGreen та увійдіть, використовуючи email і пароль.","Цю сторінку можна закрити й повернутися до застосунку.","Про NowGreen","Потрібна допомога?","Не вдалося підтвердити email","Термін дії посилання міг закінчитися або його вже використано. Відкрийте NowGreen і за потреби запросіть новий лист.","Там, де ростуть рослини та ідеї."],"fr":["Confirmation de l’e-mail","Votre e-mail est confirmé !","Votre compte NowGreen est prêt.","Retournez dans l’application NowGreen et connectez-vous avec votre adresse e-mail et votre mot de passe.","Vous pouvez fermer cette page et revenir à l’application.","Découvrir NowGreen","Besoin d’aide ?","Impossible de confirmer votre e-mail","Le lien a peut-être expiré ou a déjà été utilisé. Ouvrez NowGreen et demandez un nouveau message de confirmation si nécessaire.","Là où les plantes et les idées grandissent."],"es":["Confirmación del correo","¡Correo electrónico confirmado!","Tu cuenta de NowGreen ya está lista.","Vuelve a la aplicación NowGreen e inicia sesión con tu correo electrónico y contraseña.","Puedes cerrar esta página y volver a la aplicación.","Conoce NowGreen","¿Necesitas ayuda?","No pudimos confirmar tu correo","El enlace puede haber caducado o ya haberse utilizado. Abre NowGreen y solicita otro correo de confirmación si es necesario.","Donde crecen las plantas y las ideas."],"de":["E-Mail-Bestätigung","Deine E-Mail ist bestätigt!","Dein NowGreen-Konto ist bereit.","Kehre zur NowGreen-App zurück und melde dich mit deiner E-Mail-Adresse und deinem Passwort an.","Du kannst diese Seite schließen und zur App zurückkehren.","Über NowGreen","Brauchst du Hilfe?","E-Mail konnte nicht bestätigt werden","Der Link ist möglicherweise abgelaufen oder wurde bereits verwendet. Öffne NowGreen und fordere bei Bedarf eine neue Bestätigungs-E-Mail an.","Wo Pflanzen und Ideen wachsen."],"it":["Conferma email","Email confermata!","Il tuo account NowGreen è pronto.","Torna all’app NowGreen e accedi con il tuo indirizzo email e la password.","Puoi chiudere questa pagina e tornare all’app.","Scopri NowGreen","Hai bisogno di aiuto?","Non è stato possibile confermare l’email","Il link potrebbe essere scaduto o già utilizzato. Apri NowGreen e richiedi una nuova email di conferma, se necessario.","Dove crescono le piante e le idee."]};
-const pick=s=>{const x=String(s||'').toLowerCase().split(/[-_]/)[0];return Object.hasOwn(T,x)?x:null;};
-const queryLang=new URLSearchParams(location.search).get('lang');
-const lang=pick(queryLang)||(navigator.languages||[navigator.language]).map(pick).find(Boolean)||'en';
-const sel=document.getElementById('language');
-function render(l){const t=T[l]||T.en;document.documentElement.lang=l;sel.value=l;
- document.body.classList.toggle('has-error',confirmationError);
- const fields={eyebrow:t[0],headline:confirmationError?t[7]:t[1],lead:confirmationError?'':t[2],instructions:confirmationError?t[8]:t[3],hint:t[4],about:t[5]+' ↗',help:t[6],tagline:t[9]};
- for(const [k,v]of Object.entries(fields))document.getElementById(k).textContent=v;
- document.getElementById('status').setAttribute('d',confirmationError?'M15 15 33 33 M33 15 15 33':'m10 25 9 9 19-20');
- document.title=fields.headline+' — NowGreen';
-}
-sel.addEventListener('change',()=>render(sel.value));render(lang);
-})();
-</script>
-</body>
-</html>
+<meta http-equiv="refresh" content="1;url=/confirmed/?app=nowgreen"></head>
+<body><p><a href="/confirmed/?app=nowgreen">Continue to email confirmation · NowGreen</a></p></body></html>
