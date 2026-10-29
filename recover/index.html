@@ -72,7 +72,7 @@ get('lang').onchange=()=>{lang=get('lang').value;render();rewrite()};
 get('retry').onclick=e=>{e.preventDefault();accessToken=null;mode='request';message('');render();rewrite();};
 get('request').onsubmit=async e=>{
  e.preventDefault();if(busy)return;const a=t(),email=get('email').value.trim();
- if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){message(a[17],true);return;}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){message(a[17],true);return;}
  busy=true;get('send').disabled=true;message('');
  try{
  const c=cfg();const url='https://'+c.ref+'.supabase.co/auth/v1/recover?redirect_to='+encodeURIComponent('https://mynw.app/recover/?app='+app);
