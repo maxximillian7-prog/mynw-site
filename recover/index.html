@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#295e48"><title>Password recovery — MyNow Apps</title><link rel="icon" href="/assets/brand/mynow-logo.webp"><style>
+:root{color-scheme:light;--accent:#327857;--tint:#e8f4e6;--ink:#234a36}
+body[data-app="nowcook"]{--accent:#ad6740;--tint:#fff0de;--ink:#75452e}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top left,var(--tint),transparent 62%),#fafbf9;color:#2b3d32;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--accent)}a:focus-visible,select:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.shell{max-width:1050px;width:calc(100% - 28px);margin:auto;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 0}
+.brand{display:flex;gap:12px;align-items:center;color:var(--ink);font-size:1.25rem;font-weight:800;text-decoration:none}.brand img{width:46px;height:46px;border-radius:12px;object-fit:contain}.brand small{display:block;font-size:.65rem;color:#85978d;letter-spacing:.1em;text-transform:uppercase}
+.controls{display:flex;gap:7px}select{padding:9px;background:white;border:1px solid #d4dfd6;border-radius:11px;color:#334d3f;font-weight:650;max-width:130px}
+main{display:grid;grid-template-columns:1.1fr .9fr;flex:1;min-height:540px;margin:15px 0 30px;overflow:hidden;border-radius:28px;background:#fff;box-shadow:0 26px 75px #23463719}
+.content{padding:clamp(25px,6vw,75px);align-self:center}.icon{display:grid;place-items:center;width:71px;height:71px;background:var(--tint);color:var(--accent);border-radius:20px;font-size:33px;margin-bottom:25px}
+h1{font-size:clamp(2rem,4vw,3.3rem);line-height:1.14;letter-spacing:-.04em;color:var(--ink);margin:0 0 17px}
+p{line-height:1.72;color:#6d7d72}.subtitle{color:var(--accent);letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;font-weight:800}
+form{display:grid;gap:13px;margin-top:24px}label{font-weight:700;font-size:.9rem}input{display:block;width:100%;margin-top:6px;border:1px solid #cedbd0;border-radius:11px;padding:13px;font:inherit;min-height:49px}button{cursor:pointer;border:0;background:var(--accent);color:#fff;padding:13px 20px;min-height:48px;border-radius:12px;font:inherit;font-weight:740}button:disabled{opacity:.5;cursor:default}
+.art{background:center/cover no-repeat;position:relative;min-height:350px}.art::before{content:"";position:absolute;inset:0;background:linear-gradient(150deg,transparent,#223c3398)}.art-label{position:absolute;left:28px;bottom:27px;color:var(--ink);font-weight:800;background:#fffffff0;border-radius:17px;padding:18px 23px;font-size:1.45rem}.art-label img{width:40px;vertical-align:middle;margin-right:8px}
+.notice{font-weight:620;font-size:.91rem;color:#447759;min-height:15px}.notice.error{color:#a14f36}.links{display:flex;gap:22px;flex-wrap:wrap;margin-top:22px;font-size:.87rem}.hidden{display:none!important}
+footer{font-size:.78rem;color:#8b9b8f;padding-bottom:23px}
+@media(max-width:770px){main{grid-template-columns:1fr}.art{order:-1;min-height:210px}.content{padding:32px 28px 40px}.art-label{font-size:1.17rem;padding:13px;left:13px;bottom:13px}.art-label img{width:30px}}
+@media(max-width:480px){header{padding:15px 4px}.brand{font-size:.99rem}.brand img{width:37px;height:37px}.brand small{font-size:.55rem}select{max-width:108px;padding:7px 4px;font-size:.8rem}main{border-radius:20px}.art{min-height:155px}.content{padding:26px 22px 32px}h1{font-size:2rem}}
+</style>
+<script>
+const recoveryState=(()=>{
+const q=new URLSearchParams(location.search);
+const h=new URLSearchParams(location.hash.slice(1));
+const token=h.get('type')==='recovery'?h.get('access_token'):null;
+const bad=h.has('error')||q.has('error')||q.has('error_code')||q.has('code');
+const app=['nowcook','nowgreen'].includes(q.get('app'))?q.get('app'):null;
+const lang=q.get('lang');
+const safe=new URLSearchParams();
+if(app)safe.set('app',app);if(['en','pt','ru','uk','fr','es','de','it'].includes(lang))safe.set('lang',lang);
+if(location.hash||bad)history.replaceState(null,'',location.pathname+(safe.toString()?'?'+safe:''));
+return {token,bad,app,lang};
+})();
+</script></head><body data-app="nowgreen"><div class="shell"><header><a class="brand" id="home" href="/nowgreen/"><img id="logo" alt="" src="/assets/brand/nowgreen-logo.webp"><span><span id="appName">NowGreen</span><small>MyNow Apps</small></span></a><div class="controls"><select id="app" aria-label="Application"><option value="nowgreen">NowGreen</option><option value="nowcook">NowCook</option></select><select id="lang" aria-label="Language"><option value="en">English</option><option value="pt">Português</option><option value="ru">Русский</option><option value="uk">Українська</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option></select></div></header><main><section class="content" aria-live="polite"><div class="icon">✉</div><p class="subtitle" id="sub"></p><h1 id="title"></h1><p id="intro"></p>
+<form id="request"><label><span id="emailLabel"></span><input id="email" type="email" name="email" autocomplete="email" maxlength="254" required></label><button id="send" type="submit"></button></form>
+<form id="change" class="hidden"><label><span id="passLabel"></span><input id="pass" type="password" autocomplete="new-password" minlength="12" required></label><label><span id="againLabel"></span><input id="again" type="password" autocomplete="new-password" minlength="12" required></label><button id="save" type="submit"></button></form>
+<p id="notice" class="notice" role="status"></p><p id="note"></p><div class="links"><a id="retry" class="hidden" href="#"></a><a id="back" href="/nowgreen/"></a><a id="help" href="mailto:support@mynw.app"></a></div></section>
+<aside id="art" class="art"><div class="art-label"><img id="artlogo" src="/assets/brand/nowgreen-logo.webp" alt=""><span id="artName">NowGreen</span></div></aside></main><footer>© 2026 MyNow Apps</footer></div>
+<script>
+(()=>{
+'use strict';
+const T={"en":["Password recovery","Forgot your password?","Enter the email address linked to your account.","Email address","Send recovery email","If an account exists, we will send a recovery link. Check spam too.","Check your email","Follow the link in the email to set a new password.","Set a new password","New password","Repeat new password","Save password","Password updated","Return to the app and sign in with the new password.","Use at least 12 characters.","The passwords do not match.","The recovery link is invalid or expired. Request a new one.","Enter a valid email address.","Too many requests. Try again later.","Something went wrong. Please try again.","Return to the app","Start again","Support"],"pt":["Recuperar palavra-passe","Esqueceu-se da palavra-passe?","Introduza o email associado à sua conta.","Endereço de email","Enviar email de recuperação","Se existir uma conta, enviaremos uma ligação. Verifique também o spam.","Verifique o email","Siga a ligação recebida para definir uma nova palavra-passe.","Definir nova palavra-passe","Nova palavra-passe","Repetir palavra-passe","Guardar palavra-passe","Palavra-passe alterada","Volte à aplicação e inicie sessão com a nova palavra-passe.","Use pelo menos 12 caracteres.","As palavras-passe não coincidem.","A ligação é inválida ou expirou. Peça uma nova.","Introduza um email válido.","Demasiados pedidos. Tente mais tarde.","Ocorreu um erro. Tente novamente.","Voltar à aplicação","Recomeçar","Suporte"],"ru":["Восстановление пароля","Забыли пароль?","Введите email, привязанный к аккаунту.","Адрес электронной почты","Отправить письмо","Если аккаунт существует, мы отправим ссылку. Проверьте также «Спам».","Проверьте почту","Перейдите по ссылке из письма, чтобы установить новый пароль.","Установите новый пароль","Новый пароль","Повторите пароль","Сохранить пароль","Пароль изменён","Вернитесь в приложение и войдите с новым паролем.","Используйте не менее 12 символов.","Пароли не совпадают.","Ссылка недействительна или устарела. Запросите новую.","Введите корректный email.","Слишком много запросов. Попробуйте позже.","Произошла ошибка. Попробуйте ещё раз.","Вернуться в приложение","Начать заново","Поддержка"],"uk":["Відновлення пароля","Забули пароль?","Введіть email, пов’язаний з обліковим записом.","Адреса електронної пошти","Надіслати лист","Якщо обліковий запис існує, надішлемо посилання. Перевірте також спам.","Перевірте пошту","Перейдіть за посиланням із листа, щоб установити новий пароль.","Установіть новий пароль","Новий пароль","Повторіть пароль","Зберегти пароль","Пароль змінено","Поверніться до застосунку та увійдіть із новим паролем.","Використовуйте щонайменше 12 символів.","Паролі не збігаються.","Посилання недійсне або застаріло. Запросіть нове.","Уведіть правильний email.","Забагато запитів. Спробуйте пізніше.","Сталася помилка. Спробуйте ще раз.","Повернутися до застосунку","Почати знову","Підтримка"],"fr":["Réinitialiser le mot de passe","Mot de passe oublié ?","Saisissez l’adresse e-mail associée à votre compte.","Adresse e-mail","Envoyer l’e-mail","Si un compte existe, nous enverrons un lien. Vérifiez aussi les spams.","Consultez vos e-mails","Suivez le lien reçu pour créer un nouveau mot de passe.","Créer un nouveau mot de passe","Nouveau mot de passe","Répéter le mot de passe","Enregistrer","Mot de passe modifié","Retournez à l’application et connectez-vous avec le nouveau mot de passe.","Utilisez au moins 12 caractères.","Les mots de passe ne correspondent pas.","Le lien est invalide ou expiré. Demandez-en un autre.","Saisissez un e-mail valide.","Trop de demandes. Réessayez plus tard.","Une erreur s’est produite. Réessayez.","Retourner à l’application","Recommencer","Assistance"],"es":["Restablecer contraseña","¿Olvidaste tu contraseña?","Introduce el correo asociado a tu cuenta.","Correo electrónico","Enviar correo","Si existe una cuenta, enviaremos un enlace. Revisa también el spam.","Revisa tu correo","Abre el enlace recibido para crear una contraseña nueva.","Crear contraseña nueva","Contraseña nueva","Repetir contraseña","Guardar contraseña","Contraseña actualizada","Vuelve a la aplicación e inicia sesión con la nueva contraseña.","Usa al menos 12 caracteres.","Las contraseñas no coinciden.","El enlace no es válido o ha caducado. Solicita otro.","Introduce un correo válido.","Demasiadas solicitudes. Inténtalo más tarde.","Ocurrió un error. Inténtalo de nuevo.","Volver a la aplicación","Empezar de nuevo","Ayuda"],"de":["Passwort zurücksetzen","Passwort vergessen?","Gib die E-Mail-Adresse deines Kontos ein.","E-Mail-Adresse","E-Mail senden","Falls ein Konto existiert, senden wir einen Link. Prüfe auch den Spam-Ordner.","Posteingang prüfen","Öffne den Link in der E-Mail, um ein neues Passwort festzulegen.","Neues Passwort festlegen","Neues Passwort","Passwort wiederholen","Passwort speichern","Passwort geändert","Kehre zur App zurück und melde dich mit dem neuen Passwort an.","Verwende mindestens 12 Zeichen.","Die Passwörter stimmen nicht überein.","Der Link ist ungültig oder abgelaufen. Fordere einen neuen an.","Gib eine gültige E-Mail-Adresse ein.","Zu viele Anfragen. Versuche es später erneut.","Ein Fehler ist aufgetreten. Versuche es erneut.","Zur App zurückkehren","Erneut beginnen","Support"],"it":["Recupero password","Hai dimenticato la password?","Inserisci l’indirizzo email del tuo account.","Indirizzo email","Invia email","Se esiste un account, invieremo un link. Controlla anche lo spam.","Controlla la posta","Apri il link ricevuto per creare una nuova password.","Crea una nuova password","Nuova password","Ripeti la password","Salva password","Password modificata","Torna all’app e accedi con la nuova password.","Usa almeno 12 caratteri.","Le password non corrispondono.","Il link non è valido o è scaduto. Richiedine uno nuovo.","Inserisci un’email valida.","Troppe richieste. Riprova più tardi.","Si è verificato un errore. Riprova.","Torna all’app","Ricomincia","Supporto"]};
+const A={"nowcook":{"name":"NowCook","ref":"kmbpxbkumocsboqrcjqw","key":"sb_publishable_MlHc8r8Th6VFHIxkYqTKAA_-5f1Lm6W","logo":"/assets/brand/nowcook-logo.webp","banner":"/assets/brand/nowcook-banner.webp","home":"/nowcook/"},"nowgreen":{"name":"NowGreen","ref":"dekiwkxajjgajixniaox","key":"sb_publishable_jmwuFhiQQA8stsj_33ydBw_26jn1RlH","logo":"/assets/brand/nowgreen-logo.webp","banner":"/assets/brand/nowgreen-banner.webp","home":"/nowgreen/"}};
+const get=id=>document.getElementById(id);
+const normalize=s=>{const l=String(s||'').toLowerCase().split(/[-_]/)[0];return Object.hasOwn(T,l)?l:null};
+let app=recoveryState.app||'nowgreen';
+let lang=normalize(recoveryState.lang)||(navigator.languages||[navigator.language]).map(normalize).find(Boolean)||'en';
+let mode=recoveryState.token?'change':recoveryState.bad?'error':'request';
+let accessToken=recoveryState.token;
+let busy=false;
+const cfg=()=>A[app],t=()=>T[lang];
+function message(txt,error){get('notice').textContent=txt||'';get('notice').classList.toggle('error',!!error);}
+function render(){
+ const a=t(),c=cfg();document.documentElement.lang=lang;document.body.dataset.app=app;
+ get('app').value=app;get('lang').value=lang;get('appName').textContent=c.name;
+ get('logo').src=c.logo;get('home').href=c.home;get('back').href=c.home;get('back').textContent=a[20];get('help').textContent=a[22];
+ get('art').style.backgroundImage='url("'+c.banner+'")';get('artlogo').src=c.logo;get('artName').textContent=c.name;
+ get('sub').textContent=a[0];
+ get('title').textContent=mode==='request'?a[1]:mode==='sent'?a[6]:mode==='change'?a[8]:mode==='done'?a[12]:a[16];
+ get('intro').textContent=mode==='request'?a[2]:mode==='sent'?a[7]:mode==='change'?a[14]:mode==='done'?a[13]:'';
+ get('request').classList.toggle('hidden',mode!=='request');
+ get('change').classList.toggle('hidden',mode!=='change');
+ get('retry').classList.toggle('hidden',!['error','done'].includes(mode));
+ get('retry').textContent=a[21];get('emailLabel').textContent=a[3];get('send').textContent=a[4];
+ get('passLabel').textContent=a[9];get('againLabel').textContent=a[10];get('save').textContent=a[11];
+ get('note').textContent=mode==='request'?a[5]:'';
+ document.title=get('title').textContent+' — '+c.name;
+}
+function rewrite(){const p=new URLSearchParams();p.set('app',app);p.set('lang',lang);history.replaceState(null,'',location.pathname+'?'+p);}
+get('app').onchange=()=>{if(busy||mode==='change'){get('app').value=app;return;}app=get('app').value;mode='request';message('');render();rewrite();};
+get('lang').onchange=()=>{lang=get('lang').value;render();rewrite()};
+get('retry').onclick=e=>{e.preventDefault();accessToken=null;mode='request';message('');render();rewrite();};
+get('request').onsubmit=async e=>{
+ e.preventDefault();if(busy)return;const a=t(),email=get('email').value.trim();
+ if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){message(a[17],true);return;}
+ busy=true;get('send').disabled=true;message('');
+ try{
+ const c=cfg();const url='https://'+c.ref+'.supabase.co/auth/v1/recover?redirect_to='+encodeURIComponent('https://mynw.app/recover/?app='+app);
+ const response=await fetch(url,{method:'POST',cache:'no-store',headers:{'apikey':c.key,'Content-Type':'application/json'},body:JSON.stringify({email})});
+ if(response.status===429)message(a[18],true);
+ else if(response.ok){mode='sent';render();message(a[5]);}
+ else message(a[19],true);
+ }catch(_){message(a[19],true);}finally{busy=false;get('send').disabled=false;}
+};
+get('change').onsubmit=async e=>{
+ e.preventDefault();if(busy||!accessToken)return;const a=t(),pass=get('pass').value;
+ if(pass.length<12){message(a[14],true);return;}if(pass!==get('again').value){message(a[15],true);return;}
+ busy=true;get('save').disabled=true;message('');
+ try{
+ const c=cfg(),response=await fetch('https://'+c.ref+'.supabase.co/auth/v1/user',{method:'PUT',cache:'no-store',headers:{'apikey':c.key,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({password:pass})});
+ if(response.ok){accessToken=null;get('pass').value='';get('again').value='';mode='done';render();rewrite();}
+ else if([401,403].includes(response.status)){accessToken=null;mode='error';render();message(a[16],true);}
+ else if(response.status===429)message(a[18],true);
+ else message(a[19],true);
+ }catch(_){message(a[19],true);}finally{busy=false;get('save').disabled=false;}
+};
+render();
+})();
+</script></body></html>
