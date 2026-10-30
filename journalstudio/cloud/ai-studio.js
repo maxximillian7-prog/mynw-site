@@ -249,12 +249,34 @@
   const r=await request("/translations?post_id="+encodeURIComponent(sourceId),"GET",undefined,{timeoutMs:20000});
   if(sequence!==translationRefreshSeq||sourceId!==current?.id)return;
   translations=r.translations||[];
-  const rows=translations.map(x=>{
+  // Show the canonical source and every supported target locale, including missing translations.
+  // A missing target must not disappear from the editor just because the API has no row for it.
+  const sourceLocale=current.locale;
+  const translateSelect=$("translationLanguage");
+  if(translateSelect){
+   for(const option of translateSelect.options)option.disabled=option.value===sourceLocale;
+   if(translateSelect.value===sourceLocale){
+    const first=[...translateSelect.options].find(option=>!option.disabled);
+    if(first)translateSelect.value=first.value;
+   }
+  }
+  const sourceRow='<div class="ai-translation-item"><div><b>'+E(locales[sourceLocale]||sourceLocale)+
+   '</b> <span class="chip">Оригинал</span><div class="small muted">'+E(current.title||"Исходный текст статьи")+
+   '</div></div><div class="btns"><span class="small muted">Язык оригинала</span></div></div>';
+  const targetRows=Object.keys(locales).filter(locale=>locale!==sourceLocale).map(locale=>{
+   const x=translations.find(item=>item.locale===locale);
+   if(!x){
+    return '<div class="ai-translation-item"><div><b>'+E(locales[locale])+
+     '</b> <span class="chip amber">Нет перевода</span><div class="small muted">Перевод ещё не создан</div></div>'+
+     '<div class="btns"><button type="button" data-ai-translation-create="'+E(locale)+'"'+
+     (!providerReady||busy||dirty||!translateAllowed?' disabled title="Сохраните оригинал и проверьте доступность ИИ"':'')+
+     '>✦ Перевести</button></div></div>';
+   }
    const stale=x.source_revision!==currentSourceRevision();
-   return '<div class="ai-translation-item"><div><b>'+E(locales[x.locale]||x.locale)+'</b> <span class="chip '+(stale?"amber":x.status==="reviewed"?"":"gray")+'">'+(stale?"Устарел":x.status==="reviewed"?"Проверен":"Ожидает редактора")+'</span><div class="small muted">'+E(x.title)+'</div></div><div class="btns"><button type="button" data-ai-translation-view="'+E(x.locale)+'">Просмотр</button>'+
-   (chiefRoleAi()&&(stale?x.source_revision<currentSourceRevision():x.status!=="reviewed")?'<button type="button" data-ai-translation-approve="'+E(x.locale)+'">'+(stale?"↻ Повторно утвердить":"✓ Проверить")+'</button>':"")+'</div></div>'
+   return '<div class="ai-translation-item"><div><b>'+E(locales[locale])+'</b> <span class="chip '+(stale?"amber":x.status==="reviewed"?"":"gray")+'">'+(stale?"Устарел":x.status==="reviewed"?"Проверен":"Ожидает редактора")+'</span><div class="small muted">'+E(x.title)+'</div></div><div class="btns"><button type="button" data-ai-translation-view="'+E(locale)+'">Просмотр</button>'+
+    (chiefRoleAi()&&(stale?x.source_revision<currentSourceRevision():x.status!=="reviewed")?'<button type="button" data-ai-translation-approve="'+E(locale)+'">'+(stale?"↻ Повторно утвердить":"✓ Проверить")+'</button>':"")+'</div></div>';
   }).join("");
-  host.innerHTML=rows||'<p class="small muted">Переводов пока нет. Выберите язык и нажмите «Перевести статью».</p>';
+  host.innerHTML=sourceRow+targetRows;
   const verified=translations.filter(x=>x.status==="reviewed"&&x.source_revision===currentSourceRevision()).map(x=>x.locale);
   const missing=Object.keys(locales).filter(k=>k!==current.locale&&!verified.includes(k));
   notice.textContent="Проверено языков: "+(1+verified.length)+" / 8. "+
@@ -484,7 +506,13 @@
  $("aiImagePost").onchange=()=>{$("aiOpenImage").disabled=!$("aiImagePost").value};
  $("translationPanel").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
-  if(b.dataset.aiTranslationView!==undefined){
+  if(b.dataset.aiTranslationCreate!==undefined){
+    e.preventDefault();e.stopPropagation();
+    const locale=b.dataset.aiTranslationCreate;
+    if(!Object.hasOwn(locales,locale)||locale===current?.locale)return;
+    $("translationLanguage").value=locale;
+    run(translate);
+  }else if(b.dataset.aiTranslationView!==undefined){
     e.preventDefault();e.stopPropagation();
     showTranslation(b.dataset.aiTranslationView);
   }else if(b.dataset.aiTranslationApprove!==undefined){
