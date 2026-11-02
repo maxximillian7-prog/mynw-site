@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nowwhatapp.app",
+      "sha256_cert_fingerprints": [
+        "B4:21:D6:21:A6:39:3A:19:D5:4E:58:83:7B:B0:B6:29:D2:A8:3E:D6:69:C4:3F:A9:43:4F:AA:77:1C:0A:6A:33",
+        "89:90:43:D8:2D:34:B1:DF:B9:9A:E2:C3:90:2F:B8:95:09:37:58:46:26:7C:EB:6E:9D:DD:DE:5D:AA:B2:2F:3E",
+        "91:40:00:72:79:AE:2A:1C:7F:E5:F9:99:7E:F2:16:8C:4F:00:27:20:40:F1:B5:E7:2C:D9:A6:AF:B5:F3:26:8E"
+      ]
+    }
+  }
+]
