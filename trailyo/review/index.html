@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://egjxgintpcoqhmdohabk.supabase.co; media-src https://egjxgintpcoqhmdohabk.supabase.co; connect-src https://egjxgintpcoqhmdohabk.supabase.co; frame-ancestors 'none'">
+  <title>Trailyo · Manual Event Review</title>
+  <link rel="stylesheet" href="./review.css?v=2">
+  <script defer src="./review.js?v=2"></script>
+</head>
+<body>
+  <main class="shell">
+    <header><a href="/trailyo/" class="brand">Trailyo</a><span class="private">Moderation · Restricted link</span></header>
+    <article class="panel">
+      <div id="state" role="status" aria-live="polite">Loading moderation request…</div>
+      <section id="request" hidden>
+        <h1 id="heading">Manual review</h1>
+        <div id="summary" class="summary"></div>
+        <h2>Event details</h2>
+        <dl id="details" class="details"></dl>
+        <h2>Description</h2><p id="description" class="long"></p>
+        <h2>Author's request</h2><p id="note" class="long"></p>
+        <h2>Automatic moderation</h2><p id="automatic" class="long"></p>
+        <h2>Photographs</h2><div id="photographs" class="media-grid"></div>
+        <h2>Video</h2><div id="videos" class="media-grid"></div>
+        <section class="actions">
+          <h2>Decision</h2>
+          <p class="help">The link alone does not approve the event. Review its date, venue, price and photos, then confirm a decision.</p>
+          <div id="warnings" class="warnings"></div>
+          <label id="reason-label" for="reason" hidden>Rejection reason (at least 10 characters)</label>
+          <textarea id="reason" placeholder="Explain what the organiser needs to correct…" minlength="10" maxlength="1500" rows="4" hidden></textarea>
+          <div class="buttons"><button id="approve" type="button" class="approve">Confirm approval</button><button id="reject" type="button" class="reject">Reject event</button></div>
+          <p id="decision-status" role="status" aria-live="polite"></p>
+        </section>
+      </section>
+    </article>
+    <footer>Only authorised moderators with a valid, unexpired email link can review a submission. <a href="mailto:support@mynw.app">support@mynw.app</a></footer>
+  </main>
+</body>
+</html>
