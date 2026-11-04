@@ -11,9 +11,32 @@ html[lang="ru"] main section[data-lang]:not([data-lang="ru"]),html[lang="pt"] ma
 html[lang="ru"] main section[data-lang="ru"],html[lang="pt"] main section[data-lang="pt"]{display:block}
 @media(max-width:700px){.panel{padding:24px 18px}header .wrap{align-items:flex-start;flex-direction:column}nav{gap:10px}}
 
-/* Approved wordmark — responsive, never clipped or distorted. */
-.trailyo-wordmark{width:min(100%,240px);height:auto;object-fit:contain;display:block}
-.brand:has(.trailyo-wordmark){display:inline-flex;align-items:center;min-width:135px}
-main h1:has(.trailyo-wordmark) .trailyo-wordmark{width:min(100%,340px)}
-header .wrap{gap:12px}
-@media(max-width:900px){header .wrap{position:static}nav{gap:8px}nav a{font-size:12px}}
+
+/* Labels exist in the HTML for all three languages; browser cache cannot
+   leave only English in the header if the page has already switched language. */
+header nav a span[lang],footer .legal-links a span[lang]{display:none}
+html[lang="en"] header nav a span[lang="en"],
+html[lang="ru"] header nav a span[lang="ru"],
+html[lang="pt"] header nav a span[lang="pt"],
+html[lang="en"] footer .legal-links a span[lang="en"],
+html[lang="ru"] footer .legal-links a span[lang="ru"],
+html[lang="pt"] footer .legal-links a span[lang="pt"]{display:inline}
+header .wrap{gap:14px}
+header .brand{display:inline-flex;align-items:center;flex-shrink:0;line-height:1}
+header .brand .trailyo-wordmark{display:block;width:170px;height:62px;object-fit:contain}
+main .home-logo{margin:0 0 18px;line-height:1}
+main .home-logo .trailyo-wordmark{display:block;width:min(100%,310px);height:auto;object-fit:contain}
+header nav{gap:10px 14px;align-items:center;justify-content:center}
+header nav a{line-height:1.2}
+footer .legal-links{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+footer .legal-links a{margin:0}
+@media(max-width:900px){
+  header .wrap{justify-content:center;flex-wrap:wrap}
+  header nav{flex:1 1 480px;justify-content:center}
+  header nav a{font-size:12px}
+}
+@media(max-width:700px){
+  header .wrap{align-items:center;flex-direction:column}
+  header nav{flex:auto;justify-content:flex-start}
+  header .brand .trailyo-wordmark{width:165px;height:56px}
+}
