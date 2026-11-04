@@ -14,7 +14,10 @@ function renderMedia(target,urls,video=false){
  target.replaceChildren();
  if(!urls?.length){missing(target,video?'No approved videos uploaded.':'No approved photographs uploaded.');return;}
  urls.forEach((url,i)=>{
-   if(typeof url!=='string'||!url.startsWith('https://egjxgintpcoqhmdohabk.supabase.co/storage/v1/object/public/'))return;
+   if(typeof url!=='string')return;
+   const publicPrefix='https://egjxgintpcoqhmdohabk.supabase.co/storage/v1/object/public/';
+   const reviewPrefix='https://egjxgintpcoqhmdohabk.supabase.co/storage/v1/object/sign/trailyo-review-evidence/';
+   if(!url.startsWith(publicPrefix)&&!url.startsWith(reviewPrefix))return;
    const fig=document.createElement('figure');
    const media=document.createElement(video?'video':'img');
    if(video){media.controls=true;media.preload='none';media.src=url;}
@@ -59,6 +62,11 @@ async function read(){
    el('note').textContent=v.request.note||'No note provided';
    el('automatic').textContent=[v.automatic.reason_code||'pending',v.automatic.reason_details||''].filter(Boolean).join(' · ');
    renderMedia(el('photographs'),v.media.photos,false);
+   if(v.media.pending_photo_count>0){
+     const note=node('p',v.media.pending_photo_count+' private photograph(s) await human approval. They are visible to the reviewer only.');
+     note.className='missing';
+     el('photographs').prepend(note);
+   }
    renderMedia(el('videos'),v.media.videos,true);
    const warnings=el('warnings');warnings.replaceChildren();
    (v.blockers||[]).forEach(s=>warnings.append(node('p','• '+s)));
