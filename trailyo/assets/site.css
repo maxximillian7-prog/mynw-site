@@ -10,3 +10,10 @@ main section[data-lang]:not([data-lang="en"]){display:none}
 html[lang="ru"] main section[data-lang]:not([data-lang="ru"]),html[lang="pt"] main section[data-lang]:not([data-lang="pt"]){display:none}
 html[lang="ru"] main section[data-lang="ru"],html[lang="pt"] main section[data-lang="pt"]{display:block}
 @media(max-width:700px){.panel{padding:24px 18px}header .wrap{align-items:flex-start;flex-direction:column}nav{gap:10px}}
+
+/* Approved wordmark — responsive, never clipped or distorted. */
+.trailyo-wordmark{width:min(100%,240px);height:auto;object-fit:contain;display:block}
+.brand:has(.trailyo-wordmark){display:inline-flex;align-items:center;min-width:135px}
+main h1:has(.trailyo-wordmark) .trailyo-wordmark{width:min(100%,340px)}
+header .wrap{gap:12px}
+@media(max-width:900px){header .wrap{position:static}nav{gap:8px}nav a{font-size:12px}}
