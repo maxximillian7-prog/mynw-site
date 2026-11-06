@@ -219,7 +219,7 @@ function renderLibrary(){
  $("libraryTopicFilter").hidden=!chosen;
  if(chosen){
   $("libraryTopicName").textContent=chosen.title;
-  $("libraryTopicCount").textContent=posts.filter(p=>p.topic_id===chosen.id).length+" материалов в теме";
+  $("libraryTopicCount").textContent="Статей в теме: "+posts.filter(p=>p.topic_id===chosen.id).length;
  }
  const visible=chosen?posts.filter(p=>p.topic_id===chosen.id):posts;
  $("library").innerHTML=visible.length?visible.map(listEntry).join(""):
