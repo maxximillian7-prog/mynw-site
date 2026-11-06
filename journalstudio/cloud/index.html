@@ -168,7 +168,21 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .ai-author-avatar img{width:100%;height:100%;object-fit:cover}
 .ai-author-links{font-size:11px;display:flex;flex-wrap:wrap;gap:8px;margin-top:5px}
 .ai-author-links a{text-decoration:underline;color:var(--green)}
-.ai-author-bio{font-size:11px;color:var(--muted);margin:3px 0 0}
+.ai-author-bio{font-size:12px;line-height:1.5;color:var(--muted);margin:5px 0 0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow-wrap:anywhere;white-space:normal}
+.ai-author-item{align-items:flex-start}
+.ai-author-item .info{min-width:0;overflow-wrap:anywhere}
+.studio-author-bio-count{text-align:right;font-size:11px;margin-top:3px;color:var(--muted)}
+.studio-author-bio-count.is-over-limit{color:#a34436;font-weight:700}
+.studio-topic-open{display:block;width:100%;padding:0;border:0;border-radius:0;background:transparent;text-align:left;font-weight:inherit;color:inherit}
+.studio-topic-open:hover{background:#f1f8f1}
+.studio-topic-open:focus-visible{outline:3px solid #56966b;outline-offset:-3px;border-radius:14px}
+.studio-topic-count{display:inline-block;font-weight:750;color:var(--green);font-size:12px}
+.studio-topic-actions{padding:0 12px 12px;gap:6px}
+.studio-topic-actions button{font-size:11px;padding:6px 9px}
+.studio-library-topic-filter{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--mint,#edf5ea);border:1px solid #bad4bc;border-radius:13px;padding:12px 16px;margin:6px 0 12px}
+.studio-library-topic-filter strong{font-size:15px}
+.studio-library-topic-filter p{margin:3px 0 0}
+@media(max-width:600px){.studio-library-topic-filter{flex-wrap:wrap}}
 .ai-author-item{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
 .ai-author-item .info{flex:1;min-width:0}.ai-author-item b{font-size:14px}
 .ai-author-item .small{font-size:11px}
@@ -484,7 +498,10 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
   <p id="studioTopicStatus" class="small muted" role="status"></p>
  </form>
 </div>
-<div class="card"><div class="sectionHeading"><div><h2>Библиотека материалов</h2><p>Все статьи выбранного приложения</p></div><button class="primary" id="libraryCreate">+ Написать статью</button></div><div id="library"></div></div></section>
+<div class="card"><div class="sectionHeading"><div><h2>Библиотека материалов</h2><p>Все статьи выбранного приложения</p></div><button class="primary" id="libraryCreate">+ Написать статью</button></div><div id="libraryTopicFilter" class="studio-library-topic-filter" hidden role="status">
+ <div><div class="eyebrow">СТАТЬИ В ВЫБРАННОЙ ТЕМЕ</div><strong id="libraryTopicName"></strong><p class="small muted" id="libraryTopicCount"></p></div>
+ <button type="button" id="libraryTopicClear">← Все статьи</button>
+</div><div id="library"></div></div></section>
 <section class="view" data-view="editor">
 <div id="emptyEditor" class="card"><div class="empty"><span class="emptyIcon">✎</span><h2>Откройте статью или начните новую</h2><p>Блочный конструктор сохранит черновик на сервере редакции.</p><button class="primary" id="editorCreate">+ Создать статью</button></div></div>
 <div id="editor" hidden><div class="sectionHeading studio-editor-topline">
@@ -696,7 +713,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <button id="aiSaveSchedule">Сохранить расписание</button><div id="aiScheduleInfo" class="small muted" style="margin-top:12px">Расписание применяется к выбранному ИИ-автору.</div>
 </div><div class="card"><h2>Как работает редакция</h2><div class="ai-steps"><div><b>1 · Идея</b><p>ИИ-автор выбирает тему или следует запросу редактора.</p></div><div><b>2 · Черновик</b><p>Генерируется статья в индивидуальном стиле автора.</p></div><div><b>3 · Проверка</b><p>Редактор корректирует факты, фотографии и переводы.</p></div><div><b>4 · Утверждение</b><p>Только утверждённая версия допускается к публикации.</p></div></div></div></div></div></section>
 <section class="view" data-view="review-queue"><div class="sectionHeading"><div><div class="eyebrow">РЕДАКЦИОННЫЙ КОНТРОЛЬ</div><h2>Очередь согласования</h2><p class="muted small">Материалы, ожидающие проверки, и решения редакции</p></div><div class="btns"><button id="reviewRefresh">↻ Обновить очередь</button></div></div><div class="card"><div class="studio-review-toolbar"><label for="reviewFilter">Показать</label><select id="reviewFilter"><option value="in_review">На проверке</option><option value="changes_requested">На доработке</option><option value="approved">Утверждены</option><option value="scheduled">Запланированы</option><option value="published">Опубликованы</option><option value="all">Все материалы</option></select></div><div id="reviewQueueList"><div class="empty">Загрузка очереди…</div></div></div></section>
-<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2" id="authorWorkspaceGrid"><div class="card" id="authorsDirectoryCard"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card" id="authorEditorCard"><div id="authorOwnSummary" class="author-self-summary" hidden></div><h2 id="authorFormTitle">Профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorTagline">Краткое представление</label><input id="authorTagline" maxlength="160" placeholder="Один яркий слоган — кто и о чём пишет"><label for="authorBio">О себе / специализация</label><textarea id="authorBio"></textarea><div class="studio-ai-author-internal" hidden aria-hidden="true">
+<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2" id="authorWorkspaceGrid"><div class="card" id="authorsDirectoryCard"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card" id="authorEditorCard"><div id="authorOwnSummary" class="author-self-summary" hidden></div><h2 id="authorFormTitle">Профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorTagline">Краткое представление</label><input id="authorTagline" maxlength="160" placeholder="Один яркий слоган — кто и о чём пишет"><label for="authorBio">О себе / специализация</label><textarea id="authorBio" maxlength="1200"></textarea><div id="authorBioCounter" class="studio-author-bio-count" role="status">0 / 1200 символов</div><div class="studio-ai-author-internal" hidden aria-hidden="true">
 <label for="authorFocus">Темы и специализация ИИ-автора</label><textarea id="authorFocus" maxlength="450"></textarea>
 <label for="authorVoice">Стиль и характер текста ИИ-автора</label><textarea id="authorVoice" maxlength="550"></textarea></div>
 <label for="authorLang">Основной язык</label><select id="authorLang"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option></select>
@@ -817,11 +834,11 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./studio-i18n.js?v=20261023-51"></script>
 <script defer src="./preview.js?v=20261024-1"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261106-native-linkblocks1"></script>
+<script defer src="./client.js?v=20261106-topic-library-filter1"></script>
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261106-full-review-edit1"></script>
-<script defer src="./author-profiles.js?v=20261106-translations1"></script>
+<script defer src="./author-profiles.js?v=20261106-author-bio-preview1"></script>
 <script defer src="./author-translations.js?v=20261106-translations1"></script>
 <script defer src="./ai-studio.js?v=20261030-all-locales1"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
@@ -829,7 +846,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./studio-images.js?v=20261106-media-delete1"></script>
 <script defer src="./studio-photo-tools.js?v=20261106-full-review-edit1"></script>
 <script defer src="./media-recovery.js?v=20261023-18"></script>
-<script defer src="./journal-topics.js?v=20261023-52"></script>
+<script defer src="./journal-topics.js?v=20261106-topic-library-filter1"></script>
 <script defer src="./studio-author-guide.js?v=20261024-1"></script>
 <script defer src="./studio-member-admin.js?v=20261024-1"></script>
 <script defer src="./studio-publications.js?v=20261024-1"></script>
