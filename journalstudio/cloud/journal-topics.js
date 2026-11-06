@@ -73,7 +73,7 @@
     '</div><div class="studio-topic-card-content"><h3>'+safe(t.title)+'</h3>'+
     '<p class="muted">'+safe(t.slug)+' · v'+Number(t.revision||1)+(t.is_active?'':' · Скрыта')+
     ' · '+(1+["en","pt-PT","uk","es","fr","de","it"].filter(k=>t.translations?.[k]?.trim()).length)+'/8 языков</p>'+
-    '<span class="studio-topic-count">'+articleCount+' материалов · Открыть список ↗</span>'+
+    '<span class="studio-topic-count">Статей: '+articleCount+' · Открыть список ↗</span>'+
     '</div></button>'+
     (writable?'<div class="btns studio-topic-actions"><button type="button" data-topic-edit="'+safe(t.id)+'">Изменить</button>'+
       '<button type="button" data-topic-toggle="'+safe(t.id)+'">'+(t.is_active?'Скрыть':'Показать')+'</button></div>':'')+
