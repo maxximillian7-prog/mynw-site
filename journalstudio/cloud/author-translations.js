@@ -150,7 +150,7 @@
   if(busy)return;access();setBusy(true);
   try{await runDetection()}finally{setBusy(false)}
  }
- function open(a){
+ function open(a,skipAutoDetect=false){
   access();if(busy)throw Error("Завершите предыдущую операцию.");
   if(!a)throw Error("Автор не найден.");
   if(!canDiscard())return;
@@ -169,7 +169,7 @@
   panel.scrollIntoView({behavior:"smooth",block:"start"});
   // Automatically detect once when opening a profile that lacks reviewed
   // language metadata. This never writes or publishes anything.
-  if(!detected&&String(a.bio||a.tagline||"").trim().length>=18){
+  if(!skipAutoDetect&&!detected&&String(a.bio||a.tagline||"").trim().length>=18){
    void run(async()=>{if(selectedId===a.id&&project.slug===selectedProject&&!busy)await detectLanguage()});
   }
  }
@@ -327,7 +327,13 @@
   if(busy||!canDiscard())return;
   $("authorTranslationsCard").hidden=true;selectedId=null;selectedProject=null;selectedLocale=null;dirty=false;drafts.clear();failureNotes=[];
  };
- window.StudioAuthorTranslations={open,refresh(){
+ async function openAndTranslate(a){
+  open(a,true);
+  // A declined unsaved-changes prompt leaves the previous author selected.
+  if(!a||selectedId!==a.id||selectedProject!==project.slug)return;
+  return await autoAll();
+ }
+ window.StudioAuthorTranslations={open,openAndTranslate,refresh(){
   if(!selectedId)return;
   const a=current();
   if(!a||selectedProject!==project?.slug||!canTranslate()){

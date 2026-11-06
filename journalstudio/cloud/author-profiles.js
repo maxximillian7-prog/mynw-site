@@ -30,6 +30,7 @@
   const selected=editing&&(authors||[]).find(a=>a.id===editing.id);
   const visible=!!selected&&canTranslate();
   button.hidden=!visible;info.hidden=!visible;
+  if($("authorQuickTranslate"))$("authorQuickTranslate").hidden=!visible;
   if(visible){
    const count=translatedDescriptionCount(selected);
    button.textContent="🌐 Переводы описания ("+count+"/7)";
@@ -262,6 +263,12 @@
   if(!selected||!canTranslate())throw Error("Сначала выберите автора из списка и убедитесь, что у вас есть права редактора.");
   if(!window.StudioAuthorTranslations?.open)throw Error("Модуль перевода не загрузился. Обновите страницу Ctrl+F5.");
   window.StudioAuthorTranslations.open(selected);
+ });
+ $("authorTranslateAllQuick").onclick=()=>run(async()=>{
+  const selected=editing&&(authors||[]).find(a=>a.id===editing.id);
+  if(!selected||!canTranslate())throw Error("Выберите автора в списке слева и убедитесь, что у вас есть права редактора.");
+  if(!window.StudioAuthorTranslations?.openAndTranslate)throw Error("Модуль перевода не загрузился. Обновите страницу Ctrl+F5.");
+  await window.StudioAuthorTranslations.openAndTranslate(selected);
  });
  $("authorUploadPhoto").onclick=()=>run(uploadPhoto);
  document.getElementById("authorKind").onchange=e=>{
