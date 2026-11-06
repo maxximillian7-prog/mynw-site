@@ -226,6 +226,11 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 .studio-media-actions{display:flex;gap:6px;flex-wrap:wrap}
 .studio-media-actions button{font-size:11px;padding:6px 9px;flex:1}
 .studio-media-meta{font-size:10px;color:var(--muted);margin:4px 2px 8px}
+.studio-partner-consent-notice{margin-top:13px;padding:13px 15px;border:1px solid #d8c5a4;border-radius:12px;background:#fff9eb;color:#433b30}
+.studio-partner-consent-notice strong{font-size:13px}
+.studio-partner-consent-notice button{font-size:12px;font-weight:700;max-width:100%}
+.studio-partner-consent-notice[hidden]{display:none}
+
 .studio-media-delete{display:block;width:100%;margin-top:8px;padding:8px;border:1px solid #cc8e83;border-radius:8px;background:#fff4f1;color:#943d32;font-size:11px;font-weight:700;cursor:pointer}.studio-media-delete:disabled{opacity:.5;cursor:wait}
 @media(max-width:540px){.studio-media-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.studio-media-actions button{font-size:10px;padding:6px 4px}}
 
@@ -562,7 +567,13 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <option value="cover">Только главная обложка</option>
 <option value="inline">Добавить изображение в текст</option>
 </select><label class="jp-check"><input id="imageRights" type="checkbox"> Я подтверждаю, что имею право опубликовать это изображение</label><button type="button" class="primary" id="uploadImage">↑ Загрузить фото</button><p class="small muted" id="imageUploadStatus" role="status" aria-live="polite" style="margin:9px 0 0">Порядок: выбрать файл → указать автора фото → подтвердить права → загрузить. Первое нажатие без выбранного файла откроет выбор изображения.</p></div></div>
-<div class="workflow"><div class="eyebrow">РЕДАКЦИОННЫЙ ПРОЦЕСС</div><div class="btns" style="margin-top:9px"><button id="save" class="primary">Сохранить</button><button id="submit">На проверку</button><button id="return">На доработку</button><button id="approve">✓ Утвердить</button><button id="publish" class="primary">↗ Опубликовать</button><button id="schedule">◷ Запланировать</button><button id="hidePost" type="button" hidden>Скрыть статью</button><button id="editPublishedPost" type="button" hidden>Изменить содержание</button><button id="deletePost" type="button" hidden title="Удалить статью из Journal Studio и убрать из приложений">Удалить статью</button></div></div>
+<div class="workflow"><div class="eyebrow">РЕДАКЦИОННЫЙ ПРОЦЕСС</div>
+<div id="partnerConsentNotice" class="studio-partner-consent-notice" role="status" hidden>
+ <strong id="partnerConsentTitle">Ожидается подтверждение согласия автора</strong>
+ <p id="partnerConsentDetail" class="small" style="margin:7px 0 9px"></p>
+ <button id="partnerConsentAction" type="button">Проверить документ и подтвердить согласие</button>
+</div>
+<div class="btns" style="margin-top:9px"><button id="save" class="primary">Сохранить</button><button id="submit">На проверку</button><button id="return">На доработку</button><button id="approve">✓ Утвердить</button><button id="publish" class="primary">↗ Опубликовать</button><button id="schedule">◷ Запланировать</button><button id="hidePost" type="button" hidden>Скрыть статью</button><button id="editPublishedPost" type="button" hidden>Изменить содержание</button><button id="deletePost" type="button" hidden title="Удалить статью из Journal Studio и убрать из приложений">Удалить статью</button></div></div>
 </div></div>
 <div class="stack editorPreview"><div class="card"><div class="sectionHeading"><div><h2>Предпросмотр публикации</h2><p>Выберите площадку до утверждения статьи</p></div><span class="chip">Live preview</span></div><div class="jp-mode-switch" role="group" aria-label="Формат предпросмотра"><button type="button" data-preview-mode="phone" class="selected">▯ Телефон</button><button type="button" data-preview-mode="site">▤ Сайт</button><button type="button" data-preview-mode="instagram">◎ Instagram</button></div><div id="jpShape" class="jp-shape-row" hidden><label for="jpAspect">Формат фото</label><select id="jpAspect"><option value="4:5">Вертикальный 4:5</option><option value="1:1">Квадрат 1:1</option></select></div><div id="jpCaptionFields" class="jp-caption-fields" hidden><label for="jpCaptionText">Подпись для Instagram (необязательно)</label><textarea id="jpCaptionText" maxlength="2200" rows="4" placeholder="Здесь можно написать отдельный текст для Instagram. Если оставить пустым, будет создан краткий вариант из статьи."></textarea><div class="row"><span id="jpCaptionLength" class="small muted">0 / 2200</span><button type="button" id="jpSaveCaption">Сохранить подпись</button></div><div class="small muted" style="margin-top:7px">Сохраняется отдельно от основного текста статьи. Без подключения Meta пост не отправляется.</div></div><div id="preview" class="jp-preview-window" aria-live="polite"><div class="empty">Добавьте заголовок и блоки, чтобы увидеть статью.</div></div><div id="jpNotice" class="jp-preview-note">Предварительный макет без публикации.</div></div>
 <div class="card" id="translationPanel">
@@ -757,7 +768,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./studio-i18n.js?v=20261023-51"></script>
 <script defer src="./preview.js?v=20261024-1"></script>
 <script defer src="./studio-themes.js?v=20261023-14"></script>
-<script defer src="./client.js?v=20261106-full-review-edit1"></script>
+<script defer src="./client.js?v=20261106-consent-review1"></script>
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261106-full-review-edit1"></script>

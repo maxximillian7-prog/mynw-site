@@ -447,6 +447,24 @@ function renderEditor(){
  $("reviewEditHint").hidden=!canEditSubmittedPost(current);
  $("return").hidden=!current||s!=="in_review"||!editorRole();
  $("approve").hidden=!current||s!=="in_review"||!chiefRole();
+ // Never infer a partner's legal permission from account access or submission.
+ // Surface the missing consent directly instead of a generic API error.
+ const attachedAuthor=current?.author_id?authors.find(a=>a.id===current.author_id):null;
+ const missingAuthor=!!current?.author_id&&!attachedAuthor;
+ const pendingPartner=attachedAuthor?.kind==="partner"&&attachedAuthor.consent_status!=="approved";
+ const needsConsentAttention=s==="in_review"&&(missingAuthor||pendingPartner);
+ $("partnerConsentNotice").hidden=!needsConsentAttention;
+ $("approve").disabled=!!needsConsentAttention;
+ $("approve").title=needsConsentAttention?"Сначала подтвердите документальное согласие автора":"";
+ if(needsConsentAttention){
+  $("partnerConsentTitle").textContent=missingAuthor
+   ?"Не найден профиль автора статьи"
+   :"Требуется согласие автора: "+attachedAuthor.name;
+  $("partnerConsentDetail").textContent=missingAuthor
+   ?"Привязанный к статье профиль отсутствует или неактивен. Проверьте автора в разделе «Авторы» до утверждения."
+   :"Подтверждение прав на публикацию ещё не оформлено. Если у редакции есть разрешение или договор, проверьте документ и внесите его ссылку либо номер. Без согласия статья не может быть утверждена.";
+ }
+ $("partnerConsentAction").hidden=!chiefRole()||!pendingPartner;
  $("publish").hidden=!current||s!=="approved"||!chiefRole();
  $("schedule").hidden=!current||s!=="approved"||!chiefRole();
  renderPreview();renderEditorChannels();
@@ -736,7 +754,8 @@ async function approveAuthor(id){
   const result=await call("/authors/"+encodeURIComponent(id)+"/approve","POST",{consent_ref:ref});
   if(result?.author?.consent_status!=="approved")throw Error("Сервер не подтвердил согласие автора.");
   await refreshPosts();
-  toast("Согласие автора подтверждено. Публикация его материалов разрешена.");
+  if(current?.author_id===id)renderEditor();
+  toast("Согласие автора подтверждено. Теперь можно утвердить статью.");
  }finally{authorApprovalPending=false}
 }
 async function changeProject(slug){
@@ -784,6 +803,7 @@ $("deletePost").onclick=()=>run(()=>current&&deletePost(current.id));
 $("hidePost").onclick=()=>run(()=>current&&toggleArticleHidden(current.id));
 $("editPublishedPost").onclick=()=>run(()=>current&&editArticle(current.id));
 $("editSubmittedPost").onclick=()=>run(()=>current&&editArticle(current.id));
+$("partnerConsentAction").onclick=()=>run(async()=>{if(!current?.author_id)throw Error("Автор не выбран");await approveAuthor(current.author_id)});
 $("publishedTopicSave").onclick=()=>run(async()=>{
  if(!current||!chiefRole()||!["approved","scheduled","published"].includes(current.status))throw Error("Недоступно для данной статьи");
  const id=$("topicSelect").value||null;
