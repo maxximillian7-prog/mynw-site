@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#102338">
+  <title>Custom Mobile App Development | AI, iOS & Android — MyNow Apps</title>
+  <meta name="description" content="Independent Flutter app development in Portugal. Custom iOS & Android apps, AI features, Supabase backends and MVP launches. Projects from €5,000. View five in-house products.">
+  <link rel="canonical" href="https://mynw.app/development/">
+  <link rel="icon" href="/assets/brand/mynow-logo.webp" type="image/webp">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MyNow Apps">
+  <meta property="og:title" content="Custom mobile apps, built end to end. — MyNow Apps">
+  <meta property="og:description" content="Work directly with an independent developer in Portugal. Flutter, AI, backends and app launches. Explore five in-house projects.">
+  <meta property="og:url" content="https://mynw.app/development/">
+  <meta property="og:image" content="https://mynw.app/assets/brand/nowwhat-banner.webp">
+  <style>
+    :root{--night:#0e2136;--navy:#172e46;--ink:#132b3e;--muted:#60758a;--line:#dce6ea;--mint:#9de5cb;--aqua:#d3f4eb;--cream:#f9f9f5;--paper:#ffffff;--radius:25px}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:85px}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--cream);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    button,input{font:inherit}
+    a:focus-visible,button:focus-visible{outline:3px solid #4eb8ac;outline-offset:4px}
+    .wrap{width:min(1160px,calc(100% - 48px));margin-inline:auto}
+    .kicker{text-transform:uppercase;letter-spacing:.16em;font-weight:780;font-size:12px}
+    header{background:#fffdfaf5;border-bottom:1px solid #e8eeee;position:sticky;top:0;z-index:40;backdrop-filter:blur(18px)}
+    .topbar{height:78px;display:flex;align-items:center;gap:18px}
+    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:850;letter-spacing:-.035em;font-size:20px;white-space:nowrap}
+    .brand img{width:43px;height:43px;object-fit:contain;border-radius:12px}
+    .brand small{display:block;font-size:10px;color:#728497;font-weight:750;letter-spacing:.08em;text-transform:uppercase;margin-top:-3px}
+    nav{display:flex;gap:26px;align-items:center;margin-left:auto}
+    nav a{text-decoration:none;font-size:13px;font-weight:720;color:#496076}
+    nav a:hover{color:#078b81}
+    .nav-cta{padding:10px 17px;background:var(--night);color:#fff;border-radius:11px;font-size:13px;text-decoration:none;font-weight:760;white-space:nowrap}
+    .mobile-nav{display:none;border:1px solid #d6e3e6;border-radius:10px;padding:7px 11px;background:#fff;cursor:pointer}
+    .hero{background:radial-gradient(ellipse at 76% 22%,#335872 0,#162f48 36%,#0d2035 75%);color:white;overflow:hidden;position:relative}
+    .hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff07 1px,transparent 1px),linear-gradient(90deg,#ffffff07 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(90deg,transparent 36%,#000)}
+    .hero:after{content:"";width:680px;height:680px;border:1px solid #ffffff1d;position:absolute;border-radius:50%;right:-295px;top:-370px;box-shadow:0 0 0 100px #ffffff06,0 0 0 205px #ffffff04}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;min-height:590px;padding:88px 0}
+    .hero .kicker{color:var(--mint)}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-size:clamp(46px,5.8vw,78px);letter-spacing:-.07em;line-height:1.065;margin:21px 0 28px;max-width:720px}
+    h1 span{color:var(--mint)}
+    .hero-lead{font-size:18px;color:#c4d6e2;max-width:565px;line-height:1.78;margin-bottom:32px}
+    .buttons{display:flex;flex-wrap:wrap;gap:13px;align-items:center}
+    .button{display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;border-radius:12px;padding:14px 22px;font-size:14px;font-weight:800;min-height:50px;transition:transform .2s,box-shadow .2s}
+    .button:hover{transform:translateY(-2px)}
+    .button-primary{background:var(--mint);color:#102c33}
+    .button-outline{border:1px solid #96aec184;color:#f3fbff}
+    .hero-note{color:#91b5c6;font-size:13px;margin:20px 0 0}
+    .product-cloud{position:relative;min-height:432px}
+    .cloud-back{position:absolute;inset:42px 10px 36px 16px;border:1px solid #8fdac64f;border-radius:45px;transform:rotate(-6deg);background:linear-gradient(140deg,#ffffff20,#ffffff04)}
+    .cloud-card{position:absolute;background:#f9fcfc;color:var(--ink);border-radius:23px;box-shadow:0 24px 70px #020e1b65;display:flex;align-items:center;gap:14px;padding:17px 19px}
+    .cloud-card img{width:63px;height:63px;border-radius:18px;object-fit:contain;background:#fff}
+    .cloud-card strong{font-size:19px;letter-spacing:-.035em;display:block}
+    .cloud-card small{font-size:11px;color:#6b8194;font-weight:700}
+    .cloud-one{left:2%;top:12%;transform:rotate(-8deg);width:66%}
+    .cloud-two{right:-1%;top:35%;transform:rotate(6deg);width:67%}
+    .cloud-three{left:4%;bottom:8%;transform:rotate(-3deg);width:67%}
+    .cloud-stamp{position:absolute;bottom:1%;right:0%;background:#9de5cb;color:#103344;border-radius:50%;width:95px;height:95px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:850;font-size:12px;line-height:1.3;transform:rotate(12deg)}
+    .proof-strip{background:#eaf4f1;border-bottom:1px solid #d9e7e1}
+    .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:25px 0}
+    .proof>div{display:flex;gap:13px;align-items:flex-start;font-size:13px;color:#4d6771}
+    .proof b{display:block;color:#183b44;font-size:15px}
+    .proof span.icon{flex:none;background:white;border-radius:11px;width:38px;height:38px;display:grid;place-items:center;font-size:19px}
+    section{padding:96px 0}
+    section .eyebrow{color:#18776d;font-size:12px;font-weight:820;text-transform:uppercase;letter-spacing:.16em;margin-bottom:14px}
+    h2{font-size:clamp(34px,4vw,51px);line-height:1.13;letter-spacing:-.055em;margin:0 0 16px;max-width:800px}
+    .section-lead{font-size:17px;color:var(--muted);max-width:740px;line-height:1.75;margin-bottom:37px}
+    .service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
+    .service{border:1px solid var(--line);border-radius:var(--radius);background:white;padding:29px;min-height:270px}
+    .service .mark{width:47px;height:47px;border-radius:14px;background:#e4f7f0;display:grid;place-items:center;font-size:23px;margin-bottom:30px}
+    .service h3{font-size:21px;letter-spacing:-.04em;line-height:1.24;margin:0 0 12px}
+    .service p{font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:0}
+    .work-section{background:white}
+    .project-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+    .project{border:1px solid var(--line);border-radius:24px;background:#fff;overflow:hidden;min-width:0;display:flex;flex-direction:column}
+    .project-art{height:210px;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;position:relative;background:#eef1f9}
+    .project-art img.banner{width:100%;height:100%;object-fit:cover;border-radius:14px}
+    .project-art img.identity{width:min(100%,330px);max-height:165px;object-fit:contain;filter:drop-shadow(0 20px 15px #10283c20)}
+    .project-art.nowcook{background:#fff2df}.project-art.nowgreen{background:#e9f5e9}.project-art.nowkids{background:#e6f0fe}.project-art.trailyo{background:#ede9f7}
+    .project-details{padding:25px 28px 29px;flex:1;display:flex;flex-direction:column}
+    .project-heading{display:flex;gap:10px;justify-content:space-between;align-items:center;margin:0 0 12px}
+    .project h3{font-size:24px;letter-spacing:-.05em;margin:0}
+    .status{font-size:11px;white-space:nowrap;border-radius:100px;background:#e1f4e8;color:#225f43;padding:5px 10px;font-weight:800}
+    .status.building{background:#f3edff;color:#7350a3}
+    .project p{font-size:14px;color:var(--muted);line-height:1.7;margin:0 0 21px}
+    .tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;margin-bottom:19px}
+    .tag{font-size:11px;font-weight:750;background:#eef3f6;color:#486275;border-radius:7px;padding:6px 9px}
+    .project-link{font-size:13px;font-weight:800;color:#176b69;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+    .project-link:hover{text-decoration:underline}
+    .project-grid>.project:last-child{grid-column:1/-1;display:grid;grid-template-columns:42% 1fr}
+    .project-grid>.project:last-child .project-art{height:100%;min-height:260px}
+    .comparison{background:#10253a;color:#fff;position:relative}
+    .comparison .eyebrow{color:#a4ead4}
+    .comparison .section-lead{color:#bed2e0}
+    .process{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:34px}
+    .process article{border-top:1px solid #7c9aad5b;padding-top:19px}
+    .process .count{font-size:12px;letter-spacing:.13em;font-weight:800;color:var(--mint)}
+    .process h3{font-size:19px;letter-spacing:-.025em;margin:13px 0 10px}
+    .process p{font-size:13px;line-height:1.8;color:#bdd0da}
+    .price-card{margin-top:44px;background:#fff;border:1px solid #dfebe6;border-radius:25px;padding:31px 35px;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:32px}
+    .price-card .from{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:#4b796d;font-weight:850}
+    .price-card strong{display:block;font-size:42px;letter-spacing:-.07em;line-height:1.2}
+    .price-card p{font-size:13px;color:#6c7c89;margin:8px 0 0;max-width:620px}
+    .price-card .button{background:#163b40;color:#fff;white-space:nowrap}
+    .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    details{border:1px solid var(--line);border-radius:16px;background:#fff;padding:22px 24px}
+    details summary{font-weight:800;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px}
+    details summary::-webkit-details-marker{display:none}
+    details summary:after{content:"+";color:#168077;font-size:23px;line-height:18px}
+    details[open] summary:after{content:"−"}
+    details p{font-size:14px;color:var(--muted);line-height:1.75;margin:14px 0 0}
+    .contact{padding:80px 0 96px}
+    .contact-panel{border-radius:30px;padding:62px;display:grid;grid-template-columns:1.25fr .75fr;align-items:center;gap:40px;background:linear-gradient(120deg,#d3eee5,#e2f0f1 70%,#f4f5ee)}
+    .contact-panel .eyebrow{margin-bottom:11px}
+    .contact-panel h2{font-size:clamp(34px,4vw,52px);margin-bottom:18px}
+    .contact-panel p{color:#546e76;font-size:15px;line-height:1.75}
+    .contact-method{background:#fff;border:1px solid #cfe2d9;border-radius:22px;padding:30px}
+    .contact-method .email{font-size:20px;font-weight:800;overflow-wrap:anywhere;letter-spacing:-.04em}
+    .contact-method p{font-size:13px}
+    .contact-method .button{background:#13313b;color:#fff;width:100%}
+    .subnote{font-size:12px;color:#6d8388;margin-top:13px}
+    footer{background:#0e2136;color:#a9bdc9;padding:31px 0}
+    .footer-flex{display:flex;flex-wrap:wrap;justify-content:space-between;gap:17px;font-size:12px;align-items:center}
+    footer a{text-decoration:none;color:#dbece7;margin-left:18px}
+    footer a:hover{text-decoration:underline}
+    @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:20px;min-height:0}.product-cloud{max-width:560px;margin:auto;width:100%}.service-grid{grid-template-columns:1fr 1fr}.process{grid-template-columns:repeat(2,1fr)}nav{gap:15px}.nav-cta{display:none}}
+    @media(max-width:680px){.wrap{width:min(100% - 34px,1160px)}.topbar{height:70px;flex-wrap:wrap;position:relative}.brand{font-size:18px}.mobile-nav{display:block;margin-left:auto}.topbar nav{display:none;position:absolute;top:69px;left:-17px;right:-17px;background:#fff;box-shadow:0 18px 25px #10283a18;flex-direction:column;align-items:stretch;padding:18px 24px;gap:0}.topbar nav.open{display:flex}.topbar nav a{padding:11px 0}.hero-grid{padding:66px 0 44px}h1{font-size:clamp(43px,11vw,62px)}.hero-lead{font-size:16px}.product-cloud{min-height:340px;max-width:440px}.cloud-card{padding:11px}.cloud-card img{width:46px;height:46px}.cloud-card strong{font-size:15px}.cloud-stamp{width:70px;height:70px;font-size:10px}.proof{grid-template-columns:1fr;gap:12px}.proof>div{font-size:12px}section{padding:67px 0}.service-grid,.project-grid,.faq-grid,.process{grid-template-columns:1fr}.service{min-height:0}.project-grid>.project:last-child{grid-column:auto;display:flex}.project-grid>.project:last-child .project-art{height:210px;min-height:0}.price-card{display:block;padding:24px}.price-card .button{margin-top:22px;width:100%;white-space:normal}.contact{padding-top:45px}.contact-panel{display:block;padding:30px 23px}.contact-method{margin-top:24px;padding:23px}.footer-flex{display:block}footer a{display:inline-block;margin:10px 14px 0 0}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}}
+  </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"MyNow Apps — Independent Mobile App Development","url":"https://mynw.app/development/","description":"Custom mobile applications, AI integrations and Flutter development for businesses and startups.","areaServed":["Portugal","European Union","Worldwide"],"email":"support@mynw.app","priceRange":"Projects from EUR 5,000","knowsAbout":["Flutter","Supabase","Android","iOS","AI integrations"],"sameAs":["https://mynw.app/"]}</script>
+</head>
+<body>
+  <header><div class="wrap topbar">
+    <a class="brand" href="/" aria-label="MyNow Apps home"><img src="/assets/brand/mynow-logo.webp" width="43" height="43" alt=""><span>MyNow Apps<small>Independent development</small></span></a>
+    <button class="mobile-nav" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav" type="button">☰</button>
+    <nav id="site-nav" aria-label="Main navigation">
+      <a href="#services">Services</a><a href="#work">Selected work</a><a href="#approach">How I work</a><a href="#faq">FAQ</a><a href="/">Product website</a>
+    </nav>
+    <a class="nav-cta" href="#contact">Discuss a project ↗</a>
+  </div></header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="kicker">Independent developer · Based in Portugal · Worldwide</div>
+          <h1 id="hero-title">Your app idea.<br><span>A real product.</span></h1>
+          <p class="hero-lead">I design and build custom mobile applications for businesses and startups — from the first prototype to the backend, AI features and launch. One developer, direct communication, end-to-end ownership.</p>
+          <div class="buttons">
+            <a class="button button-primary" href="mailto:support@mynw.app?subject=Custom%20app%20development%20enquiry">Tell me about your project <span aria-hidden="true">↗</span></a>
+            <a class="button button-outline" href="#work">Explore my work ↓</a>
+          </div>
+          <p class="hero-note">Flutter · iOS & Android · Supabase · AI integrations</p>
+        </div>
+        <div class="product-cloud" aria-label="A selection of MyNow Apps products">
+          <div class="cloud-back" aria-hidden="true"></div>
+          <div class="cloud-card cloud-one"><img src="/assets/brand/nowwhat-logo.webp" alt="" width="63" height="63"><span><strong>NowWhat</strong><small>Productivity &amp; AI</small></span></div>
+          <div class="cloud-card cloud-two"><img src="/assets/brand/nowgreen-logo.webp" alt="" width="63" height="63"><span><strong>NowGreen</strong><small>Plants &amp; care</small></span></div>
+          <div class="cloud-card cloud-three"><img src="/assets/brand/nowkids-logo.webp" alt="" width="63" height="63"><span><strong>NowKids</strong><small>Family learning</small></span></div>
+          <span class="cloud-stamp">Built with<br>real product<br>experience</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="proof-strip"><div class="wrap proof">
+      <div><span class="icon" aria-hidden="true">◇</span><span><b>Direct collaboration</b>Work with the person writing your app.</span></div>
+      <div><span class="icon" aria-hidden="true">⌘</span><span><b>Cross-platform development</b>One Flutter codebase for Android and iOS.</span></div>
+      <div><span class="icon" aria-hidden="true">✳</span><span><b>Product-first thinking</b>Designed around real workflows, not feature lists.</span></div>
+    </div></div>
+
+    <section id="services"><div class="wrap">
+      <div class="eyebrow">What I can build</div>
+      <h2>From a business problem to a usable app.</h2>
+      <p class="section-lead">I focus on mobile-first products with a clear purpose, practical scope and room to grow. Architecture, design, development and integration work stay connected throughout.</p>
+      <div class="service-grid">
+        <article class="service"><div class="mark" aria-hidden="true">◈</div><h3>Custom business apps</h3><p>Client portals, booking journeys, internal operations, family and membership experiences, notifications and workflow automation.</p></article>
+        <article class="service"><div class="mark" aria-hidden="true">✺</div><h3>AI-powered features</h3><p>Photo and document recognition, smart recommendations, conversational assistants, speech features and structured AI workflows.</p></article>
+        <article class="service"><div class="mark" aria-hidden="true">↗</div><h3>Startup MVPs</h3><p>A focused version of your product, with authentication, database, core flows, monetisation where needed and a practical launch plan.</p></article>
+      </div>
+    </div></section>
+
+    <section id="work" class="work-section"><div class="wrap">
+      <div class="eyebrow">Selected in-house work</div>
+      <h2>Products I build — not hypothetical case studies.</h2>
+      <p class="section-lead">These are independent MyNow Apps product projects, not commissioned client work. They demonstrate the kinds of systems and experiences I can build.</p>
+      <div class="project-grid">
+        <article class="project">
+          <div class="project-art"><img class="banner" src="/assets/brand/nowwhat-banner.webp" loading="lazy" alt="NowWhat original product artwork"></div>
+          <div class="project-details"><div class="project-heading"><h3>NowWhat</h3><span class="status">Google Play</span></div>
+          <p>An AI-powered personal organiser: capture information from photos or documents, turn it into actionable items, manage reminders and keep everyday plans together.</p>
+          <div class="tags"><span class="tag">AI &amp; OCR</span><span class="tag">Productivity</span><span class="tag">Notifications</span></div>
+          <a class="project-link" href="/nowwhat/">Explore NowWhat <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="project">
+          <div class="project-art nowcook"><img class="banner" src="/assets/brand/nowcook-banner.webp" loading="lazy" alt="NowCook original product artwork"></div>
+          <div class="project-details"><div class="project-heading"><h3>NowCook</h3><span class="status">Google Play</span></div>
+          <p>A kitchen companion combining photo-based pantry recognition, recipe recommendations, meal planning and an AI cooking assistant.</p>
+          <div class="tags"><span class="tag">Computer vision</span><span class="tag">AI recipes</span><span class="tag">Subscriptions</span></div>
+          <a class="project-link" href="/nowcook/">Explore NowCook <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="project">
+          <div class="project-art nowgreen"><img class="banner" src="/assets/brand/nowgreen-banner.webp" loading="lazy" alt="NowGreen original product artwork"></div>
+          <div class="project-details"><div class="project-heading"><h3>NowGreen</h3><span class="status">Google Play</span></div>
+          <p>A plant-care and garden-planning app with an AI assistant, plant journals, reminders and a multi-author editorial experience.</p>
+          <div class="tags"><span class="tag">Photo recognition</span><span class="tag">Content platform</span><span class="tag">Planning</span></div>
+          <a class="project-link" href="/nowgreen/">Explore NowGreen <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="project">
+          <div class="project-art nowkids"><img class="banner" src="/assets/brand/nowkids-banner.webp" loading="lazy" alt="NowKids original product artwork"></div>
+          <div class="project-details"><div class="project-heading"><h3>NowKids</h3><span class="status">Google Play</span></div>
+          <p>A family learning and organisation platform: parent/child spaces, study tools, activities, homework and family coordination.</p>
+          <div class="tags"><span class="tag">Education</span><span class="tag">Family accounts</span><span class="tag">Safety</span></div>
+          <a class="project-link" href="/nowkids/">Explore NowKids <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="project">
+          <div class="project-art trailyo"><img class="identity" src="/trailyo/assets/trailyo-logo.png" loading="lazy" alt="Trailyo original wordmark"></div>
+          <div class="project-details"><div class="project-heading"><h3>Trailyo</h3><span class="status building">In development</span></div>
+          <p>A social discovery platform bringing together local events, city experiences, communities and activity planning. Built around imported event data, discovery and multilingual content.</p>
+          <div class="tags"><span class="tag">Events &amp; discovery</span><span class="tag">Data integrations</span><span class="tag">Communities</span></div>
+          <a class="project-link" href="/trailyo/">Explore Trailyo <span aria-hidden="true">↗</span></a></div>
+        </article>
+      </div>
+    </div></section>
+
+    <section id="approach" class="comparison"><div class="wrap">
+      <div class="eyebrow">How I work</div>
+      <h2>One point of contact. A clear path to launch.</h2>
+      <p class="section-lead">No agency layers. For projects that fit a focused independent-development approach, I work directly with you throughout discovery, implementation and testing.</p>
+      <div class="process">
+        <article><div class="count">01 / DISCOVER</div><h3>Understand your idea</h3><p>We identify the users, business goal, critical workflows and what the first release needs to do.</p></article>
+        <article><div class="count">02 / SCOPE</div><h3>Define the MVP</h3><p>You receive a proposal with scope, milestones, assumptions and a project-based estimate.</p></article>
+        <article><div class="count">03 / BUILD</div><h3>Design and develop</h3><p>I implement the app, database, integrations and agreed features, with progress checkpoints.</p></article>
+        <article><div class="count">04 / RELEASE</div><h3>Test and launch</h3><p>We validate key journeys, address issues and prepare deployment to the relevant platforms.</p></article>
+      </div>
+      <div class="price-card">
+        <div><div class="from">Indicative starting budget</div><strong>€5,000+</strong><p>For a scoped custom app project. Typical MVP proposals may be higher depending on AI features, complexity, platform requirements and integrations. Final scope and price are agreed before work begins.</p></div>
+        <a href="mailto:support@mynw.app?subject=App%20project%20estimate" class="button">Request a project estimate ↗</a>
+      </div>
+    </div></section>
+
+    <section id="faq"><div class="wrap">
+      <div class="eyebrow">Questions</div><h2>What working together looks like.</h2>
+      <p class="section-lead">A few practical points before your first message.</p>
+      <div class="faq-grid">
+        <details><summary>Do you work alone?</summary><p>Yes. You communicate directly with the developer responsible for your project. Larger requests may need to be divided into phases or scoped differently.</p></details>
+        <details><summary>Can you build for both iOS and Android?</summary><p>Yes. I generally use Flutter for a shared mobile codebase, with platform-specific integrations where required. Store review and approval remain subject to Apple and Google policies.</p></details>
+        <details><summary>Can you integrate AI into an existing workflow?</summary><p>Yes, where a useful, well-defined workflow can be built: image or document interpretation, structured outputs, recommendation engines and assistant-style interactions.</p></details>
+        <details><summary>How much will my app cost?</summary><p>Custom development projects start from €5,000. A reliable fixed-price estimate follows a short discussion of the problem, scope, integrations and milestones.</p></details>
+      </div>
+    </div></section>
+
+    <section id="contact" class="contact"><div class="wrap">
+      <div class="contact-panel">
+        <div><div class="eyebrow">Let's talk</div><h2>Have an app idea worth building?</h2><p>Send a short description of your project, who it serves and the main problem you want to solve. A rough budget and target date are helpful, but not required.</p></div>
+        <div class="contact-method"><div class="eyebrow">Project enquiries</div><div class="email">support@mynw.app</div><p>Share your goals, key features and any existing website or designs. Portugal-based, open to remote projects worldwide.</p>
+          <a class="button" href="mailto:support@mynw.app?subject=MyNow%20Apps%20%E2%80%94%20project%20enquiry&body=Hello%2C%0A%0AI%27d%20like%20to%20discuss%20a%20mobile%20app%20project.%0A%0AProject%20idea%3A%0AWho%20it%27s%20for%3A%0AImportant%20features%3A%0AApproximate%20budget%3A%0ATarget%20date%3A%0A%0AThank%20you%2C">Email about my project ↗</a>
+          <div class="subnote">Opens your email app. This page does not collect or store your enquiry.</div>
+        </div>
+      </div>
+    </div></section>
+  </main>
+
+  <footer><div class="wrap footer-flex">
+    <div>© <span id="year">2026</span> MyNow Apps · Independent mobile app development · Portugal</div>
+    <div><a href="/">All apps</a><a href="/privacy/">Privacy</a><a href="mailto:support@mynw.app">Contact</a></div>
+  </div></footer>
+  <script>
+    (() => {
+      const button=document.querySelector('.mobile-nav');
+      const nav=document.querySelector('#site-nav');
+      button?.addEventListener('click',()=>{const opened=nav.classList.toggle('open');button.setAttribute('aria-expanded',String(opened));button.textContent=opened?'×':'☰';});
+      nav?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{nav.classList.remove('open');button?.setAttribute('aria-expanded','false');if(button)button.textContent='☰';}));
+      const year=document.querySelector('#year');if(year)year.textContent=String(new Date().getFullYear());
+    })();
+  </script>
+</body></html>
