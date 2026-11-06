@@ -6,7 +6,7 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const statuses={draft:"Черновик",in_review:"На проверке",changes_requested:"На доработке",approved:"Утверждена",scheduled:"Запланирована",published:"Опубликована",archived:"Архив"};
 const roles={owner:"Владелец",chief_editor:"Главный редактор",editor:"Редактор",author:"Автор",reviewer:"Рецензент"};
 const channels={nowgreen:"NowGreen",nowcook:"NowCook",nowwhat:"NowWhat",nowkids:"NowKids",website:"Сайт",wordpress:"WordPress",instagram:"Instagram"};
-let session=null,projects=[],project=null,posts=[],authors=[],topics=[],current=null,draft=null,blocks=[],placements=[],deliveries=[],assets={},tab="home",dirty=false,toastTimer=null,flashError=false;
+let session=null,projects=[],project=null,posts=[],authors=[],topics=[],current=null,draft=null,blocks=[],placements=[],deliveries=[],assets={},tab="home",dirty=false,toastTimer=null,flashError=false,libraryTopicId=null;
 const editorRole=()=>["owner","chief_editor","editor"].includes(project?.role);
 const chiefRole=()=>["owner","chief_editor"].includes(project?.role);
 const editable=()=>!current||["draft","changes_requested"].includes(current.status);
@@ -211,8 +211,32 @@ function renderDashboard(){
  $("recentAuthors").innerHTML=authors.length?authors.slice(0,4).map(authorMini).join(""):'<div class="empty"><span class="emptyIcon">♙</span><b>Авторов ещё нет</b><p>Добавьте ИИ-персонажей или пригласите настоящих блогеров.</p><button data-open-tab="authors">Управлять авторами</button></div>';
  $("channelSummary").innerHTML='<div class="channelCard"><span>❧ &nbsp;'+esc(project.name)+' Journal</span><span class="chip">Feed активен</span></div><div class="channelCard"><span>◈ &nbsp; Сайт / блог</span><span class="chip amber">Адаптер ожидает</span></div><div class="channelCard"><span>◎ &nbsp; Instagram</span><span class="chip amber">Подключить</span></div>';
 }
+// Filter the complete already-loaded article catalog by topic, preserving
+// unpublished and review-stage materials as well as published articles.
 function renderLibrary(){
- $("library").innerHTML=posts.length?posts.map(listEntry).join(""):'<div class="empty"><span class="emptyIcon">▤</span><h3>Статей пока нет</h3><p>Добавьте первый материал для журнала</p><button class="primary" data-create>+ Написать статью</button></div>'
+ const chosen=topics.find(t=>t.id===libraryTopicId)||null;
+ if(libraryTopicId&&!chosen)libraryTopicId=null;
+ $("libraryTopicFilter").hidden=!chosen;
+ if(chosen){
+  $("libraryTopicName").textContent=chosen.title;
+  $("libraryTopicCount").textContent=posts.filter(p=>p.topic_id===chosen.id).length+" материалов в теме";
+ }
+ const visible=chosen?posts.filter(p=>p.topic_id===chosen.id):posts;
+ $("library").innerHTML=visible.length?visible.map(listEntry).join(""):
+  chosen?'<div class="empty"><span class="emptyIcon">▤</span><h3>В этой теме пока нет статей</h3><p>Назначьте тему материалу в конструкторе.</p></div>':
+  '<div class="empty"><span class="emptyIcon">▤</span><h3>Статей пока нет</h3><p>Добавьте первый материал для журнала</p><button class="primary" data-create>+ Написать статью</button></div>';
+}
+function openTopicArticles(id){
+ if(tab!=="library")throw Error("Откройте раздел «Материалы».");
+ const selected=topics.find(t=>t.id===id);
+ if(!selected)throw Error("Тема не найдена. Обновите список тем.");
+ libraryTopicId=selected.id;
+ renderLibrary();
+ $("libraryTopicFilter").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function clearTopicArticles(){
+ libraryTopicId=null;
+ renderLibrary();
 }
 function renderAuthors(){
  $("authorsList").innerHTML=authors.length?authors.map(a=>{
@@ -807,7 +831,7 @@ async function changeProject(slug){
  if(dirty&&!confirm("Несохранённые изменения будут потеряны. Продолжить?")){$("project").value=project.slug;return}
  const target=projects.find(p=>p.slug===slug);if(!target)return;
  project=target;window.StudioTheme?.apply(project.slug);sessionStorage.setItem('journal_active_project',project.slug);
- current=null;draft=null;placements=[];assets={};dirty=false;
+ current=null;draft=null;placements=[];assets={};dirty=false;libraryTopicId=null;
  $("invite").hidden=!editorRole();$("authorsInvite").hidden=!chiefRole();
  await loadData();await showTab("home",true);
 }
@@ -819,6 +843,7 @@ document.addEventListener("click",e=>{
  if(b.dataset.tab) return void run(()=>showTab(b.dataset.tab));
  if(b.dataset.openTab)return void run(()=>showTab(b.dataset.openTab));
  if(b.dataset.create!==undefined)return void run(createPost);
+ if(b.dataset.topicOpen!==undefined)return void run(()=>openTopicArticles(b.dataset.topicOpen));
  if(b.dataset.openPost)return void run(()=>openPost(b.dataset.openPost));
  if(b.dataset.editPost)return void run(()=>editArticle(b.dataset.editPost));
  if(b.dataset.articleTopic)return void run(()=>openArticleTopic(b.dataset.articleTopic));
@@ -844,6 +869,7 @@ $("project").onchange=e=>run(()=>changeProject(e.target.value));
 $("login").onclick=()=>run(login);$("register").onclick=()=>run(signup);$("recoverPassword").onclick=()=>run(recoverPassword);$("activate").onclick=()=>run(claimOwner);
 $("logout").onclick=signout;
 $("backLibrary").onclick=()=>run(()=>showTab("library"));
+$("libraryTopicClear").onclick=clearTopicArticles;
 $("save").onclick=()=>run(savePost);
 $("deletePost").onclick=()=>run(()=>current&&deletePost(current.id));
 $("hidePost").onclick=()=>run(()=>current&&toggleArticleHidden(current.id));
