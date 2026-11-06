@@ -41,7 +41,15 @@ async function publicTopics(projectId:string,locale:string,defaultLocale:string)
 // field's translation rather than exposing an outdated biography or invented facts.
 function localizedAuthor(a:any,locale:string){
  const row=a.translations?.[locale];
- const same=locale===(a.preferred_locale||"ru");
+ const meta=a.translations?._source;
+ const originalFields=["name","tagline","bio","focus"];
+ // Use the verified language of the *written profile*, not the language the
+ // author chose in their account settings. A Ukrainian account may write RU.
+ const detected=meta&&meta.source&&originalFields.every(field=>
+   meta.source[field]===String(a[field]||""))&&
+   ["ru","uk","en","pt-PT","es","fr","de","it"].includes(meta.locale)?
+   meta.locale:null;
+ const same=locale===(detected||a.preferred_locale||"ru");
  const value=(field:"name"|"tagline"|"bio"|"focus")=>{
   const original=String(a[field]||"");
   if(same||!row||typeof row[field]!=="string"||!row[field].trim()||

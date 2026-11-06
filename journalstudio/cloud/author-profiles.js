@@ -12,11 +12,16 @@
  const supportedLanguages=["ru","en","uk","pt-PT","es","fr","de","it"];
  function translatedDescriptionCount(a){
   if(!a)return 0;
+  const fields=["name","tagline","bio","focus"],meta=a.translations?._source;
+  const sourceLocale=meta&&fields.every(k=>meta.source?.[k]===String(a[k]||""))?
+   meta.locale:(a.preferred_locale||"ru");
   return supportedLanguages.filter(locale=>{
-   if(locale===(a.preferred_locale||"ru"))return false;
-   const t=a.translations?.[locale],orig=a;
-   return !!t&&["tagline","bio"].some(field=>
-    typeof t[field]==="string"&&!!t[field].trim()&&t.source?.[field]===String(orig[field]||""));
+   if(locale===sourceLocale)return false;
+   const t=a.translations?.[locale];
+   if(!t)return false;
+   const required=["tagline","bio","focus"].filter(k=>String(a[k]||"").trim());
+   return required.length>0&&required.every(k=>
+    typeof t[k]==="string"&&!!t[k].trim()&&t.source?.[k]===String(a[k]||""));
   }).length;
  }
  function updateSelectedTranslationControl(){
