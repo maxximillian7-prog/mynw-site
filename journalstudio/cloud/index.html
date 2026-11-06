@@ -186,6 +186,19 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .ai-author-item{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
 .ai-author-item .info{flex:1;min-width:0}.ai-author-item b{font-size:14px}
 .ai-author-item .small{font-size:11px}
+/* The author directory is narrower than the entire viewport. Keep biography
+   and actions in distinct grid rows so action buttons never crush the text into
+   a one-character-wide column. Scoped to #authorsList to avoid AI studio cards. */
+#authorsList .ai-author-item{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:start;column-gap:14px;row-gap:10px;padding:14px 0}
+#authorsList .ai-author-item>.ai-author-avatar{grid-column:1;grid-row:1;align-self:start}
+#authorsList .ai-author-item>.info{grid-column:2;grid-row:1;min-width:0;width:100%;max-width:100%;overflow-wrap:break-word;word-break:normal}
+#authorsList .ai-author-item>.info b{word-break:normal;overflow-wrap:break-word}
+#authorsList .ai-author-item>.info .chip{vertical-align:middle}
+#authorsList .ai-author-item .ai-author-bio{max-width:100%;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;white-space:normal;word-break:normal;overflow-wrap:break-word}
+#authorsList .ai-author-item>.studio-author-actions{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px;min-width:0;width:100%}
+#authorsList .studio-author-actions button{font-size:12px;padding:8px 12px;white-space:normal}
+@media(max-width:600px){#authorsList .ai-author-item>.studio-author-actions{grid-column:1/-1}}
+
 .ai-translation-item{padding:9px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:9px}
 .ai-translation-item .btns button{font-size:11px;padding:6px 9px}
 @media(max-width:960px){.ai-grid{grid-template-columns:1fr}}@media(max-width:560px){.ai-personas{grid-template-columns:1fr 1fr}.author-photo-editor{grid-template-columns:1fr}}
@@ -838,7 +851,7 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261106-full-review-edit1"></script>
-<script defer src="./author-profiles.js?v=20261106-author-bio-preview1"></script>
+<script defer src="./author-profiles.js?v=20261106-author-grid-fix2"></script>
 <script defer src="./author-translations.js?v=20261106-translations1"></script>
 <script defer src="./ai-studio.js?v=20261030-all-locales1"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
