@@ -485,6 +485,8 @@ Deno.serve(async(req)=>{
     translated[field]=value.trim();
     original[field]=String(person[field]||"");
    }
+   if(!body.expected_source||typeof body.expected_source!=="object"||fields.some(field=>body.expected_source[field]!==original[field]))
+    throw Error("Оригинал профиля изменился. Обновите карточку перед сохранением перевода.");
    const saved:any={...(person.translations||{})};
    if(Object.values(translated).some(Boolean))
     saved[locale]={...translated,source:original,updated_at:new Date().toISOString()};
