@@ -156,6 +156,14 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .ai-translated-content p{white-space:pre-wrap;font-size:13px}
 .author-photo-editor{display:grid;grid-template-columns:90px minmax(0,1fr);gap:16px;align-items:center;margin:12px 0}
 .studio-author-translation-panel{margin-top:18px}.studio-author-translation-panel[hidden]{display:none}
+.studio-author-quick-translate{margin:10px 0 16px;padding:12px 0;border-bottom:1px solid var(--line,#dae4dc)}
+.studio-author-quick-translate[hidden]{display:none}
+.studio-author-quick-translate p{margin:7px 0 0}
+.studio-translation-primary-action{margin:12px 0 6px}
+.studio-translation-primary-action button{font-size:14px;white-space:normal;text-align:left}
+.studio-translation-primary-action p{margin:5px 0 0}
+.studio-translation-panel-header{align-items:flex-start}
+
 .studio-author-translation-grid{display:grid;grid-template-columns:minmax(225px,.9fr) minmax(320px,1.4fr);gap:24px}
 .studio-author-translation-source{padding:12px;border-radius:12px;background:var(--surface,#f5f7f4);white-space:pre-wrap;overflow-wrap:anywhere;max-height:520px;overflow:auto}
 .studio-author-translation-source p{margin:10px 0 0;line-height:1.55}
@@ -734,18 +742,11 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <button id="aiSaveSchedule">Сохранить расписание</button><div id="aiScheduleInfo" class="small muted" style="margin-top:12px">Расписание применяется к выбранному ИИ-автору.</div>
 </div><div class="card"><h2>Как работает редакция</h2><div class="ai-steps"><div><b>1 · Идея</b><p>ИИ-автор выбирает тему или следует запросу редактора.</p></div><div><b>2 · Черновик</b><p>Генерируется статья в индивидуальном стиле автора.</p></div><div><b>3 · Проверка</b><p>Редактор корректирует факты, фотографии и переводы.</p></div><div><b>4 · Утверждение</b><p>Только утверждённая версия допускается к публикации.</p></div></div></div></div></div></section>
 <section class="view" data-view="review-queue"><div class="sectionHeading"><div><div class="eyebrow">РЕДАКЦИОННЫЙ КОНТРОЛЬ</div><h2>Очередь согласования</h2><p class="muted small">Материалы, ожидающие проверки, и решения редакции</p></div><div class="btns"><button id="reviewRefresh">↻ Обновить очередь</button></div></div><div class="card"><div class="studio-review-toolbar"><label for="reviewFilter">Показать</label><select id="reviewFilter"><option value="in_review">На проверке</option><option value="changes_requested">На доработке</option><option value="approved">Утверждены</option><option value="scheduled">Запланированы</option><option value="published">Опубликованы</option><option value="all">Все материалы</option></select></div><div id="reviewQueueList"><div class="empty">Загрузка очереди…</div></div></div></section>
-<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="grid2" id="authorWorkspaceGrid"><div class="card" id="authorsDirectoryCard"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card" id="authorEditorCard"><div id="authorOwnSummary" class="author-self-summary" hidden></div><h2 id="authorFormTitle">Профиль автора</h2><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorTagline">Краткое представление</label><input id="authorTagline" maxlength="160" placeholder="Один яркий слоган — кто и о чём пишет"><label for="authorBio">О себе / специализация</label><textarea id="authorBio" maxlength="1200"></textarea><div id="authorBioCounter" class="studio-author-bio-count" role="status">0 / 1200 символов</div><div class="studio-ai-author-internal" hidden aria-hidden="true">
-<label for="authorFocus">Темы и специализация ИИ-автора</label><textarea id="authorFocus" maxlength="450"></textarea>
-<label for="authorVoice">Стиль и характер текста ИИ-автора</label><textarea id="authorVoice" maxlength="550"></textarea></div>
-<label for="authorLang">Основной язык</label><select id="authorLang"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option></select>
-<div class="author-photo-editor"><div id="authorPhotoPreview" class="author-photo-placeholder">♙</div><div><label for="authorPhoto">Фотография или аватар</label><input id="authorPhoto" type="file" accept="image/png,image/jpeg,image/webp"><div class="small muted">Фото — своё или с подтверждёнными правами. До 8 МБ.</div><label class="ai-check"><input id="authorPhotoRights" type="checkbox"> Подтверждаю право публикации</label><input type="hidden" id="authorPhotoId"><button type="button" id="authorUploadPhoto">Загрузить фото</button></div></div>
-<label for="authorSocial">Сайт или личная страница</label><input id="authorSocial" type="url" placeholder="https://">
-<label for="authorInstagram">Instagram</label><input id="authorInstagram" type="url" placeholder="https://www.instagram.com/...">
-<label for="authorYoutube">YouTube</label><input id="authorYoutube" type="url" placeholder="https://www.youtube.com/..."><div class="btns" style="margin-top:15px"><button id="saveAuthor" class="primary">Добавить автора</button><button type="button" id="translateSelectedAuthor" aria-controls="authorTranslationsCard" hidden>🌐 Перевести описание</button></div><p id="selectedAuthorTranslationInfo" class="small muted" hidden></p><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div>
-<div class="card studio-author-translation-panel" id="authorTranslationsCard" hidden>
- <div class="sectionHeading"><div><div class="eyebrow">ПЕРЕВОДЫ ПРОФИЛЯ АВТОРА</div>
+<section class="view" data-view="authors"><div class="sectionHeading"><div><h2>Авторы Journal Studio</h2><p>Профили авторов и приглашения</p></div><button id="authorsInvite" class="primary">+ Пригласить автора</button></div><div class="card studio-author-translation-panel" id="authorTranslationsCard" hidden>
+ <div class="sectionHeading studio-translation-panel-header"><div><div class="eyebrow">ПЕРЕВОДЫ ПРОФИЛЯ АВТОРА</div>
   <h2 id="authorTranslationTitle">Профиль автора · Переводы</h2>
-  <p class="muted small">Оригинал сохраняется. Проверенные переводы показываются читателям на выбранном языке; устаревшие автоматически заменяются оригиналом.</p>
+  <p class="muted small">Оригинал сохраняется. Переводы показываются читателям только после подтверждения редактором.</p>
+ <div class="studio-translation-primary-action"><button type="button" id="authorTranslationAutoAll" class="primary">✦ Автоперевести на все отсутствующие языки</button><p class="small muted">Определение языка и создание ИИ-черновиков для незаполненных языков.</p></div>
  </div><button id="authorTranslationClose" type="button">Закрыть</button></div>
  <div class="studio-author-translation-grid">
   <div>
@@ -784,7 +785,6 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
     <button id="authorTranslationDelete" type="button">Удалить перевод языка</button>
    </div>
    <div class="studio-auto-translation-actions">
-    <button type="button" id="authorTranslationAutoAll">✦ Автоперевести на все отсутствующие языки</button>
     <button type="button" id="authorTranslationSaveAll" class="primary" hidden>✓ Сохранить проверенные переводы</button>
    </div>
    <div id="authorTranslationBatchReview" class="studio-auto-review-list" hidden role="status"></div>
@@ -792,6 +792,14 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
   </div>
  </div>
 </div>
+<div class="grid2" id="authorWorkspaceGrid"><div class="card" id="authorsDirectoryCard"><div id="authorsList"></div><div id="authorProfileHint" class="tip" hidden>Это ваш профиль автора. Редакция проверяет подтверждение прав на материалы перед публикацией.</div></div><div class="card" id="authorEditorCard"><div id="authorOwnSummary" class="author-self-summary" hidden></div><h2 id="authorFormTitle">Профиль автора</h2><div class="studio-author-quick-translate" id="authorQuickTranslate" hidden><button type="button" id="authorTranslateAllQuick" class="primary" aria-controls="authorTranslationsCard">✦ Перевести на недостающие языки</button><p class="small muted">Определим язык текста и подготовим переводы. Сохранение — после вашей проверки.</p></div><p class="muted small">Настоящие блогеры и ИИ-персонажи создают материалы в одной редакции.</p><label for="authorName">Имя</label><input id="authorName" placeholder="Например: Ivy"><label for="authorKind">Тип</label><select id="authorKind"><option value="partner">Реальный автор</option><option value="ai">ИИ-автор</option></select><label for="authorTagline">Краткое представление</label><input id="authorTagline" maxlength="160" placeholder="Один яркий слоган — кто и о чём пишет"><label for="authorBio">О себе / специализация</label><textarea id="authorBio" maxlength="1200"></textarea><div id="authorBioCounter" class="studio-author-bio-count" role="status">0 / 1200 символов</div><div class="studio-ai-author-internal" hidden aria-hidden="true">
+<label for="authorFocus">Темы и специализация ИИ-автора</label><textarea id="authorFocus" maxlength="450"></textarea>
+<label for="authorVoice">Стиль и характер текста ИИ-автора</label><textarea id="authorVoice" maxlength="550"></textarea></div>
+<label for="authorLang">Основной язык</label><select id="authorLang"><option value="ru">Русский</option><option value="pt-PT">Português (PT)</option><option value="en">English</option><option value="uk">Українська</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option></select>
+<div class="author-photo-editor"><div id="authorPhotoPreview" class="author-photo-placeholder">♙</div><div><label for="authorPhoto">Фотография или аватар</label><input id="authorPhoto" type="file" accept="image/png,image/jpeg,image/webp"><div class="small muted">Фото — своё или с подтверждёнными правами. До 8 МБ.</div><label class="ai-check"><input id="authorPhotoRights" type="checkbox"> Подтверждаю право публикации</label><input type="hidden" id="authorPhotoId"><button type="button" id="authorUploadPhoto">Загрузить фото</button></div></div>
+<label for="authorSocial">Сайт или личная страница</label><input id="authorSocial" type="url" placeholder="https://">
+<label for="authorInstagram">Instagram</label><input id="authorInstagram" type="url" placeholder="https://www.instagram.com/...">
+<label for="authorYoutube">YouTube</label><input id="authorYoutube" type="url" placeholder="https://www.youtube.com/..."><div class="btns" style="margin-top:15px"><button id="saveAuthor" class="primary">Добавить автора</button><button type="button" id="translateSelectedAuthor" aria-controls="authorTranslationsCard" hidden>🌐 Перевести описание</button></div><p id="selectedAuthorTranslationInfo" class="small muted" hidden></p><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div>
 <div class="card" id="teamAuthorsCard" hidden>
   <div class="sectionHeading">
     <div>
@@ -872,8 +880,8 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261106-full-review-edit1"></script>
-<script defer src="./author-profiles.js?v=20261106-auto-all-language1"></script>
-<script defer src="./author-translations.js?v=20261106-auto-all-language1"></script>
+<script defer src="./author-profiles.js?v=20261106-auto-translate-visible2"></script>
+<script defer src="./author-translations.js?v=20261106-auto-translate-visible2"></script>
 <script defer src="./ai-studio.js?v=20261030-all-locales1"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-62"></script>
