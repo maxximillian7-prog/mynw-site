@@ -160,6 +160,13 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-author-translation-source{padding:12px;border-radius:12px;background:var(--surface,#f5f7f4);white-space:pre-wrap;overflow-wrap:anywhere;max-height:520px;overflow:auto}
 .studio-author-translation-source p{margin:10px 0 0;line-height:1.55}
 .studio-author-translation-panel textarea{width:100%;resize:vertical}
+.studio-auto-translation-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.studio-auto-review-list{margin:10px 0 12px;padding:14px;border-radius:12px;background:#f2f7f2;border:1px solid #d5e5d4}
+.studio-auto-review-list[hidden]{display:none}
+.studio-auto-review-list .draft-review-row{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:6px 0}
+.studio-auto-review-list .draft-review-row:not(:last-child){border-bottom:1px solid #d9e8d7}
+.studio-auto-review-list button{font-size:12px;padding:6px 10px}
+#authorTranslationSourceStatus{line-height:1.5;white-space:pre-wrap}
 @media(max-width:800px){.studio-author-translation-grid{grid-template-columns:1fr}}
 
 .author-photo-placeholder{width:88px;height:88px;border-radius:20px;background:var(--mint);color:var(--green);font-size:43px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line)}
@@ -741,6 +748,14 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
  </div><button id="authorTranslationClose" type="button">Закрыть</button></div>
  <div class="studio-author-translation-grid">
   <div>
+   <label for="authorTranslationSourceLocale">Язык написанного текста (не язык аккаунта)</label>
+   <select id="authorTranslationSourceLocale">
+    <option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option>
+    <option value="pt-PT">Português (PT)</option><option value="es">Español</option>
+    <option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option>
+   </select>
+   <div class="btns" style="margin:9px 0 12px"><button type="button" id="authorTranslationDetect">🔎 Определить язык текста</button></div>
+   <p id="authorTranslationSourceStatus" class="small muted" role="status"></p>
    <label for="authorTranslationLocale">Язык перевода</label>
    <select id="authorTranslationLocale">
     <option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option>
@@ -767,6 +782,11 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
     <button id="authorTranslationSave" type="button" class="primary">✓ Сохранить проверенный перевод</button>
     <button id="authorTranslationDelete" type="button">Удалить перевод языка</button>
    </div>
+   <div class="studio-auto-translation-actions">
+    <button type="button" id="authorTranslationAutoAll">✦ Автоперевести на все отсутствующие языки</button>
+    <button type="button" id="authorTranslationSaveAll" class="primary" hidden>✓ Сохранить проверенные переводы</button>
+   </div>
+   <div id="authorTranslationBatchReview" class="studio-auto-review-list" hidden role="status"></div>
    <p class="small muted">ИИ создаёт только черновик и может расходовать API-токены. Для публикации перевода нужна отдельная проверка и сохранение редактором. Фото, контакты и социальные ссылки не переводятся.</p>
   </div>
  </div>
@@ -851,8 +871,8 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261106-full-review-edit1"></script>
-<script defer src="./author-profiles.js?v=20261106-author-grid-translation-fix3"></script>
-<script defer src="./author-translations.js?v=20261106-translation-access-fix2"></script>
+<script defer src="./author-profiles.js?v=20261106-auto-all-language1"></script>
+<script defer src="./author-translations.js?v=20261106-auto-all-language1"></script>
 <script defer src="./ai-studio.js?v=20261030-all-locales1"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-62"></script>
