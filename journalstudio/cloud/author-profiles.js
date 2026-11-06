@@ -10,6 +10,12 @@
  const canEdit=a=>project?.role==="owner"||project?.role==="chief_editor"||a.kind==="partner"&&a.owner_user_id===session?.user?.id;
  const canTranslate=()=>["owner","chief_editor","editor"].includes(project?.role||"");
  const profileFields={name:"authorName",bio:"authorBio",tagline:"authorTagline",focus:"authorFocus",voice_style:"authorVoice",preferred_locale:"authorLang",website:"authorSocial",instagram:"authorInstagram",youtube:"authorYoutube",photo_asset_id:"authorPhotoId"};
+ function updateBioCounter(){
+  const field=$("authorBio"),view=$("authorBioCounter");if(!field||!view)return;
+  const count=field.value.length;
+  view.textContent=count+" / 1200 символов";
+  view.classList.toggle("is-over-limit",count>1200);
+ }
  const safeLink=v=>typeof v==="string"&&/^https:\/\//i.test(v)?v:"";
  function photo(id){
   if(!id)return null;
@@ -122,6 +128,7 @@
  function reset(){
   editing=null;
   for(const id of Object.values(profileFields)){const el=$(id);if(el)el.value=id==="authorLang"?"ru":""}
+  updateBioCounter();
   $("authorPhotoPreview").textContent="♙";$("authorPhotoRights").checked=false;$("authorPhoto").value="";
   $("authorFormTitle").textContent="Новый профиль автора";$("saveAuthor").textContent="Добавить автора";
   $("authorKind").disabled=false;$("authorKind").value="partner";
@@ -131,6 +138,7 @@
   $("authorFormTitle").textContent="Редактирование: "+author.name;
   $("saveAuthor").textContent="Сохранить профиль";
   $("authorName").value=author.name||"";$("authorBio").value=author.bio||"";
+  updateBioCounter();
   $("authorTagline").value=author.tagline||"";$("authorFocus").value=author.focus||"";
   $("authorVoice").value=author.voice_style||"";$("authorLang").value=author.preferred_locale||"ru";
   $("authorSocial").value=author.social_links?.website||"";
@@ -153,6 +161,7 @@
    youtube:$("authorYoutube").value.trim()
   };
   if(!fields.name)throw Error("Укажите имя автора");
+  if(fields.bio.length>1200)throw Error("Поле «О себе» допускает не более 1200 символов.");
   for(const k of ["social_url","instagram","youtube"])if(fields[k]&&!safeLink(fields[k]))throw Error("Ссылки должны начинаться с https://");
   return fields;
  }
@@ -214,6 +223,8 @@
     if(a&&canEdit(a))fill(a);
   }
  });
+ $("authorBio").addEventListener("input",updateBioCounter);
+ updateBioCounter();
  $("authorUploadPhoto").onclick=()=>run(uploadPhoto);
  document.getElementById("authorKind").onchange=e=>{
   const ai=e.target.value==="ai";
