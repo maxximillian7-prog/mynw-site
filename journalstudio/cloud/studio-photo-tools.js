@@ -36,8 +36,8 @@
     '<button type="button" data-photo-tool="upload">↑ Загрузить фотографию</button>'+
     '<button type="button" data-photo-tool="add">+ Вставить фото в текст</button></div>';
   }else if(current?.status==="in_review"&&editorRole()){
-   html+='<div class="studio-photo-replacement">Материал отправлен на проверку. Для замены или загрузки фото сначала откройте редакторскую правку. '+
-    '<button type="button" class="primary" data-photo-tool="unlock">✎ Редактировать фотографии</button></div>';
+   html+='<div class="studio-photo-replacement">Материал на проверке. Откройте полную редакторскую правку, чтобы изменять язык, тему, текст, фото и остальные поля. '+
+    '<button type="button" class="primary" data-photo-tool="unlock">✎ Редактировать всю статью</button></div>';
   }else if(current?.status==="in_review"){
    html+='<p class="small muted">Материал уже отправлен на проверку. Изменения фотографий доступны после возвращения редакцией на доработку.</p>';
   }

@@ -175,7 +175,7 @@ function editorialDecision({title,message,confirmLabel="Подтвердить",
 }
 function statusTag(s){return '<span class="chip '+(["in_review","scheduled"].includes(s)?"amber":s==="published"?"":"gray")+'">'+esc(statuses[s]||s)+'</span>'}
 function canManagePost(p){return !!p&&chiefRole()&&p.status!=='archived'}
-function canEditSubmittedPhotos(p){return !!p&&p.status==='in_review'&&editorRole()}
+function canEditSubmittedPost(p){return !!p&&p.status==='in_review'&&editorRole()}
 function canDeletePost(p){
  if(!p||!project)return false;
  if(chiefRole())return true;
@@ -192,7 +192,7 @@ function listEntry(p){
  '<button type="button" data-open-post="'+id+'">Открыть ↗</button>'+
  (man?'<button type="button" data-article-topic="'+id+'">Тема журнала</button><button type="button" data-edit-post="'+id+'">Изменить</button><button type="button" data-article-translations="'+id+'">Переводы (8)</button>'+
  '<button type="button" data-toggle-post-hidden="'+id+'">'+(p.is_hidden?'Показать':'Скрыть')+'</button>':'')+
- (canEditSubmittedPhotos(p)&&!man?'<button type="button" data-edit-post="'+id+'">Редактировать фото</button>':'')+
+ (canEditSubmittedPost(p)&&!man?'<button type="button" data-edit-post="'+id+'">✎ Редактировать всю статью</button>':'')+
  (canDeletePost(p)?'<button type="button" data-delete-post="'+id+'">Удалить</button>':'')+'</div></div>'
 }
 
@@ -294,14 +294,14 @@ async function editArticle(id){
  if(!p)throw Error("Обновите список статей.");
  if(p.status==="in_review"&&editorRole()){
    const ok=await editorialDecision({
-     title:"Редактировать фотографии присланной статьи",
-     message:"«"+p.title+"»\n\nМатериал будет переведён в режим редакторской правки. Оригинальные фотографии останутся в медиатеке. После сохранения необходимо повторное согласование.",
-     confirmLabel:"Редактировать фотографии"
+     title:"Редактировать всю присланную статью",
+     message:"«"+p.title+"»\n\nОткроется полное редактирование: язык оригинала, тема журнала, заголовок, описание, текст, автор, фото, обложка и оформление. Статья временно перейдёт в статус «На доработке», а после сохранения — в «Черновик». Прежние версии и фотографии сохранятся; переводы потребуется проверить или обновить для новой редакции. Публикации не произойдёт.",
+     confirmLabel:"Открыть полное редактирование"
    });
    if(!ok)return;
    const result=await call("/posts/"+encodeURIComponent(id)+"/action","POST",{
      action:"request_changes",expected_revision:p.revision,
-     note:"Редакторская корректировка фотографий и расположения иллюстраций."
+     note:"Редакторская корректировка языка оригинала, темы, заголовка, текста, изображений и других полей."
    });
    if(result.post?.id!==id||result.post.status!=="changes_requested")
      throw Error("Не удалось открыть статью для редакторской правки.");
@@ -321,7 +321,7 @@ async function editArticle(id){
    await refreshPosts();
  }
  await openPost(id);
- toast("Внесите изменения, сохраните статью и отправьте её на повторное согласование.");
+ toast("Все поля доступны для редактирования. После сохранения проверьте переводы и отправьте статью на повторное согласование.");
 }
 async function openArticleTopic(id){
  const post=posts.find(x=>x.id===id);
@@ -440,9 +440,11 @@ function renderEditor(){
  $("hidePost").hidden=!current||!canManagePost(current);
  $("hidePost").textContent=current?.is_hidden?"Показать статью":"Скрыть статью";
  $("editPublishedPost").hidden=!current||!(
-  canEditSubmittedPhotos(current)||
+  canEditSubmittedPost(current)||
   (canManagePost(current)&&["published","approved","scheduled"].includes(current.status)));
- $("editPublishedPost").textContent=current?.status==="in_review"?"✎ Редактировать фотографии":"Изменить содержание";
+ $("editPublishedPost").textContent=current?.status==="in_review"?"✎ Редактировать всю статью":"Изменить содержание";
+ $("editSubmittedPost").hidden=!canEditSubmittedPost(current);
+ $("reviewEditHint").hidden=!canEditSubmittedPost(current);
  $("return").hidden=!current||s!=="in_review"||!editorRole();
  $("approve").hidden=!current||s!=="in_review"||!chiefRole();
  $("publish").hidden=!current||s!=="approved"||!chiefRole();
@@ -585,7 +587,7 @@ async function upload(){
   input.scrollIntoView({behavior:"smooth",block:"center"});input.click();return;
  }
  const fail=message=>{imageUploadMessage(message,true);throw Error(message)};
- if(!draft||!editable())fail("Статья недоступна для изменений. Для присланного материала выберите «Редактировать фотографии» и подтвердите переход к правке.");
+ if(!draft||!editable())fail("Статья недоступна для изменений. Для присланного материала выберите «Редактировать всю статью» и подтвердите открытие редакторской правки.");
  if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>8*1024*1024)
   fail("Нужен JPG, PNG или WebP размером до 8 МБ.");
  if(!$("imageRights").checked)
@@ -781,6 +783,7 @@ $("save").onclick=()=>run(savePost);
 $("deletePost").onclick=()=>run(()=>current&&deletePost(current.id));
 $("hidePost").onclick=()=>run(()=>current&&toggleArticleHidden(current.id));
 $("editPublishedPost").onclick=()=>run(()=>current&&editArticle(current.id));
+$("editSubmittedPost").onclick=()=>run(()=>current&&editArticle(current.id));
 $("publishedTopicSave").onclick=()=>run(async()=>{
  if(!current||!chiefRole()||!["approved","scheduled","published"].includes(current.status))throw Error("Недоступно для данной статьи");
  const id=$("topicSelect").value||null;

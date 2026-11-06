@@ -45,9 +45,10 @@
   const area=$("reviewQueueList");if(!area)return;
   if(!rows.length){area.innerHTML='<div class="studio-review-empty">В этой категории материалов пока нет.</div>';return}
   area.innerHTML=rows.map(p=>{
-   const actions=p.status==="in_review"
+   const actions=(p.status==="in_review"
      ?'<button type="button" data-review-open="'+E(p.id)+'">Проверить →</button>'
-     :'<button type="button" data-review-open="'+E(p.id)+'">Открыть →</button>';
+     :'<button type="button" data-review-open="'+E(p.id)+'">Открыть →</button>')+
+     (p.status==="in_review"&&editorRole()?'<button type="button" data-review-edit="'+E(p.id)+'">✎ Редактировать всё</button>':'');
    return '<div class="studio-review-queue-item"><div><b>'+E(p.title)+'</b><small>'+E(p.locale||"ru")+' · версия '+Number(p.revision||1)+' · '+E(formatDate(p.updated_at))+'</small><span class="studio-review-status">'+E(statuses[p.status]||p.status)+'</span></div><div class="btns">'+actions+'</div></div>';
   }).join("");
  }
@@ -115,6 +116,7 @@
  document.addEventListener("click",e=>{
   const button=e.target.closest("button");if(!button)return;
   if(button.dataset.reviewOpen!==undefined)e.preventDefault(),run(()=>openPost(button.dataset.reviewOpen));
+  if(button.dataset.reviewEdit!==undefined)e.preventDefault(),run(()=>editArticle(button.dataset.reviewEdit));
  });
  $("reviewSend").onclick=()=>run(sendComment);
  $("reviewReload").onclick=()=>run(loadThread);
