@@ -140,7 +140,7 @@
   if(busy||!discardPermission())return;
   $("authorTranslationsCard").hidden=true;selectedId=null;selectedLocale=null;selectedProject=null;dirty=false;
  };
- window.StudioAuthorTranslations={refresh(){
+ window.StudioAuthorTranslations={open,refresh(){
   if(!selectedId)return;
   const a=current();
   if(!a||selectedProject!==project?.slug||!canTranslate()){

@@ -9,6 +9,29 @@
  const photos=new Map(),photoRequests=new Map(),retryAfter=new Map();
  const canEdit=a=>project?.role==="owner"||project?.role==="chief_editor"||a.kind==="partner"&&a.owner_user_id===session?.user?.id;
  const canTranslate=()=>["owner","chief_editor","editor"].includes(project?.role||"");
+ const supportedLanguages=["ru","en","uk","pt-PT","es","fr","de","it"];
+ function translatedDescriptionCount(a){
+  if(!a)return 0;
+  return supportedLanguages.filter(locale=>{
+   if(locale===(a.preferred_locale||"ru"))return false;
+   const t=a.translations?.[locale],orig=a;
+   return !!t&&["tagline","bio"].some(field=>
+    typeof t[field]==="string"&&!!t[field].trim()&&t.source?.[field]===String(orig[field]||""));
+  }).length;
+ }
+ function updateSelectedTranslationControl(){
+  const button=$("translateSelectedAuthor"),info=$("selectedAuthorTranslationInfo");
+  if(!button||!info)return;
+  const selected=editing&&(authors||[]).find(a=>a.id===editing.id);
+  const visible=!!selected&&canTranslate();
+  button.hidden=!visible;info.hidden=!visible;
+  if(visible){
+   const count=translatedDescriptionCount(selected);
+   button.textContent="🌐 Переводы описания ("+count+"/7)";
+   info.textContent=count?"Переводы описания готовы: "+count+" из 7 языков. Откройте для проверки остальных.":
+    "Переводов описания пока нет. Нажмите кнопку, выберите язык и создайте ИИ-черновик или введите перевод вручную.";
+  }
+ }
  const profileFields={name:"authorName",bio:"authorBio",tagline:"authorTagline",focus:"authorFocus",voice_style:"authorVoice",preferred_locale:"authorLang",website:"authorSocial",instagram:"authorInstagram",youtube:"authorYoutube",photo_asset_id:"authorPhotoId"};
  function updateBioCounter(){
   const field=$("authorBio"),view=$("authorBioCounter");if(!field||!view)return;
@@ -105,8 +128,9 @@
     '<div class="small muted">'+E(a.tagline||a.focus||"")+'</div>'+
     '<p class="ai-author-bio">'+E(a.bio||"")+'</p>'+
     '<div class="ai-author-links">'+links(a)+'</div>'+
+    (canTranslate()?'<div class="small muted studio-author-translation-count">🌐 Переводы описания: '+translatedDescriptionCount(a)+'/7 языков</div>':"")+
     (a.kind==="partner"&&a.consent_status!=="approved"?'<div class="small muted">Согласие на публикацию ожидает проверки</div>':"")+
-    '</div><div class="btns">'+(edit?'<button type="button" data-profile-edit="'+E(a.id)+'">Редактировать</button>':"")+
+    '</div><div class="btns studio-author-actions">'+(edit?'<button type="button" data-profile-edit="'+E(a.id)+'">Редактировать</button>':"")+
     (canTranslate()?'<button type="button" data-profile-translate="'+E(a.id)+'">🌐 Переводы</button>':"")+
     (["owner","chief_editor"].includes(project.role)&&a.kind==="partner"&&a.consent_status!=="approved"?'<button type="button" data-author-approve="'+E(a.id)+'">✓ Согласие</button>':"")+
     (["owner","chief_editor"].includes(project.role)&&a.kind==="partner"?'<button type="button" class="studio-editor-remove-profile" data-editor-remove-profile="'+E(a.id)+'">Удалить автора</button>':"")+'</div></article>';
@@ -123,6 +147,7 @@
   }
   for(const a of authors||[])if(a.photo_asset_id&&!photo(a.photo_asset_id))void signed(a.photo_asset_id);
   renderImages();
+  updateSelectedTranslationControl();
   window.StudioAuthorTranslations?.refresh?.();
  }
  function reset(){
@@ -132,6 +157,7 @@
   $("authorPhotoPreview").textContent="♙";$("authorPhotoRights").checked=false;$("authorPhoto").value="";
   $("authorFormTitle").textContent="Новый профиль автора";$("saveAuthor").textContent="Добавить автора";
   $("authorKind").disabled=false;$("authorKind").value="partner";
+  updateSelectedTranslationControl();
  }
  function fill(author,autofocus=true){
   editing=author;
@@ -149,6 +175,7 @@
   const url=photo(author.photo_asset_id);
   $("authorPhotoPreview").innerHTML=url?'<img src="'+E(url)+'" alt="Фото автора">':E(author.name.slice(0,1));
   if(author.photo_asset_id)void signed(author.photo_asset_id);
+  updateSelectedTranslationControl();
   if(autofocus)$("authorName").focus();
  }
  function data(){
@@ -225,6 +252,12 @@
  });
  $("authorBio").addEventListener("input",updateBioCounter);
  updateBioCounter();
+ $("translateSelectedAuthor").onclick=()=>run(()=>{
+  const selected=editing&&(authors||[]).find(a=>a.id===editing.id);
+  if(!selected||!canTranslate())throw Error("Сначала выберите автора из списка и убедитесь, что у вас есть права редактора.");
+  if(!window.StudioAuthorTranslations?.open)throw Error("Модуль перевода не загрузился. Обновите страницу Ctrl+F5.");
+  window.StudioAuthorTranslations.open(selected);
+ });
  $("authorUploadPhoto").onclick=()=>run(uploadPhoto);
  document.getElementById("authorKind").onchange=e=>{
   const ai=e.target.value==="ai";
