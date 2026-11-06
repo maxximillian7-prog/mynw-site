@@ -214,7 +214,7 @@ Deno.serve(async(req)=>{
   if(!a||!a.is_active)throw Error("Author not found");
   const target=lang(b.locale);
   if(!target||target===(a.preferred_locale||"ru"))throw Error("Choose another target language");
-  const keys=["name","tagline","bio","focus"];
+  const keys=["name","tagline","bio","focus"] as const;
   const schema={type:"object",additionalProperties:false,required:keys,properties:Object.fromEntries(keys.map(k=>[k,{type:"string"}]))};
   const source={name:String(a.name||""),tagline:String(a.tagline||""),bio:String(a.bio||""),focus:String(a.focus||"")};
   const system="Translate a public author profile faithfully into target locale "+target+
