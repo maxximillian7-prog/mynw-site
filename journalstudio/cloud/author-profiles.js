@@ -117,6 +117,7 @@
   }
   for(const a of authors||[])if(a.photo_asset_id&&!photo(a.photo_asset_id))void signed(a.photo_asset_id);
   renderImages();
+  window.StudioAuthorTranslations?.refresh?.();
  }
  function reset(){
   editing=null;
