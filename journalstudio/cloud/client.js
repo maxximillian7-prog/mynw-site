@@ -614,8 +614,6 @@ function addSelectedTextLink(index){
  if(!selection.trim())throw Error("Выделите нужные слова в поле текста перед нажатием кнопки.");
  if(selection.trim().length>180||/[\r\n]/.test(selection.trim()))
   throw Error("Выделите короткую фразу до 180 символов в одной строке.");
- if(blocks.length+2>80)
-  throw Error("Слишком много блоков. Уберите ненужные блоки перед добавлением ссылки.");
  const entered=window.prompt("Введите HTTPS-ссылку для выделенных слов:", "https://");
  if(entered===null)return;
  const url=entered.trim();
