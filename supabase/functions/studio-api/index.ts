@@ -720,7 +720,7 @@ Deno.serve(async(req)=>{
     const path=variant||(!m.original_deleted_at?m.storage_path:null);
     let urlSigned:string|null=null;
     if(path){try{urlSigned=await signedMediaPath(path,900)}catch{}}
-    return {id:m.id,alt:m.alt_text||"",source_type:m.source_type,
+    return {id:m.id,alt:m.alt_text||"",source_type:m.source_type,mine:m.uploader_id===u.id,
      source_url:m.source_url||null,copyright_holder:m.copyright_holder||"",
      license:m.license||"",prompt:m.generation_prompt||"",
      model:m.generator_model||null,created_at:m.created_at,
