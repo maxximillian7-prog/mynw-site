@@ -65,13 +65,19 @@
   $("topicsRefresh").disabled=loading;
   host.innerHTML=topics.length?topics.map(t=>{
    const image=media.find(m=>m.id===t.image_asset_id);
-   return '<article class="studio-topic-card"><div class="studio-topic-image">'+
-    (image?.thumb_url?'<img src="'+safe(image.thumb_url)+'" alt="'+safe(t.title)+'" style="object-position:'+Number(t.focus_x??50)+'% '+Number(t.focus_y??50)+'%">':'<span style="font-size:30px">🌿</span>')+
+   const articleCount=(posts||[]).filter(p=>p.topic_id===t.id).length;
+   return '<article class="studio-topic-card">'+
+    '<button type="button" class="studio-topic-open" data-topic-open="'+safe(t.id)+'" aria-label="Показать статьи темы '+safe(t.title)+': '+articleCount+'">'+
+    '<div class="studio-topic-image">'+
+    (image?.thumb_url?'<img src="'+safe(image.thumb_url)+'" alt="" style="object-position:'+Number(t.focus_x??50)+'% '+Number(t.focus_y??50)+'%">':'<span style="font-size:30px">🌿</span>')+
     '</div><div class="studio-topic-card-content"><h3>'+safe(t.title)+'</h3>'+
     '<p class="muted">'+safe(t.slug)+' · v'+Number(t.revision||1)+(t.is_active?'':' · Скрыта')+
     ' · '+(1+["en","pt-PT","uk","es","fr","de","it"].filter(k=>t.translations?.[k]?.trim()).length)+'/8 языков</p>'+
-    (writable?'<div class="btns"><button type="button" data-topic-edit="'+safe(t.id)+'">Изменить</button>'+
-      '<button type="button" data-topic-toggle="'+safe(t.id)+'">'+(t.is_active?'Скрыть':'Показать')+'</button></div>':'')+'</div></article>';
+    '<span class="studio-topic-count">'+articleCount+' материалов · Открыть список ↗</span>'+
+    '</div></button>'+
+    (writable?'<div class="btns studio-topic-actions"><button type="button" data-topic-edit="'+safe(t.id)+'">Изменить</button>'+
+      '<button type="button" data-topic-toggle="'+safe(t.id)+'">'+(t.is_active?'Скрыть':'Показать')+'</button></div>':'')+
+    '</article>';
   }).join(""):'<p class="small muted">Тем пока нет. Создайте первую тему и выберите для неё изображение.</p>';
  }
  async function reload(){
