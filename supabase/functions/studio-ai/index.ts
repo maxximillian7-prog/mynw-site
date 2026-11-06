@@ -204,22 +204,46 @@ Deno.serve(async(req)=>{
   const result=await runJob(job.id);
   return reply(result.error?503:200,{...result,job_id:job.id});
  }
+ // Only authorized editors can detect the language of profile text.
+ // Returns a proposal, never overwrites the author's account language.
+ if(action==="detect-author-profile-language"&&req.method==="POST"){
+  const b=await req.json(),pr=await project(title(b.project,48));
+  await member(pr.id,caller.id,["owner","chief_editor","editor"]);
+  if(!idok(b.author_id))throw Error("Invalid author");
+  const [a]=await db("studio_authors?select=id,name,bio,tagline,focus,preferred_locale,is_active&project_id=eq."+pr.id+"&id=eq."+b.author_id+"&limit=1");
+  if(!a||!a.is_active)throw Error("Author not found");
+  const sample=[String(a.bio||"").slice(0,1800),String(a.tagline||""),String(a.focus||"")].filter(Boolean).join("\n");
+  if(sample.trim().length<18)throw Error("Недостаточно текста для надёжного определения языка. Выберите язык вручную.");
+  const locales=["ru","en","uk","pt-PT","es","fr","de","it"];
+  const schema={type:"object",additionalProperties:false,required:["source_locale","confidence"],
+    properties:{source_locale:{type:"string",enum:locales},confidence:{type:"string",enum:["high","medium","low"]}}};
+  const system="Identify the main language actually WRITTEN in this author biography and tagline. Ignore preferred/account locale, names, locations, code switches and quoted proper names. Russian (ru) and Ukrainian (uk) must be distinguished based on grammar and function words, not country references. Choose exactly one from ru, uk, en, pt-PT, es, fr, de, it. If mixed, prefer the biography's main body. Return source_locale and confidence.";
+  const result=await llm(system,JSON.stringify({bio_and_tagline:sample,declared_account_locale:a.preferred_locale||"ru"}),schema,"studio_author_language_detection",160);
+  const detected=lang(result.body?.source_locale);
+  if(!detected)throw Error("Язык не распознан; выберите его вручную.");
+  return reply(200,{source_locale:detected,confidence:result.body.confidence,
+    declared_locale:a.preferred_locale||"ru",requires_editor_review:true});
+ }
  // Generate an unpublished, editor-reviewed profile translation draft.
  if(action==="translate-author-profile"&&req.method==="POST"){
   const b=await req.json(),pr=await project(title(b.project,48));
   await member(pr.id,caller.id,["owner","chief_editor","editor"]);
   if(!available())throw Error("AI_PROVIDER_NOT_CONFIGURED");
   if(!idok(b.author_id))throw Error("Invalid author");
-  const [a]=await db("studio_authors?select=id,name,kind,tagline,bio,focus,preferred_locale,is_active&project_id=eq."+pr.id+"&id=eq."+b.author_id+"&limit=1");
+  const [a]=await db("studio_authors?select=id,name,kind,tagline,bio,focus,preferred_locale,translations,is_active&project_id=eq."+pr.id+"&id=eq."+b.author_id+"&limit=1");
   if(!a||!a.is_active)throw Error("Author not found");
   const target=lang(b.locale);
-  if(!target||target===(a.preferred_locale||"ru"))throw Error("Choose another target language");
+  const fieldsForSource=["name","tagline","bio","focus"],meta=a.translations?._source;
+  const knownLocale=meta&&fieldsForSource.every(field=>
+   meta.source?.[field]===String(a[field]||""))?lang(meta.locale):null;
+  const sourceLocale=lang(b.source_locale)||knownLocale||lang(a.preferred_locale)||"ru";
+  if(!target||target===sourceLocale)throw Error("Выберите язык, отличный от языка исходного текста");
   const keys=["name","tagline","bio","focus"] as const;
   const schema={type:"object",additionalProperties:false,required:keys,properties:Object.fromEntries(keys.map(k=>[k,{type:"string"}]))};
   const source={name:String(a.name||""),tagline:String(a.tagline||""),bio:String(a.bio||""),focus:String(a.focus||"")};
   const system="Translate a public author profile faithfully into target locale "+target+
    ". Use European Portuguese for pt-PT. Preserve personal facts, proper names, channel brands, and identity; do not invent credentials or experience. Preserve empty source fields. Translate names only when appropriate; avoid translating contact details and URLs. Return precisely four JSON string fields.";
-  const result=await llm(system,JSON.stringify({sourceLocale:a.preferred_locale||"ru",targetLocale:target,source}),schema,"studio_author_profile_translation",2300);
+  const result=await llm(system,JSON.stringify({sourceLocale,targetLocale:target,source}),schema,"studio_author_profile_translation",2300);
   const draft:any={},limits={name:100,tagline:200,bio:4000,focus:900};
   for(const key of keys){
    const value=result.body?.[key];
