@@ -587,7 +587,7 @@ async function upload(){
   input.scrollIntoView({behavior:"smooth",block:"center"});input.click();return;
  }
  const fail=message=>{imageUploadMessage(message,true);throw Error(message)};
- if(!draft||!editable())fail("Статья недоступна для изменений. Для присланного материала выберите «Редактировать фотографии» и подтвердите переход к правке.");
+ if(!draft||!editable())fail("Статья недоступна для изменений. Для присланного материала выберите «Редактировать всю статью» и подтвердите открытие редакторской правки.");
  if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>8*1024*1024)
   fail("Нужен JPG, PNG или WebP размером до 8 МБ.");
  if(!$("imageRights").checked)
