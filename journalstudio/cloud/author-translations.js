@@ -62,6 +62,7 @@
  async function save(){
   if(busy)return;const a=current(),data=payload();
   if(!a)throw Error("Автор не найден.");
+  if(!["name","tagline","bio","focus"].some(k=>data[k]))throw Error("Заполните хотя бы одно поле перевода или воспользуйтесь кнопкой удаления.");
   setBusy(true);
   try{
    const res=await call("/authors/"+encodeURIComponent(a.id)+"/translations","PATCH",data);
