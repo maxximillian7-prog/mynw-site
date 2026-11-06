@@ -194,7 +194,9 @@ async function reviewAction(p:any,role:string,uid:string,action:string,data:any)
   }
   if(p.author_id){
    const [a]=await db("studio_authors?select=kind,consent_status&project_id=eq."+p.project_id+"&id=eq."+p.author_id);
-   if(!a||(a.kind==="partner"&&a.consent_status!=="approved"))throw Error("Partner consent required");
+   if(!a)throw Error("Привязанный к статье автор не найден. Проверьте профиль в разделе «Авторы».");
+    if(a.kind==="partner"&&a.consent_status!=="approved")
+     throw Error("Согласие приглашённого автора не подтверждено. Откройте «Авторы → Проверить права» и укажите документальное основание.");
   }
   const versions=await db("studio_channel_versions?select=channel,locale,title,summary,caption,blocks,template_id,cover_path&post_id=eq."+p.id);
   const translations=await db("studio_ai_translations?select=locale,title,summary,blocks,source_revision,status&post_id=eq."+p.id+"&source_revision=eq."+p.revision+"&status=eq.reviewed");
