@@ -468,32 +468,59 @@ Deno.serve(async(req)=>{
    const result=await db("studio_authors",{method:"POST",body:JSON.stringify({project_id:pr.id,owner_user_id:kind==="partner"?u.id:null,kind,name:txt(body.name,100),tagline:String(body.tagline||"").slice(0,160),bio:String(body.bio||"").slice(0,1200),preferred_locale:String(body.preferred_locale||"ru"),photo_asset_id:photo,...kindFields,social_links:socialLinks,consent_status:kind==="ai"?"approved":"pending"})});
    return reply(201,{author:result[0]});
   }
-  // Editor-reviewed localized copy; original biography and partner consent are never changed.
+  // Authenticated, editor-reviewed author profile translations, with a
+  // separate detected language for the *written text*. The author's chosen
+  // preferred_locale remains unchanged (may differ from bio language).
   if(a[0]==="authors"&&idok(a[1])&&a[2]==="translations"&&a.length===3&&req.method==="PATCH"){
    const [person]=await db("studio_authors?select=id,project_id,name,tagline,bio,focus,preferred_locale,translations&id=eq."+a[1]+"&is_active=eq.true&limit=1");
    if(!person)throw Error("Автор не найден");
    can(await member(person.project_id,u.id),"owner","chief_editor","editor");
-   const locale=String(body.locale||""),locales=["ru","en","uk","pt-PT","es","fr","de","it"];
-   if(!locales.includes(locale)||locale===person.preferred_locale)
-    throw Error("Выберите язык перевода, отличный от языка оригинала");
+   const locales=["ru","en","uk","pt-PT","es","fr","de","it"];
    const fields=["name","tagline","bio","focus"] as const;
    const limits={name:100,tagline:200,bio:4000,focus:900};
-   const translated:any={},original:any={};
-   for(const field of fields){
-    const value=body[field]===undefined?"":body[field];
-    if(typeof value!=="string"||value.length>limits[field])throw Error("Слишком длинный или некорректный перевод: "+field);
-    translated[field]=value.trim();
-    original[field]=String(person[field]||"");
-   }
-   if(!body.expected_source||typeof body.expected_source!=="object"||fields.some(field=>body.expected_source[field]!==original[field]))
+   const original:any={};
+   for(const field of fields)original[field]=String(person[field]||"");
+   if(!body.expected_source||typeof body.expected_source!=="object"||
+      fields.some(field=>body.expected_source[field]!==original[field]))
     throw Error("Оригинал профиля изменился. Обновите карточку перед сохранением перевода.");
    const saved:any={...(person.translations||{})};
-   if(Object.values(translated).some(Boolean))
-    saved[locale]={...translated,source:original,updated_at:new Date().toISOString()};
-   else delete saved[locale];
-   if(JSON.stringify(saved).length>45000)throw Error("Слишком большой объём переводов");
+   const oldMeta=saved._source;
+   const recognized=oldMeta&&locales.includes(oldMeta.locale)&&
+     fields.every(field=>oldMeta.source?.[field]===original[field])?oldMeta.locale:null;
+   const sourceLocale=body.source_locale===undefined?(recognized||person.preferred_locale||"ru"):String(body.source_locale);
+   if(!locales.includes(sourceLocale))throw Error("Выберите реальный язык исходного текста");
+   const incoming=Array.isArray(body.items)?body.items:
+      body.locale?[{...body,locale:body.locale}]:[];
+   if(!Array.isArray(incoming)||incoming.length>7||
+      (!incoming.length&&body.source_locale===undefined))
+    throw Error("Неверный список переводов");
+   if(incoming.length>1&&body.confirm_publish!==true)
+    throw Error("Перед публикацией нескольких переводов требуется подтверждение редактора");
+   const used=new Set<string>();
+   for(const item of incoming){
+    if(!item||typeof item!=="object")throw Error("Недопустимый перевод");
+    const locale=String(item.locale||"");
+    if(!locales.includes(locale)||locale===sourceLocale||used.has(locale))
+     throw Error("Язык перевода должен отличаться от языка текста и не повторяться: "+locale);
+    used.add(locale);
+    const translated:any={};
+    for(const field of fields){
+     const value=item[field]===undefined?"":item[field];
+     if(typeof value!=="string"||value.length>limits[field])
+      throw Error("Недопустимая длина перевода: "+field);
+     translated[field]=value.trim();
+    }
+    if(Object.values(translated).some(Boolean))
+     saved[locale]={...translated,source:{...original},updated_at:new Date().toISOString()};
+    else delete saved[locale];
+   }
+   // Meta is never public as a profile text; it only drives locale selection.
+   saved._source={locale:sourceLocale,source:{...original},updated_at:new Date().toISOString()};
+   if(JSON.stringify(saved).length>64000)throw Error("Слишком большой объём переводов");
    const [updated]=await db("studio_authors?id=eq."+person.id,{method:"PATCH",body:JSON.stringify({translations:saved})});
-   return reply(200,{ok:true,author_id:person.id,locale,translations:updated.translations||{}});
+   if(!updated)throw Error("Не удалось сохранить переводы");
+   return reply(200,{ok:true,author_id:person.id,source_locale:sourceLocale,
+    saved_locales:[...used],translations:updated.translations||{}});
   }
   if(a[0]==="authors"&&a[1]&&a.length===2&&req.method==="PATCH"){
    if(!idok(a[1]))throw Error("Invalid author id");
