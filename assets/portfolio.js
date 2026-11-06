@@ -4,6 +4,7 @@
   const APP_IDS=['nowwhat','nowcook','nowgreen','nowkids'];
   const LANGS=['en','pt','ru','uk','fr','es','de','it'];
   const LABELS={en:'English',pt:'Português',ru:'Русский',uk:'Українська',fr:'Français',es:'Español',de:'Deutsch',it:'Italiano'};
+  const DEV_LABELS={en:'App development',pt:'Desenvolvimento de apps',ru:'Разработка приложений',uk:'Розробка застосунків',fr:'Développement d’apps',es:'Desarrollo de apps',de:'App-Entwicklung',it:'Sviluppo app'};
   const URLS={
     nowwhat:{home:'/nowwhat/',guide:'/manual/',privacy:'/privacy/',terms:'/terms/',delete:'/delete-account/',support:'/support/',play:'https://play.google.com/store/apps/details?id=com.nowwhatapp.app'},
     nowcook:{home:'/nowcook/',play:'https://play.google.com/store/apps/details?id=com.nowapps.nowcook',guide:'/nowcook/manual/',privacy:'/nowcook/privacy/',terms:'/nowcook/terms/',delete:'/nowcook/delete-account/',support:'/nowcook/support/'},
@@ -28,7 +29,7 @@
     document.documentElement.lang=locale==='uk'?'uk':locale;
     const brand=document.querySelector('.eco-brand small');if(brand)brand.textContent=localeText.brandSub;
     const links=document.querySelectorAll('[data-eco-link]');
-    links.forEach(e=>{const k=e.dataset.ecoLink;if(localeText[k])e.textContent=localeText[k]});
+    links.forEach(e=>{const k=e.dataset.ecoLink;if(k==='navDevelopment')e.textContent=DEV_LABELS[locale]||DEV_LABELS.en;else if(localeText[k])e.textContent=localeText[k]});
     const select=document.getElementById('eco-language');
     if(select)select.value=locale;
   }
