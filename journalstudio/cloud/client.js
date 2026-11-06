@@ -383,7 +383,7 @@ function blockHtml(b,i,edit){
  else if(b.type==="image"){const url=assets[b.asset_id]||"";inner=url?'<img data-media-id="'+esc(b.asset_id)+'" alt="'+esc(b.alt||"")+'" src="'+esc(url)+'" style="max-width:100%;max-height:200px;border-radius:10px;margin-bottom:10px">':'<p class="muted small">Загруженное изображение</p>';inner+='<div class="studio-media-size" data-optimized-id="'+esc(b.asset_id)+'">'+esc(window.StudioOptimizer?.label?.(b.asset_id)||"Оптимизация изображений") +'</div>';
  inner+='<label>Подпись к фото</label><input data-block="'+i+'" data-prop="caption" value="'+esc(b.caption||"")+'"><label>Альтернативный текст (для доступности)</label><input data-block="'+i+'" data-prop="alt" value="'+esc(b.alt||"")+'">'+(edit?'<button type="button" class="jp-cover-select '+(draft?.cover_path===b.asset_id?'active':'')+'" data-block-cover="'+i+'">'+(draft?.cover_path===b.asset_id?'✓ Выбрана обложкой':'○ Сделать обложкой')+'</button>':'');}
  else inner='<textarea data-block="'+i+'" data-prop="text" rows="'+(b.type==="text"?5:2)+'" placeholder="Введите текст">'+esc(b.text||"")+'</textarea>';
- return '<div class="block"><div class="row"><strong>'+(["heading","text"].includes(b.type)?'<span class="studio-group-index">'+esc(window.StudioI18n?.t?.("Группа")||"Группа")+' '+groupNumberAt(i)+' · </span>':'')+esc(window.StudioI18n?.t?.(({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок"))||({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок"))+'</strong>'+(edit?'<div class="btns">'+(b.type==="image"?'<button type="button" data-photo-jump="'+i+'">↕ Положение фото</button>':'<button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button>')+'<button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+'</div>';
+ return '<div class="block"><div class="row"><strong>'+(["heading","text"].includes(b.type)?'<span class="studio-group-index">'+esc(window.StudioI18n?.t?.("Группа")||"Группа")+' '+groupNumberAt(i)+' · </span>':'')+esc(window.StudioI18n?.t?.(({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок"))||({text:"Текст",heading:"Заголовок",quote:"Цитата",image:"Фотография",link:"Ссылка"}[b.type]||"Блок"))+'</strong>'+(edit?'<div class="btns">'+(b.type==="image"?'<button type="button" data-photo-jump="'+i+'">↕ Положение фото</button>':'<button data-block-up="'+i+'">↑</button><button data-block-down="'+i+'">↓</button>')+'<button data-block-remove="'+i+'">Удалить</button></div>':"")+'</div>'+inner+(edit&&b.type==="text"?'<div class="studio-inline-link-tools"><button type="button" data-inline-link="'+i+'" title="Выделите слова в этом абзаце, затем нажмите кнопку">🔗 Сделать выделенный текст ссылкой</button><span class="small muted">В приложении откроется отдельная кликабельная строка между частями текста.</span></div>':'')+'</div>';
 }
 function capture(){
  if(!draft)return;
@@ -586,6 +586,53 @@ function addBlock(t){
  if(!draft||!editable())return;capture();
  blocks.push(t==="link"?{type:"link",label:"",url:""}:{type:t,text:""});draft.blocks=blocks;dirty=true;renderEditor();
 }
+// The installed NowGreen app supports standalone `link` content blocks, not
+// inline rich spans in paragraph text. Split precisely at the selection so the
+// label becomes a native tappable link between the surrounding text segments.
+function splitTextForAppLink(source,start,end,url){
+ if(typeof source!=="string"||!Number.isInteger(start)||!Number.isInteger(end)||start<0||end>source.length||start>=end)
+  throw Error("Выделите слова для ссылки внутри текстового блока.");
+ const selection=source.slice(start,end);
+ const prefixLength=selection.length-selection.trimStart().length;
+ const selectedLength=selection.trimEnd().length;
+ const linkStart=start+prefixLength,linkEnd=start+selectedLength;
+ const label=source.slice(linkStart,linkEnd);
+ if(!label||label.length>180||label.includes("\n")||label.includes("\r"))
+  throw Error("Выделите одну короткую фразу (до 180 символов, без переноса строки).");
+ const result=[];
+ if(linkStart>0)result.push({type:"text",text:source.slice(0,linkStart)});
+ result.push({type:"link",label,url});
+ if(linkEnd<source.length)result.push({type:"text",text:source.slice(linkEnd)});
+ return result;
+}
+function addSelectedTextLink(index){
+ if(!draft||!editable())throw Error("Статья доступна только для просмотра.");
+ const field=document.querySelector('#blocks textarea[data-block="'+index+'"][data-prop="text"]');
+ if(!field||blocks[index]?.type!=="text")throw Error("Сначала откройте текстовый блок статьи.");
+ const start=field.selectionStart,end=field.selectionEnd;
+ const selection=field.value.slice(start,end);
+ if(!selection.trim())throw Error("Выделите нужные слова в поле текста перед нажатием кнопки.");
+ if(selection.trim().length>180||/[\r\n]/.test(selection.trim()))
+  throw Error("Выделите короткую фразу до 180 символов в одной строке.");
+ if(blocks.length+2>80)
+  throw Error("Слишком много блоков. Уберите ненужные блоки перед добавлением ссылки.");
+ const entered=window.prompt("Введите HTTPS-ссылку для выделенных слов:", "https://");
+ if(entered===null)return;
+ const url=entered.trim();
+ let parsed;
+ try{parsed=new URL(url)}catch{throw Error("Нужен корректный адрес вида https://example.com/")}
+ if(parsed.protocol!=="https:"||!parsed.hostname||parsed.username||parsed.password||url.length>1000)
+  throw Error("Разрешены только HTTPS-ссылки без логина и пароля.");
+ capture();
+ const parts=splitTextForAppLink(blocks[index].text||"",start,end,url);
+ if(blocks.length-1+parts.length>80)
+  throw Error("В статье может быть не больше 80 блоков.");
+ blocks.splice(index,1,...parts);
+ draft.blocks=blocks;
+ dirty=true;
+ renderEditor();
+ toast("Ссылка добавлена. В NowGreen она откроется касанием отдельной строкой. Сохраните статью.");
+}
 function modifyBlock(index,operation){
  if(!editable())return;capture();
  if(operation==="remove"){blocks.splice(index,1);/* Text blocks are independent of the cover. Never alter draft.cover_path here. */}
@@ -783,6 +830,7 @@ document.addEventListener("click",e=>{
  if(b.dataset.delivery)return void run(()=>viewDelivery(b.dataset.delivery));
  if(b.dataset.authorApprove)return void run(()=>approveAuthor(b.dataset.authorApprove));
  if(b.dataset.add)return void run(async()=>addBlock(b.dataset.add));
+ if(b.dataset.inlineLink!==undefined)return void run(()=>addSelectedTextLink(+b.dataset.inlineLink));
  if(b.dataset.coverClear!==undefined)return void run(async()=>{if(!editable())return;capture();draft.cover_path=null;dirty=true;renderEditor();toast("Обложка снята. Фото внутри статьи и в медиатеке сохранено.");});
  if(b.dataset.blockCover!==undefined)return void run(async()=>{const item=blocks[+b.dataset.blockCover];if(!item||item.type!=="image")return;capture();draft.cover_path=item.asset_id;dirty=true;renderEditor();toast("Обложка выбрана. Сохраните изменения.");});
  if(b.dataset.photoJump!==undefined)return void run(()=>window.StudioPhotoTools?.selectImage?.(+b.dataset.photoJump,true));
