@@ -5,7 +5,7 @@
  const $=id=>document.getElementById(id);
  const esc=t=>String(t??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
  let result=null,busy=false,startedPost=null,startedProject=null,pendingRequest=null;
- let library=[],libraryOffset=0,libraryMore=false,libraryBusy=false,libraryProject=null,libraryRequest=0;
+ let library=[],libraryOffset=0,libraryMore=false,libraryBusy=false,libraryProject=null,libraryRequest=0,libraryDeleting=false;
  const url="https://npsfaymjckcqhtyiafms.supabase.co/functions/v1/studio-image";
  const status=(message,error=false)=>{const el=$("imageGenerateStatus");if(!el)return;el.textContent=message;el.style.color=error?"#9d453b":""};
  const editablePost=()=>Boolean(current?.id&&draft&&editable()&&project?.slug);
@@ -59,6 +59,7 @@
      '<div class="studio-media-actions"><button type="button" data-library-cover="'+esc(item.id)+'"'+(draft.cover_path===item.id?' disabled':'')+'>Обложка</button>'+
      '<button type="button" data-library-insert="'+esc(item.id)+'"'+(blocks.some(b=>b.type==="image"&&b.asset_id===item.id)?' disabled':'')+'>В текст</button></div>'):
      '<p class="small muted">'+(item.available?"Для использования откройте редактируемый черновик":"Изображение временно недоступно")+'</p>';
+    const deleteAction=item.mine?'<button type="button" class="studio-media-delete" data-library-delete="'+esc(item.id)+'"'+(libraryDeleting?' disabled':'')+'>🗑 Удалить файл</button>':'';
     const label=item.source_type==="ai"?"ИИ":item.source_type==="stock"?"Фотобанк":"Загружено";
     return '<article class="studio-media-card" data-media-id="'+esc(item.id)+'">'+
      '<div class="studio-media-visual">'+
@@ -66,7 +67,7 @@
        '<span class="studio-media-status">'+(draft?.cover_path===item.id?"Обложка":blocks?.some(b=>b.type==="image"&&b.asset_id===item.id)?"В тексте":"В медиатеке")+'</span></div>'+
      '<div class="studio-media-caption" title="'+esc(item.alt||item.prompt||"")+'">'+esc((item.alt||item.prompt||"Без названия").slice(0,84))+'</div>'+
      '<div class="studio-media-meta">'+label+' · '+(item.optimized?"WebP":"Оригинал")+'</div>'+
-     buttons+'</article>';
+     buttons+deleteAction+'</article>';
    }).join("");
   }
   $("mediaLibraryMore").hidden=!libraryMore;
@@ -94,6 +95,28 @@
   }catch(e){
    if(token===libraryRequest)$("mediaLibraryStatus").textContent="Не удалось загрузить медиатеку: "+e.message;
   }finally{if(token===libraryRequest){libraryBusy=false;renderLibrary();}}
+ }
+ async function deleteLibraryItem(id){
+  if(libraryDeleting)return;
+  const item=library.find(x=>x.id===id);
+  if(!item?.mine)throw Error("Удалять можно только собственные загруженные изображения.");
+  if(draft?.cover_path===id||blocks?.some(b=>b.type==="image"&&b.asset_id===id))
+   throw Error("Изображение выбрано в текущей статье. Сначала уберите его из обложки и текста, затем сохраните изменения.");
+  const agreed=await editorialDecision({
+   title:"Удалить изображение из медиатеки?",
+   message:"«"+String(item.alt||item.prompt||"Изображение").slice(0,120)+"»\n\nУдаление необратимо и удаляет исходный файл и его оптимизированные копии. Если изображение используется в любой статье, теме, переводе или профиле автора, сервер запретит операцию.",
+   confirmLabel:"Удалить мой файл"
+  });
+  if(!agreed)return;
+  const slug=project.slug;
+  libraryDeleting=true;renderLibrary();
+  try{
+   const data=await call("/media/"+encodeURIComponent(id),"DELETE",{confirm:true});
+   if(!data?.ok||data.deleted_id!==id)throw Error("Сервер не подтвердил удаление");
+   delete assets[id];
+   if(project?.slug===slug)await loadLibrary({reset:true});
+   toast("Собственный файл удалён из медиатеки и хранилища.");
+  }finally{libraryDeleting=false;renderLibrary()}
  }
  function removeLegacyDuplicate(){
   if(!editablePost())throw Error("Нужен редактируемый черновик");
@@ -278,6 +301,7 @@
   if(b.dataset.libraryCover){e.preventDefault();run(()=>useLibraryItem(b.dataset.libraryCover,true));}
   if(b.dataset.libraryInsert){e.preventDefault();run(()=>useLibraryItem(b.dataset.libraryInsert,false));}
   if(b.dataset.libraryReplace){e.preventDefault();run(()=>window.StudioPhotoTools.applyReplacement(b.dataset.libraryReplace,library.find(x=>x.id===b.dataset.libraryReplace)));}
+  if(b.dataset.libraryDelete){e.preventDefault();run(()=>deleteLibraryItem(b.dataset.libraryDelete));}
  });
  const originalRender=renderEditor;
  renderEditor=function(...args){originalRender(...args);if(!imageEditor()&&!$("studioImageAi").hidden)setSource("library");refreshControls();if(library.length&&$("studioImageLibrary")&&!$("studioImageLibrary").hidden)renderLibrary()};
