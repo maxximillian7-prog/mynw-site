@@ -155,6 +155,13 @@ body[data-studio-role="reviewer"] [data-tab="home"],body[data-studio-role="revie
 .studio-translation-approval .btns{display:flex;flex-wrap:wrap;gap:8px}
 .ai-translated-content p{white-space:pre-wrap;font-size:13px}
 .author-photo-editor{display:grid;grid-template-columns:90px minmax(0,1fr);gap:16px;align-items:center;margin:12px 0}
+.studio-author-translation-panel{margin-top:18px}.studio-author-translation-panel[hidden]{display:none}
+.studio-author-translation-grid{display:grid;grid-template-columns:minmax(225px,.9fr) minmax(320px,1.4fr);gap:24px}
+.studio-author-translation-source{padding:12px;border-radius:12px;background:var(--surface,#f5f7f4);white-space:pre-wrap;overflow-wrap:anywhere;max-height:520px;overflow:auto}
+.studio-author-translation-source p{margin:10px 0 0;line-height:1.55}
+.studio-author-translation-panel textarea{width:100%;resize:vertical}
+@media(max-width:800px){.studio-author-translation-grid{grid-template-columns:1fr}}
+
 .author-photo-placeholder{width:88px;height:88px;border-radius:20px;background:var(--mint);color:var(--green);font-size:43px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line)}
 .author-photo-placeholder img{width:100%;height:100%;object-fit:cover}
 .ai-author-avatar{width:56px;height:56px;border-radius:14px;overflow:hidden;background:var(--mint);display:grid;place-items:center;color:var(--green);font-size:24px;font-weight:700;flex:none}
@@ -697,6 +704,43 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <label for="authorSocial">Сайт или личная страница</label><input id="authorSocial" type="url" placeholder="https://">
 <label for="authorInstagram">Instagram</label><input id="authorInstagram" type="url" placeholder="https://www.instagram.com/...">
 <label for="authorYoutube">YouTube</label><input id="authorYoutube" type="url" placeholder="https://www.youtube.com/..."><button id="saveAuthor" class="primary" style="margin-top:15px">Добавить автора</button><div class="loginNote">Партнёрские статьи публикуются после подтверждения согласия автора и решения редактора.</div></div></div>
+<div class="card studio-author-translation-panel" id="authorTranslationsCard" hidden>
+ <div class="sectionHeading"><div><div class="eyebrow">ПЕРЕВОДЫ ПРОФИЛЯ АВТОРА</div>
+  <h2 id="authorTranslationTitle">Профиль автора · Переводы</h2>
+  <p class="muted small">Оригинал сохраняется. Проверенные переводы показываются читателям на выбранном языке; устаревшие автоматически заменяются оригиналом.</p>
+ </div><button id="authorTranslationClose" type="button">Закрыть</button></div>
+ <div class="studio-author-translation-grid">
+  <div>
+   <label for="authorTranslationLocale">Язык перевода</label>
+   <select id="authorTranslationLocale">
+    <option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option>
+    <option value="pt-PT">Português (PT)</option><option value="es">Español</option>
+    <option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option>
+   </select>
+   <p id="authorTranslationStatus" class="small muted" role="status"></p>
+   <div class="studio-author-translation-source">
+    <strong>Исходные сведения (только чтение)</strong>
+    <p id="authorTranslationOriginal" class="small"></p>
+   </div>
+  </div>
+  <div>
+   <label for="authorTranslationName">Имя для показа на этом языке (необязательно)</label>
+   <input id="authorTranslationName" maxlength="100" placeholder="Оставьте пустым, чтобы сохранить оригинальное имя">
+   <label for="authorTranslationTagline">Краткое представление</label>
+   <textarea id="authorTranslationTagline" maxlength="200" rows="2"></textarea>
+   <label for="authorTranslationBio">О себе / биография</label>
+   <textarea id="authorTranslationBio" maxlength="4000" rows="7"></textarea>
+   <label for="authorTranslationFocus">Специализация (если указана)</label>
+   <textarea id="authorTranslationFocus" maxlength="900" rows="3"></textarea>
+   <div class="btns" style="margin-top:15px">
+    <button id="authorTranslationAi" type="button">✦ ИИ-черновик перевода</button>
+    <button id="authorTranslationSave" type="button" class="primary">✓ Сохранить проверенный перевод</button>
+    <button id="authorTranslationDelete" type="button">Удалить перевод языка</button>
+   </div>
+   <p class="small muted">ИИ создаёт только черновик и может расходовать API-токены. Для публикации перевода нужна отдельная проверка и сохранение редактором. Фото, контакты и социальные ссылки не переводятся.</p>
+  </div>
+ </div>
+</div>
 <div class="card" id="teamAuthorsCard" hidden>
   <div class="sectionHeading">
     <div>
@@ -777,7 +821,8 @@ body[data-studio-role="author"] #authorVoice{display:none!important}
 <script defer src="./media-optimizer.js?v=20261023-18"></script>
 <script defer src="./studio-features.js?v=20261024-1"></script>
 <script defer src="./review-workflow.js?v=20261106-full-review-edit1"></script>
-<script defer src="./author-profiles.js?v=20261024-2"></script>
+<script defer src="./author-profiles.js?v=20261106-translations1"></script>
+<script defer src="./author-translations.js?v=20261106-translations1"></script>
 <script defer src="./ai-studio.js?v=20261030-all-locales1"></script>
 <script defer src="./studio-image-limits.js?v=20261024-60"></script>
 <script defer src="./studio-full-article.js?v=20261024-62"></script>

@@ -8,6 +8,7 @@
  // Coalesce requests and retry failed signing instead of caching null forever.
  const photos=new Map(),photoRequests=new Map(),retryAfter=new Map();
  const canEdit=a=>project?.role==="owner"||project?.role==="chief_editor"||a.kind==="partner"&&a.owner_user_id===session?.user?.id;
+ const canTranslate=()=>["owner","chief_editor","editor"].includes(project?.role||"");
  const profileFields={name:"authorName",bio:"authorBio",tagline:"authorTagline",focus:"authorFocus",voice_style:"authorVoice",preferred_locale:"authorLang",website:"authorSocial",instagram:"authorInstagram",youtube:"authorYoutube",photo_asset_id:"authorPhotoId"};
  const safeLink=v=>typeof v==="string"&&/^https:\/\//i.test(v)?v:"";
  function photo(id){
@@ -100,6 +101,7 @@
     '<div class="ai-author-links">'+links(a)+'</div>'+
     (a.kind==="partner"&&a.consent_status!=="approved"?'<div class="small muted">Согласие на публикацию ожидает проверки</div>':"")+
     '</div><div class="btns">'+(edit?'<button type="button" data-profile-edit="'+E(a.id)+'">Редактировать</button>':"")+
+    (canTranslate()?'<button type="button" data-profile-translate="'+E(a.id)+'">🌐 Переводы</button>':"")+
     (["owner","chief_editor"].includes(project.role)&&a.kind==="partner"&&a.consent_status!=="approved"?'<button type="button" data-author-approve="'+E(a.id)+'">✓ Согласие</button>':"")+
     (["owner","chief_editor"].includes(project.role)&&a.kind==="partner"?'<button type="button" class="studio-editor-remove-profile" data-editor-remove-profile="'+E(a.id)+'">Удалить автора</button>':"")+'</div></article>';
   }).join(""):'<div class="empty">Добавьте первого автора.</div>';
@@ -115,6 +117,7 @@
   }
   for(const a of authors||[])if(a.photo_asset_id&&!photo(a.photo_asset_id))void signed(a.photo_asset_id);
   renderImages();
+  window.StudioAuthorTranslations?.refresh?.();
  }
  function reset(){
   editing=null;
