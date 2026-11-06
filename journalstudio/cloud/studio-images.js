@@ -91,7 +91,7 @@
    const used=new Set(library.map(a=>a.id));
    library=[...library,...items.filter(a=>!used.has(a.id))];
    libraryMore=!!data.has_more;libraryOffset=data.next_offset??libraryOffset+items.length;
-   $("mediaLibraryStatus").textContent=library.length+" изображений. Удаление из статьи не удаляет их из медиатеки. Повторное использование не тратит ИИ-кредиты.";
+   $("mediaLibraryStatus").textContent=library.length+" изображений. Удаление фотографии из текста не удаляет файл. Собственные неиспользуемые изображения можно убрать кнопкой «Удалить файл».";
   }catch(e){
    if(token===libraryRequest)$("mediaLibraryStatus").textContent="Не удалось загрузить медиатеку: "+e.message;
   }finally{if(token===libraryRequest){libraryBusy=false;renderLibrary();}}
