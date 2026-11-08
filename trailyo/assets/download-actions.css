@@ -1,0 +1,6 @@
+.trailyo-downloads{margin:16px 0 22px;padding:14px 0 2px}
+.trailyo-download-title{font-weight:750;font-size:15px;margin-bottom:10px;color:#27445b}
+.trailyo-store-row{display:flex;flex-wrap:wrap;gap:10px}
+.trailyo-store-link{display:inline-block;border-radius:12px;padding:12px 14px;border:1px solid #136e62;background:#155e55;color:#fff;text-decoration:none;font-weight:700;font-size:14px;line-height:1.35}
+.trailyo-store-link.disabled{background:#e5ebec;border-color:#cbd6d8;color:#54676b;cursor:not-allowed;user-select:none}
+.trailyo-store-link:not(.disabled):hover{background:#0a4942}
