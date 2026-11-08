@@ -3,6 +3,7 @@
   'use strict';
   const translations = {
     en: {
+      heroMain:'Discover your next experience',heroAccent:'in Portugal',poster1Category:'Concerts',poster1Tagline:'An evening of vivid emotions',poster2Category:'Art',poster2Tagline:'Another point of view',poster3Category:'Nature',poster3Tagline:'Find your horizon',poster4Category:'Meetups',poster4Tagline:'Taste the city',
       metaTitle: 'Trailyo — Discover Portugal, your way | MyNow Apps',
       metaDesc: 'Meet Trailyo, a new mobile app for discovering events, local experiences, communities and hidden corners of Portugal. Explore features and find out how it works.',
       navFeatures:'Features',navPreview:'App preview',navPosters:'Inspiration',navHow:'How it works',navPartners:'Partners',navDownload:'Get the app',
@@ -36,6 +37,7 @@
       menuLabel:'Open menu',langLabel:'Website language'
     },
     ru: {
+      heroMain:'Откройте новые впечатления',heroAccent:'в Португалии',poster1Category:'Концерты',poster1Tagline:'Вечер ярких эмоций',poster2Category:'Арт',poster2Tagline:'Другой взгляд',poster3Category:'Природа',poster3Tagline:'Найди свой горизонт',poster4Category:'Встречи',poster4Tagline:'Попробуй город на вкус',
       metaTitle:'Trailyo — Открывайте Португалию по-своему | MyNow Apps',
       metaDesc:'Trailyo — мобильное приложение для поиска событий, экскурсий, сообществ и интересных мест Португалии. Узнайте о возможностях приложения.',
       navFeatures:'Возможности',navPreview:'Приложение',navPosters:'Вдохновение',navHow:'Как работает',navPartners:'Партнёрам',navDownload:'Скачать',
@@ -69,6 +71,7 @@
       menuLabel:'Открыть меню',langLabel:'Язык сайта'
     },
     pt: {
+      heroMain:'Descubra a sua próxima experiência',heroAccent:'em Portugal',poster1Category:'Concertos',poster1Tagline:'Uma noite cheia de emoções',poster2Category:'Arte',poster2Tagline:'Um novo olhar',poster3Category:'Natureza',poster3Tagline:'Encontre o seu horizonte',poster4Category:'Encontros',poster4Tagline:'Saboreie a cidade',
       metaTitle:'Trailyo — Descubra Portugal à sua maneira | MyNow Apps',
       metaDesc:'Conheça o Trailyo, uma aplicação para descobrir eventos, experiências, comunidades e recantos de Portugal. Explore as funcionalidades da aplicação.',
       navFeatures:'Funcionalidades',navPreview:'A aplicação',navPosters:'Inspiração',navHow:'Como funciona',navPartners:'Parceiros',navDownload:'Obter a app',
@@ -169,4 +172,34 @@
     }
   }
   setLanguage(initial,false);
+
+  // Slow self-running feed inside the phone mock-up; user gestures take priority.
+  const feed=document.getElementById('phone-feed');
+  if(feed){
+    const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+    let last=0, quietUntil=0, dragging=false;
+    const pause=()=>{quietUntil=performance.now()+2800};
+    feed.addEventListener('wheel',pause,{passive:true});
+    feed.addEventListener('pointerdown',()=>{dragging=true;pause()},{passive:true});
+    window.addEventListener('pointerup',()=>{if(dragging){dragging=false;pause()}},{passive:true});
+    feed.addEventListener('touchstart',()=>{dragging=true;pause()},{passive:true});
+    feed.addEventListener('touchend',()=>{dragging=false;pause()},{passive:true});
+    feed.addEventListener('keydown',pause);
+    feed.addEventListener('focus',pause);
+    feed.addEventListener('mouseenter',()=>{quietUntil=performance.now()+1000});
+    feed.addEventListener('mouseleave',pause);
+    const animate=(stamp)=>{
+      const dt=last?Math.min((stamp-last)/1000,.055):0;
+      last=stamp;
+      if(!motion.matches&&!dragging&&stamp>quietUntil&&document.visibilityState==='visible'){
+        const max=Math.max(0,feed.scrollHeight-feed.clientHeight);
+        if(max>0){
+          if(feed.scrollTop>=max-1)feed.scrollTop=0;
+          else feed.scrollTop=Math.min(max,feed.scrollTop+dt*17);
+        }
+      }
+      requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }
 })();
