@@ -24,7 +24,10 @@ a.main{display:block;border-radius:14px;background:#1c7c69;color:#fff;padding:14
 a.secondary{color:#246e67;text-decoration:underline}
 .small{font-size:13px;line-height:1.5}
 .bad{display:none;color:#a13636}
-</style></head>
+</style>
+<link rel="stylesheet" href="/trailyo/assets/download-actions.css">
+<script defer src="/trailyo/assets/store-links.js"></script>
+<script defer src="/trailyo/assets/download-actions.js"></script></head>
 <body><article>
 <a href="/trailyo/"><img class="logo" src="/trailyo/assets/trailyo-logo.png" alt="Trailyo"></a>
 <div class="tag" id="badge"></div>
@@ -32,6 +35,7 @@ a.secondary{color:#246e67;text-decoration:underline}
 <p id="summary"></p>
 <a class="main" id="openApp" href="/trailyo/"></a>
 <p class="small"><span id="fallback"></span> <a class="secondary" href="/trailyo/" id="siteLink">Trailyo</a></p>
+<div class="trailyo-downloads" id="storeDownloads"></div>
 <p class="bad" id="invalid"></p>
 </article>
 <script>
@@ -47,6 +51,7 @@ a.secondary{color:#246e67;text-decoration:underline}
     pt:{badge:"Convite para evento",title:"Descobre um evento no Trailyo",summary:"Partilharam contigo um evento. Abre no Trailyo para ver a data, o local e a descrição.",button:"Abrir evento",fallback:"Ainda não tens a app? Visita",invalid:"A ligação do convite é inválida."}
   }[lang];
   document.documentElement.lang=lang;
+  document.getElementById("storeDownloads").setAttribute("data-lang",lang);
   document.getElementById('badge').textContent=words.badge;
   document.getElementById('subject').textContent=words.title;
   document.getElementById('summary').textContent=words.summary;
