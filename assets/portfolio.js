@@ -55,6 +55,29 @@
     const u=URLS[app];if(!u.play)return '';
     return '<section class="eco-section eco-install" id="download"><div class="eco-container"><div class="eco-note eco-download-note"><div><div class="eco-section-eyebrow">'+TITLES[app]+' · Android</div><h2>'+E(t.play)+'</h2><p>'+E(t[app].summary)+'</p><a class="eco-button" href="'+u.play+'" target="_blank" rel="noopener noreferrer">'+E(t.play)+' ↗</a></div><a class="eco-qr-link" href="'+u.play+'" target="_blank" rel="noopener noreferrer" aria-label="'+TITLES[app]+' Google Play QR">'+qrGraphic(app)+'</a></div></div></section>';
   }
+
+  const TRAILYO_PROMO={"en":{"status":"Coming soon","kicker":"A NEW WAY TO EXPLORE","title":"Your next unforgettable experience starts here.","body":"Meet Trailyo — a new app for finding concerts, culture, inspiring places, local experiences and communities across Portugal. Discover what to do, where to go and who to go with.","cta":"Discover Trailyo","note":"Portugal · Events · Experiences · Communities","photoLabel":"A world of experiences"},"pt":{"status":"Brevemente disponível","kicker":"UMA NOVA FORMA DE DESCOBRIR","title":"A sua próxima experiência inesquecível começa aqui.","body":"Conheça o Trailyo — uma nova aplicação para descobrir concertos, cultura, locais inspiradores, experiências e comunidades em Portugal. Saiba o que fazer, onde ir e com quem partilhar.","cta":"Conhecer o Trailyo","note":"Portugal · Eventos · Experiências · Comunidades","photoLabel":"Um mundo de experiências"},"ru":{"status":"Скоро доступно","kicker":"НОВЫЙ ВЗГЛЯД НА ПОРТУГАЛИЮ","title":"Ваши следующие впечатления начинаются здесь.","body":"Знакомьтесь: Trailyo — новое приложение для поиска концертов, культурных событий, интересных мест, развлечений и сообществ по всей Португалии. Находите идеи для отдыха и людей с общими интересами.","cta":"Узнать о Trailyo","note":"Португалия · События · Впечатления · Сообщества","photoLabel":"Мир новых впечатлений"},"uk":{"status":"Незабаром","kicker":"НОВИЙ СПОСІБ ВІДКРИВАТИ","title":"Ваші наступні враження починаються тут.","body":"Знайомтеся: Trailyo — новий застосунок для пошуку концертів, культурних подій, цікавих місць, розваг і спільнот у Португалії. Знаходьте ідеї для відпочинку та однодумців.","cta":"Дізнатися про Trailyo","note":"Португалія · Події · Враження · Спільноти","photoLabel":"Світ нових вражень"},"fr":{"status":"Bientôt disponible","kicker":"UNE NOUVELLE FAÇON D'EXPLORER","title":"Votre prochaine expérience inoubliable commence ici.","body":"Découvrez Trailyo, une nouvelle application pour trouver concerts, culture, lieux inspirants, expériences locales et communautés au Portugal. Trouvez des idées de sorties et des personnes qui partagent vos passions.","cta":"Découvrir Trailyo","note":"Portugal · Événements · Expériences · Communautés","photoLabel":"Un monde d'expériences"},"es":{"status":"Próximamente","kicker":"UNA NUEVA FORMA DE EXPLORAR","title":"Tu próxima experiencia inolvidable empieza aquí.","body":"Conoce Trailyo, una nueva aplicación para descubrir conciertos, cultura, lugares inspiradores, experiencias y comunidades por todo Portugal. Encuentra planes y personas con tus mismos intereses.","cta":"Descubrir Trailyo","note":"Portugal · Eventos · Experiencias · Comunidades","photoLabel":"Un mundo de experiencias"},"de":{"status":"Demnächst verfügbar","kicker":"PORTUGAL NEU ENTDECKEN","title":"Dein nächstes unvergessliches Erlebnis beginnt hier.","body":"Lerne Trailyo kennen – die neue App für Konzerte, Kultur, besondere Orte, lokale Erlebnisse und Communities in Portugal. Entdecke Aktivitäten und Menschen mit gemeinsamen Interessen.","cta":"Trailyo entdecken","note":"Portugal · Events · Erlebnisse · Communities","photoLabel":"Eine Welt voller Erlebnisse"},"it":{"status":"Prossimamente","kicker":"UN NUOVO MODO DI ESPLORARE","title":"La tua prossima esperienza indimenticabile inizia qui.","body":"Scopri Trailyo, una nuova app per trovare concerti, cultura, luoghi suggestivi, esperienze locali e community in tutto il Portogallo. Trova nuove idee e persone con i tuoi stessi interessi.","cta":"Scopri Trailyo","note":"Portogallo · Eventi · Esperienze · Community","photoLabel":"Un mondo di esperienze"}};
+  function trailyoPromo(){
+    const p=TRAILYO_PROMO[locale]||TRAILYO_PROMO.en;
+    const siteLang=(locale==='ru'||locale==='pt')?locale:'en';
+    const link='/trailyo/?lang='+siteLang;
+    return '<section class="eco-trailyo-promo" id="trailyo-promo" aria-labelledby="eco-trailyo-heading"><div class="eco-container">'+
+      '<div class="eco-trailyo-shell"><div class="eco-trailyo-copy">'+
+      '<span class="eco-trailyo-status"><span class="eco-trailyo-status-dot" aria-hidden="true"></span>'+E(p.status)+'</span>'+
+      '<div class="eco-trailyo-logo"><img src="/trailyo/assets/trailyo-logo.png" alt="Trailyo" width="390" height="155" loading="lazy" decoding="async"></div>'+
+      '<div class="eco-trailyo-kicker">'+E(p.kicker)+'</div>'+
+      '<h2 id="eco-trailyo-heading">'+E(p.title)+'</h2>'+
+      '<p class="eco-trailyo-lead">'+E(p.body)+'</p>'+
+      '<div class="eco-trailyo-actions"><a class="eco-trailyo-cta" href="'+link+'">'+E(p.cta)+' <span aria-hidden="true">↗</span></a>'+
+      '<span class="eco-trailyo-micro">EN · RU · PT</span></div>'+
+      '</div><div class="eco-trailyo-art" aria-hidden="true">'+
+      '<div class="eco-trailyo-orbit eco-trailyo-orbit-one"></div><div class="eco-trailyo-orbit eco-trailyo-orbit-two"></div>'+
+      '<div class="eco-trailyo-photo eco-trailyo-photo-concert"><img src="/trailyo/assets/media/concerts.webp" alt="" width="600" height="800" loading="lazy" decoding="async"></div>'+
+      '<div class="eco-trailyo-photo eco-trailyo-photo-nature"><img src="/trailyo/assets/media/nature.webp" alt="" width="600" height="800" loading="lazy" decoding="async"></div>'+
+      '<div class="eco-trailyo-photo eco-trailyo-photo-meet"><img src="/trailyo/assets/media/meetings.webp" alt="" width="600" height="800" loading="lazy" decoding="async"></div>'+
+      '<div class="eco-trailyo-float"><span class="eco-trailyo-spark" aria-hidden="true">✦</span> '+E(p.photoLabel)+'</div>'+
+      '</div></div><p class="eco-trailyo-footer">'+E(p.note)+'</p></div></section>';
+  }
   function home(t){
     const stage=APP_IDS.map(a=>'<a href="'+URLS[a].home+'" class="eco-stage-tile">'+logo(a)+'<strong>'+TITLES[a]+'</strong></a>').join('');
     root.innerHTML='<section class="eco-hero"><div class="eco-container eco-hero-grid"><div>'+
@@ -64,6 +87,7 @@
       '<section class="eco-section" id="apps"><div class="eco-container"><div class="eco-section-eyebrow">'+E(t.appsKicker)+'</div>'+
       '<h2>'+E(t.appsTitle)+'</h2><p class="eco-section-lead">'+E(t.appsLead)+'</p>'+
       '<div class="eco-cards">'+APP_IDS.map(a=>homeCard(a,t)).join('')+'</div></div></section>'+
+      trailyoPromo()+
       '<section class="eco-section" id="documentation"><div class="eco-container"><div class="eco-note"><div><div class="eco-section-eyebrow">'+E(t.docsKicker)+'</div><h2>'+E(t.helpTitle)+'</h2><p>'+E(t.helpText)+'</p></div><a href="/nowwhat/" class="eco-button">'+E(t.explore)+' →</a></div></div></section>'+
       /* Retain old deep-link hash targets used in Google Play descriptions and documentation. */
       '<div id="features"></div><div id="documents"></div><div id="vault"></div><div id="saved"></div><div id="finance"></div><div id="calendar"></div><div id="briefing"></div>'+

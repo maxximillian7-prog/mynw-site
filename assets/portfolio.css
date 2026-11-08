@@ -209,3 +209,36 @@ body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px
 .eco-cards>a.eco-card:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
 .eco-cards>a.eco-card:hover .eco-card-link span,.eco-cards>a.eco-card:focus-visible .eco-card-link span{transform:translateX(5px)}
 @media(prefers-reduced-motion:reduce){.eco-cards>a.eco-card{transition:none}.eco-cards>a.eco-card:hover{transform:none}.eco-cards>a.eco-card:hover .eco-card-link span{transform:none}}
+
+
+/* Trailyo coming-soon showcase on MyNow Apps homepage. */
+.eco-trailyo-promo{padding:34px 0 82px;background:linear-gradient(180deg,#f7f9fc,#f2f7f2 70%,#f7f9fc)}
+.eco-trailyo-shell{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);min-height:500px;position:relative;isolation:isolate;overflow:hidden;border-radius:35px;background:radial-gradient(ellipse 65% 90% at 95% 55%,#215c4e 0%,transparent 80%),linear-gradient(130deg,#0b362d 0%,#0a2925 100%);color:#f7f7ed;box-shadow:0 28px 70px rgba(9,52,41,.16)}
+.eco-trailyo-shell:before{content:"";position:absolute;left:-160px;bottom:-190px;width:460px;height:460px;border-radius:50%;border:1px solid #d7e9cf1e;box-shadow:0 0 0 60px #ffffff04,0 0 0 126px #ffffff04;pointer-events:none}
+.eco-trailyo-copy{position:relative;z-index:2;display:flex;align-items:flex-start;flex-direction:column;justify-content:center;padding:46px 10px 47px 53px}
+.eco-trailyo-status{display:inline-flex;gap:10px;align-items:center;padding:7px 14px;background:#dceee23b;border:1px solid #dceee244;border-radius:99px;font-size:12px;font-weight:850;letter-spacing:.025em;color:#daf3de}
+.eco-trailyo-status-dot{height:9px;width:9px;background:#e6c16e;border-radius:50%;box-shadow:0 0 0 4px #e6c16e27}
+.eco-trailyo-logo{background:#fbf8ef;display:flex;align-items:center;justify-content:center;border-radius:24px;padding:10px 25px;margin:24px 0 23px;box-shadow:0 12px 30px rgba(0,10,8,.13);width:min(100%,342px);height:132px}
+.eco-trailyo-logo img{display:block;object-fit:contain;object-position:center;width:100%;max-width:290px;height:116px}
+.eco-trailyo-kicker{font-size:11px;line-height:1.35;font-weight:850;text-transform:uppercase;letter-spacing:.16em;color:#b5d8bb}
+.eco-trailyo-copy h2{color:#fff;max-width:540px;line-height:1.13;font-size:clamp(1.95rem,3.1vw,2.65rem);font-weight:850;letter-spacing:-.048em;margin:13px 0 16px}
+.eco-trailyo-copy .eco-trailyo-lead{color:#d2e4d9;font-size:14px;line-height:1.76;margin:0 0 23px;max-width:535px}
+.eco-trailyo-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.eco-trailyo-cta{min-height:47px;display:inline-flex;align-items:center;justify-content:center;gap:12px;font-size:14px;font-weight:900;background:#e9eddb;color:#123e2f!important;border-radius:14px;padding:11px 22px;box-shadow:0 6px 22px rgba(0,0,0,.12);transition:transform .2s,background .2s}
+.eco-trailyo-cta:hover{transform:translateY(-2px);background:#fff}
+.eco-trailyo-micro{font-size:12px;letter-spacing:.1em;color:#a8c6b4;font-weight:850}
+.eco-trailyo-art{position:relative;min-height:500px;overflow:hidden}
+.eco-trailyo-orbit{position:absolute;left:4%;top:10%;width:440px;height:440px;border-radius:50%;background:#a5d6ae0f;border:1px solid #ffffff21}
+.eco-trailyo-orbit-two{left:18%;top:22%;height:310px;width:310px;background:#b4eac70c}
+.eco-trailyo-photo{position:absolute;background:#fff;border:5px solid #ffffffde;border-radius:22px;overflow:hidden;box-shadow:0 25px 43px rgba(0,25,17,.35);transform-origin:center center}
+.eco-trailyo-photo img{display:block;height:100%;width:100%;object-fit:cover}
+.eco-trailyo-photo-concert{height:307px;width:222px;left:6%;top:8%;transform:rotate(-9deg);z-index:2}
+.eco-trailyo-photo-nature{height:329px;width:226px;right:6%;top:10%;transform:rotate(7deg);z-index:1}
+.eco-trailyo-photo-meet{height:203px;width:292px;left:23%;bottom:8%;transform:rotate(-2deg);z-index:3}
+.eco-trailyo-float{position:absolute;right:4%;bottom:6%;z-index:4;display:inline-flex;align-items:center;gap:9px;padding:12px 16px;background:#fffef6;border:1px solid #d5e7dc;border-radius:14px;color:#174c38;font-size:12px;line-height:1.3;font-weight:850;box-shadow:0 14px 31px #0002;max-width:225px}
+.eco-trailyo-spark{color:#bb9252;font-size:19px}
+.eco-trailyo-footer{text-align:right;color:#7b9687;font-size:12px;letter-spacing:.02em;margin:13px 5px 0}
+@media(max-width:1050px){.eco-trailyo-copy{padding-left:35px}.eco-trailyo-photo-concert{left:3%}.eco-trailyo-photo-nature{right:-7%}.eco-trailyo-photo-meet{left:13%}.eco-trailyo-float{right:3%}}
+@media(max-width:740px){.eco-trailyo-promo{padding:12px 0 57px}.eco-trailyo-shell{grid-template-columns:1fr}.eco-trailyo-copy{padding:35px 27px 10px}.eco-trailyo-copy h2{max-width:650px;font-size:clamp(1.85rem,5vw,2.5rem)}.eco-trailyo-logo{height:115px;margin:20px 0}.eco-trailyo-logo img{height:100px}.eco-trailyo-art{height:345px;min-height:345px}.eco-trailyo-photo-concert{width:180px;height:258px;left:12%;top:6%}.eco-trailyo-photo-nature{width:170px;height:275px;right:11%;top:9%}.eco-trailyo-photo-meet{width:260px;height:165px;left:27%;bottom:3%}.eco-trailyo-float{right:7%;bottom:5%}}
+@media(max-width:480px){.eco-trailyo-shell{border-radius:22px}.eco-trailyo-copy{padding:29px 20px 0}.eco-trailyo-logo{width:min(100%,300px);height:104px}.eco-trailyo-logo img{height:92px;max-width:260px}.eco-trailyo-copy h2{font-size:1.8rem}.eco-trailyo-copy .eco-trailyo-lead{font-size:13px}.eco-trailyo-art{height:300px;min-height:300px}.eco-trailyo-photo-concert{width:145px;height:217px;left:5%;top:8%}.eco-trailyo-photo-nature{width:149px;height:223px;right:5%;top:8%}.eco-trailyo-photo-meet{width:208px;height:147px;left:19%;bottom:5%}.eco-trailyo-float{right:2%;bottom:5%;font-size:10px;max-width:170px;padding:8px}.eco-trailyo-footer{text-align:center}}
+@media(prefers-reduced-motion:reduce){.eco-trailyo-cta{transition:none}}
