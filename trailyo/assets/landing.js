@@ -186,8 +186,6 @@
     feed.addEventListener('touchend',()=>{dragging=false;pause()},{passive:true});
     feed.addEventListener('keydown',pause);
     feed.addEventListener('focus',pause);
-    feed.addEventListener('mouseenter',()=>{quietUntil=performance.now()+1000});
-    feed.addEventListener('mouseleave',pause);
     const animate=(stamp)=>{
       const dt=last?Math.min((stamp-last)/1000,.055):0;
       last=stamp;
@@ -202,4 +200,51 @@
     };
     requestAnimationFrame(animate);
   }
+
+  // dragMouseReady
+  (() => {
+    const feed = document.getElementById('phone-feed');
+    if (!feed || feed.dataset.dragMouseReady === '1') return;
+    feed.dataset.dragMouseReady = '1';
+
+    let dragging = false;
+    let startY = 0;
+    let startScrollTop = 0;
+
+    feed.style.cursor = 'grab';
+
+    feed.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
+        dragging = true;
+        startY = e.clientY;
+        startScrollTop = feed.scrollTop;
+        feed.style.cursor = 'grabbing';
+        if (feed.setPointerCapture) {
+          try { feed.setPointerCapture(e.pointerId); } catch (_) {}
+        }
+        e.preventDefault();
+      }
+    });
+
+    feed.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dy = e.clientY - startY;
+      feed.scrollTop = startScrollTop - dy;
+      e.preventDefault();
+    });
+
+    const stopDragging = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      feed.style.cursor = 'grab';
+      if (feed.releasePointerCapture) {
+        try { feed.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
+    };
+
+    feed.addEventListener('pointerup', stopDragging);
+    feed.addEventListener('pointercancel', stopDragging);
+    feed.addEventListener('lostpointercapture', stopDragging);
+  })();
+
 })();
