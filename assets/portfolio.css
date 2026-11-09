@@ -36,6 +36,8 @@ body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px
 .eco-stage-tile:nth-child(3){background:#e5f5e8}
 .eco-stage-tile:nth-child(4){transform:translateY(26px);background:#ebebff}
 .eco-stage-tile img{width:72px;height:72px;object-fit:contain}
+/* Desktop only: enlarge the four hero app logos without changing the tile boxes or mobile layout. */
+@media (min-width:1001px){.eco-hero .eco-stage-tile img{transform:translateY(-3px) scale(1.35);transform-origin:center}}
 .eco-stage-tile .eco-symbol{font-size:3rem}
 .eco-stage-tile strong{font-size:1.06rem;font-weight:900}
 .eco-section{padding:82px 0}
