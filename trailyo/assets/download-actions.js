@@ -27,7 +27,18 @@
         const href=available(links[platform]);
         const item=document.createElement(href?"a":"span");
         item.className="trailyo-store-link"+(href?"":" disabled");
-        item.textContent=words[platform]+(href?"":" · "+words.soon);
+        if(platform==="ios"&&href){
+          item.classList.add("trailyo-store-ios");
+          const apple=document.createElement("img");
+          apple.src="/trailyo/assets/apple-white.svg";
+          apple.alt="";
+          apple.width=21;apple.height=21;
+          const text=document.createElement("span");
+          text.textContent=words.ios;
+          item.append(apple,text);
+        }else{
+          item.textContent=words[platform]+(href?"":" · "+words.soon);
+        }
         if(href){
           item.href=href;
           item.target="_blank";
@@ -39,6 +50,18 @@
         row.appendChild(item);
       }
       container.appendChild(row);
+      const ios=available(links.ios);
+      if(ios&&typeof window.MyNowStoreQR==="function"){
+        const qr=document.createElement("a");
+        qr.className="trailyo-download-qr";
+        qr.href=ios;
+        qr.target="_blank";
+        qr.rel="noopener noreferrer";
+        qr.setAttribute("aria-label",words.title+" — App Store QR");
+        qr.innerHTML=window.MyNowStoreQR("trailyo","/services/trailyo-logo.jpg",
+          "Trailyo App Store QR");
+        container.appendChild(qr);
+      }
     }
   });
 })();
