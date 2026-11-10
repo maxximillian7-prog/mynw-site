@@ -142,3 +142,24 @@
   .hero-actions .btn-appstore{min-height:50px;white-space:nowrap}
   .hero-actions .btn-appstore .apple-mark{width:22px;height:22px}
 }
+
+/* Desktop download section: two equally-sized QR/store stacks.
+   Preserve the existing mobile button and QR presentation. */
+.trailyo-desktop-stores{display:none}
+@media(min-width:701px){
+  .download .store-buttons,.download .trailyo-ios-qr-link{display:none}
+  .trailyo-desktop-stores{display:grid;grid-template-columns:repeat(2,190px);gap:25px;justify-content:center;align-items:start;margin:30px auto 18px}
+  .trailyo-desktop-store{width:190px;display:flex;flex-direction:column;gap:12px}
+  .trailyo-desktop-code{width:190px;height:190px;display:grid;place-items:center;background:#fff;border:1px solid #d7e7dc;border-radius:17px;padding:6px;box-shadow:0 12px 32px #20452d1b}
+  .trailyo-desktop-code .eco-qr-composite,.trailyo-desktop-code .eco-qr-composite svg{display:block;width:176px;height:176px}
+  .trailyo-desktop-code .eco-qr-composite{position:relative}
+  .trailyo-desktop-code .eco-qr-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:41px;height:41px;padding:4px;display:grid;place-items:center;background:#fff;border-radius:10px}
+  .trailyo-desktop-code .eco-qr-center img{width:33px;height:33px;object-fit:cover;border-radius:7px}
+  .trailyo-desktop-store-btn{display:flex;align-items:center;justify-content:center;gap:7px;height:52px;width:190px;padding:10px 8px;border-radius:13px;background:#111821;color:#fff!important;font-weight:800;font-size:12px;white-space:nowrap;box-shadow:0 8px 20px #20452d23}
+  .trailyo-desktop-store-btn img{width:20px;height:20px;object-fit:contain}
+  .trailyo-desktop-coming{border-style:dashed;display:flex;flex-direction:column;gap:6px;color:#537c68;font-weight:800;line-height:1.3}
+  .trailyo-desktop-coming > span{font-size:42px}
+  .trailyo-desktop-disabled{opacity:.65;cursor:default}
+  .trailyo-google-icon{width:22px;height:22px;display:inline-block;background:conic-gradient(from 155deg at 40% 50%,#00c46d 0 35%,#19a7ff 35% 56%,#ffdc3b 56% 76%,#ff555a 76% 100%);clip-path:polygon(8% 0,100% 50%,8% 100%)}
+  .trailyo-desktop-code:focus-visible,.trailyo-desktop-store-btn:focus-visible{outline:3px solid #ecb75f;outline-offset:4px}
+}

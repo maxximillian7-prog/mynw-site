@@ -32,7 +32,7 @@
       step3Title:'Make it a real day out',step3Body:'Save a favourite, share an idea or continue to the organiser’s official page.',
       partnerKicker:'LET’S WORK TOGETHER',partnerTitle:'Your next audience is already looking for an experience.',partnerBody:'Trailyo is built to connect explorers with local culture and trusted experience providers. We welcome conversations with organisers, cultural organisations and affiliate/API partners.',partnerBtn:'Discuss a partnership',
       partner1:'Clear source attribution',partner2:'Links to original booking providers',partner3:'Multilingual discovery experience',partner4:'A mobile-first product for Portugal',
-      downloadKicker:'YOUR NEXT STORY STARTS HERE',downloadTitle:'A whole world of “what’s next” in your pocket.',downloadBody:'Trailyo is available for iPhone on the App Store. On a computer, scan the QR code; on iPhone, tap the download button.',appStore:'App Store',googlePlay:'Google Play',availableSoon:'Coming soon',downloadNote:'Available now for iPhone. Google Play is coming soon.',iosDownloadBtn:'Download for iPhone',downloadOnThe:'Download on the',scanToInstall:'Scan with your iPhone to download Trailyo',helpLink:'See the app guide',
+      downloadKicker:'YOUR NEXT STORY STARTS HERE',downloadTitle:'A whole world of “what’s next” in your pocket.',downloadBody:'Trailyo is available for iPhone on the App Store. On a computer, scan the QR code; on iPhone, tap the download button.',appStore:'App Store',googlePlay:'Google Play',availableSoon:'Coming soon',downloadNote:'Available now for iPhone. Google Play is coming soon.',iosDownloadBtn:'Download on the App Store',downloadOnThe:'Download on the',scanToInstall:'Scan with your iPhone to download Trailyo',helpLink:'See the app guide',
       footerIntro:'Discover experiences, places and people across Portugal.',footerExplore:'Explore',footerResources:'Resources',footerContact:'Get in touch',privacy:'Privacy',terms:'Terms',safety:'Community rules',support:'Support',data:'Data rights',delete:'Delete account',guide:'App guide',footerCopyright:'© 2026 MyNow Apps. Trailyo is a discovery platform, not a ticket seller.',footerExample:'Creative posters on this page are fictional demonstrations.',
       menuLabel:'Open menu',langLabel:'Website language'
     },
@@ -66,7 +66,7 @@
       step3Title:'Отправляйтесь навстречу впечатлениям',step3Body:'Сохраните событие, поделитесь идеей или перейдите на сайт организатора.',
       partnerKicker:'ДАВАЙТЕ СОТРУДНИЧАТЬ',partnerTitle:'Ваша аудитория уже ищет новые впечатления.',partnerBody:'Trailyo соединяет любителей путешествий и досуга с культурными организациями и партнёрами. Мы открыты к сотрудничеству с организаторами и поставщиками API и партнёрских программ.',partnerBtn:'Обсудить сотрудничество',
       partner1:'Указание первоисточника',partner2:'Переходы на сайты бронирования',partner3:'Поиск на нескольких языках',partner4:'Мобильный сервис для Португалии',
-      downloadKicker:'ВАША СЛЕДУЮЩАЯ ИСТОРИЯ',downloadTitle:'Целый мир интересных планов — в кармане.',downloadBody:'Trailyo уже доступен для iPhone в App Store. На компьютере отсканируйте QR-код, на iPhone нажмите кнопку загрузки.',appStore:'App Store',googlePlay:'Google Play',availableSoon:'Скоро',downloadNote:'Уже доступно для iPhone. Версия для Google Play скоро появится.',iosDownloadBtn:'Скачать для iPhone',downloadOnThe:'Загрузить в',scanToInstall:'Наведите камеру iPhone, чтобы скачать Trailyo',helpLink:'Инструкция по приложению',
+      downloadKicker:'ВАША СЛЕДУЮЩАЯ ИСТОРИЯ',downloadTitle:'Целый мир интересных планов — в кармане.',downloadBody:'Trailyo уже доступен для iPhone в App Store. На компьютере отсканируйте QR-код, на iPhone нажмите кнопку загрузки.',appStore:'App Store',googlePlay:'Google Play',availableSoon:'Скоро',downloadNote:'Уже доступно для iPhone. Версия для Google Play скоро появится.',iosDownloadBtn:'Скачать в App Store',downloadOnThe:'Загрузить в',scanToInstall:'Наведите камеру iPhone, чтобы скачать Trailyo',helpLink:'Инструкция по приложению',
       footerIntro:'Впечатления, места и люди по всей Португалии.',footerExplore:'Разделы',footerResources:'Информация',footerContact:'Связаться',privacy:'Конфиденциальность',terms:'Условия',safety:'Правила сообществ',support:'Поддержка',data:'Права на данные',delete:'Удалить аккаунт',guide:'Инструкция',footerCopyright:'© 2026 MyNow Apps. Trailyo помогает находить события, но не продаёт билеты.',footerExample:'Афиши на сайте — вымышленные иллюстрации.',
       menuLabel:'Открыть меню',langLabel:'Язык сайта'
     },
@@ -100,7 +100,7 @@
       step3Title:'Viva a experiência',step3Body:'Guarde um favorito, partilhe uma ideia ou visite a página oficial do organizador.',
       partnerKicker:'VAMOS COLABORAR',partnerTitle:'O seu próximo público já procura novas experiências.',partnerBody:'O Trailyo liga exploradores à cultura local e a fornecedores de experiências. Estamos disponíveis para colaborar com organizadores, entidades culturais e parceiros de afiliação/API.',partnerBtn:'Falar sobre parceria',
       partner1:'Atribuição clara às fontes',partner2:'Ligações aos fornecedores de reservas',partner3:'Experiência de descoberta multilingue',partner4:'Produto mobile-first para Portugal',
-      downloadKicker:'A SUA PRÓXIMA HISTÓRIA COMEÇA AQUI',downloadTitle:'Um mundo de possibilidades no seu bolso.',downloadBody:'O Trailyo já está disponível para iPhone na App Store. No computador, leia o código QR; no iPhone, toque no botão para descarregar.',appStore:'App Store',googlePlay:'Google Play',availableSoon:'Brevemente',downloadNote:'Já disponível para iPhone. Em breve no Google Play.',iosDownloadBtn:'Descarregar para iPhone',downloadOnThe:'Descarregar na',scanToInstall:'Leia com a câmara do iPhone para descarregar o Trailyo',helpLink:'Consultar o manual',
+      downloadKicker:'A SUA PRÓXIMA HISTÓRIA COMEÇA AQUI',downloadTitle:'Um mundo de possibilidades no seu bolso.',downloadBody:'O Trailyo já está disponível para iPhone na App Store. No computador, leia o código QR; no iPhone, toque no botão para descarregar.',appStore:'App Store',googlePlay:'Google Play',availableSoon:'Brevemente',downloadNote:'Já disponível para iPhone. Em breve no Google Play.',iosDownloadBtn:'Descarregar na App Store',downloadOnThe:'Descarregar na',scanToInstall:'Leia com a câmara do iPhone para descarregar o Trailyo',helpLink:'Consultar o manual',
       footerIntro:'Experiências, lugares e pessoas por todo o Portugal.',footerExplore:'Explorar',footerResources:'Informações',footerContact:'Contactos',privacy:'Privacidade',terms:'Termos',safety:'Regras da comunidade',support:'Apoio',data:'Direitos sobre os dados',delete:'Eliminar conta',guide:'Manual',footerCopyright:'© 2026 MyNow Apps. O Trailyo é uma plataforma de descoberta, não vende bilhetes.',footerExample:'Os cartazes deste site são demonstrações fictícias.',
       menuLabel:'Abrir menu',langLabel:'Idioma do site'
     }
@@ -161,7 +161,7 @@
     }catch(_){return null;}
   }
   const links=window.TRAILYO_STORE_LINKS||{};
-  for(const [id,key] of [['store-android','android'],['store-ios','ios'],['hero-store-ios','ios'],['footer-store-ios','ios']]){
+  for(const [id,key] of [['store-android','android'],['store-ios','ios'],['hero-store-ios','ios'],['trailyo-desktop-ios-button','ios'],['footer-store-ios','ios']]){
     const el=document.getElementById(id);
     if(!el)continue;
     const link=safeLink(links[key]);
@@ -176,12 +176,15 @@
   const iosLink=safeLink(links.ios);
   const qrLink=document.getElementById('trailyo-ios-qr-link');
   const qrTarget=document.getElementById('trailyo-ios-qr');
+  const qrDesktop=document.getElementById('trailyo-desktop-ios-qr');
   if(iosLink&&qrLink&&qrTarget&&typeof window.MyNowStoreQR==='function'){
     qrLink.href=iosLink;
     qrLink.target='_blank';
     qrLink.rel='noopener noreferrer';
-    qrTarget.innerHTML=window.MyNowStoreQR('trailyo','/services/trailyo-logo.jpg',
+    const markup=window.MyNowStoreQR('trailyo','/assets/trailyo-qr-icon.webp',
       'Trailyo App Store download QR');
+    qrTarget.innerHTML=markup;
+    if(qrDesktop)qrDesktop.innerHTML=markup;
   }else if(qrLink){
     qrLink.hidden=true;
   }

@@ -58,14 +58,14 @@
 
   const TRAILYO_PROMO={"en":{"status":"Coming soon","kicker":"A NEW WAY TO EXPLORE","title":"Your next unforgettable experience starts here.","body":"Meet Trailyo — a new app for finding concerts, culture, inspiring places, local experiences and communities across Portugal. Discover what to do, where to go and who to go with.","cta":"Discover Trailyo","note":"Portugal · Events · Experiences · Communities","photoLabel":"A world of experiences"},"pt":{"status":"Brevemente disponível","kicker":"UMA NOVA FORMA DE DESCOBRIR","title":"A sua próxima experiência inesquecível começa aqui.","body":"Conheça o Trailyo — uma nova aplicação para descobrir concertos, cultura, locais inspiradores, experiências e comunidades em Portugal. Saiba o que fazer, onde ir e com quem partilhar.","cta":"Conhecer o Trailyo","note":"Portugal · Eventos · Experiências · Comunidades","photoLabel":"Um mundo de experiências"},"ru":{"status":"Скоро доступно","kicker":"НОВЫЙ ВЗГЛЯД НА ПОРТУГАЛИЮ","title":"Ваши следующие впечатления начинаются здесь.","body":"Знакомьтесь: Trailyo — новое приложение для поиска концертов, культурных событий, интересных мест, развлечений и сообществ по всей Португалии. Находите идеи для отдыха и людей с общими интересами.","cta":"Узнать о Trailyo","note":"Португалия · События · Впечатления · Сообщества","photoLabel":"Мир новых впечатлений"},"uk":{"status":"Незабаром","kicker":"НОВИЙ СПОСІБ ВІДКРИВАТИ","title":"Ваші наступні враження починаються тут.","body":"Знайомтеся: Trailyo — новий застосунок для пошуку концертів, культурних подій, цікавих місць, розваг і спільнот у Португалії. Знаходьте ідеї для відпочинку та однодумців.","cta":"Дізнатися про Trailyo","note":"Португалія · Події · Враження · Спільноти","photoLabel":"Світ нових вражень"},"fr":{"status":"Bientôt disponible","kicker":"UNE NOUVELLE FAÇON D'EXPLORER","title":"Votre prochaine expérience inoubliable commence ici.","body":"Découvrez Trailyo, une nouvelle application pour trouver concerts, culture, lieux inspirants, expériences locales et communautés au Portugal. Trouvez des idées de sorties et des personnes qui partagent vos passions.","cta":"Découvrir Trailyo","note":"Portugal · Événements · Expériences · Communautés","photoLabel":"Un monde d'expériences"},"es":{"status":"Próximamente","kicker":"UNA NUEVA FORMA DE EXPLORAR","title":"Tu próxima experiencia inolvidable empieza aquí.","body":"Conoce Trailyo, una nueva aplicación para descubrir conciertos, cultura, lugares inspiradores, experiencias y comunidades por todo Portugal. Encuentra planes y personas con tus mismos intereses.","cta":"Descubrir Trailyo","note":"Portugal · Eventos · Experiencias · Comunidades","photoLabel":"Un mundo de experiencias"},"de":{"status":"Demnächst verfügbar","kicker":"PORTUGAL NEU ENTDECKEN","title":"Dein nächstes unvergessliches Erlebnis beginnt hier.","body":"Lerne Trailyo kennen – die neue App für Konzerte, Kultur, besondere Orte, lokale Erlebnisse und Communities in Portugal. Entdecke Aktivitäten und Menschen mit gemeinsamen Interessen.","cta":"Trailyo entdecken","note":"Portugal · Events · Erlebnisse · Communities","photoLabel":"Eine Welt voller Erlebnisse"},"it":{"status":"Prossimamente","kicker":"UN NUOVO MODO DI ESPLORARE","title":"La tua prossima esperienza indimenticabile inizia qui.","body":"Scopri Trailyo, una nuova app per trovare concerti, cultura, luoghi suggestivi, esperienze locali e community in tutto il Portogallo. Trova nuove idee e persone con i tuoi stessi interessi.","cta":"Scopri Trailyo","note":"Portogallo · Eventi · Esperienze · Community","photoLabel":"Un mondo di esperienze"}};
   const TRAILYO_RELEASE={
-    en:{status:'Available on the App Store',install:'Download for iPhone',scan:'Scan with your iPhone'},
-    pt:{status:'Disponível na App Store',install:'Descarregar para iPhone',scan:'Leia com o iPhone'},
-    ru:{status:'Доступно в App Store',install:'Скачать для iPhone',scan:'Сканируйте с iPhone'},
-    uk:{status:'Доступно в App Store',install:'Завантажити для iPhone',scan:'Скануйте з iPhone'},
-    fr:{status:"Disponible sur l’App Store",install:'Télécharger pour iPhone',scan:'Scannez avec un iPhone'},
-    es:{status:'Disponible en App Store',install:'Descargar para iPhone',scan:'Escanear con iPhone'},
-    de:{status:'Im App Store verfügbar',install:'Für iPhone laden',scan:'Mit dem iPhone scannen'},
-    it:{status:"Disponibile sull'App Store",install:'Scarica per iPhone',scan:'Scansiona con iPhone'}
+    en:{status:'Available on the App Store',install:'Download on the App Store',scan:'Scan with your iPhone'},
+    pt:{status:'Disponível na App Store',install:'Descarregar na App Store',scan:'Leia com o iPhone'},
+    ru:{status:'Доступно в App Store',install:'Скачать в App Store',scan:'Сканируйте с iPhone'},
+    uk:{status:'Доступно в App Store',install:'Завантажити з App Store',scan:'Скануйте з iPhone'},
+    fr:{status:"Disponible sur l’App Store",install:'Télécharger sur l’App Store',scan:'Scannez avec un iPhone'},
+    es:{status:'Disponible en App Store',install:'Descargar en App Store',scan:'Escanear con iPhone'},
+    de:{status:'Im App Store verfügbar',install:'Im App Store laden',scan:'Mit dem iPhone scannen'},
+    it:{status:"Disponibile sull'App Store",install:'Scarica su App Store',scan:'Scansiona con iPhone'}
   };
   function trailyoPromo(){
     const p=TRAILYO_PROMO[locale]||TRAILYO_PROMO.en;
@@ -75,8 +75,18 @@
     const available=/^https:\/\/apps\.apple\.com\//.test(ios);
     const release=TRAILYO_RELEASE[locale]||TRAILYO_RELEASE.en;
     const qr=available&&typeof window.MyNowStoreQR==='function'
-      ?window.MyNowStoreQR('trailyo','/services/trailyo-logo.jpg',
+      ?window.MyNowStoreQR('trailyo','/assets/trailyo-qr-icon.webp',
         'Trailyo App Store QR'):'';
+    const desktopStores=available?'<div class="eco-trailyo-desktop-stores">'+
+      '<div class="eco-trailyo-desktop-store">'+
+       (qr?'<a class="eco-trailyo-desktop-qr" href="'+E(ios)+'" target="_blank" rel="noopener noreferrer" aria-label="Trailyo App Store QR">'+qr+'</a>':'')+
+       '<a class="eco-trailyo-store-btn eco-trailyo-desktop-button" href="'+E(ios)+'" target="_blank" rel="noopener noreferrer"><img src="/trailyo/assets/apple-white.svg" alt="" width="22" height="22">'+E(release.install)+'</a>'+
+      '</div>'+
+      '<div class="eco-trailyo-desktop-store eco-trailyo-desktop-pending">'+
+       '<div class="eco-trailyo-desktop-qr eco-trailyo-qr-coming" aria-label="Google Play — coming soon"><span class="eco-trailyo-coming-icon" aria-hidden="true">◌</span><span>Google Play</span></div>'+
+       '<span class="eco-trailyo-store-btn eco-trailyo-desktop-button eco-trailyo-play-disabled" aria-disabled="true"><span class="eco-trailyo-play-icon" aria-hidden="true"></span>Google Play</span>'+
+      '</div>'+
+    '</div>':'';
     return '<section class="eco-trailyo-promo" id="trailyo-promo" aria-labelledby="eco-trailyo-heading"><div class="eco-container">'+
       '<div class="eco-trailyo-shell"><div class="eco-trailyo-copy">'+
       '<span class="eco-trailyo-status"><span class="eco-trailyo-status-dot" aria-hidden="true"></span>'+E(available?release.status:p.status)+'</span>'+
@@ -90,7 +100,7 @@
         '<a class="eco-trailyo-store-btn" href="'+E(ios)+'" target="_blank" rel="noopener noreferrer"><img src="/trailyo/assets/apple-white.svg" alt="" width="22" height="22">'+E(release.install)+'</a>'+
         (qr?'<a class="eco-trailyo-qr-link" href="'+E(ios)+'" target="_blank" rel="noopener noreferrer" aria-label="'+E(release.scan)+'">'+qr+'<span>'+E(release.scan)+'</span></a>':'')+
       '</div>':'')+
-      '</div><div class="eco-trailyo-art" aria-hidden="true">'+
+      desktopStores+'</div><div class="eco-trailyo-art" aria-hidden="true">'+
       '<div class="eco-trailyo-orbit eco-trailyo-orbit-one"></div><div class="eco-trailyo-orbit eco-trailyo-orbit-two"></div>'+
       '<div class="eco-trailyo-photo eco-trailyo-photo-concert"><img src="/trailyo/assets/media/concerts.webp" alt="" width="600" height="800" loading="lazy" decoding="async"></div>'+
       '<div class="eco-trailyo-photo eco-trailyo-photo-nature"><img src="/trailyo/assets/media/nature.webp" alt="" width="600" height="800" loading="lazy" decoding="async"></div>'+
