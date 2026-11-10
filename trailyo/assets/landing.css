@@ -163,3 +163,18 @@
   .trailyo-google-icon{width:22px;height:22px;display:inline-block;background:conic-gradient(from 155deg at 40% 50%,#00c46d 0 35%,#19a7ff 35% 56%,#ffdc3b 56% 76%,#ff555a 76% 100%);clip-path:polygon(8% 0,100% 50%,8% 100%)}
   .trailyo-desktop-code:focus-visible,.trailyo-desktop-store-btn:focus-visible{outline:3px solid #ecb75f;outline-offset:4px}
 }
+
+/* The full original Trailyo PNG covers the SVG centre exactly: no white rim. */
+.trailyo-ios-qr-link .eco-qr-center,
+.trailyo-desktop-code .eco-qr-center{
+ width:26.5%;height:26.5%;padding:0;
+ background:transparent;border:0;border-radius:4px;box-shadow:none;overflow:hidden;
+}
+.trailyo-ios-qr-link .eco-qr-center img,
+.trailyo-desktop-code .eco-qr-center img{
+ display:block;width:100%;height:100%;max-width:none;
+ border-radius:4px;object-fit:contain;
+}
+/* Return to the MyNow Apps catalogue in desktop navigation and mobile menu. */
+.navigation .nav-all-apps{font-weight:800;color:#167050;white-space:nowrap}
+.navigation .nav-all-apps:hover{color:#0b382e}
