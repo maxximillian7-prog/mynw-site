@@ -15,9 +15,10 @@
   <title>Trailyo — Discover Portugal, your way | MyNow Apps</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="./assets/landing.css?v=20261108-photos-1">
-  <script defer src="./assets/store-links.js"></script>
-  <script defer src="./assets/landing.js?v=20261108-photos-1"></script>
+  <link rel="stylesheet" href="./assets/landing.css?v=20261110-appstore-1">
+  <script defer src="./assets/store-links.js?v=20261110-ios"></script>
+  <script defer src="/assets/store-qr.js?v=20261110-ios"></script>
+  <script defer src="./assets/landing.js?v=20261110-appstore-1"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -51,6 +52,7 @@
         <p class="hero-lead" data-t="heroText">Meet Trailyo — a multilingual mobile app that brings events, local experiences, communities and hidden corners of Portugal together in one place.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#features"><span data-t="heroBtn">Explore the app</span><span aria-hidden="true">↗</span></a>
+          <a id="hero-store-ios" class="btn btn-appstore" href="#download"><img class="apple-mark" src="./assets/apple-white.svg" alt="" width="23" height="23"><span data-t="iosDownloadBtn">Download for iPhone</span></a>
           <a class="btn btn-light" href="#preview"><span data-t="heroAlt">See the highlights</span><span aria-hidden="true">→</span></a>
         </div>
         <p class="tiny-note" data-t="heroNote">Discover in Portugal · English, Русский, Português</p>
@@ -165,12 +167,16 @@
     <div class="container">
       <span class="eyebrow" data-t="downloadKicker">YOUR NEXT STORY STARTS HERE</span>
       <h2 data-t="downloadTitle">A whole world of “what’s next” in your pocket.</h2>
-      <p data-t="downloadBody">Trailyo is preparing its first release. Discover the app and follow the official store links when available.</p>
+      <p data-t="downloadBody">Trailyo is available for iPhone on the App Store. Scan the code on your computer or tap to install on your phone.</p>
       <div class="store-buttons">
         <a id="store-android" class="store-btn inactive" aria-disabled="true"><span class="store-icon" aria-hidden="true">▷</span><span><small data-t="availableSoon">Coming soon</small><strong data-t="googlePlay">Google Play</strong></span></a>
-        <a id="store-ios" class="store-btn inactive" aria-disabled="true"><span class="store-icon" aria-hidden="true">●</span><span><small data-t="availableSoon">Coming soon</small><strong data-t="appStore">App Store</strong></span></a>
+        <a id="store-ios" class="store-btn store-ios" href="#download"><img class="apple-mark" src="./assets/apple-white.svg" alt="" width="28" height="28"><span><small data-t="downloadOnThe">Download on the</small><strong data-t="appStore">App Store</strong></span></a>
       </div>
-      <small class="store-note" data-t="downloadNote">Store links will appear here once the public listings are available.</small>
+      <a class="trailyo-ios-qr-link" id="trailyo-ios-qr-link" href="#download" aria-label="Scan QR to download Trailyo from the App Store">
+        <span id="trailyo-ios-qr" aria-hidden="true"></span>
+        <span class="trailyo-qr-caption" data-t="scanToInstall">Scan with your iPhone to download Trailyo</span>
+      </a>
+      <small class="store-note" data-t="downloadNote">Available now for iPhone. Google Play is coming soon.</small>
       <div style="margin-top:27px"><a href="./manual/" style="font-weight:800;color:#14563f;text-decoration:underline;text-underline-offset:4px" data-t="helpLink">See the app guide</a></div>
     </div>
   </section>
@@ -182,6 +188,7 @@
         <a href="./" aria-label="Trailyo homepage"><img src="./assets/trailyo-logo.png" alt="Trailyo" width="140"></a>
         <p data-t="footerIntro">Discover experiences, places and people across Portugal.</p>
         <a class="contact" href="mailto:support@mynw.app">support@mynw.app</a>
+        <a id="footer-store-ios" class="footer-appstore-link" href="#download"><img src="./assets/apple-white.svg" alt="" width="19" height="19"><span data-t="iosDownloadBtn">Download for iPhone</span></a>
       </div>
       <div>
         <h3 data-t="footerExplore">Explore</h3>
