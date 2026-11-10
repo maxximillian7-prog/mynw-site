@@ -4,3 +4,14 @@
 .trailyo-store-link{display:inline-block;border-radius:12px;padding:12px 14px;border:1px solid #136e62;background:#155e55;color:#fff;text-decoration:none;font-weight:700;font-size:14px;line-height:1.35}
 .trailyo-store-link.disabled{background:#e5ebec;border-color:#cbd6d8;color:#54676b;cursor:not-allowed;user-select:none}
 .trailyo-store-link:not(.disabled):hover{background:#0a4942}
+
+.trailyo-store-ios{display:inline-flex;align-items:center;gap:9px;background:#121820;border-color:#121820}
+.trailyo-store-ios img{width:21px;height:21px;object-fit:contain;flex-shrink:0}
+.trailyo-store-ios:not(.disabled):hover{background:#29313a}
+.trailyo-download-qr{display:inline-flex;position:relative;margin-top:14px;padding:8px;background:#fff;border:1px solid #d9e4e8;border-radius:15px;box-shadow:0 6px 20px #203a4b16}
+.trailyo-download-qr .eco-qr-composite,.trailyo-download-qr .eco-qr-composite svg{display:block;width:148px;height:148px}
+.trailyo-download-qr .eco-qr-composite{position:relative}
+.trailyo-download-qr .eco-qr-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;padding:4px;width:37px;height:37px;background:#fff;border-radius:9px}
+.trailyo-download-qr .eco-qr-center img{width:29px;height:29px;object-fit:cover;border-radius:6px}
+.trailyo-download-qr:focus-visible{outline:3px solid #138b76;outline-offset:4px}
+@media(max-width:700px){.trailyo-download-qr{display:none}}
