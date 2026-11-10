@@ -244,3 +244,22 @@ body.ecosystem{margin:0;background:#f7f9fc;color:var(--portfolio-text);font:16px
 @media(max-width:740px){.eco-trailyo-promo{padding:12px 0 57px}.eco-trailyo-shell{grid-template-columns:1fr}.eco-trailyo-copy{padding:35px 27px 10px}.eco-trailyo-copy h2{max-width:650px;font-size:clamp(1.85rem,5vw,2.5rem)}.eco-trailyo-logo{height:115px;margin:20px 0}.eco-trailyo-logo img{height:100px}.eco-trailyo-art{height:345px;min-height:345px}.eco-trailyo-photo-concert{width:180px;height:258px;left:12%;top:6%}.eco-trailyo-photo-nature{width:170px;height:275px;right:11%;top:9%}.eco-trailyo-photo-meet{width:260px;height:165px;left:27%;bottom:3%}.eco-trailyo-float{right:7%;bottom:5%}}
 @media(max-width:480px){.eco-trailyo-shell{border-radius:22px}.eco-trailyo-copy{padding:29px 20px 0}.eco-trailyo-logo{width:min(100%,300px);height:104px}.eco-trailyo-logo img{height:92px;max-width:260px}.eco-trailyo-copy h2{font-size:1.8rem}.eco-trailyo-copy .eco-trailyo-lead{font-size:13px}.eco-trailyo-art{height:300px;min-height:300px}.eco-trailyo-photo-concert{width:145px;height:217px;left:5%;top:8%}.eco-trailyo-photo-nature{width:149px;height:223px;right:5%;top:8%}.eco-trailyo-photo-meet{width:208px;height:147px;left:19%;bottom:5%}.eco-trailyo-float{right:2%;bottom:5%;font-size:10px;max-width:170px;padding:8px}.eco-trailyo-footer{text-align:center}}
 @media(prefers-reduced-motion:reduce){.eco-trailyo-cta{transition:none}}
+
+
+/* Trailyo iOS release: keep the existing homepage promo and offline QR style. */
+.eco-trailyo-store-row{display:flex;align-items:center;flex-wrap:wrap;gap:17px;margin:24px 0 0}
+.eco-trailyo-store-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-height:50px;border-radius:14px;padding:12px 18px;background:#111820;color:#fff!important;
+  font-weight:850;font-size:14px;text-decoration:none;box-shadow:0 8px 24px rgba(9,27,35,.22)}
+.eco-trailyo-store-btn:hover{background:#2c353f;transform:translateY(-1px)}
+.eco-trailyo-store-btn img{width:22px;height:22px;object-fit:contain;flex:0 0 auto}
+.eco-trailyo-qr-link{display:inline-flex;align-items:center;gap:10px;padding:7px 11px 7px 7px;
+  color:#183d34!important;background:#fff;border:1px solid #d2e4db;border-radius:16px;
+  text-decoration:none;box-shadow:0 8px 24px rgba(10,40,33,.14)}
+.eco-trailyo-qr-link:hover{box-shadow:0 13px 29px rgba(10,40,33,.19)}
+.eco-trailyo-qr-link >span:last-child{font-size:12px;max-width:100px;line-height:1.35;font-weight:750}
+.eco-trailyo-qr-link .eco-qr-composite,.eco-trailyo-qr-link .eco-qr-composite svg{width:134px;height:134px}
+.eco-trailyo-qr-link .eco-qr-center{width:33px;height:33px;padding:3px;border-radius:9px}
+.eco-trailyo-qr-link .eco-qr-center img{width:27px;height:27px;border-radius:6px;object-fit:cover}
+.eco-trailyo-store-btn:focus-visible,.eco-trailyo-qr-link:focus-visible{outline:3px solid #e6c16e;outline-offset:3px}
+@media(max-width:740px){.eco-trailyo-qr-link{display:none}.eco-trailyo-store-row{margin-top:17px}}
