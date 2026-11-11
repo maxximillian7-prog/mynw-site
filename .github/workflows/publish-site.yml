@@ -32,6 +32,8 @@ jobs:
           grep -q 'id="privacy"' qwin/index.html
           grep -q 'id="delete"' qwin/index.html
           grep -q 'id="terms"' qwin/index.html
+      - name: Validate Qwin site policies and 3 languages
+        run: node qwin/check-docs.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload complete static website
