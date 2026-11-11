@@ -9,7 +9,6 @@
 <meta property="og:description" content="Discover Qwin, read our policies and contact the team.">
 <title>Qwin | Marketplace, Support & Documents</title>
 <link rel="icon" type="image/svg+xml" href="./assets/qwin_wave_icon.svg">
-<link rel="apple-touch-icon" href="./assets/qwin_wave_icon.svg">
 <meta property="og:image" content="https://mynw.app/qwin/assets/qwin_wave_icon.svg">
 <style>
 :root{color-scheme:light;--navy:#092842;--teal:#08988e;--aqua:#35dbc9;--ink:#162e40;--muted:#587078;--border:#d9e8e8}
@@ -51,6 +50,7 @@ body{min-width:0;overflow-wrap:break-word}
 .nav a{line-height:1.3;min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:7px 5px}
 .lang-wrap{display:flex;flex-shrink:0;align-items:center}
 .lang-wrap select{cursor:pointer;min-height:44px}
+.nav-scroll-hint{display:none}
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .hero-brand{display:flex;align-items:center;gap:15px}
 .hero-icon{width:62px;height:62px;display:block;flex-shrink:0;border-radius:15px;box-shadow:0 10px 30px #02182b55}
@@ -64,6 +64,8 @@ body{min-width:0;overflow-wrap:break-word}
   .lang-wrap{grid-column:2;grid-row:1}
   .nav{grid-column:1/-1;grid-row:2;display:flex;width:100%;margin:0;gap:7px;overflow-x:auto;overflow-y:hidden;padding:3px 0 10px;flex-wrap:nowrap;justify-content:flex-start;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain;scroll-snap-type:x proximity}
   .nav::-webkit-scrollbar{display:none}
+  .nav-scroll-hint{display:flex;grid-column:2;grid-row:2;z-index:2;justify-self:end;align-items:center;align-self:stretch;padding:0 2px 9px 18px;background:linear-gradient(90deg,#fff0,#fff 55%);font-size:23px;font-weight:700;line-height:1;color:#087c78;pointer-events:none}
+  .nav{padding-right:19px}
   .nav a{scroll-snap-align:start;flex:0 0 auto;min-height:38px;padding:7px 13px;border:1px solid #d8ece9;border-radius:999px;background:#eef9f7;color:#075c58;font-size:12px}
   .nav a:hover{background:#dff5f1}
   html{scroll-padding-top:124px}
@@ -118,7 +120,7 @@ body{min-width:0;overflow-wrap:break-word}
 <body>
 <header><div class="container bar">
 <a class="brand" href="/qwin/" aria-label="Qwin — homepage"><img src="./assets/qwin_wordmark.svg" width="148" height="43" alt="Qwin" decoding="async"></a>
-<nav class="nav" aria-label="Qwin documents"><a href="#about" data-t="navAbout">About</a><a href="#privacy" data-t="privacy">Privacy</a><a href="#terms" data-t="terms">Terms</a><a href="#safety" data-t="safety">Safety</a><a href="#delete" data-t="deletion">Delete account</a></nav>
+<nav class="nav" aria-label="Qwin documents"><a href="#about" data-t="navAbout">About</a><a href="#privacy" data-t="privacy">Privacy</a><a href="#terms" data-t="terms">Terms</a><a href="#safety" data-t="safety">Safety</a><a href="#delete" data-t="deletion">Delete account</a></nav><span class="nav-scroll-hint" aria-hidden="true">›</span>
 <label class="lang-wrap"><span class="visually-hidden">Language</span><select id="language" aria-label="Language"><option value="pt">Português</option><option value="en">English</option><option value="ru">Русский</option></select></label>
 </div></header>
 <div class="hero"><div class="container hero-content">
