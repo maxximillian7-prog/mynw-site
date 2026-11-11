@@ -4,9 +4,11 @@ import {runInNewContext} from 'node:vm';
 
 const html=readFileSync(new URL('./index.html',import.meta.url),'utf8');
 const script=readFileSync(new URL('./i18n.js',import.meta.url),'utf8');
-const match=script.match(/const words=([^;]+);/);
-assert.ok(match,'Qwin language dictionary must exist');
-const dictionary=JSON.parse(match[1]);
+const dictionaryStart=script.indexOf('const words=')+'const words='.length;
+const dictionaryEnd=script.indexOf(';\nconst supported=',dictionaryStart);
+assert.ok(dictionaryStart>='const words='.length&&dictionaryEnd>dictionaryStart,
+  'Qwin language dictionary must exist');
+const dictionary=JSON.parse(script.slice(dictionaryStart,dictionaryEnd));
 const keys=[...new Set([...html.matchAll(/data-t="([a-zA-Z][\w]*)"/g)]
   .map(x=>x[1]))];
 for(const name of keys){
