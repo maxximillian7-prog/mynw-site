@@ -1,0 +1,43 @@
+name: Publish MyNow Apps site
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages-manual-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+      - name: Verify existing site and Qwin docs
+        shell: bash
+        run: |
+          test -f CNAME
+          test -f index.html
+          test -f trailyo/index.html
+          test -f qwin/index.html
+          test -f qwin/i18n.js
+          test -f .nojekyll
+          grep -q 'id="privacy"' qwin/index.html
+          grep -q 'id="delete"' qwin/index.html
+          grep -q 'id="terms"' qwin/index.html
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload complete static website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy site to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
