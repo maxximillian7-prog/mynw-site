@@ -220,3 +220,8 @@ footer a{color:#baf7e9}
 .qwin-documents .document-zone section.doc{scroll-margin-top:110px}
 .qwin-documents .document-zone h2{scroll-margin-top:110px}
 @media(max-width:680px){.docs-page-main{padding-top:18px;padding-bottom:48px}.docs-page-intro{border-radius:18px;padding:22px 19px;margin-bottom:18px}.docs-page-intro h1{font-size:32px}.docs-page-intro>p:not(.section-overline){font-size:14px}}
+
+/* Exact approved Qwin transparent PNG in the documentation site's header. */
+.qwin-documents .brand-approved{width:205px;height:72px;min-width:205px;overflow:hidden;display:block;position:relative}
+.qwin-documents .brand-approved img{width:205px!important;max-width:none!important;height:auto!important;transform:translateY(-22px);object-fit:initial}
+@media(max-width:720px){.qwin-documents .brand-approved{width:150px;min-width:150px;height:60px}.qwin-documents .brand-approved img{width:150px!important;transform:translateY(-15px)}}

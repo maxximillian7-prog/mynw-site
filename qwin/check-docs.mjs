@@ -65,12 +65,29 @@ for(const selector of ['.hero-photo-group','.hero-grid','.feature-cards',
 for(const selector of ['.doccard','.docs-page-intro']){
   assert.ok(css.includes(selector),'Missing separate docs CSS: '+selector);
 }
-const sourceImages=[...home.matchAll(/<img[^>]+src="(https:\/\/images\.unsplash\.com\/[^"]+)"[^>]*>/g)];
-assert.ok(sourceImages.length>=6,'Professional photo-driven landing must have multiple verified photos');
-for(const image of sourceImages){
-  assert.ok(/alt="[^"]+"/.test(image[0]),'Photograph requires alt text');
-  assert.ok(/referrerpolicy="no-referrer"/.test(image[0]),'Photograph must minimize referrer disclosure');
+const marketingImages=[...home.matchAll(/<img[^>]+src="(\/qwin\/assets\/marketing\/[^"]+)"[^>]*>/g)];
+assert.equal(marketingImages.length,7,'Seven new Qwin generated photo placements must exist');
+const expectedFiles=new Set([
+  'qwin_hero_clothing.png','qwin_hero_chair.png','qwin_category_electronics.png',
+  'qwin_category_bicycle.png','qwin_editorial_secondlife.png'
+]);
+for(const name of expectedFiles){
+  assert.ok(marketingImages.some(x=>x[1].endsWith(name)),
+    'Missing expected generated marketing photograph: '+name);
 }
+for(const image of marketingImages){
+  assert.ok(/alt="[^"]+"/.test(image[0]),'Photograph requires alt text');
+  assert.ok(/data-fallback-src="https:\/\/images\.unsplash\.com\//.test(image[0]),
+    'Marketing photograph must retain a safe fallback until uploaded');
+}
+const approvedLogo='/qwin/assets/qwin_home_logo_transparent.png';
+assert.ok(home.includes(approvedLogo) && docs.includes(approvedLogo),
+  'The exact previously approved Qwin logo must be used throughout the site');
+assert.ok(!home.includes('qwin_wordmark.svg') && !docs.includes('qwin_wordmark.svg'),
+  'Old wordmarks must not appear on either webpage');
+const fallbackScript=readFileSync(new URL('./marketing-images.js',import.meta.url),'utf8');
+assert.ok(fallbackScript.includes('data-fallback-src'),
+  'Marketing image failure handling must be present');
 assert.ok(!/href="https?:\/\/(?:play\.google\.com|apps\.apple\.com)/.test(home),
   'App-store buttons must not appear before public Qwin launch');
 
