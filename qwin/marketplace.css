@@ -205,3 +205,18 @@ footer a{color:#baf7e9}
 @media(max-width:860px){.app-showcase{height:590px}.showcase-float.float-left{left:10%}.showcase-float.float-right{right:8%}}
 @media(max-width:680px){.app-showcase{height:555px;padding:0 4px}.phone-shell{transform:rotate(2deg) scale(.94)}.showcase-float{padding:8px 10px;gap:7px}.showcase-float>span{width:29px;height:29px;font-size:18px}.showcase-float strong{font-size:11px}.showcase-float small{font-size:9px}.showcase-float.float-left{left:-7px;top:22%}.showcase-float.float-right{right:-7px;bottom:19%}.orbit-one{width:370px;height:440px;top:45px}.orbit-two{width:345px;height:345px;top:80px}}
 @media(max-width:380px){.showcase-float.float-left,.showcase-float.float-right{display:none}.app-showcase{height:530px}.phone-shell{transform:rotate(2deg) scale(.9)}}
+
+/* Separated policy centre: all legal texts live on /qwin/docs/, not the app landing. */
+.qwin-documents{background:#f8fbfa}
+.docs-page-main{padding-top:32px;padding-bottom:72px}
+.docs-page-intro{background:linear-gradient(120deg,#e5f8f1,#f6fffc);border:1px solid #d7ebe3;border-radius:25px;padding:clamp(26px,4vw,47px);margin-bottom:26px}
+.docs-page-intro h1{font-size:clamp(31px,4vw,48px);line-height:1.13;color:#0b2540;letter-spacing:-.05em;margin:7px 0 12px}
+.docs-page-intro>p:not(.section-overline){color:#4d6f76;max-width:700px;font-size:16px;line-height:1.65;margin:0 0 20px}
+.docs-page-intro .cta{box-shadow:0 5px 18px #0b4d5210}
+.qwin-documents .document-zone{padding-top:0}
+.qwin-documents .document-zone .docgrid{margin-top:15px}
+.qwin-documents .document-zone .doccard{transition:box-shadow .15s,transform .15s}
+.qwin-documents .document-zone .doccard:hover{transform:translateY(-2px);box-shadow:0 9px 22px #0d4f4a0f}
+.qwin-documents .document-zone section.doc{scroll-margin-top:110px}
+.qwin-documents .document-zone h2{scroll-margin-top:110px}
+@media(max-width:680px){.docs-page-main{padding-top:18px;padding-bottom:48px}.docs-page-intro{border-radius:18px;padding:22px 19px;margin-bottom:18px}.docs-page-intro h1{font-size:32px}.docs-page-intro>p:not(.section-overline){font-size:14px}}

@@ -11,11 +11,21 @@
 <title>Qwin | The Marketplace App for Portugal · Coming Soon</title>
 <link rel="icon" type="image/png" href="./assets/qwin_icon.png?v=20261112">
 <link rel="stylesheet" href="./marketplace.css?v=20261112">
+<script>
+/* Keep existing OAuth/provider URLs such as /qwin/#privacy working unchanged. */
+(function(){
+  var oldSections=['documents','about','privacy','terms','safety','ai','delete','partners','cookies','contact'];
+  var target=window.location.hash.slice(1);
+  if(oldSections.indexOf(target)!==-1){
+    window.location.replace('/qwin/docs/'+window.location.search+'#'+target);
+  }
+})();
+</script>
 </head><body>
 <div class="top-announce" data-t="launchNotice">Qwin mobile app · Preparing for launch in Portugal</div>
 <header><div class="container bar">
 <a class="brand" href="/qwin/" aria-label="Qwin home"><img src="./assets/qwin_wordmark.svg" width="154" height="61" alt="Qwin"></a>
-<nav class="nav" aria-label="Qwin navigation"><a href="#marketplace" data-t="navMarket">The app</a><a href="#how" data-t="navHow">How it works</a><a href="#platforms" data-t="navPlatforms">Platforms</a><a href="#documents" data-t="navDocs">Documents</a><a href="#contact" data-t="contact">Support</a></nav><span class="nav-scroll-hint" aria-hidden="true">›</span>
+<nav class="nav" aria-label="Qwin navigation"><a href="#marketplace" data-t="navMarket">The app</a><a href="#how" data-t="navHow">How it works</a><a href="#platforms" data-t="navPlatforms">Platforms</a><a href="/qwin/docs/" data-t="navDocs">Documents</a><a href="/qwin/docs/#contact" data-t="contact">Support</a></nav><span class="nav-scroll-hint" aria-hidden="true">›</span>
 <label class="lang-wrap"><span class="visually-hidden">Language</span><select id="language" aria-label="Language"><option value="pt">Português</option><option value="en">English</option><option value="ru">Русский</option></select></label>
 </div></header>
 <div class="hero"><div class="container hero-content"><div class="hero-copy">
@@ -70,61 +80,6 @@
 <article class="partner-card"><div class="partner-name">Etsy</div><span class="partner-status" data-t="etsyStatus">Integration testing</span><p data-t="etsyDesc">Seller OAuth and a guarded draft workflow are being tested. Etsy eligibility and Creativity Standards apply. Qwin is not endorsed by Etsy.</p><span class="partner-foot" data-t="etsyFoot">Eligible shops and listings only</span></article>
 <article class="partner-card"><div class="partner-name">eBay</div><span class="partner-status" data-t="ebayStatus">Sandbox development</span><p data-t="ebayDesc">Sandbox account linking and category matching are in development. Product discovery, messaging and affiliate purchasing are not live.</p><span class="partner-foot" data-t="ebayFoot">Requires API and affiliate approvals</span></article></div>
 <p class="notice-legal" style="margin-top:15px" data-t="partnerNotice">External checkout remains with the relevant marketplace. If future eBay affiliate listings are approved, commercial links will be clearly disclosed beside each offer.</p></section>
-<section class="market-section"><div class="principle-banner"><div><h2 data-t="trustTitle">Designed to make second-hand shopping feel effortless.</h2><p data-t="trustBody">From your first search to your first listing, Qwin puts everyday buying and selling into one thoughtfully designed mobile experience.</p></div><a class="cta" href="#safety" data-t="trustCta">Safety & trust ↗</a></div></section>
-<div id="documents" class="document-zone"><div class="section-heading"><div><p class="section-overline" data-t="docsEyebrow">EVERYTHING YOU NEED TO KNOW</p><h2 data-t="docsHeading">Privacy, safety & support</h2><p data-t="docsLead">Learn how Qwin handles personal data, external platforms, AI, moderation and account deletion.</p></div></div>
-<section id="about" class="doc"><h2 data-t="aboutTitle">About Qwin</h2><p data-t="aboutText">Qwin is a marketplace application in development by MyNow Apps in Portugal. Internal listings, search, filters, chats, offers and favourites belong to one Qwin experience. External seller connections are optional and subject to platform permissions. Qwin does not process payments.</p><p class="warning" data-t="partnerText">Qwin is not publicly launched. OLX and Etsy connections are being tested; eBay is at Sandbox development stage. No external platform has guaranteed publication, messaging, affiliate payouts or checkout through Qwin.</p></section>
-<h2 data-t="docsTitle">Documents and help</h2>
-<div class="docgrid">
-<a class="doccard" href="#privacy"><strong data-t="privacy">Privacy policy</strong><span data-t="privacySub">Data, third-party accounts and controls</span></a>
-<a class="doccard" href="#terms"><strong data-t="terms">Terms of use</strong><span data-t="termsSub">Buyer and seller responsibilities</span></a>
-<a class="doccard" href="#safety"><strong data-t="safety">Marketplace safety</strong><span data-t="safetySub">Fraud, reporting, prohibited items</span></a>
-<a class="doccard" href="#ai"><strong data-t="aiTitle">AI & image policy</strong><span data-t="aiSub">Disclosure, user approval, accuracy</span></a>
-<a class="doccard" href="#delete"><strong data-t="deletion">Delete account</strong><span data-t="deleteSub">Account and listing removal instructions</span></a>
-<a class="doccard" href="#partners"><strong data-t="partnersPolicy">External marketplaces & affiliate disclosure</strong><span data-t="partnersPolicySub">OLX, Etsy, eBay and future partner links</span></a>
-<a class="doccard" href="#cookies"><strong data-t="cookiesTitle">Site cookies</strong><span data-t="cookiesSub">Preferences and essential operation</span></a>
-<a class="doccard" href="#contact"><strong data-t="contact">Contact & support</strong><span data-t="contactSub">Questions and abuse reports</span></a>
-</div>
-<section class="doc" id="privacy"><h2 data-t="privacy">Privacy policy</h2>
-<p data-t="privacyIntro">Qwin is provided by MyNow Apps, an independent developer based in Portugal. This notice describes how the app handles personal data. Last reviewed: 12 November 2026.</p>
-<h3 data-t="privacyDataHeader">Data processed</h3>
-<ul><li data-t="privacyData1">Account credentials are handled by the authentication provider. Qwin stores your user ID, profile, listing details, photographs and the public contact information you choose.</li>
-<li data-t="privacyData2">Messages, offers, saved listings, reporting and moderation records are stored to provide marketplace functions.</li>
-<li data-t="privacyData3">AI-assisted descriptions and images are sent to the configured AI service only after you request or approve the processing. Do not upload others' personal data without permission.</li>
-<li data-t="privacyData4">If you authorize OLX, Etsy or (once enabled) eBay seller connections, Qwin exchanges data necessary for the chosen features. Tokens are kept in server-side protected storage, not in public listings or the mobile application.</li><li data-t="privacyData5">Search and filters use listing details such as category, city and optional delivery settings. The app may process diagnostic, security and support records. Your private home address is not published by default.</li></ul>
-<h3 data-t="privacyLegalHeader">Purpose, protection and retention</h3>
-<p data-t="privacyLegal">Processing supports account management, your requested marketplace services, fraud prevention, support and legal obligations. Necessary processing relies on contract performance and legitimate safety interests; optional marketing requires applicable consent. Data are retained only as needed for these purposes and applicable law. Deletion may be limited by active transactions, legal claims or fraud investigations.</p>
-<h3 data-t="privacyRightsHeader">Your rights</h3><p data-t="privacyRights">Under applicable GDPR rules you may request access, correction, export, deletion, restriction or objection by contacting support. You may complain to Portugal's supervisory authority, CNPD. Platform-held data must also be managed with the respective platform.</p></section>
-<section class="doc" id="terms"><h2 data-t="terms">Terms of use</h2>
-<p data-t="termsBody1">By using Qwin you agree to provide accurate information, have the rights to sell and photograph your items, respect other members, and comply with Portuguese law and each connected marketplace's terms. The seller and buyer negotiate and complete transactions directly; Qwin is not a party to the sale, does not receive or hold payment, and does not guarantee item condition or delivery.</p>
-<p data-t="termsBody2">Do not post counterfeit, stolen, illegal or unsafe products, misleading photos, spam, harassment or listings infringing third-party rights. Moderators may remove reported content or suspend accounts to maintain safety. External publication, prices, listing limits, charges and eligibility remain controlled by the external platforms.</p>
-<p data-t="termsBody3">Your listing photographs and descriptions remain yours or their respective owners. You grant Qwin the limited permission necessary to display approved listings and, if available and requested, relay them to a connected marketplace. Disconnecting does not automatically remove an existing external listing.</p><p data-t="termsBody4">Qwin buying and offer actions on its own listings create requests, not paid orders. For any future third-party item integration, Qwin will identify the source and use only supported provider purchase or message APIs, or direct the user to the official checkout. Payments, shipping, returns and disputes belong to the relevant service.</p></section>
-<section class="doc" id="safety"><h2 data-t="safety">Marketplace safety and moderation</h2>
-<ul><li data-t="safe1">Inspect items before payment and verify the seller, especially for high-value products.</li>
-<li data-t="safe2">Never share passwords, one-time codes, bank login details or identity documents in marketplace chat.</li>
-<li data-t="safe3">Use safe public meeting places; do not pay through unexpected third-party links.</li>
-<li data-t="safe4">Use the in-app report function or contact support for prohibited items, harassment, infringement or suspected scams. Provide the listing ID and supporting information.</li>
-<li data-t="safe5">Users may contest moderation actions through support. Safety and law-enforcement requests are evaluated under applicable law.</li></ul></section>
-<section class="doc" id="ai"><h2 data-t="aiTitle">AI-generated text and images</h2>
-<p data-t="aiBody1">AI may suggest listing text, category matches and alternative product photos. You decide whether to accept or publish each result. AI can be inaccurate and should never invent defects, brands, conditions or supplied accessories. Keep truthful originals and check all details before publishing.</p>
-<p data-t="aiBody2">AI-adjusted listing photographs should be identified in expanded-image view. Sellers must not conceal damage or materially misrepresent products. The original and proposed alternatives can be reviewed before approval. Requests may be subject to quotas, paid features and content safeguards.</p>
-<p data-t="aiBody3">Etsy's separate Creativity Standards and policies determine whether AI-assisted or seller-designed work is eligible there. Qwin listing eligibility is not automatic permission to publish on Etsy.</p></section>
-<section class="doc" id="delete"><h2 data-t="deletion">Delete listings and accounts</h2>
-<p data-t="deleteBody1">For an individual listing, open My listings, select your listing and choose Edit / Delete from connected platforms. Qwin attempts supported external deletion first; it will not report success unless the platform confirms. Active sales or legal holds may require resolution.</p>
-<p data-t="deleteBody2">Use the in-app Delete Account option if it is available for your account. Otherwise email support@mynw.app from your registered address with subject “Qwin account deletion”. Verification and necessary legal retention may apply. Separate OLX, Etsy and eBay accounts must be managed directly with those providers.</p>
-<p class="warning" data-t="deleteNotice">Uninstalling Qwin does not delete the online account. Disconnecting OLX, Etsy or eBay does not automatically remove external listings. Verify removal with the relevant service.</p></section>
-<section class="doc" id="partners"><h2 data-t="partnersPolicy">External marketplaces & affiliate disclosure</h2>
-<p data-t="partnersPolicyIntro">Qwin is independent from OLX, Etsy and eBay. Each platform controls its own terms, user authorization, listing eligibility, fees, moderation and checkout. This website shows only illustrative listings, not an active product feed.</p>
-<h3>OLX Portugal</h3><p data-t="partnersOlx">Qwin's test environment includes official category data, OAuth account linking, listing drafts and seller-specific publishing operations. Availability depends on account permissions and provider confirmation.</p>
-<h3>Etsy</h3><p data-t="partnersEtsy">Etsy seller integration is being tested. Only permitted items meeting Etsy's eligibility and Creativity Standards are supported. Qwin does not scrape Etsy listings or replace Etsy checkout.</p>
-<p class="external-disclosure" lang="en">The term 'Etsy' is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.</p>
-<h3>eBay</h3><p data-t="partnersEbay">eBay account linking and taxonomy are being developed in Sandbox. eBay browsing, messaging, buying and eBay Partner Network affiliate integration are not live. If an approved affiliate integration is launched, Qwin may earn commissions on qualifying purchases; paid links will be clearly disclosed next to the item and action.</p>
-<p data-t="partnersExternal">Qwin cannot promise messaging, offers, purchase tracking or in-app checkout for external listings unless approved APIs and user permissions support them. Otherwise users will be directed to the original provider. Qwin never marks an external purchase paid without confirmation.</p>
-</section>
-<section class="doc" id="cookies"><h2 data-t="cookiesTitle">Website cookies and storage</h2>
-<p data-t="cookiesBody">This documentation page uses the browser's local storage to remember your language choice. Other cookies or site analytics, if enabled elsewhere on MyNow Apps, follow the hosting site's applicable policy. Qwin app credentials are not collected by this documentation page.</p></section>
-<section class="doc" id="contact"><h2 data-t="contact">Contact & support</h2>
-<p><a href="mailto:support@mynw.app?subject=Qwin%20Support">support@mynw.app</a></p>
-<p data-t="contactBody">For technical help, privacy requests, moderation appeals, abuse, copyright or listing removal, include “Qwin” in the subject and the relevant listing ID if available. Do not email passwords or authentication tokens.</p>
-</section>
-</div></main><footer><div class="container"><div><strong>Qwin · MyNow Apps</strong><p><small data-t="footer">Portugal · Qwin in development · No in-app payments · Marketplace connections subject to approval.</small></p></div><a href="/">MyNow Apps</a></div></footer>
+<section class="market-section"><div class="principle-banner"><div><h2 data-t="trustTitle">Designed to make second-hand shopping feel effortless.</h2><p data-t="trustBody">From your first search to your first listing, Qwin puts everyday buying and selling into one thoughtfully designed mobile experience.</p></div><a class="cta" href="/qwin/docs/#safety" data-t="trustCta">Safety & trust ↗</a></div></section>
+</main><footer><div class="container"><div><strong>Qwin · MyNow Apps</strong><p><small data-t="footer">Portugal · Qwin in development · No in-app payments · Marketplace connections subject to approval.</small></p></div><a href="/">MyNow Apps</a></div></footer>
 <script defer src="./i18n.js?v=20261112-market"></script></body></html>

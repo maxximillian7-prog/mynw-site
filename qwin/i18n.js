@@ -21,7 +21,10 @@ function apply(language){
       el.textContent=words[key]?.[l==='ru'?0:1]||el.dataset.original;
     }
   });
-  document.title=l==='ru'?'Qwin — приложение-маркетплейс | Скоро':l==='pt'?'Qwin — aplicação marketplace | Em breve':'Qwin — Marketplace App | Coming Soon';
+  const isDocumentsPage=/\/qwin\/docs(?:\/|$)/.test(new URL(location.href).pathname);
+  document.title=isDocumentsPage
+    ?l==='ru'?'Qwin — документы и поддержка':l==='pt'?'Qwin — documentos e apoio':'Qwin — Documents & Support'
+    :l==='ru'?'Qwin — приложение-маркетплейс | Скоро':l==='pt'?'Qwin — aplicação marketplace | Em breve':'Qwin — Marketplace App | Coming Soon';
   try{localStorage.setItem('qwin-doc-lang',l);}catch(_){}
   const u=new URL(location.href);u.searchParams.set('lang',l);history.replaceState(null,'',u);
 }
