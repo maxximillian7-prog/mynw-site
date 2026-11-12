@@ -1,136 +1,69 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#092842">
-<meta name="description" content="Qwin marketplace: official information, privacy, terms, AI transparency, safety and account deletion.">
-<meta property="og:title" content="Qwin — Marketplace & Support">
-<meta property="og:description" content="Discover Qwin, read our policies and contact the team.">
-<title>Qwin | Marketplace, Support & Documents</title>
-<link rel="icon" type="image/png" href="./assets/qwin_icon.png?v=20261112">
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f2fbf6">
+<meta name="description" content="Qwin is a new marketplace experience in Portugal. Explore local listings, optional AI tools, seller-controlled marketplace connections and our policies. Preparing for launch.">
+<meta name="robots" content="index,follow"><meta property="og:type" content="website">
+<meta property="og:title" content="Qwin — Discover. Sell. Connect.">
+<meta property="og:description" content="A marketplace experience built for Portugal. Qwin is preparing for launch.">
+<meta property="og:url" content="https://mynw.app/qwin/"><link rel="canonical" href="https://mynw.app/qwin/">
 <meta property="og:image" content="https://mynw.app/qwin/assets/qwin_icon.png?v=20261112">
-<style>
-:root{color-scheme:light;--navy:#092842;--teal:#08988e;--aqua:#35dbc9;--ink:#162e40;--muted:#587078;--border:#d9e8e8}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f7fcfa;color:var(--ink);font:16px/1.62 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
-a{color:#067c78}a:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #0ca5a0;outline-offset:3px}
-header{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;box-shadow:0 3px 16px #09284208}
-.container{max-width:1090px;margin:auto;padding:0 23px}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0}
-.brand{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:29px;font-weight:900;letter-spacing:-1.7px;color:var(--navy)}
-.brand b{color:var(--teal);font-weight:900}
-.nav{display:flex;gap:15px;align-items:center;flex-wrap:wrap}
-.nav a{text-decoration:none;font-size:13px;font-weight:650;white-space:nowrap}
-select{border:1px solid var(--border);border-radius:12px;background:#fff;color:var(--navy);font-size:13px;padding:9px}
-.hero{overflow:hidden;color:#fff;background:linear-gradient(125deg,#072541 0%,#073e55 47%,#06a9a0 100%);position:relative}
-.hero:after{content:'';position:absolute;right:-180px;top:-120px;width:600px;height:600px;border:70px solid #ffffff0b;border-radius:50%}
-.hero-content{position:relative;z-index:1;padding-top:82px;padding-bottom:86px}
-.eyebrow{text-transform:uppercase;letter-spacing:.25em;font-size:12px;font-weight:850;color:#a2f5ed}
-h1{font-size:clamp(33px,6vw,60px);line-height:1.11;letter-spacing:-.05em;max-width:780px;margin:18px 0 19px}
-.hero p{max-width:650px;font-size:18px;color:#defefa}
-.pills{display:flex;flex-wrap:wrap;gap:9px;margin-top:27px}.pill{background:#ffffff20;border:1px solid #ffffff55;padding:8px 15px;border-radius:22px;font-size:12px;font-weight:750}
-main{padding:42px 0 82px}.docgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px;margin:20px 0 45px}
-.doccard{display:block;min-height:125px;background:#fff;border:1px solid var(--border);border-radius:19px;padding:22px;text-decoration:none;color:var(--ink);box-shadow:0 5px 18px #0a3d4909;transition:transform .18s,box-shadow .18s}
-.doccard:hover{transform:translateY(-3px);box-shadow:0 10px 24px #0a3d4916}.doccard strong{font-size:16px}.doccard span{display:block;color:var(--muted);font-size:13px;margin-top:7px}
-section.doc{scroll-margin-top:104px;background:white;border:1px solid var(--border);padding:clamp(18px,4vw,40px);border-radius:22px;margin:16px 0 22px;box-shadow:0 6px 18px #0e423a08}
-section.doc h2{font-size:clamp(22px,3vw,27px);color:var(--navy);margin:0 0 15px}
-section.doc h3{font-size:17px;color:#096963;margin:26px 0 6px}
-section.doc ul{padding-left:22px}.doc p,.doc li{color:#415762}
-small{font-size:12px}.warning{border-left:3px solid var(--teal);background:#eafaf6;padding:12px 14px;border-radius:8px}
-footer{background:#082b43;color:#dbf5f1;padding:31px 0}footer a{color:#b9fff6}
-@media(max-width:680px){.bar{align-items:flex-start}.nav{gap:9px;justify-content:flex-end}.nav a{font-size:11px}.hero-content{padding:54px 0 65px}}
-
-/* Keep the site in sync with the Qwin app's original SVG wordmark and icon. */
-html{scroll-padding-top:106px;overflow-x:clip}
-body{min-width:0;overflow-wrap:break-word}
-.bar{min-height:76px}
-.brand{flex:none;min-height:44px;letter-spacing:normal}
-.brand img{display:block;width:184px;max-width:100%;height:72px;max-height:none;object-fit:contain}
-.nav{min-width:0;flex-wrap:nowrap;margin-left:auto}
-.nav a{line-height:1.3;min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:7px 5px}
-.lang-wrap{display:flex;flex-shrink:0;align-items:center}
-.lang-wrap select{cursor:pointer;min-height:44px}
-.nav-scroll-hint{display:none}
-.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.hero-brand{display:flex;align-items:center;gap:15px}
-.hero-icon{width:62px;height:62px;display:block;flex-shrink:0;border-radius:15px;box-shadow:0 10px 30px #02182b55}
-.doc,.doccard{min-width:0}
-.doc p,.doc li{overflow-wrap:anywhere}
-@media(max-width:860px){
-  .container{padding-inline:20px}
-  .bar{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:3px;min-height:0;padding:10px 0 0}
-  .brand{grid-column:1;grid-row:1;justify-self:start;min-width:0}
-  .brand img{width:165px}
-  .lang-wrap{grid-column:2;grid-row:1}
-  .nav{grid-column:1/-1;grid-row:2;display:flex;width:100%;margin:0;gap:7px;overflow-x:auto;overflow-y:hidden;padding:3px 0 10px;flex-wrap:nowrap;justify-content:flex-start;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain;scroll-snap-type:x proximity}
-  .nav::-webkit-scrollbar{display:none}
-  .nav-scroll-hint{display:flex;grid-column:2;grid-row:2;z-index:2;justify-self:end;align-items:center;align-self:stretch;padding:0 2px 9px 18px;background:linear-gradient(90deg,#fff0,#fff 55%);font-size:23px;font-weight:700;line-height:1;color:#087c78;pointer-events:none}
-  .nav{padding-right:19px}
-  .nav a{scroll-snap-align:start;flex:0 0 auto;min-height:38px;padding:7px 13px;border:1px solid #d8ece9;border-radius:999px;background:#eef9f7;color:#075c58;font-size:12px}
-  .nav a:hover{background:#dff5f1}
-  html{scroll-padding-top:124px}
-  section.doc{scroll-margin-top:124px}
-}
-@media(max-width:680px){
-  .container{padding-inline:16px}
-  header{box-shadow:0 2px 12px #09284210}
-  .bar{padding-top:9px}
-  .brand img{width:145px;height:62px;max-height:none}
-  .lang-wrap select{font-size:13px;padding:8px 10px;min-height:40px;max-width:142px}
-  .nav{gap:6px;padding-bottom:9px}
-  .nav a{font-size:12px;min-height:36px;padding:7px 12px}
-  .hero:after{width:370px;height:370px;border-width:40px;right:-180px;top:-100px}
-  .hero-content{padding:36px 0 42px}
-  .hero-brand{gap:11px}
-  .hero-icon{width:47px;height:47px;border-radius:12px}
-  .eyebrow{font-size:10px;letter-spacing:.17em}
-  h1{font-size:clamp(30px,8.3vw,43px);line-height:1.13;margin:19px 0 15px;letter-spacing:-.04em}
-  .hero p{font-size:15px;line-height:1.6;margin:0}
-  .pills{gap:7px;margin-top:21px}
-  .pill{font-size:11px;padding:6px 11px}
-  main{padding:23px 0 51px}
-  main>h2{font-size:22px;line-height:1.25;margin:28px 0 12px}
-  .docgrid{grid-template-columns:minmax(0,1fr);gap:9px;margin:13px 0 29px}
-  .doccard{min-height:0;padding:15px 17px;border-radius:15px;box-shadow:0 2px 10px #0a3d4908}
-  .doccard strong{font-size:15px;line-height:1.35}
-  .doccard span{margin-top:3px;font-size:12px;line-height:1.45}
-  section.doc{margin:12px 0 16px;padding:20px 17px;border-radius:17px;scroll-margin-top:120px}
-  section.doc h2{font-size:22px;line-height:1.25;margin:0 0 12px}
-  section.doc h3{font-size:16px;line-height:1.35;margin:21px 0 7px}
-  .doc p,.doc li{font-size:14px;line-height:1.62}
-  section.doc ul{padding-left:19px}
-  .warning{padding:12px}
-  footer{padding:25px 0 max(28px,env(safe-area-inset-bottom))}
-  footer small{line-height:1.55;display:block}
-}
-@media(max-width:370px){
-  .brand img{width:115px}
-  .lang-wrap select{max-width:128px}
-  .hero-content{padding-top:30px}
-  h1{font-size:30px}
-  section.doc{padding:17px 14px}
-}
-@media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .doccard{transition:none}
-}
-
-</style>
-</head>
-<body>
+<title>Qwin | Marketplace for Portugal · Coming Soon</title>
+<link rel="icon" type="image/png" href="./assets/qwin_icon.png?v=20261112">
+<link rel="stylesheet" href="./marketplace.css?v=20261112">
+</head><body>
+<div class="top-announce" data-t="launchNotice">Qwin is in development — this is a preview, not a live marketplace.</div>
 <header><div class="container bar">
-<a class="brand" href="/qwin/" aria-label="Qwin — homepage"><img src="./assets/qwin_wordmark.png?v=20261112" width="184" height="72" alt="Qwin" decoding="async"></a>
-<nav class="nav" aria-label="Qwin documents"><a href="#about" data-t="navAbout">About</a><a href="#privacy" data-t="privacy">Privacy</a><a href="#terms" data-t="terms">Terms</a><a href="#safety" data-t="safety">Safety</a><a href="#delete" data-t="deletion">Delete account</a></nav><span class="nav-scroll-hint" aria-hidden="true">›</span>
+<a class="brand" href="/qwin/" aria-label="Qwin home"><img src="./assets/qwin_wordmark.svg" width="154" height="61" alt="Qwin"></a>
+<nav class="nav" aria-label="Qwin navigation"><a href="#marketplace" data-t="navMarket">Marketplace</a><a href="#how" data-t="navHow">How it works</a><a href="#platforms" data-t="navPlatforms">Platforms</a><a href="#documents" data-t="navDocs">Documents</a><a href="#contact" data-t="contact">Support</a></nav><span class="nav-scroll-hint" aria-hidden="true">›</span>
 <label class="lang-wrap"><span class="visually-hidden">Language</span><select id="language" aria-label="Language"><option value="pt">Português</option><option value="en">English</option><option value="ru">Русский</option></select></label>
 </div></header>
-<div class="hero"><div class="container hero-content">
-<div class="hero-brand"><img class="hero-icon" src="./assets/qwin_icon.png?v=20261112" width="62" height="62" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">MYNOW APPS / QWIN</div></div>
-<h1 data-t="heroTitle">A smarter way to give things a second life.</h1>
-<p data-t="heroIntro">Photograph, describe, and list an item on Qwin. When connected and permitted, manage partner marketplace listings in one place.</p>
-<div class="pills"><span class="pill" data-t="pillOne">Portuguese marketplace</span><span class="pill" data-t="pillTwo">Optional AI tools</span><span class="pill" data-t="pillThree">Seller-controlled sharing</span></div>
+<div class="hero"><div class="container hero-content"><div class="hero-copy">
+<div class="hero-brand"><img class="hero-icon" src="./assets/qwin_icon.png?v=20261112" width="42" height="42" alt="" aria-hidden="true"><span class="eyebrow" data-t="heroEyebrow">THE NEXT MARKETPLACE EXPERIENCE · PORTUGAL</span></div>
+<h1 data-t="heroTitle">Find something great. Give things a new story.</h1>
+<p data-t="heroIntro">One place to discover local listings, chat with sellers and create your own listings with optional AI assistance. Built for Portugal, with optional marketplace connections developed separately.</p>
+<div class="hero-actions"><a class="cta primary" href="#marketplace" data-t="heroCtaOne">Discover Qwin ↗</a><a class="cta secondary" href="#how" data-t="heroCtaTwo">How Qwin works</a></div>
+<div class="pills"><span class="pill" data-t="pillOne">Designed for Portugal</span><span class="pill" data-t="pillTwo">Optional AI tools</span><span class="pill" data-t="pillThree">Seller-controlled listings</span></div>
+<p class="hero-notice" data-t="heroAvailability">Currently in development. No public app-store download or live web purchasing yet.</p></div>
+<div class="market-visual" aria-label="Illustrative Qwin interface">
+<div class="float-label one" aria-hidden="true">♡ <span data-t="visualSave">Save favourites</span></div>
+<div class="float-label two" aria-hidden="true">✦ <span data-t="visualPhoto">Photo-first listings</span></div>
+<div class="market-window"><div class="market-head"><img src="./assets/qwin_wordmark.svg" alt="Qwin" width="80" height="33"><span class="mini-loc">⌖ Portugal</span></div>
+<div class="market-faux-search" data-t="visualSearch">⌕ Search items, brands, places...</div>
+<div class="market-chipline" aria-hidden="true"><span data-t="visualAll">All</span><span data-t="visualElectronics">Electronics</span><span data-t="visualHome">Home</span><span data-t="visualFashion">Fashion</span></div>
+<div class="demo-grid">
+<div class="demo-card"><div class="demo-image a"><span aria-hidden="true">🎧</span></div><div class="demo-body"><div class="demo-price">€85</div><strong data-t="demoHeadphones">Wireless headphones</strong><small>Lisboa · <span data-t="demoSample">Illustrative item</span></small></div></div>
+<div class="demo-card"><div class="demo-image b"><span aria-hidden="true">🪑</span></div><div class="demo-body"><div class="demo-price">€46</div><strong data-t="demoChair">Vintage chair</strong><small>Porto · <span data-t="demoSample">Illustrative item</span></small></div></div>
+<div class="demo-card"><div class="demo-image c"><span aria-hidden="true">📷</span></div><div class="demo-body"><div class="demo-price">€110</div><strong data-t="demoCamera">Digital camera</strong><small>Sintra · <span data-t="demoSample">Illustrative item</span></small></div></div>
+<div class="demo-card"><div class="demo-image d"><span aria-hidden="true">🧥</span></div><div class="demo-body"><div class="demo-price">€30</div><strong data-t="demoJacket">Denim jacket</strong><small>Cascais · <span data-t="demoSample">Illustrative item</span></small></div></div>
+</div><div class="demo-disclaimer" data-t="demoNotice">Visual concept only · No real listings or prices</div></div></div>
 </div></div>
-<main class="container">
-<section id="about" class="doc"><h2 data-t="aboutTitle">About Qwin</h2><p data-t="aboutText">Qwin is a MyNow Apps marketplace for listing and discovering items in Portugal. Sellers choose the listing details, images, contact preferences and external platforms. Qwin does not process buyer payments.</p><p class="warning" data-t="partnerText">OLX and Etsy are independent platforms governed by their own rules, eligibility, fees and moderation. Connecting a platform never guarantees publication. Etsy accepts only items compliant with its Creativity Standards.</p></section>
+<main class="container"><div class="intro-stats" aria-label="Qwin highlights">
+<div class="intro-stat"><div class="stat-icon" aria-hidden="true">⌕</div><div><strong data-t="statOneTitle">One familiar search</strong><span data-t="statOneBody">Categories, filters and local discovery</span></div></div>
+<div class="intro-stat"><div class="stat-icon" aria-hidden="true">◎</div><div><strong data-t="statTwoTitle">Three app languages</strong><span data-t="statTwoBody">Português, English, Русский</span></div></div>
+<div class="intro-stat"><div class="stat-icon" aria-hidden="true">✦</div><div><strong data-t="statThreeTitle">Your listing, your choice</strong><span data-t="statThreeBody">Approve photos, words and destinations</span></div></div></div>
+<section class="market-section" id="marketplace"><div class="section-heading"><div><p class="section-overline" data-t="marketEyebrow">EXPLORE CATEGORIES</p><h2 data-t="marketTitle">Everything feels easier in one place.</h2><p data-t="marketBody">From electronics and furniture to fashion, children's items and more. Qwin is designed for a unified catalogue, not separate storefronts.</p></div></div>
+<div class="categories-grid">
+<div class="category-tile"><span class="category-emoji" aria-hidden="true">📱</span><strong data-t="catElectronics">Electronics</strong></div>
+<div class="category-tile"><span class="category-emoji" aria-hidden="true">🛋️</span><strong data-t="catHome">Home</strong></div>
+<div class="category-tile"><span class="category-emoji" aria-hidden="true">👟</span><strong data-t="catFashion">Fashion</strong></div>
+<div class="category-tile"><span class="category-emoji" aria-hidden="true">🚲</span><strong data-t="catSports">Sports</strong></div>
+<div class="category-tile"><span class="category-emoji" aria-hidden="true">🧸</span><strong data-t="catKids">Kids</strong></div>
+<div class="category-tile"><span class="category-emoji" aria-hidden="true">🚗</span><strong data-t="catAuto">Motors</strong></div></div></section>
+<section class="market-section" id="how"><div class="section-heading"><div><p class="section-overline" data-t="howEyebrow">SIMPLE BY DESIGN</p><h2 data-t="howTitle">List in minutes. Stay in control.</h2><p data-t="howBody">A guided flow that keeps sellers in charge of original photos, truthful details and any external publishing.</p></div></div>
+<div class="steps-grid">
+<article class="step-card"><span class="step-number">01</span><h3 data-t="stepOneTitle">Take a photo</h3><p data-t="stepOneBody">Start with real pictures. Qwin can suggest a category and help prepare a draft.</p></article>
+<article class="step-card"><span class="step-number">02</span><h3 data-t="stepTwoTitle">Review the details</h3><p data-t="stepTwoBody">Check title, price, condition and optional AI ideas. You approve changes before publishing.</p></article>
+<article class="step-card"><span class="step-number">03</span><h3 data-t="stepThreeTitle">Publish & connect</h3><p data-t="stepThreeBody">List in Qwin; connect supported external seller accounts only with your permission and subject to approval.</p></article></div></section>
+<section class="market-section" id="platforms"><div class="section-heading"><div><p class="section-overline" data-t="platformEyebrow">ONE CATALOG · SEPARATE PERMISSIONS</p><h2 data-t="platformTitle">Your marketplace, more possibilities.</h2><p data-t="platformIntro">OLX, Etsy and eBay are independent services. Qwin integrations are being tested, not active partner storefronts.</p></div></div>
+<div class="partner-grid">
+<article class="partner-card"><div class="partner-name">OLX</div><span class="partner-status" data-t="olxStatus">Integration testing</span><p data-t="olxDesc">Official category information and seller-authorized connection routes are present in the test environment. Publishing and messaging depend on account permissions and the provider.</p><span class="partner-foot" data-t="olxFoot">Optional seller connection</span></article>
+<article class="partner-card"><div class="partner-name">Etsy</div><span class="partner-status" data-t="etsyStatus">Integration testing</span><p data-t="etsyDesc">Seller OAuth and a guarded draft workflow are being tested. Etsy eligibility and Creativity Standards apply. Qwin is not endorsed by Etsy.</p><span class="partner-foot" data-t="etsyFoot">Eligible shops and listings only</span></article>
+<article class="partner-card"><div class="partner-name">eBay</div><span class="partner-status" data-t="ebayStatus">Sandbox development</span><p data-t="ebayDesc">Sandbox account linking and category matching are in development. Product discovery, messaging and affiliate purchasing are not live.</p><span class="partner-foot" data-t="ebayFoot">Requires API and affiliate approvals</span></article></div>
+<p class="notice-legal" style="margin-top:15px" data-t="partnerNotice">External checkout remains with the relevant marketplace. If future eBay affiliate listings are approved, commercial links will be clearly disclosed beside each offer.</p></section>
+<section class="market-section"><div class="principle-banner"><div><h2 data-t="trustTitle">More clarity. More control. Better second-hand shopping.</h2><p data-t="trustBody">Real photos, seller-approved AI edits, private conversations and clear information about where a transaction happens. Qwin is preparing for public release.</p></div><a class="cta" href="#safety" data-t="trustCta">Safety & trust ↗</a></div></section>
+<div id="documents" class="document-zone"><div class="section-heading"><div><p class="section-overline" data-t="docsEyebrow">TRANSPARENT FROM THE START</p><h2 data-t="docsHeading">Documents, rights & support</h2><p data-t="docsLead">Learn how Qwin handles personal data, external platforms, AI, moderation and account deletion.</p></div></div>
+<section id="about" class="doc"><h2 data-t="aboutTitle">About Qwin</h2><p data-t="aboutText">Qwin is a marketplace application in development by MyNow Apps in Portugal. Internal listings, search, filters, chats, offers and favourites belong to one Qwin experience. External seller connections are optional and subject to platform permissions. Qwin does not process payments.</p><p class="warning" data-t="partnerText">Qwin is not publicly launched. OLX and Etsy connections are being tested; eBay is at Sandbox development stage. No external platform has guaranteed publication, messaging, affiliate payouts or checkout through Qwin.</p></section>
 <h2 data-t="docsTitle">Documents and help</h2>
 <div class="docgrid">
 <a class="doccard" href="#privacy"><strong data-t="privacy">Privacy policy</strong><span data-t="privacySub">Data, third-party accounts and controls</span></a>
@@ -138,23 +71,24 @@ body{min-width:0;overflow-wrap:break-word}
 <a class="doccard" href="#safety"><strong data-t="safety">Marketplace safety</strong><span data-t="safetySub">Fraud, reporting, prohibited items</span></a>
 <a class="doccard" href="#ai"><strong data-t="aiTitle">AI & image policy</strong><span data-t="aiSub">Disclosure, user approval, accuracy</span></a>
 <a class="doccard" href="#delete"><strong data-t="deletion">Delete account</strong><span data-t="deleteSub">Account and listing removal instructions</span></a>
+<a class="doccard" href="#partners"><strong data-t="partnersPolicy">External marketplaces & affiliate disclosure</strong><span data-t="partnersPolicySub">OLX, Etsy, eBay and future partner links</span></a>
 <a class="doccard" href="#cookies"><strong data-t="cookiesTitle">Site cookies</strong><span data-t="cookiesSub">Preferences and essential operation</span></a>
 <a class="doccard" href="#contact"><strong data-t="contact">Contact & support</strong><span data-t="contactSub">Questions and abuse reports</span></a>
 </div>
 <section class="doc" id="privacy"><h2 data-t="privacy">Privacy policy</h2>
-<p data-t="privacyIntro">Qwin is provided by MyNow Apps, an independent developer based in Portugal. This notice describes how the app handles personal data. Last reviewed: 11 November 2026.</p>
+<p data-t="privacyIntro">Qwin is provided by MyNow Apps, an independent developer based in Portugal. This notice describes how the app handles personal data. Last reviewed: 12 November 2026.</p>
 <h3 data-t="privacyDataHeader">Data processed</h3>
 <ul><li data-t="privacyData1">Account credentials are handled by the authentication provider. Qwin stores your user ID, profile, listing details, photographs and the public contact information you choose.</li>
 <li data-t="privacyData2">Messages, offers, saved listings, reporting and moderation records are stored to provide marketplace functions.</li>
 <li data-t="privacyData3">AI-assisted descriptions and images are sent to the configured AI service only after you request or approve the processing. Do not upload others' personal data without permission.</li>
-<li data-t="privacyData4">When you connect OLX or Etsy, platform authorization tokens are processed by the protected server. Publication and conversation data may be exchanged only as required for requested functions.</li></ul>
+<li data-t="privacyData4">If you authorize OLX, Etsy or (once enabled) eBay seller connections, Qwin exchanges data necessary for the chosen features. Tokens are kept in server-side protected storage, not in public listings or the mobile application.</li><li data-t="privacyData5">Search and filters use listing details such as category, city and optional delivery settings. The app may process diagnostic, security and support records. Your private home address is not published by default.</li></ul>
 <h3 data-t="privacyLegalHeader">Purpose, protection and retention</h3>
 <p data-t="privacyLegal">Processing supports account management, your requested marketplace services, fraud prevention, support and legal obligations. Necessary processing relies on contract performance and legitimate safety interests; optional marketing requires applicable consent. Data are retained only as needed for these purposes and applicable law. Deletion may be limited by active transactions, legal claims or fraud investigations.</p>
 <h3 data-t="privacyRightsHeader">Your rights</h3><p data-t="privacyRights">Under applicable GDPR rules you may request access, correction, export, deletion, restriction or objection by contacting support. You may complain to Portugal's supervisory authority, CNPD. Platform-held data must also be managed with the respective platform.</p></section>
 <section class="doc" id="terms"><h2 data-t="terms">Terms of use</h2>
 <p data-t="termsBody1">By using Qwin you agree to provide accurate information, have the rights to sell and photograph your items, respect other members, and comply with Portuguese law and each connected marketplace's terms. The seller and buyer negotiate and complete transactions directly; Qwin is not a party to the sale, does not receive or hold payment, and does not guarantee item condition or delivery.</p>
 <p data-t="termsBody2">Do not post counterfeit, stolen, illegal or unsafe products, misleading photos, spam, harassment or listings infringing third-party rights. Moderators may remove reported content or suspend accounts to maintain safety. External publication, prices, listing limits, charges and eligibility remain controlled by the external platforms.</p>
-<p data-t="termsBody3">Your listing photographs and descriptions remain yours or their respective owners; you grant Qwin the non-exclusive permission required to display your listings and relay approved publications. You can revoke a connected platform through account settings, subject to its separate removal policies.</p></section>
+<p data-t="termsBody3">Your listing photographs and descriptions remain yours or their respective owners. You grant Qwin the limited permission necessary to display approved listings and, if available and requested, relay them to a connected marketplace. Disconnecting does not automatically remove an existing external listing.</p><p data-t="termsBody4">Qwin buying and offer actions on its own listings create requests, not paid orders. For any future third-party item integration, Qwin will identify the source and use only supported provider purchase or message APIs, or direct the user to the official checkout. Payments, shipping, returns and disputes belong to the relevant service.</p></section>
 <section class="doc" id="safety"><h2 data-t="safety">Marketplace safety and moderation</h2>
 <ul><li data-t="safe1">Inspect items before payment and verify the seller, especially for high-value products.</li>
 <li data-t="safe2">Never share passwords, one-time codes, bank login details or identity documents in marketplace chat.</li>
@@ -167,15 +101,21 @@ body{min-width:0;overflow-wrap:break-word}
 <p data-t="aiBody3">Etsy's separate Creativity Standards and policies determine whether AI-assisted or seller-designed work is eligible there. Qwin listing eligibility is not automatic permission to publish on Etsy.</p></section>
 <section class="doc" id="delete"><h2 data-t="deletion">Delete listings and accounts</h2>
 <p data-t="deleteBody1">For an individual listing, open My listings, select your listing and choose Edit / Delete from connected platforms. Qwin attempts supported external deletion first; it will not report success unless the platform confirms. Active sales or legal holds may require resolution.</p>
-<p data-t="deleteBody2">To request permanent account deletion, contact support from the email associated with your account with subject “Qwin account deletion”. We will verify ownership, explain any required transaction or legal retention restrictions, and assist with removal. Separate OLX/Etsy accounts and their data must be deleted at the respective services.</p>
-<p class="warning" data-t="deleteNotice">Deleting the Qwin app from a device does not delete the online account. Disconnecting an external platform does not delete listings already hosted there.</p></section>
+<p data-t="deleteBody2">Use the in-app Delete Account option if it is available for your account. Otherwise email support@mynw.app from your registered address with subject “Qwin account deletion”. Verification and necessary legal retention may apply. Separate OLX, Etsy and eBay accounts must be managed directly with those providers.</p>
+<p class="warning" data-t="deleteNotice">Uninstalling Qwin does not delete the online account. Disconnecting OLX, Etsy or eBay does not automatically remove external listings. Verify removal with the relevant service.</p></section>
+<section class="doc" id="partners"><h2 data-t="partnersPolicy">External marketplaces & affiliate disclosure</h2>
+<p data-t="partnersPolicyIntro">Qwin is independent from OLX, Etsy and eBay. Each platform controls its own terms, user authorization, listing eligibility, fees, moderation and checkout. This website shows only illustrative listings, not an active product feed.</p>
+<h3>OLX Portugal</h3><p data-t="partnersOlx">Qwin's test environment includes official category data, OAuth account linking, listing drafts and seller-specific publishing operations. Availability depends on account permissions and provider confirmation.</p>
+<h3>Etsy</h3><p data-t="partnersEtsy">Etsy seller integration is being tested. Only permitted items meeting Etsy's eligibility and Creativity Standards are supported. Qwin does not scrape Etsy listings or replace Etsy checkout.</p>
+<p class="external-disclosure" lang="en">The term 'Etsy' is a trademark of Etsy, Inc. This Application uses Etsy's API, but is not endorsed or certified by Etsy.</p>
+<h3>eBay</h3><p data-t="partnersEbay">eBay account linking and taxonomy are being developed in Sandbox. eBay browsing, messaging, buying and eBay Partner Network affiliate integration are not live. If an approved affiliate integration is launched, Qwin may earn commissions on qualifying purchases; paid links will be clearly disclosed next to the item and action.</p>
+<p data-t="partnersExternal">Qwin cannot promise messaging, offers, purchase tracking or in-app checkout for external listings unless approved APIs and user permissions support them. Otherwise users will be directed to the original provider. Qwin never marks an external purchase paid without confirmation.</p>
+</section>
 <section class="doc" id="cookies"><h2 data-t="cookiesTitle">Website cookies and storage</h2>
 <p data-t="cookiesBody">This documentation page uses the browser's local storage to remember your language choice. Other cookies or site analytics, if enabled elsewhere on MyNow Apps, follow the hosting site's applicable policy. Qwin app credentials are not collected by this documentation page.</p></section>
 <section class="doc" id="contact"><h2 data-t="contact">Contact & support</h2>
 <p><a href="mailto:support@mynw.app?subject=Qwin%20Support">support@mynw.app</a></p>
 <p data-t="contactBody">For technical help, privacy requests, moderation appeals, abuse, copyright or listing removal, include “Qwin” in the subject and the relevant listing ID if available. Do not email passwords or authentication tokens.</p>
 </section>
-</main>
-<footer><div class="container"><strong>Qwin · MyNow Apps</strong><p><small data-t="footer">Portugal · No in-app payment processing · All rights reserved. Product features and linked marketplace availability may change.</small></p><a href="/">MyNow Apps</a></div></footer>
-<script defer src="./i18n.js"></script>
-</body></html>
+</div></main><footer><div class="container"><div><strong>Qwin · MyNow Apps</strong><p><small data-t="footer">Portugal · Qwin in development · No in-app payments · Marketplace connections subject to approval.</small></p></div><a href="/">MyNow Apps</a></div></footer>
+<script defer src="./i18n.js?v=20261112-market"></script></body></html>
