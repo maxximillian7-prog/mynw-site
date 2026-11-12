@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d2f49">
+<meta name="robots" content="index,follow">
+<meta name="description" content="Discover verified cinema venues in Portugal with Trailyo. Addresses, directions, contacts and authorised links to showtimes.">
+<title>Cinemas — Trailyo</title>
+<link rel="icon" href="../assets/trailyo-logo.png" type="image/png">
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#19334a;background:#f5fbfa;line-height:1.52}
+*{box-sizing:border-box}body{margin:0}a{color:#007a74}
+a:focus-visible,button:focus-visible{outline:3px solid #14b4a6;outline-offset:3px}
+header{background:#fff;border-bottom:1px solid #dceceb;position:sticky;top:0;z-index:9}
+.head,.wrap{max-width:1080px;margin:auto;padding:0 20px}
+.head{display:flex;justify-content:space-between;align-items:center;min-height:75px;gap:12px}
+.brand{display:flex;align-items:center;gap:15px;text-decoration:none;color:#12334a;font-weight:800}.brand img{width:116px;max-height:51px;object-fit:contain}
+.langs{display:flex;gap:5px}.langs button{font-size:12px;border:1px solid #cde6e3;background:white;border-radius:8px;padding:8px 10px;cursor:pointer;color:#21465b}
+.langs button[aria-pressed=true]{background:#def8f2;color:#006b62;border-color:#50baa9}
+.wrap{padding-top:34px;padding-bottom:64px}
+.crumb{font-size:13px;color:#547078;margin-bottom:14px}.crumb a{text-decoration:none}
+h1{font-size:clamp(27px,5vw,42px);letter-spacing:-.035em;line-height:1.17;margin:0 0 12px}
+.lead{color:#59717b;margin:0 0 22px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:0;background:#fff;border:1px solid #dbeae8;border-radius:22px;overflow:hidden;box-shadow:0 14px 35px #0a465713}
+.photo{height:340px;width:100%;object-fit:cover;display:block;background:#dff4ed}
+.photo.empty{background:radial-gradient(circle at 60% 22%,#48c7b6,transparent 50%),linear-gradient(140deg,#0b2445,#007f87);display:flex;align-items:center;justify-content:center;color:#e0fffc;font-size:90px}
+.side{padding:27px;display:flex;flex-direction:column;justify-content:center}
+.tag{display:inline-block;background:#e3f8f3;color:#087c72;border-radius:40px;padding:5px 12px;font-size:12px;font-weight:750;margin-bottom:15px}
+.name{font-size:clamp(22px,4vw,31px);font-weight:850;letter-spacing:-.03em;line-height:1.22;margin-bottom:14px}
+.muted{color:#687e86}.sub{font-size:13px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+.btn{background:#0b9085;color:#fff;text-decoration:none;border:1px solid #0b9085;padding:12px 17px;border-radius:12px;font-size:14px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;min-height:44px}
+.btn:hover{background:#066c67}.btn.light{background:#fff;color:#086b65;border-color:#b9dbd6}.btn.light:hover{background:#edfaf7}
+.details{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.panel{border-radius:19px;background:#fff;border:1px solid #dbeae8;padding:22px}
+.panel h2{font-size:18px;margin:0 0 12px}.panel p{margin:8px 0;color:#4e6871}
+.map{margin-top:15px;border:0;border-radius:12px;width:100%;height:235px;background:#e3f0eb}
+.credit{font-size:11px;line-height:1.5;color:#637982;margin:7px 0 0}
+footer{padding:24px 20px;text-align:center;background:#e9f5f1;color:#50716d;font-size:12px}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:17px}
+.place-card{background:#fff;border:1px solid #dcebe9;box-shadow:0 8px 20px #0d3b4b0b;border-radius:17px;overflow:hidden;display:flex;flex-direction:column}
+.place-card img,.place-card .placeholder{height:145px;width:100%;object-fit:cover;background:linear-gradient(120deg,#0d2c51,#11bca6)}
+.place-card .placeholder{display:grid;place-items:center;color:white;font-size:54px}
+.place-card section{padding:17px;flex:1;display:flex;flex-direction:column;gap:7px}
+.place-card strong{font-size:18px}.place-card .btn{margin-top:auto;align-self:start}
+.search{width:100%;max-width:420px;border:1px solid #c8dedc;border-radius:12px;padding:12px 14px;margin-bottom:20px;font:inherit}
+.notice{padding:12px 15px;background:#e9f6f5;color:#345c62;border-radius:12px;font-size:13px;margin-top:20px}
+#status{padding:25px 0;color:#5f7880}
+@media(max-width:720px){.hero{grid-template-columns:1fr}.photo{height:220px}.side{padding:20px}.details{grid-template-columns:1fr}.head{padding:0 13px}.brand img{width:92px}.wrap{padding:23px 15px 45px}}
+</style>
+</head>
+<body>
+<header><div class="head"><a class="brand" href="/trailyo/"><img src="../assets/trailyo-logo.png" alt="Trailyo"> <span id="brandcaption">Cinemas</span></a><div class="langs" aria-label="Language"><button data-lang="pt" aria-pressed="true">PT</button><button data-lang="en" aria-pressed="false">EN</button><button data-lang="ru" aria-pressed="false">RU</button></div></div></header>
+<main class="wrap"><div class="crumb"><a href="/trailyo/">Trailyo</a> / <a href="/trailyo/cinema/" id="back">Cinemas</a></div><div id="status" role="status">A carregar cinemas…</div><div id="app"></div></main>
+<footer>Trailyo · MyNow Apps · <a href="/trailyo/">mynw.app/trailyo</a>. <span id="footerNotice">Cinema information may change. Check the official venue website.</span></footer>
+<script>
+(() => {
+'use strict';
+const base='https://egjxgintpcoqhmdohabk.supabase.co/rest/v1/trailyo_cinema_venues';
+const key='sb_publishable_-lPz1b6u0-7dIR2lpfJbdQ_kDePgrT6';
+const qs=new URLSearchParams(location.search);
+const id=qs.get('id');
+const t={
+ pt:{cinemas:'Cinemas',load:'A carregar cinemas…',error:'Não foi possível carregar os cinemas.',back:'Todos os cinemas',search:'Pesquisar cinemas, cidades…',view:'Ver detalhes',shows:'Consultar sessões no Orlok',info:'Sobre o cinema',visit:'Visita e contactos',hours:'Horário',hoursUnknown:'Confirme o horário e as sessões no site oficial.',address:'Morada',phone:'Telefone',email:'Email',site:'Site oficial',map:'Abrir no Google Maps',noResult:'Sem resultados.',photo:'Créditos da fotografia',safety:'O Orlok é um serviço externo. A Trailyo encaminha para o respetivo site e não reproduz os seus horários, cartazes ou conteúdos protegidos.',foot:'Os dados podem mudar. Confirme as informações no site oficial.',noInfo:'Descrição detalhada por confirmar.',tag:'Cinema · Portugal'},
+ en:{cinemas:'Cinemas',load:'Loading cinemas…',error:'Could not load cinemas.',back:'All cinemas',search:'Search cinemas, cities…',view:'View details',shows:'Showtimes on Orlok',info:'About this cinema',visit:'Visit & contacts',hours:'Opening hours',hoursUnknown:'Confirm hours and screenings with the official cinema website.',address:'Address',phone:'Telephone',email:'Email',site:'Official website',map:'Open in Google Maps',noResult:'No results.',photo:'Photo credit',safety:'Orlok is an independent external service. Trailyo links to its pages and does not reproduce screening data, movie posters or copyrighted content.',foot:'Information may change. Check the official venue website.',noInfo:'Detailed description not verified yet.',tag:'Cinema · Portugal'},
+ ru:{cinemas:'Кинотеатры',load:'Загружаем кинотеатры…',error:'Не удалось загрузить кинотеатры.',back:'Все кинотеатры',search:'Название кинотеатра, город…',view:'Подробнее',shows:'Расписание на Orlok',info:'О кинотеатре',visit:'Посещение и контакты',hours:'Режим работы',hoursUnknown:'Режим работы и сеансы уточняйте на официальном сайте кинотеатра.',address:'Адрес',phone:'Телефон',email:'Email',site:'Официальный сайт',map:'Открыть Google Maps',noResult:'Ничего не найдено.',photo:'Автор фотографии',safety:'Orlok — независимый внешний сервис. Trailyo размещает ссылки, но не копирует расписание, постеры или защищённые авторским правом материалы.',foot:'Данные могут изменяться. Уточняйте информацию на официальном сайте.',noInfo:'Подробное описание пока не проверено.',tag:'Кинотеатр · Португалия'}
+};
+let lang=(qs.get('lang')||navigator.language||'pt').toLowerCase();
+lang=lang.startsWith('ru')?'ru':lang.startsWith('en')?'en':'pt';
+const app=document.getElementById('app'),status=document.getElementById('status');
+const el=(name,cls,text)=>{const e=document.createElement(name);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
+const add=(parent,...nodes)=>{nodes.forEach(n=>n&&parent.appendChild(n));return parent};
+const link=(txt,url,cls='btn light')=>{try{let u=new URL(url,location.href);if(u.protocol!=='https:'&&u.protocol!=='http:')return null;let e=el('a',cls,txt);e.href=u.href;e.rel='noopener noreferrer';if(u.origin!==location.origin)e.target='_blank';return e}catch{return null}};
+const str=(obj,key)=>String(obj&&obj[key]!==null&&obj[key]!==undefined?obj[key]:'').trim();
+const meta=c=>c.metadata&&typeof c.metadata==='object'?c.metadata:{};
+const photo=c=>str(c,'image_url').startsWith('https://')?str(c,'image_url'):'';
+function updateLocale(){document.documentElement.lang=lang;document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));document.getElementById('brandcaption').textContent=t[lang].cinemas;document.getElementById('back').textContent=t[lang].back;document.getElementById('footerNotice').textContent=t[lang].foot;status.textContent=t[lang].load}
+function imageFor(c,large=false){const u=photo(c);if(!u)return el('div',large?'photo empty':'placeholder','🎬');const image=el('img',large?'photo':'');image.src=u;image.alt=c.name||'';image.loading='lazy';image.onerror=()=>image.replaceWith(el('div',large?'photo empty':'placeholder','🎬'));return image}
+function recordTitle(c){return str(c,'name')}
+function description(c){let m=meta(c),k='description_'+lang;return str(m,k)||str(c,'description_pt')||t[lang].noInfo}
+function details(c){app.replaceChildren();document.title=recordTitle(c)+' — Trailyo';const hero=el('div','hero'),side=el('div','side');add(side,el('div','tag',t[lang].tag),el('div','name',recordTitle(c)),el('div','muted',[str(c,'address'),str(c,'city')].filter(Boolean).join(' · ')));const buttons=el('div','actions');const orlok=str(meta(c),'orlok_referral_url');if(orlok)add(buttons,link(t[lang].shows,orlok,'btn'));const official=str(meta(c),'official_website_url')||str(c,'website_url');if(official)add(buttons,link(t[lang].site,official));add(side,buttons);add(hero,imageFor(c,true),side);app.appendChild(hero);
+const layout=el('div','details'),about=el('section','panel'),visit=el('section','panel');add(about,el('h2','',t[lang].info),el('p','',description(c)));if(str(c,'image_author')&&str(c,'image_license')){const credit=el('p','credit',t[lang].photo+': '+str(c,'image_author')+' · '+str(c,'image_license')+' · ');const src=link('Wikimedia Commons',str(c,'image_source_url'),'');if(src)credit.appendChild(src);about.appendChild(credit)}
+add(visit,el('h2','',t[lang].visit));let m=meta(c);const lines=[[t[lang].address,[str(c,'address'),str(c,'city')].filter(Boolean).join(', ')],[t[lang].hours,str(m,'opening_hours_'+lang)||str(m,'opening_hours_pt')||t[lang].hoursUnknown],[t[lang].phone,str(c,'phone')],[t[lang].email,str(c,'email')]];lines.forEach(([label,value])=>{if(!value)return;const p=el('p','');add(p,el('strong','',label+': '),document.createTextNode(value));visit.appendChild(p)});
+const lat=Number(c.latitude),lon=Number(c.longitude);if(Number.isFinite(lat)&&Number.isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180&&c.latitude!==null&&c.longitude!==null){const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(lat+','+lon);const mapLink=link(t[lang].map,url);if(mapLink)visit.appendChild(mapLink);const iframe=el('iframe','map');const d=.007;iframe.src='https://www.openstreetmap.org/export/embed.html?bbox='+[lon-d,lat-d,lon+d,lat+d].join('%2C')+'&layer=mapnik&marker='+lat+'%2C'+lon;iframe.loading='lazy';iframe.referrerPolicy='no-referrer';iframe.title=t[lang].map;visit.appendChild(iframe)}
+add(layout,about,visit);app.appendChild(layout);app.appendChild(el('p','notice',t[lang].safety));status.textContent=''}
+function directory(rows){document.title=t[lang].cinemas+' — Trailyo';app.replaceChildren();add(app,el('h1','',t[lang].cinemas),el('p','lead',t[lang].tag));const search=el('input','search');search.type='search';search.placeholder=t[lang].search;search.setAttribute('aria-label',t[lang].search);const grid=el('div','list');app.append(search,grid);const paint=()=>{grid.replaceChildren();let term=search.value.trim().toLowerCase();let filtered=rows.filter(c=>[c.name,c.city,c.address].join(' ').toLowerCase().includes(term));if(!filtered.length){grid.appendChild(el('p','',t[lang].noResult));return}filtered.forEach(c=>{const card=el('article','place-card'),text=el('section','');add(text,el('strong','',recordTitle(c)),el('div','muted sub',[str(c,'city'),str(c,'address')].filter(Boolean).join(' · ')));let url='/trailyo/cinema/?id='+encodeURIComponent(c.id)+'&lang='+lang;add(text,link(t[lang].view,url,'btn'));add(card,imageFor(c),text);grid.appendChild(card)})};search.addEventListener('input',paint);paint();status.textContent=''}
+async function load(){updateLocale();try{const validId=id&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);if(id&&!validId)throw Error('Invalid cinema ID');const fields='id,name,city,address,latitude,longitude,phone,email,website_url,description_pt,image_url,image_author,image_license,image_source_url,metadata';const query='?select='+fields+'&published=eq.true&operating_status=eq.open'+(validId?'&id=eq.'+encodeURIComponent(id):'&order=city.asc,name.asc&limit=500');const response=await fetch(base+query,{headers:{apikey:key,Accept:'application/json'}});if(!response.ok)throw Error('HTTP '+response.status);const rows=await response.json();if(!Array.isArray(rows))throw Error('Bad response');if(validId){if(!rows.length)throw Error('Not found');details(rows[0])}else{directory(rows)}}catch(e){status.textContent=t[lang].error;status.setAttribute('data-error',String(e&&e.message||e))}}
+document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>{if(lang===button.dataset.lang)return;const url=new URL(location.href);lang=button.dataset.lang;url.searchParams.set('lang',lang);history.replaceState(null,'',url);load()}));
+load();
+})();
+</script>
+</body></html>
