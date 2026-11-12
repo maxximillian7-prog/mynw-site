@@ -80,6 +80,11 @@ for(const image of marketingImages){
   assert.ok(/data-fallback-src="https:\/\/images\.unsplash\.com\//.test(image[0]),
     'Marketing photograph must retain a safe fallback until uploaded');
 }
+const iconPath='/qwin/assets/qwin_icon.png?v=q-approved-20261112';
+for (const [label,page] of [['home',home],['docs',docs]]) {
+  assert.ok(page.includes('rel="icon" type="image/png" sizes="any" href="'+iconPath+'"'),
+    'Q favicon missing or wrong on '+label);
+}
 const approvedLogo='/qwin/assets/qwin_home_logo_transparent.png';
 assert.ok(home.includes(approvedLogo) && docs.includes(approvedLogo),
   'The exact previously approved Qwin logo must be used throughout the site');
