@@ -70,7 +70,7 @@ lang=lang.startsWith('ru')?'ru':lang.startsWith('en')?'en':'pt';
 const app=document.getElementById('app'),status=document.getElementById('status');
 const el=(name,cls,text)=>{const e=document.createElement(name);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
 const add=(parent,...nodes)=>{nodes.forEach(n=>n&&parent.appendChild(n));return parent};
-const link=(txt,url,cls='btn light')=>{try{let u=new URL(url,location.href);if(u.protocol!=='https:'&&u.protocol!=='http:')return null;let e=el('a',cls,txt);e.href=u.href;e.rel='noopener noreferrer';if(u.origin!==location.origin)e.target='_blank';return e}catch{return null}};
+const link=(txt,url,cls='btn light')=>{try{if(typeof url!=='string'||!url.trim())return null;let u=new URL(url,location.href);if(u.protocol!=='https:'&&u.protocol!=='http:')return null;let e=el('a',cls,txt);e.href=u.href;e.rel='noopener noreferrer';if(u.origin!==location.origin)e.target='_blank';return e}catch{return null}};
 const str=(obj,key)=>String(obj&&obj[key]!==null&&obj[key]!==undefined?obj[key]:'').trim();
 const meta=c=>c.metadata&&typeof c.metadata==='object'?c.metadata:{};
 const photo=c=>str(c,'image_url').startsWith('https://')?str(c,'image_url'):'';
