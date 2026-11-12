@@ -1,13 +1,16 @@
-/* Use verified Qwin-generated marketing assets when present. Gracefully fall back while
-   the user's binary GitHub upload has not completed. No fabricated items or pricing. */
+/* Qwin approved generated visuals: show each local file when installed.
+ * Until marketing PNGs arrive in GitHub, display original licensed fallback
+ * photos instead of broken placeholders. Handles early image-load failures too. */
 (function(){
   'use strict';
-  document.querySelectorAll('img[data-fallback-src]').forEach(function(image){
-    image.addEventListener('error',function(){
-      var fallback=image.getAttribute('data-fallback-src');
-      if(!fallback||image.dataset.fallbackUsed==='true')return;
-      image.dataset.fallbackUsed='true';
-      image.src=fallback;
-    },{once:true});
+  document.querySelectorAll('img[data-fallback-src]').forEach(function(img){
+    function useFallback(){
+      var fallback=img.getAttribute('data-fallback-src');
+      if(!fallback||img.dataset.fallbackUsed==='true')return;
+      img.dataset.fallbackUsed='true';
+      img.src=fallback;
+    }
+    img.addEventListener('error',useFallback,{once:true});
+    if(img.complete && img.naturalWidth===0)useFallback();
   });
 })();
