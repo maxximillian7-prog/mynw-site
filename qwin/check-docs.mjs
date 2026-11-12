@@ -23,6 +23,28 @@ const sections=[...html.matchAll(/<section[^>]+id="([^"]+)"/g)]
 for(const name of ['privacy','terms','safety','ai','delete','cookies','contact']){
   assert.ok(sections.includes(name),`Missing Qwin policy section: ${name}`);
 }
+const requiredSections=['marketplace','how','platforms','documents','about',
+  'privacy','terms','safety','ai','delete','partners','cookies','contact'];
+for(const id of requiredSections){
+  assert.ok(new RegExp('id="'+id+'"').test(html),
+    'Missing app landing or documentation anchor: '+id);
+}
+assert.match(html,/<div class="app-showcase"/,
+  'Promotional page must present the mobile application');
+assert.match(html,/phone-shell/,
+  'Illustrative app-phone preview must be present');
+assert.doesNotMatch(html,/demo-grid|demo-price|€\\s*[0-9]+/,
+  'Public promotional website must not resemble a live sales catalogue');
+assert.match(html,/Qwin is independent from OLX, Etsy and eBay/,
+  'Provider independence must be disclosed');
+assert.match(html,/The term 'Etsy' is a trademark of Etsy, Inc\\. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc\\./,
+  'Official Etsy API disclaimer must be present verbatim');
+assert.ok(!/href="https?:\\/\\/(?:play\\.google\\.com|apps\\.apple\\.com)/.test(html),
+  'Do not advertise nonexistent public app-store listing links');
+const css=readFileSync(new URL('./marketplace.css',import.meta.url),'utf8');
+for(const selector of ['.phone-shell','.hero-content','.partner-card','.doccard']){
+  assert.ok(css.includes(selector),'Missing core marketing CSS: '+selector);
+}
 for(const lang of ['ru','en','pt']){
   const elements=keys.map(k=>({
     key:k,dataset:{},textContent:`English original ${k}`,
@@ -56,5 +78,5 @@ for(const lang of ['ru','en','pt']){
       `Translation not rendered for ${element.key}/${lang}`);
   }
 }
-console.log('Qwin documents validated: '+keys.length+
+console.log('Qwin promotional site and documents validated: '+keys.length+
   ' translatable keys, 7 policy sections, RU EN PT locale switching');
