@@ -41,19 +41,38 @@ assert.ok(home.includes('href="/qwin/docs/" data-t="navDocs"'),
   'Main navigation must open standalone documents menu');
 assert.ok(home.includes('href="/qwin/docs/#contact"'),
   'Support navigation must open standalone documents');
-assert.ok(home.includes('href="/qwin/docs/#safety"'),
-  'Safety CTA must point to the moved document');
-assert.ok(home.includes('app-showcase')&&home.includes('phone-shell'),
-  'Homepage must remain a mobile app promotion');
+assert.ok(home.includes('href="/qwin/docs/"'),
+  'All legal documents must remain accessible from the Docs menu');
+assert.ok(home.includes('hero-photo-group')&&home.includes('hero-photo-primary'),
+  'Homepage must have real editorial photography and preserve mobile app promotion');
+assert.ok(!home.includes('phone-shell')&&!home.includes('showcase-float'),
+  'Old faux-phone UI must not remain');
+assert.ok(home.includes('id="marketplace"')&&home.includes('id="how"')
+  &&home.includes('id="platforms"'),'Main feature anchors must remain');
+assert.ok(home.includes('newHeroFirst')&&home.includes('newHeroSecond'),
+  'Editorial heading must have localized text');
 assert.ok(!home.includes('demo-grid') && !home.includes('demo-price'),
   'Do not simulate live inventory or a web marketplace');
 assert.ok(docs.includes('Qwin is independent from OLX, Etsy and eBay'),
   'Platform independence disclosure missing');
 assert.ok(docs.includes("The term 'Etsy' is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc."),
   'Etsy API disclaimer missing');
-for(const selector of ['.phone-shell','.hero-content','.doccard','.docs-page-intro']){
-  assert.ok(css.includes(selector),'Missing CSS: '+selector);
+const landingCss=readFileSync(new URL('./landing-editorial.css',import.meta.url),'utf8');
+for(const selector of ['.hero-photo-group','.hero-grid','.feature-cards',
+  '.editorial-grid','.category-photo-grid','.platform-grid','.closing-section']){
+  assert.ok(landingCss.includes(selector),'Missing editorial landing CSS: '+selector);
 }
+for(const selector of ['.doccard','.docs-page-intro']){
+  assert.ok(css.includes(selector),'Missing separate docs CSS: '+selector);
+}
+const sourceImages=[...home.matchAll(/<img[^>]+src="(https:\/\/images\.unsplash\.com\/[^"]+)"[^>]*>/g)];
+assert.ok(sourceImages.length>=6,'Professional photo-driven landing must have multiple verified photos');
+for(const image of sourceImages){
+  assert.ok(/alt="[^"]+"/.test(image[0]),'Photograph requires alt text');
+  assert.ok(/referrerpolicy="no-referrer"/.test(image[0]),'Photograph must minimize referrer disclosure');
+}
+assert.ok(!/href="https?:\/\/(?:play\.google\.com|apps\.apple\.com)/.test(home),
+  'App-store buttons must not appear before public Qwin launch');
 
 // Hash fragments never reach a web server. Redirect old published OAuth,
 // legal and support URLs in the browser while preserving any ?lang parameter.
