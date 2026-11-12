@@ -1,3 +1,54 @@
+/* Shared foundation for Qwin's standalone promotional page and legal sections */
+:root{color-scheme:light;--navy:#0b2240;--teal:#078d84;--ink:#19323f;--muted:#5a777c;--border:#dceae6}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:0;overflow-wrap:break-word;font:16px/1.58 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+a{color:#087f77}
+a:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #0b9b8f;outline-offset:3px}
+header{position:sticky;top:0;z-index:20}
+.container{max-width:1220px;margin-inline:auto;padding-inline:24px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-block:9px}
+.brand{display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none;min-height:58px}
+.brand img{display:block;object-fit:contain;max-width:100%}
+.nav{display:flex;align-items:center;gap:16px;margin-left:auto}
+.nav a{text-decoration:none;white-space:nowrap;line-height:1.3}
+.lang-wrap{display:flex;align-items:center;flex:none}
+.lang-wrap select{display:block;background:#fff;border:1px solid #d1e5df;color:#173949;padding:10px 12px;min-height:42px;max-width:160px;cursor:pointer}
+.nav-scroll-hint{display:none}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.hero{position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.hero-content{position:relative;z-index:1}
+.hero h1{max-width:710px}
+.hero p{margin:0}
+.hero-brand{display:flex;align-items:center}
+.eyebrow{font-weight:850;text-transform:uppercase}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-size:12px;font-weight:750;border-radius:100px}
+main{padding-block:0 80px}
+.docgrid{display:grid;gap:13px}
+.doccard{display:block;text-decoration:none;color:#183944;background:#fff;border:1px solid #dceae6}
+.doccard strong{display:block}
+.doccard span{display:block;color:#668085;margin-top:8px}
+section.doc{background:#fff;border:1px solid #dceae6}
+section.doc h2{color:#0b2540;margin:0 0 18px}
+section.doc h3{font-size:17px;color:#096d68;margin:24px 0 7px}
+section.doc ul{padding-left:23px}
+.doc p,.doc li{overflow-wrap:anywhere}
+.warning{border-radius:10px;padding:14px 16px}
+footer a{color:#b6f5e7}
+@media(max-width:860px){
+ .bar{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:0;min-height:0}
+ .brand{grid-column:1;grid-row:1;min-width:0;justify-self:start}
+ .lang-wrap{grid-column:2;grid-row:1}
+ .nav{grid-column:1/-1;grid-row:2;width:100%;display:flex;gap:7px;min-width:0;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;margin:0;padding:3px 6px 10px 0}
+ .nav::-webkit-scrollbar{display:none}
+ .nav a{flex:0 0 auto;font-size:12px;padding:7px 12px;min-height:36px;border-radius:999px;background:#ebf9f4;border:1px solid #d7ece6}
+ .nav-scroll-hint{display:none}
+ .lang-wrap select{max-width:144px}
+}
+@media(max-width:680px){.container{padding-inline:16px}.bar{padding-top:6px}.brand{min-height:48px}.lang-wrap select{font-size:12px;padding:7px 9px;min-height:39px}.doc p,.doc li{font-size:14px;line-height:1.67}.doccard strong{font-size:14px}.doccard span{font-size:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 /* Qwin marketplace landing — light/teal identity; source of truth: qwin-app/develop */
 :root{--qw-navy:#0b2240;--qw-teal:#008f88;--qw-mint:#d7f8ef;--qw-ink:#19323f;--qw-line:#dceae7;--qw-white:#fff}
 html{scroll-padding-top:108px}
