@@ -120,6 +120,18 @@ input[type=search]{width:100%} .filters select{width:100%}
 @media(max-width:1550px){.editorEditingLayout{grid-template-columns:minmax(0,1fr)}.editorPreviewColumn{position:static;max-height:none;overflow:visible}}
 @media(max-width:650px){#livePreview.pt-live-preview{padding:9px 3px}.pt-phone{height:620px;min-height:420px}.pt-search-commons .split{display:flex}}
 
+
+.pt-stock-links{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 13px}
+.pt-stock-links a{background:#fff;border:1px solid #bdded7;border-radius:9px;color:#186c66;font-weight:800;font-size:12px;padding:8px 11px}
+.pt-stock-links a:hover{background:#e6f5f1}
+.pt-stock-import{border:1px solid #d3e5df;border-radius:10px;margin:12px 0 0;padding:11px;background:#fff}
+.pt-stock-import summary{font-size:12px;font-weight:800;cursor:pointer;color:#225e5a}
+.pt-stock-import .field{margin:9px 0}
+.pt-license-confirm{display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.5;padding:9px;background:#f2f8f5;border-radius:8px;color:#295b57}
+.pt-license-confirm input{margin-top:3px;flex:none}
+.pt-stock-import a{font-size:11px;align-self:center}
+.pt-result-card .pt-result-name{font-weight:800;font-size:10px;color:#397b73}
+
 </style></head>
 <body>
 <div class="layout">
@@ -193,11 +205,26 @@ input[type=search]{width:100%} .filters select{width:100%}
   <p class="secondary">Нажмите на фотографию для мгновенного просмотра. Затем подтвердите выбранную обложку. До утверждения редактором изображение остаётся кандидатом.</p>
   <div id="mediaArea" class="secondary">Изображений нет</div>
   <div class="pt-search-commons">
-   <strong>Подобрать новое реальное фото</strong>
-   <p class="secondary">Поиск Wikimedia Commons. Сохраняются только фотографии с разрешённой лицензией и указанием автора. AI-фото не создаются.</p>
-   <div class="split"><input class="input" type="search" id="commonsQuery" placeholder="Например: MAAT Lisboa museum exterior" aria-label="Поиск фотографий Wikimedia Commons"><button class="btn" id="commonsSearchBtn" type="button">Найти</button></div>
+   <strong>Найти настоящее бесплатное фото</strong>
+   <p class="secondary">Автопоиск: Wikimedia Commons и Openverse. Дополнительно можно искать в Pexels, Unsplash и Pixabay. Все результаты требуют проверки соответствия статье, авторства и лицензии.</p>
+   <div class="split" style="margin:7px 0"><select id="photoProvider" aria-label="Каталог фотографий" style="max-width:165px;flex:none"><option value="all">Все каталоги</option><option value="commons">Wikimedia Commons</option><option value="openverse">Openverse</option></select><input class="input" type="search" id="commonsQuery" placeholder="Например: MAAT Lisboa museum exterior" aria-label="Поиск бесплатных фотографий"><button class="btn" id="commonsSearchBtn" type="button">Найти</button></div>
+   <div class="pt-stock-links" aria-label="Поиск в фотобанках">
+    <a id="pexelsLink" target="_blank" rel="noopener noreferrer" href="https://www.pexels.com/">Pexels ↗</a>
+    <a id="unsplashLink" target="_blank" rel="noopener noreferrer" href="https://unsplash.com/">Unsplash ↗</a>
+    <a id="pixabayLink" target="_blank" rel="noopener noreferrer" href="https://pixabay.com/">Pixabay ↗</a>
+   </div>
    <div id="commonsStatus" class="secondary" role="status"></div>
    <div class="pt-search-results" id="commonsResults"></div>
+   <details class="pt-stock-import">
+    <summary>Добавить найденное фото с Pexels, Unsplash или Pixabay</summary>
+    <p class="secondary">Откройте изображение на сайте фотобанка, проверьте автора и тип лицензии. Укажите страницу конкретного фото и прямой адрес изображения. Новое фото попадёт в редакцию только кандидатом.</p>
+    <div class="field"><label for="stockProvider">Фотобанк</label><select id="stockProvider"><option value="pexels">Pexels</option><option value="unsplash">Unsplash</option><option value="pixabay">Pixabay</option></select></div>
+    <div class="field"><label for="stockPage">Ссылка на страницу конкретной фотографии</label><input id="stockPage" type="url" placeholder="https://www.pexels.com/photo/…"></div>
+    <div class="field"><label for="stockImage">Прямая ссылка на изображение</label><input id="stockImage" type="url" placeholder="https://images.pexels.com/photos/…"></div>
+    <div class="field"><label for="stockAuthor">Автор фотографии</label><input id="stockAuthor" placeholder="Имя автора на сайте"></div>
+    <label class="pt-license-confirm"><input type="checkbox" id="stockVerified"> Я проверил фото на странице источника, условия бесплатной коммерческой лицензии, авторство, отсутствие AI-генерации и соответствие статье.</label>
+    <div class="btns"><button type="button" class="btn primary" id="stockAddBtn">Добавить в статью на утверждение</button><a id="stockLicenseLink" target="_blank" rel="noopener noreferrer" href="https://www.pexels.com/license/">Правила лицензии ↗</a></div>
+   </details>
   </div>
  </div>
 </div></div>
