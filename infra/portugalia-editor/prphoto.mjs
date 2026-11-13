@@ -217,7 +217,7 @@ async function generateMediumCover(itemId){
 
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:7},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:8,medium_generation_configured:Boolean(process.env.NEON_AI_GATEWAY_TOKEN&&process.env.NEON_AI_GATEWAY_BASE_URL&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
 try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
