@@ -219,6 +219,7 @@ const $=id=>document.getElementById(id),escapeHtml=x=>String(x??"").replace(/[&<
 const statuses={candidate:"В обработке",needs_facts:"Нужны факты",draft:"Черновик",ready_for_review:"На согласовании",approved:"Утверждено",rejected:"Отклонено",queued:"В очереди"};
 let session,me,categories=[],items=[],current=null,activeStatus="incoming",dirty=false,loading=false;
 let toastTimeout=0,approvalPending=false;
+let previewMode="phone",previewPhotoId=null,photoSearchResults=[];
 function toast(msg,error=false){const el=$("toast");el.textContent=msg;el.classList.toggle("error",error);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.hidden=true,4800)}
 function login(message){$("loginMessage").textContent=message||"Войдите в Journal Studio и вернитесь в этот раздел.";$("loginOverlay").hidden=false}
 function iso(v){if(!v)return"—";try{return new Date(v).toLocaleString("ru-RU",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch{return v}}
@@ -261,20 +262,66 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  $("approvalWarning").textContent=i.intake_ready?"Техническая приёмка пройдена. Перед окончательным утверждением редактор проверяет содержание, исходную ссылку и права на иллюстрацию.":"Неполный материал не может быть утверждён. Причины указаны вверху; ручное подтверждение фактов потребуется после исправлений.";
  dirty=false;renderMedia(item.media);renderHistory(item);renderPreview();
 }
+const PHOTO_API="https://br-young-paper-b972wmgd-prphoto.compute.c-7.eu-central-1.aws.neon.tech";
+async function photoCall(path,options={}){
+ if(!session?.access_token)throw Error("Войдите в Journal Studio");
+ const request=()=>fetch(PHOTO_API+path,{method:options.method||"GET",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:options.body?JSON.stringify(options.body):undefined,cache:"no-store"});
+ let response=await request();
+ if(response.status===401&&session.refresh_token){
+  const renew=await fetch(S+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{"apikey":KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:session.refresh_token})});
+  if(renew.ok){session=await renew.json();sessionStorage.setItem("journal_session",JSON.stringify(session));response=await request();}
+ }
+ const data=await response.json().catch(()=>({}));
+ if(!response.ok)throw Error(data.error||"Не удалось обработать фотографию");
+ return data;
+}
+function choosePreviewPhoto(){
+ const i=current?.article||{},media=(current?.media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
+ return media.find(m=>m.id===previewPhotoId)||media.find(m=>m.public_url===i.photo_url&&m.status==="approved")||media.find(m=>m.status==="approved")||media.find(m=>m.public_url===i.photo_url)||media[0]||null;
+}
 function renderMedia(media){
- const area=$("mediaArea");
- const options=(media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
- if(!options.length){area.textContent="Для этой статьи пока нет индивидуальной реальной фотографии с проверенными правами. Повторяющиеся AI-обложки и старые универсальные изображения больше не принимаются. Поиск ведётся в Wikimedia Commons и собственных лицензированных фотоархивах.";return}
- area.innerHTML=options.map(m=>{
-  const preview=/^https:\/\//i.test(m.public_url||"")?'<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Тематическая иллюстрация">':"<p class='secondary'>Файл ещё не готов</p>";
-  const can=m.public_url&&m.rights_verified&&["licensed_original","owned_original"].includes(m.media_type)&&m.status==="candidate";
-  const references=(m.license_details||"").split(" | ");
-  const originalPhoto=references.find(x=>/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/i.test(x.trim()));
-  const photoCreditLink=originalPhoto?'<a rel="noopener noreferrer" target="_blank" href="'+escapeHtml(originalPhoto.trim())+'" style="display:inline-block;margin:5px 0">Просмотреть оригинал и лицензию Wikimedia Commons</a>':'';
-  return'<div class="figure">'+preview+'<h4>'+escapeHtml(m.media_type==="generated_illustration"?"ИИ-иллюстрация":m.media_type==="brand_generic"?"Тематическая обложка рубрики":m.media_type==="licensed_original"?"Лицензированное тематическое фото":m.media_type)+" · "+escapeHtml(m.status)+'</h4><small>Права: '+(m.status==="approved"?"проверено и одобрено редактором":m.rights_verified?"метаданные лицензии получены, ожидает выбора редактора":"не проверены")+'</small>'+(m.attribution?'<small>Автор/источник: '+escapeHtml(m.attribution)+'</small>':'')+(m.license_details?'<small>Лицензия: '+escapeHtml(m.license_details)+'</small>':'')+photoCreditLink+'<div class="figureActions">'+(me?.user?.edit&&can?'<button class="btn" data-media-approve="'+escapeHtml(m.id)+'">Одобрить изображение</button>':"")+(me?.user?.edit?'<button class="btn danger" data-media-reject="'+escapeHtml(m.id)+'">Отклонить</button>':"")+'</div></div>';
- }).join("");
- area.querySelectorAll("[data-media-approve]").forEach(b=>b.onclick=()=>sendAction("approve_media",{media_id:b.dataset.mediaApprove}));
- area.querySelectorAll("[data-media-reject]").forEach(b=>b.onclick=()=>{const why=prompt("Причина отклонения изображения:");if(why)sendAction("reject_media",{media_id:b.dataset.mediaReject,note:why})});
+ const area=$("mediaArea");const options=(media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
+ if(!options.length){area.innerHTML='<div class="imagePending">🖼 Фотографий для этой статьи пока нет. Воспользуйтесь поиском ниже.</div>';return;}
+ const chosen=choosePreviewPhoto();
+ area.innerHTML='<div class="pt-photo-gallery">'+options.map(m=>{
+  const active=chosen?.id===m.id;
+  return '<button type="button" class="pt-photo-choice '+(active?"selected":"")+'" data-media-preview="'+escapeHtml(m.id)+'" aria-pressed="'+active+'" title="Показать в телефоне">'+
+  '<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Вариант обложки">'+
+  '<span>'+(m.status==="approved"?"✓ Фото утверждено":"● Ожидает утверждения")+'</span></button>';
+ }).join("")+'</div><div class="pt-photo-row"><span class="secondary">'+(chosen?chosen.status==="approved"?"✓ Выбрано утверждённое фото":"Выбрано фото-кандидат":"Выберите обложку")+'</span>'+
+ (me?.user?.edit&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
+ '</div>'+(chosen?.attribution?'<div class="faint">Автор и лицензия: '+escapeHtml(chosen.attribution)+'</div>':"")+
+ '<div class="pt-photo-row"><a target="_blank" rel="noopener noreferrer" href="https://commons.wikimedia.org/w/index.php?search='+encodeURIComponent(current?.article?.headline_ru||"Portugal")+'&title=Special:MediaSearch&type=image">Поиск на Wikimedia Commons ↗</a></div>';
+ area.querySelectorAll("[data-media-preview]").forEach(button=>button.onclick=()=>{previewPhotoId=button.dataset.mediaPreview;renderMedia(current?.media);renderPreview();});
+ const apply=$("applySelectedPhoto");
+ if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
+}
+async function searchCommons(){
+ const query=$("commonsQuery").value.trim(),area=$("commonsResults"),note=$("commonsStatus");
+ if(query.length<3){note.textContent="Введите не менее трёх символов.";return;}
+ $("commonsSearchBtn").disabled=true;note.textContent="Ищем подлинные фотографии с разрешённой лицензией…";area.innerHTML="";
+ try{
+  const data=await photoCall("/api/search?q="+encodeURIComponent(query));photoSearchResults=data.photos||[];
+  if(!photoSearchResults.length){note.textContent="Ничего подходящего не найдено. Попробуйте другое место или запрос на португальском/английском.";return;}
+  note.textContent="Найдено "+photoSearchResults.length+" вариантов. Выберите фото, которое соответствует сюжету.";
+  area.innerHTML=photoSearchResults.map((p,n)=>'<div class="pt-result-card"><img loading="lazy" src="'+escapeHtml(p.url)+'" alt="Реальная фотография Wikimedia Commons"><small>'+escapeHtml(p.author)+' · '+escapeHtml(p.license)+'</small><a href="'+escapeHtml(p.file_page)+'" target="_blank" rel="noopener noreferrer">Посмотреть оригинал</a><button type="button" class="btn" data-attach-photo="'+n+'">Выбрать для статьи</button></div>').join("");
+  area.querySelectorAll("[data-attach-photo]").forEach(button=>button.onclick=()=>attachCommons(Number(button.dataset.attachPhoto)));
+ }catch(e){note.textContent=e.message;toast(e.message,true);}
+ finally{$("commonsSearchBtn").disabled=false;}
+}
+async function attachCommons(index){
+ if(!current||!photoSearchResults[index])return;
+ if(dirty){toast("Сначала сохраните правки текста, затем выберите фотографию.",true);return;}
+ const p=photoSearchResults[index],note=$("commonsStatus");
+ if(!confirm("Добавить выбранное фото Wikimedia Commons к статье? Оно будет ждать ручного утверждения."))return;
+ note.textContent="Проверяем права и сохраняем фото в редакцию…";
+ try{
+  const r=await photoCall("/api/attach",{method:"POST",body:{item_id:current.article.id,file_title:p.title}});
+  previewPhotoId=r.media_id;
+  await refreshSelected();
+  note.textContent="Фото добавлено. Оно отображается в телефоне. Для публикации нажмите «Утвердить выбранное» после проверки.";
+  toast("Фото сохранено как кандидат; публикация не выполнялась.");
+ }catch(e){note.textContent=e.message;toast(e.message,true);}
 }
 function renderHistory(data){
  const events=[...(data.comments||[]).map(x=>({kind:"Комментарий",when:x.created_at,desc:x.body})),...(data.revisions||[]).map(x=>({kind:x.action,when:x.created_at,desc:x.note||""}))].sort((a,b)=>String(b.when).localeCompare(String(a.when))).slice(0,30);
