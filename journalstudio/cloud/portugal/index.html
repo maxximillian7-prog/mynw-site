@@ -115,7 +115,7 @@ input[type=search]{width:100%} .filters select{width:100%}
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
   <div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button><button id="approveBtn" class="btn primary">✓ Утвердить статью</button></div>
   <hr class="divider"><div class="split"><div class="field"><label>Куда поставить в очередь</label><select id="destination"><option value="main">Главная лента</option><option value="afisha">Афиша</option></select></div><div class="field" style="justify-content:end"><button id="queueBtn" class="btn">↗ В очередь Telegram</button></div></div>
-  <p class="secondary">Это только внутренняя очередь. Отправка в Telegram отключена до завершения настройки канала и бота.</p>
+  <p class="secondary">После утверждения редактором материал поступает в очередь Telegram. Доставка в выбранный канал проверяется автоматически каждые 5 минут. Черновики и материалы без проверенных прав на фото не публикуются.</p>
  </div>
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
 </div>
@@ -160,13 +160,13 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  $("storySource").textContent=i.source_name;$("needsFactsBadge").textContent=i.needs_more_facts?"Требуется проверка фактов":i.context_verified?"Контекст проверен":"Не проверено";
  $("evidence").value=i.canonical_url||"";$("factState").textContent=i.source_fact_checked?"✓ Проверено редактором":"Не подтверждено";
  $("saveStatus").textContent="";$("note").value="";$("comment").value="";$("emptyPanel").classList.add("hidden");$("editorPanel").classList.remove("hidden");
- const editable=me?.user?.can_edit&&!["approved","rejected"].includes(i.status)&&i.editorial_status!=="approved";
+ const editable=me?.user?.edit&&!["approved","rejected"].includes(i.status)&&i.editorial_status!=="approved";
  for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException","saveBtn"])$(id).disabled=!editable;
  $("verifyBtn").disabled=!editable;
- for(const id of ["changesBtn","rejectBtn","reopenBtn","approveBtn","queueBtn"])$(id).disabled=!me?.user?.can_approve;
- $("changesBtn").disabled=!me?.user?.can_edit;
- $("approveBtn").disabled=!me?.user?.can_approve||i.status==="approved";$("queueBtn").disabled=!me?.user?.can_approve||i.status!=="approved";
- $("reopenBtn").disabled=!me?.user?.can_approve||!(i.status==="approved"||i.status==="rejected");
+ for(const id of ["changesBtn","rejectBtn","reopenBtn","approveBtn","queueBtn"])$(id).disabled=!me?.user?.approve;
+ $("changesBtn").disabled=!me?.user?.edit;
+ $("approveBtn").disabled=!me?.user?.approve||i.status==="approved";$("queueBtn").disabled=!me?.user?.approve||i.status!=="approved";
+ $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected");
  $("approvalWarning").textContent=i.intake_ready?"Техническая приёмка пройдена. Перед окончательным утверждением редактор проверяет содержание, исходную ссылку и права на иллюстрацию.":"Неполный материал не может быть утверждён. Причины указаны вверху; ручное подтверждение фактов потребуется после исправлений.";
  dirty=false;renderMedia(item.media);renderHistory(item);renderPreview();
 }
@@ -180,7 +180,7 @@ function renderMedia(media){
   const references=(m.license_details||"").split(" | ");
   const originalPhoto=references.find(x=>/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/i.test(x.trim()));
   const photoCreditLink=originalPhoto?'<a rel="noopener noreferrer" target="_blank" href="'+escapeHtml(originalPhoto.trim())+'" style="display:inline-block;margin:5px 0">Просмотреть оригинал и лицензию Wikimedia Commons</a>':'';
-  return'<div class="figure">'+preview+'<h4>'+escapeHtml(m.media_type==="generated_illustration"?"ИИ-иллюстрация":m.media_type==="brand_generic"?"Тематическая обложка рубрики":m.media_type==="licensed_original"?"Лицензированное тематическое фото":m.media_type)+" · "+escapeHtml(m.status)+'</h4><small>Права: '+(m.status==="approved"?"проверено и одобрено редактором":m.rights_verified?"метаданные лицензии получены, ожидает выбора редактора":"не проверены")+'</small>'+(m.attribution?'<small>Автор/источник: '+escapeHtml(m.attribution)+'</small>':'')+(m.license_details?'<small>Лицензия: '+escapeHtml(m.license_details)+'</small>':'')+photoCreditLink+'<div class="figureActions">'+(me?.user?.can_edit&&can?'<button class="btn" data-media-approve="'+escapeHtml(m.id)+'">Одобрить изображение</button>':"")+(me?.user?.can_edit?'<button class="btn danger" data-media-reject="'+escapeHtml(m.id)+'">Отклонить</button>':"")+'</div></div>';
+  return'<div class="figure">'+preview+'<h4>'+escapeHtml(m.media_type==="generated_illustration"?"ИИ-иллюстрация":m.media_type==="brand_generic"?"Тематическая обложка рубрики":m.media_type==="licensed_original"?"Лицензированное тематическое фото":m.media_type)+" · "+escapeHtml(m.status)+'</h4><small>Права: '+(m.status==="approved"?"проверено и одобрено редактором":m.rights_verified?"метаданные лицензии получены, ожидает выбора редактора":"не проверены")+'</small>'+(m.attribution?'<small>Автор/источник: '+escapeHtml(m.attribution)+'</small>':'')+(m.license_details?'<small>Лицензия: '+escapeHtml(m.license_details)+'</small>':'')+photoCreditLink+'<div class="figureActions">'+(me?.user?.edit&&can?'<button class="btn" data-media-approve="'+escapeHtml(m.id)+'">Одобрить изображение</button>':"")+(me?.user?.edit?'<button class="btn danger" data-media-reject="'+escapeHtml(m.id)+'">Отклонить</button>':"")+'</div></div>';
  }).join("");
  area.querySelectorAll("[data-media-approve]").forEach(b=>b.onclick=()=>sendAction("approve_media",{media_id:b.dataset.mediaApprove}));
  area.querySelectorAll("[data-media-reject]").forEach(b=>b.onclick=()=>{const why=prompt("Причина отклонения изображения:");if(why)sendAction("reject_media",{media_id:b.dataset.mediaReject,note:why})});
@@ -228,7 +228,7 @@ async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;a
 async function sendAction(action,other={}){
  if(!current)return;const note=other.note??$("note").value;
  if(dirty&&action!=="comment"&&!confirm("Есть несохранённые правки. Выполнить действие без них?"))return;
- try{const r=await call("/api/action",{method:"POST",body:{item_id:current.article.id,action,note,...other}});toast(action==="queue"?"Добавлено во внутреннюю очередь. Telegram не отправлен.":"Действие выполнено");await refreshSelected()}catch(e){toast(e.message,true)}
+ try{const r=await call("/api/action",{method:"POST",body:{item_id:current.article.id,action,note,...other}});toast(action==="queue"?"Материал поставлен в очередь Telegram. После проверок он будет отправлен автоматически.":"Действие выполнено");await refreshSelected()}catch(e){toast(e.message,true)}
 }
 function bind(){
  document.querySelectorAll("[data-status]").forEach(x=>x.onclick=async()=>{activeStatus=x.dataset.status;document.querySelectorAll("[data-status]").forEach(y=>y.classList.toggle("active",x===y));await list()});
