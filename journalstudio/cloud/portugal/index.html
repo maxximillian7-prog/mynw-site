@@ -324,33 +324,89 @@ function renderMedia(media){
  const apply=$("applySelectedPhoto");
  if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
 }
+
+function updateStockLinks(){
+ const currentArticle=current?.article||{};
+ const fallback=[currentArticle.location_city,currentArticle.title_original||currentArticle.headline_ru||currentArticle.title_ru].filter(Boolean).join(" ").trim().slice(0,85);
+ const query=$("commonsQuery").value.trim()||fallback||"Portugal";
+ const q=encodeURIComponent(query);
+ const links={
+  pexels:"https://www.pexels.com/search/"+q+"/",
+  unsplash:"https://unsplash.com/s/photos/"+q,
+  pixabay:"https://pixabay.com/images/search/"+q+"/"
+ };
+ for(const [provider,link] of Object.entries(links)){
+  const el=$(provider+"Link");if(el){el.href=link;el.title="Искать «"+query+"» на "+provider;}
+ }
+ const lic={
+  pexels:"https://www.pexels.com/license/",
+  unsplash:"https://unsplash.com/license",
+  pixabay:"https://pixabay.com/service/license-summary/"
+ };
+ $("stockLicenseLink").href=lic[$("stockProvider").value]||lic.pexels;
+}
 async function searchCommons(){
  const query=$("commonsQuery").value.trim(),area=$("commonsResults"),note=$("commonsStatus");
  if(query.length<3){note.textContent="Введите не менее трёх символов.";return;}
- $("commonsSearchBtn").disabled=true;note.textContent="Ищем подлинные фотографии с разрешённой лицензией…";area.innerHTML="";
+ $("commonsSearchBtn").disabled=true;
+ note.textContent="Ищем настоящие фотографии с открытой лицензией…";area.innerHTML="";
+ const selected=$("photoProvider").value;
+ const providers=selected==="all"?["commons","openverse"]:[selected];
  try{
-  const data=await photoCall("/api/search?q="+encodeURIComponent(query));photoSearchResults=data.photos||[];
-  if(!photoSearchResults.length){note.textContent="Ничего подходящего не найдено. Попробуйте другое место или запрос на португальском/английском.";return;}
-  note.textContent="Найдено "+photoSearchResults.length+" вариантов. Выберите фото, которое соответствует сюжету.";
-  area.innerHTML=photoSearchResults.map((p,n)=>'<div class="pt-result-card"><img loading="lazy" src="'+escapeHtml(p.url)+'" alt="Реальная фотография Wikimedia Commons"><small>'+escapeHtml(p.author)+' · '+escapeHtml(p.license)+'</small><a href="'+escapeHtml(p.file_page)+'" target="_blank" rel="noopener noreferrer">Посмотреть оригинал</a><button type="button" class="btn" data-attach-photo="'+n+'">Выбрать для статьи</button></div>').join("");
+  const results=await Promise.allSettled(providers.map(provider=>photoCall("/api/search?provider="+provider+"&q="+encodeURIComponent(query))));
+  const photos=[],issues=[],known=new Set();
+  results.forEach((result,n)=>{
+   const provider=providers[n];
+   if(result.status!=="fulfilled"){issues.push((provider==="commons"?"Wikimedia": "Openverse")+" недоступен");return;}
+   for(const photo of result.value.photos||[]){
+    const v={...photo,provider:photo.provider||provider};
+    if(!v.url||known.has(v.url))continue;known.add(v.url);photos.push(v);
+   }
+  });
+  photoSearchResults=photos;
+  if(!photos.length){note.textContent="Нет подходящих изображений. "+issues.join("; ")+". Попробуйте новый запрос или Pexels, Unsplash, Pixabay.";return;}
+  note.textContent="Найдено "+photos.length+" лицензированных вариантов"+(issues.length?". "+issues.join("; "):"")+". Перед выбором проверьте сюжет и автора.";
+  area.innerHTML=photos.map((p,n)=>'<div class="pt-result-card"><div class="pt-result-name">'+escapeHtml(p.provider==="openverse"?"Openverse · "+(p.source||"открытая коллекция"):"Wikimedia Commons")+'</div>'+
+   '<img loading="lazy" src="'+escapeHtml(p.preview_url||p.url)+'" alt="'+escapeHtml(p.title||"Фотография")+'">'+
+   '<small>'+escapeHtml(p.author||"Неизвестно")+' · '+escapeHtml(p.license||"Лицензия не указана")+'</small>'+
+   '<a href="'+escapeHtml(p.file_page)+'" target="_blank" rel="noopener noreferrer">Оригинал и права ↗</a>'+
+   '<button type="button" class="btn" data-attach-photo="'+n+'">Выбрать для статьи</button></div>').join("");
   area.querySelectorAll("[data-attach-photo]").forEach(button=>button.onclick=()=>attachCommons(Number(button.dataset.attachPhoto)));
- }catch(e){note.textContent=e.message;toast(e.message,true);}
+ }catch(e){note.textContent=e.message;toast(e.message,true)}
  finally{$("commonsSearchBtn").disabled=false;}
 }
 async function attachCommons(index){
  if(!current||!photoSearchResults[index])return;
  if(dirty){toast("Сначала сохраните правки текста, затем выберите фотографию.",true);return;}
  const p=photoSearchResults[index],note=$("commonsStatus");
- if(!confirm("Добавить выбранное фото Wikimedia Commons к статье? Оно будет ждать ручного утверждения."))return;
- note.textContent="Проверяем права и сохраняем фото в редакцию…";
+ if(!confirm("Добавить фото из "+(p.provider==="openverse"?"Openverse":"Wikimedia Commons")+" к статье? Оно будет ждать ручного утверждения."))return;
+ note.textContent="Повторно сверяем авторство и лицензию…";
  try{
-  const r=await photoCall("/api/attach",{method:"POST",body:{item_id:current.article.id,file_title:p.title}});
+  const body=p.provider==="openverse"?{item_id:current.article.id,provider:"openverse",image_id:p.image_id}:{item_id:current.article.id,provider:"commons",file_title:p.title};
+  const r=await photoCall("/api/attach",{method:"POST",body});
   previewPhotoId=r.media_id;
   await refreshSelected();
-  note.textContent="Фото добавлено. Оно отображается в телефоне. Для публикации нажмите «Утвердить выбранное» после проверки.";
-  toast("Фото сохранено как кандидат; публикация не выполнялась.");
+  note.textContent="Фото сохранено как кандидат и видно в телефонном предпросмотре. Перед выпуском утвердите изображение.";
+  toast("Фото добавлено, в Telegram ничего не опубликовано.");
  }catch(e){note.textContent=e.message;toast(e.message,true);}
 }
+async function importStockPhoto(){
+ if(!current)return;
+ if(dirty){toast("Сначала сохраните изменения статьи.",true);return;}
+ const provider=$("stockProvider").value,page_url=$("stockPage").value.trim(),image_url=$("stockImage").value.trim(),author=$("stockAuthor").value.trim(),confirmed=$("stockVerified").checked;
+ if(!page_url||!image_url||!author||!confirmed){toast("Нужны страница фото, прямая ссылка, автор и подтверждение проверки.",true);return;}
+ const button=$("stockAddBtn"),note=$("commonsStatus");
+ button.disabled=true;note.textContent="Сохраняем проверенные редактором сведения и фото-кандидат…";
+ try{
+  const data=await photoCall("/api/import",{method:"POST",body:{item_id:current.article.id,provider,page_url,image_url,author,confirmed}});
+  previewPhotoId=data.media_id;await refreshSelected();
+  note.textContent="Фото из "+provider+" добавлено к статье. Проверьте предпросмотр и отдельно утвердите обложку.";
+  $("stockVerified").checked=false;
+  toast("Фотография добавлена как кандидат для ручной приёмки.");
+ }catch(e){note.textContent=e.message;toast(e.message,true);}
+ finally{button.disabled=false;}
+}
+
 function renderHistory(data){
  const events=[...(data.comments||[]).map(x=>({kind:"Комментарий",when:x.created_at,desc:x.body})),...(data.revisions||[]).map(x=>({kind:x.action,when:x.created_at,desc:x.note||""}))].sort((a,b)=>String(b.when).localeCompare(String(a.when))).slice(0,30);
  $("historyArea").innerHTML=events.length?events.map(x=>'<div class="entry"><b>'+escapeHtml(x.kind)+'</b><small>'+escapeHtml(iso(x.when))+'</small><div>'+escapeHtml(x.desc)+'</div></div>').join(""):'<p class="secondary">История редакционных решений появится здесь.</p>';
@@ -441,7 +497,7 @@ function jumpEditor(id){
 }
 async function selectArticle(id){
  if(dirty&&!confirm("Остались несохранённые изменения. Перейти к другой статье?"))return;
- try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));previewPhotoId=null;photoSearchResults=[];$("commonsResults").innerHTML="";$("commonsStatus").textContent="";current=item;fill(item);document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
+ try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));previewPhotoId=null;photoSearchResults=[];$("commonsResults").innerHTML="";$("commonsStatus").textContent="";current=item;$("commonsQuery").value=[item.article.location_city,item.article.title_original||item.article.headline_ru||item.article.title_ru].filter(Boolean).join(" ").trim().slice(0,85);fill(item);updateStockLinks();document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
 }
 async function list(){
  const p=new URLSearchParams({status:activeStatus,category:$("categoryFilter").value,q:$("search").value});
@@ -511,7 +567,12 @@ function bind(){
  $("quickPhoto").onclick=()=>{$("photoPanel").scrollIntoView({behavior:"smooth",block:"center"});$("commonsQuery").focus()};
  $("quickSave").onclick=saveArticle;
  $("commonsSearchBtn").onclick=searchCommons;
+ $("commonsQuery").addEventListener("input",updateStockLinks);
  $("commonsQuery").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchCommons()}});
+ $("stockProvider").addEventListener("change",updateStockLinks);
+ $("stockAddBtn").onclick=importStockPhoto;
+ for(const provider of ["pexels","unsplash","pixabay"])$(provider+"Link").addEventListener("click",()=>{$("stockProvider").value=provider;updateStockLinks()});
+ updateStockLinks();
 
 
  $("changesBtn").onclick=()=>sendAction("request_changes");
