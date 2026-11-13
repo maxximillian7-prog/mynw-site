@@ -87,7 +87,7 @@ input[type=search]{width:100%} .filters select{width:100%}
 .pt-phone-chat{min-height:0;flex:1;overflow-y:auto;scrollbar-width:thin;padding:13px 11px 22px;background-color:#e1eae6;background-image:radial-gradient(circle at 10px 15px,#c9dbd36e 1px,transparent 1.5px);background-size:24px 31px}
 .pt-day-chip{display:table;margin:0 auto 13px;padding:4px 12px;border-radius:15px;color:#48605d;background:#ffffffc9;font-size:10px}
 .pt-chat-post{max-width:95%;border-radius:13px 13px 12px 4px;margin-bottom:11px;background:#fff;box-shadow:0 1px 2px #163b391b;overflow:hidden;color:#1c292e}
-.pt-chat-cover{width:100%;max-height:230px;aspect-ratio:16/9;object-fit:cover;display:block;background:#e8efec}
+.pt-chat-cover{width:100%;height:auto;max-height:300px;object-fit:contain;display:block;background:#e8efec}
 .pt-chat-body{padding:12px 13px 8px;font-size:13px;line-height:1.47;overflow-wrap:anywhere}
 .pt-chat-body .pt-message-title{margin:0 0 9px;font-size:15px;font-weight:850;line-height:1.28}
 .pt-chat-body .pt-caption-lead{font-size:12.5px;margin:7px 0;white-space:pre-line}
@@ -181,6 +181,7 @@ input[type=search]{width:100%} .filters select{width:100%}
    <button class="btn" type="button" id="quickHeadline">✎ Заголовок</button>
    <button class="btn" type="button" id="quickStory">✎ Текст</button>
    <button class="btn" type="button" id="quickPhoto">▧ Фото</button>
+   <button class="btn primary" type="button" id="quickSave">💾 Сохранить</button>
   </div>
   <div class="preview pt-live-preview" id="livePreview"></div>
   <div class="pt-screen-notice" id="previewHint">Мобильный макет Telegram на основе подготовленных текста и фотографии.</div>
@@ -392,6 +393,7 @@ function renderPreview(){
    '</div></div>';
   const scroller=$("ptChatScroll");if(scroller)scroller.scrollTop=oldTop;
   $("previewHint").textContent=img?(full.length>1024?"Предпросмотр отправки: фотография с подписью и отдельный полный текст поста.":"Предпросмотр отправки: фотография с подписью."):"Предпросмотр текстового сообщения. Для приёмки требуется реальная фотография.";
+  if(full.length>4000)$("previewHint").textContent="⚠️ Текст длиннее 4000 символов — сократите его перед отправкой.";
  }else{
   root.innerHTML='<article class="pt-article-view">'+
    '<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(catName)+'</div>'+
@@ -485,6 +487,7 @@ function bind(){
  $("quickHeadline").onclick=()=>jumpEditor("headline");
  $("quickStory").onclick=()=>jumpEditor("story");
  $("quickPhoto").onclick=()=>{$("photoPanel").scrollIntoView({behavior:"smooth",block:"center"});$("commonsQuery").focus()};
+ $("quickSave").onclick=saveArticle;
  $("commonsSearchBtn").onclick=searchCommons;
  $("commonsQuery").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchCommons()}});
 
