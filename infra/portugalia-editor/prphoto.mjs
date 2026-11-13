@@ -1,3 +1,4 @@
+import {createHash,createHmac,randomUUID} from "node:crypto";
 // Portugal editorial: signed in photo choice using real Wikimedia Commons files.
 const studio="https://npsfaymjckcqhtyiafms.supabase.co",key="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 const uuid=x=>/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(x||"");
@@ -142,13 +143,86 @@ async function selectApproved(id,mediaId){
  await db("UPDATE pr_items SET photo_url=$2,photo_rights=$3,photo_attribution=$4,photo_license=$5,photo_licence_url=$6,updated_at=now() WHERE id=$1::uuid",[id,a.public_url,rights,a.attribution,details[0]||null,details[1]||null]);
  return {selected:true,media_id:mediaId,photo_url:a.public_url};
 }
+
+const BKT="pr-editorial-media",AI_COVER_MODEL="gpt-5",GENERATOR_NAME="neon-gpt5-image-medium";
+const hashHex=x=>createHash("sha256").update(x).digest("hex");
+const hmac=(key,input)=>createHmac("sha256",key).update(input).digest();
+async function putCover(key,image){
+ const access=process.env.AWS_ACCESS_KEY_ID,secret=process.env.AWS_SECRET_ACCESS_KEY,region=process.env.AWS_REGION||"eu-central-1",endpoint=process.env.AWS_ENDPOINT_URL_S3;
+ if(!access||!secret||!endpoint)throw bad("Хранилище Neon недоступно",503);
+ const base=new URL(endpoint),path="/"+BKT+"/"+key.split("/").map(encodeURIComponent).join("/");
+ const uploadURL=base.origin+path,now=new Date(),iso=now.toISOString().replace(/[:-]|\.\d{3}/g,""),date=iso.slice(0,8);
+ const payloadHash=hashHex(image),contentType="image/jpeg";
+ const headers={"content-type":contentType,"host":base.host,"x-amz-content-sha256":payloadHash,"x-amz-date":iso};
+ const signed="content-type;host;x-amz-content-sha256;x-amz-date";
+ const canonical="PUT\n"+path+"\n\n"+Object.entries(headers).sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>k+":"+v+"\n").join("")+"\n"+signed+"\n"+payloadHash;
+ const scope=date+"/"+region+"/s3/aws4_request";
+ const toSign="AWS4-HMAC-SHA256\n"+iso+"\n"+scope+"\n"+hashHex(canonical);
+ const signing=hmac(hmac(hmac(hmac("AWS4"+secret,date),region),"s3"),"aws4_request");
+ const signature=createHmac("sha256",signing).update(toSign).digest("hex");
+ const authorization="AWS4-HMAC-SHA256 Credential="+access+"/"+scope+", SignedHeaders="+signed+", Signature="+signature;
+ const res=await fetch(uploadURL,{method:"PUT",headers:{...headers,Authorization:authorization},body:image,signal:AbortSignal.timeout(40000)});
+ if(!res.ok)throw bad("Не удалось сохранить изображение в Neon Storage ("+res.status+")",503);
+ return uploadURL;
+}
+function coverPrompt(info){
+ const title=plain(info.headline_ru||info.title_ru||info.title_original).slice(0,230);
+ const city=plain(info.location_city||info.location_region||"Португалия").slice(0,100);
+ const desc=plain(info.story_ru||info.summary_ru).slice(0,900);
+ if(title.length<8||desc.length<80)throw bad("Для генерации нужен полноценный текст статьи",422);
+ return "Create ONE attractive 3:2 landscape editorial cover image at medium quality for the Portuguese information magazine Portugal Ryadom. "+
+ "The image MUST be clearly an original AI ILLUSTRATION, not a fabricated documentary photo. "+
+ "Subject: "+title+". Location/context: "+city+". Key facts: "+desc+". "+
+ "A single strong focal subject, calm sophisticated photographic-illustration aesthetic, authentic Portuguese setting where appropriate, soft natural light, detailed composition, suitable for a small mobile Telegram article cover. "+
+ "NO text, NO readable writing, NO watermarks, NO labels or logos, NO fake passports, documents, ID cards, government forms or official seals. "+
+ "Do not simulate real news photographs, protests, exact museum artworks, copyrighted artworks, or identifiable real people; if real events or institutions are discussed use conceptual symbolic illustration. "+
+ "Professional editorial visual, not a collage, 1536x1024 landscape.";
+}
+async function generateMediumCover(itemId){
+ const draft=await checkItem(itemId);
+ const [info]=await db("SELECT i.title_original,i.title_ru,i.summary_ru,i.primary_category,i.location_city,i.location_region,d.headline_ru,d.story_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
+ if(!info)throw bad("Черновик не найден",404);
+ const prompt=coverPrompt(info);
+ const [counter]=await db("SELECT count(*)::int AS n FROM pr_media_assets WHERE item_id=$1::uuid AND media_type='generated_illustration' AND created_at>now()-interval '24 hours'",[itemId]);
+ if(Number(counter?.n||0)>=3)throw bad("Лимит: максимум 3 AI-варианта на статью за 24 часа",429);
+ const reserved=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,status,rights_verified,illustration_label_required) VALUES($1::uuid,$2::uuid,'generated_illustration',$3,$4,'generating',false,true) ON CONFLICT DO NOTHING RETURNING id",[itemId,draft.draft_id,GENERATOR_NAME,prompt.slice(0,2000)]);
+ const mid=reserved[0]?.id;if(!mid)throw bad("Генерация для этой статьи уже выполняется",409);
+ try{
+  const token=process.env.NEON_AI_GATEWAY_TOKEN,host=process.env.NEON_AI_GATEWAY_BASE_URL;
+  if(!token||!host)throw bad("Нейросетевая генерация Neon недоступна",503);
+  const request={model:AI_COVER_MODEL,input:prompt,tools:[{type:"image_generation",size:"1536x1024",quality:"medium",output_format:"jpeg",output_compression:82}],tool_choice:{type:"image_generation"},store:false};
+  const response=await fetch(host.replace(/\/$/,"")+"/openai/v1/responses",{
+    method:"POST",headers:{"authorization":"Bearer "+token,"content-type":"application/json"},
+    body:JSON.stringify(request),signal:AbortSignal.timeout(160000)
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw bad("Сервис генерации вернул "+response.status+": "+plain(data.error?.message||"ошибка провайдера").slice(0,120),503);
+  const imageCall=(data.output||[]).find(x=>x.type==="image_generation_call"&&x.status==="completed"&&x.result);
+  if(!imageCall)throw bad("Изображение не получено от AI Gateway",502);
+  const encoded=imageCall.result;
+  if(typeof encoded!=="string"||encoded.length<20000||encoded.length>5500000)throw bad("Некорректный размер созданной фотографии",502);
+  const bytes=Buffer.from(encoded,"base64");
+  if(bytes.byteLength<12000||bytes.byteLength>3500000||bytes[0]!==0xff||bytes[1]!==0xd8)throw bad("AI Gateway не вернул корректное JPEG-изображение",502);
+  const key="ai-covers/"+itemId+"/"+mid+".jpg";
+  const publicURL=await putCover(key,bytes);
+  const caption="AI-иллюстрация · создана для журнала «Португалия рядом»";
+  const details="AI-generated editorial illustration (Medium); Neon AI Gateway; one image; not documentary; manual approval required";
+  await db("UPDATE pr_media_assets SET storage_bucket=$2,storage_key=$3,public_url=$4,attribution=$5,license_details=$6,rights_verified=true,status='candidate',failure_reason=NULL WHERE id=$1::uuid AND status='generating'",[mid,BKT,key,publicURL,caption,details]);
+  return {media_id:mid,photo_url:publicURL,quality:"medium",media_type:"generated_illustration",ai_label:caption,needs_approval:true};
+ }catch(e){
+  try{await db("UPDATE pr_media_assets SET status='failed',failure_reason=$2 WHERE id=$1::uuid AND status='generating'",[mid,String(e.message||e).slice(0,200)])}catch{}
+  throw e;
+ }
+}
+
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:6},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:7},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
 try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/import"){const raw=await req.text();if(raw.length>2500)throw bad("Слишком длинный запрос");return result(await importFromStock(JSON.parse(raw||"{}")),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/select"){const raw=await req.text();if(raw.length>1200)throw bad("Слишком длинный запрос");const b=JSON.parse(raw||"{}");return result(await selectApproved(b.item_id,b.media_id),200,origin);}
+if(req.method==="POST"&&u.pathname==="/api/generate"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком большой запрос");const b=JSON.parse(raw||"{}");if(b.quality&&b.quality!=="medium")throw bad("Сейчас поддерживается качество Medium");return result(await generateMediumCover(b.item_id),200,origin);}
 return result({error:"Not found"},404,origin);
 }catch(e){return result({error:String(e.message||e).slice(0,200)},e.status||500,origin);}}};
