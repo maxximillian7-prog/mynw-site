@@ -5,35 +5,42 @@ const SHA=t=>createHash("sha256").update(t).digest("hex");
 const clean=t=>String(t||"").replace(/<!\[CDATA\[|\]\]>/gi,"").replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<br\s*\/?>|<\/p>|<\/div>/gi,"\n").replace(/<[^>]*>/g," ").replace(/&nbsp;|&#160;/gi," ").replace(/&amp;/gi,"&").replace(/&quot;/gi,'"').replace(/&apos;/gi,"'").replace(/&lt;/gi,"<").replace(/&gt;/gi,">").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(+n)).replace(/&#x([a-f0-9]+);/gi,(_,n)=>String.fromCodePoint(parseInt(n,16))).replace(/[ \t]+/g," ").replace(/\n{3,}/g,"\n\n").trim();
 const xmlTag=(xml,name)=>{const m=xml.match(new RegExp("<"+name+"(?:\\s[^>]*)?>([\\s\\S]*?)<\\/"+name+">","i"));return m?m[1]:""};
 const pt=/(portugal|portugu[eê]s|lisboa|porto|algarve|cascais|sintra|set[úu]bal|coimbra|braga|aveiro|madeira|a[cç]ores|faro|viseu|leiria|santar[eé]m|oeiras|amadora|loul[eé]|nacional|governo|autarqu|munic[ií]p|c[âa]mara |presidente da rep[úu]blica|assembleia da rep[úu]blica|aima|sns|seguran[cç]a social|irs|finan[cç]as)/i;
-const patterns={
- documents:/aima|resid[êe]ncia|autoriza[cç][ãa]o de|passaport|cart[ãa]o de cidad|visto|nacionalidade|cidadania|imigra[cç]|reagrupamento|licen[cç]a|certid[ãa]o|burocracia|document|servi[cç]o p[úu]blico/i,
- family:/crian[cç]|fam[ií]li|filho|filha|escola|educa[cç]|ensino|professor|universidade|estudante|inf[âa]ncia|creche|aluno|parental|bolsa de estudo|juven|adolesc|jardim de inf[âa]ncia/i,
- work:/emprego|trabalho|sal[áa]rio|remunera[cç]|profiss|desemprego|subs[ií]dio|irs|impost|finan[cç]as|atividade|pens[ãa]o|rendimento|economia|empresa|contrato de trabalho|teletrabalho|apoio social/i,
- life:/habita[cç]|arrendamento|renda|casa|moradia|transport|metro|comboio|autocarro|[úu]tente|sa[úu]de|hospital|centro de sa[úu]de|sns|alimenta[cç]|mercado|custo de vida|eletricidade|energia|[áa]gua|seguran[cç]a rodovi[áa]ria/i,
- tips:/como |dicas|guia pr[áa]tico|passo a passo|poupar|gratuit|desconto|vantagen|servi[cç]o digital|online|app|candidatura|inscri[cç][ãa]o|prevenir|evitar|procedimento|hor[áa]rio|acesso|benef[ií]cio|recomenda[cç][ãa]o/i,
- places:/turism|praia|parque natural|passeio|trilho|percurs|castelo|museu|patrim[óo]nio|monumento|visitar|viagem|paisagem|sintra|rio douro|serra|costa|rota|destino|caminhada|praias/i,
- events:/festival|concerto|feira|exposi[cç]|teatro|espet[áa]culo|agenda cultural|evento|festival|m[úu]sica ao vivo|mostra|cinema|oficina|visita guiada/i,
- news:/aviso|alerta|interrup[cç]|restri[cç]|greve|tempestade|prote[cç][ãa]o civil|decis[ãa]o|lei|medida|governo|novo programa|prazo|regras|regulamento|anuncia/i
+// Strict, reader-centred topic classification. Do not classify from accidental words in summaries.
+const topicTitle={
+ documents:/\b(aima|sef|autoriza[cç][ãa]o de resid[êe]ncia|t[ií]tulo de resid[êe]ncia|visto[s]?|passaporte[s]?|nacionalidade|cidadania|cart[ãa]o de cidad[ãa]o|nif|niss|reagrupamento familiar|documentos pessoais|certid[ãa]o de nascimento|renova[cç][ãa]o de documentos)\b/i,
+ family:/\b(escola[s]?|creche[s]?|educa[cç][ãa]o|professor(?:es)?|aluno[s]?|crian[cç]a[s]?|estudante[s]?|universidade[s]?|ensino|maternidade|jardim de inf[âa]ncia|parentalidade|bolsa de estudo)\b/i,
+ life:/\b(habita[cç][ãa]o|renda[s]?|arrendamento|habita[cç][õo]es|transportes p[úu]blicos|comboio[s]?|metro|autocarro[s]?|passe[s]? social|hospital|sns|sa[úu]de|centro de sa[úu]de|eletricidade|[áa]gua|custo de vida|imobili[áa]rio|bairros|mun[ií]cipes)\b/i,
+ work:/\b(emprego[s]?|desemprego|sal[áa]rios?|trabalho[s]?|irs|impostos?|pens[õo]es|reforma[s]?|subs[ií]dios?|contratos? de trabalho|apoio[s]? social[is]?|remunera[cç][ãa]o|negocia[cç][ãa]o salarial)\b/i,
+ tips:/\b(como (?:fazer|pedir|obter|evitar|poupar)|guia pr[áa]tico|passo a passo|dicas para|descontos?|burlas?|fraudes?|poupar|apoios gratuitos?|inscri[cç][õo]es)\b/i,
+ places:/\b(praia[s]?|parque natural|passeio[s]?|trilho[s]?|percursos?|castelo[s]?|miradouro[s]?|monumento[s]?|turismo rural|rotas?|destinos?|algarve|serra[s]?|caminhada[s]?|aldeia[s]? hist[óo]rica[s]?)\b/i,
+ events:/\b(festival|concertos?|feira[s]?|exposi[cç][õo]es|teatro|espet[áa]culo[s]?|agenda cultural|evento[s]?|m[úu]sica ao vivo|visita[s]? guiada[s]?)\b/i,
+ news:/\b(alerta[s]?|greve[s]?|avisos?|tempestade[s]?|prote[cç][ãa]o civil|interrup[cç][õo]es|encerramento[s]?|interdi[cç][ãa]o|restri[cç][õo]es|aprovad[ao] nova lei|mudan[cç]a nas regras)\b/i
 };
-const actionable=/prazo|pre[cç]o|regras|apoio|novas medidas|entrada em vigor|alter[aã][cç]|quando|como |onde |redu[cç]|gratuit|abertura|inscri[cç]|candidatura|bilhete|alerta|hor[áa]rio|pagamento|subsid|benef[ií]cio/i;
-const reject=/celebridade|fofoca|hor[oó]scopo|reality show|meme|star wars|darth vader|nvidia|bitcoin|elon musk|trump|iran|ir[ãa]o|usa|eua|israel|ucr[âa]nia|r[úu]ssia|guerra mundial/i;
+const actionable=/\b(como|quando|onde|prazo[s]?|pre[cç]os?|regras?|apoios?|entrada em vigor|gratuit[oa]s?|inscri[cç][ãa]o|candidatura[s]?|benefici[áa]rios?|descontos?|recomenda[cç][ãa]o|moradores?|pessoas?|residente[s]?|nova[s]? medida[s]?|alter[aã][cç][õo]es|alarga|poupar|evitar burlas|documentos necess[áa]rios|condi[cç][õo]es)\b/i;
+const reject=/\b(celebridade|fofoca|hor[oó]scopo|reality show|meme|star wars|darth vader|nvidia|bitcoin|elon musk|trump|iran|ir[ãa]o|israel|ucr[âa]nia|r[úu]ssia|guerra mundial)\b/i;
 const evalItem=(title,body,preferred)=>{
- const merged=(title+" "+body).toLowerCase();
- if(!pt.test(merged)||reject.test(merged))return null;
- let category=preferred,weight=0;
- for(const [code,rx] of Object.entries(patterns)){const m=merged.match(rx),n=m?m.length:0;
-  let bonus=code==="events"?-12:0;
-  if(n&&code!=="news")bonus+=17;
-  if(n&&code===preferred)bonus+=4;
-  if(m&&bonus>weight){category=code;weight=bonus}
+ const head=title.toLowerCase(),summary=body.toLowerCase(),all=head+" "+summary;
+ if(!pt.test(all)||reject.test(head))return null;
+ let category=null;
+ // Specific eligibility in the headline is mandatory, with one defensible primary category.
+ for(const topic of ["documents","family","life","work","tips","places","events","news"]){
+  if(topicTitle[topic].test(head)){category=topic;break}
  }
- if(!patterns[category]?.test(merged))return null;
- let score=20+(pt.test(title)?19:9)+(body.length>=160?14:body.length>=100?7:0)+
- (body.length>260?5:0)+(actionable.test(merged)?21:0)+(weight>0?15:0)+
- (/(\d{1,3}\s?€|20\d\d|[0-9]{1,2}:[0-9]{2})/.test(merged)?8:0);
- if(category==="events")score-=11;
- if(category==="news"&&!actionable.test(merged))score-=18;
- return{category,score:Math.min(100,Math.max(0,score)),reason:"Выбран за практическую полезность, актуальность и привязку к Португалии; полный русскоязычный рерайт и изображение ещё требуются"};
+ if(!category)return null;
+ const practical=actionable.test(all);
+ if(!practical&&!["places","events"].includes(category))return null;
+ // This thematic channel is not a general politics, international or celebrity feed.
+ if(/\b(presidente|ministro|fmi|banco central|bce|elei[cç][õo]es)\b/.test(head) &&
+    !/\b(renda|habita[cç]|irs|visto|resid[êe]ncia|sal[áa]rio|subs[ií]dio|gratuit|apoio|transporte|sa[úu]de)\b/.test(head))return null;
+ const localInTitle=pt.test(head);
+ let score=40+(localInTitle?13:7)+(body.length>=150?13:body.length>=100?6:0)+(practical?21:0)+
+ (/\b(€|euros|gratuit|prazo|dias?|hor[áa]rio|quando|quem pode|saber mais)\b/i.test(all)?7:0)+
+ (/^(como|nov[ao]s?|gratuit|alerta|apoio|redu[cç])/.test(head)?5:0);
+ if(category==="events")score-=13;
+ if(category==="places"&&body.length>210)score+=5;
+ if(category==="news"&&!/\b(seguran[cç]a|sa[úu]de|transporte|interrup[cç][ãa]o|aviso|alerta|servi[cç]o)\b/.test(all))return null;
+ score=Math.min(100,Math.max(0,score));
+ return{category,score,reason:"Tema указан в заголовке; есть практическая польза для жителей Португалии. Требуются русский рерайт, первичная проверка фактов и лицензированное фото."};
 };
 function parseRSS(raw){
  const found=[...raw.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/gi)].slice(0,70);
@@ -64,6 +71,7 @@ export default {async fetch(req){
    const val=evalItem(item.title,item.body,feed.primary_category);
    if(!val||val.score<feed.min_score){rejected++;continue}
    if(val.category==="events"&&feed.source_family==="rtp_news"){rejected++;continue}
+   if(feed.source_family==="rtp_news"&&val.score<76){rejected++;continue}
    candidates.push({...item,when,val});
   }
   candidates.sort((a,b)=>b.val.score-a.val.score);
@@ -89,7 +97,7 @@ export default {async fetch(req){
   return json({ok:true,feed:feed.code,feed_items:options.length,passing_criteria:candidates.length,rejected,saved_research_hits:saved,promoted_to_translation_rtp:promoted,duplicate,telegram_sent:0});
  }catch(e){
   const msg=String(e.message||e).slice(0,160);
-  await sql("UPDATE pr_discovery_feeds SET last_scan_at=now(),last_error=$2,last_new_count=0 WHERE code=(SELECT code FROM pr_discovery_feeds WHERE is_enabled ORDER BY COALESCE(last_scan_at,'1970-01-01'::timestamptz) LIMIT 1)",["",msg]).catch(()=>{});
+  await sql("UPDATE pr_discovery_feeds SET last_scan_at=now(),last_error=$1,last_new_count=0 WHERE code=(SELECT code FROM pr_discovery_feeds WHERE is_enabled ORDER BY COALESCE(last_scan_at,'1970-01-01'::timestamptz) LIMIT 1)",[msg]).catch(()=>{});
   return json({ok:false,error:msg},500)
  }
 }};
