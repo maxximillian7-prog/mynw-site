@@ -10,7 +10,7 @@ export default {async fetch(req){
  if(req.method!=="POST"||!req.headers.get("x-neon-trigger-invocation-id"))return res({error:"schedule_only"},403);
  if(!process.env.TRAILYO_PUBLISHABLE_KEY)return res({ok:true,skipped:"public_key_not_configured"});
  try{
- const candidates=await sql("SELECT i.id,i.external_id,i.summary_ru,d.id draft_id,d.status draft_status,d.ai_model,d.source_context_used FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id WHERE s.code='trailyo_events' AND i.duplicate_of IS NULL AND i.status='candidate' AND i.external_id ~ '^[0-9a-f-]{36}$' AND (length(coalesce(i.summary_ru,''))<=520 OR length(coalesce(d.source_context_used,'')) BETWEEN 495 AND 505 OR i.title_ru IS NULL) ORDER BY i.discovered_at DESC LIMIT 30");
+ const candidates=await sql("SELECT i.id,i.external_id,i.summary_ru,d.id draft_id,d.status draft_status,d.ai_model,d.source_context_used FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id WHERE s.code='trailyo_events' AND i.duplicate_of IS NULL AND i.status='candidate' AND i.external_id ~ '^[0-9a-f-]{36}$' AND (length(coalesce(i.summary_ru,''))<=520 OR length(coalesce(d.source_context_used,'')) BETWEEN 495 AND 505 OR i.title_ru IS NULL) ORDER BY CASE WHEN length(coalesce(i.summary_ru,''))=500 THEN 0 WHEN length(coalesce(d.source_context_used,'')) BETWEEN 495 AND 505 THEN 1 ELSE 2 END, i.discovered_at DESC LIMIT 30");
  if(!candidates.length)return res({ok:true,skipped:"no_truncated_translation"});
  const items=candidates.filter(x=>uuid(x.external_id));
  const u=new URL(SUPABASE+"/rest/v1/event_translations");
