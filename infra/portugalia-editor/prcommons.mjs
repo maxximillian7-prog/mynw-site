@@ -15,7 +15,11 @@ const themes=[
  {id:"castle",check:/castelo|castle|pal[aá]cio|крепост|дворец|замок/i,terms:/castle|castelo|pal[aá]cio|palace|fortress|forte/i,query:"historic castle"},
  {id:"school",check:/escola|educa[cç]|school|школ|университет|образован|ученик|college/i,terms:/escola|school|campus|college|universidade|university/i,query:"school university campus building"},
  {id:"health",check:/hospital|sa[uú]de|clinic|больниц|здоровь|поликлиник|медицин|врач/i,terms:/hospital|clinic|cl[ií]nica|sa[uú]de|medical centre/i,query:"hospital medical center exterior"},
- {id:"heritage",check:/patrim[oó]nio|monument|history|hist[oó]ric|истори|памятник|достопримеч/i,terms:/heritage|patrim[oó]nio|monument|historic|hist[oó]ric|old town/i,query:"historic heritage monument"}
+ {id:"heritage",check:/patrim[oó]nio|monument|history|hist[oó]ric|истори|памятник|достопримеч/i,terms:/heritage|patrim[oó]nio|monument|historic|hist[oó]ric|old town/i,query:"historic heritage monument"},
+ {id:"concert",check:/concert|concerto|m[úu]sica|music|dj|gig|live band|концерт|музык|дидже|вечерин/i,terms:/concert|concerto|music|m[úu]sica|stage|palco|music hall|sala de concerto|perform/i,query:"music concert hall stage"},
+ {id:"theatre",check:/teatro|theatre|drama|спектакл|театр|акт[её]р/i,terms:/teatro|theatre|theater|stage|auditorium|performance|palco/i,query:"theatre auditorium interior"},
+ {id:"festival",check:/festival|фестивал|feira|ярмар|fair|market|mercado/i,terms:/festival|feira|fair|market|mercado|festiv/i,query:"cultural street festival"},
+ {id:"workshop",check:/workshop|oficina|masterclass|master class|мастер.класс|заняти|ремесл/i,terms:/workshop|oficina|art class|craft|handmade|studio/i,query:"creative workshop art studio"}
 ];
 function chooseQuery(item){
  const title=(item.title_original||"")+" "+(item.title_ru||"");
@@ -45,8 +49,8 @@ export default {async fetch(req){
  let article;
  try{
  const [state]=await q("SELECT count(*)::integer AS attempted_today FROM pr_commons_media_jobs WHERE attempted_at>now()-interval '24 hours'");
- if(state&&Number(state.attempted_today)>=12)return ok({ok:true,skipped:"daily_photo_search_limit"});
- const selected=await q("SELECT i.id,i.title_original,i.title_ru,i.location_city,i.primary_category FROM pr_items i JOIN pr_editorial_value_reviews v ON v.item_id=i.id JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.status='candidate' AND i.duplicate_of IS NULL AND i.primary_category NOT IN ('events') AND v.value_score>=55 AND d.status IN ('draft','needs_facts') AND length(d.source_context_used)>=160 AND NOT EXISTS(SELECT 1 FROM pr_media_assets a WHERE a.item_id=i.id AND a.rights_verified AND a.public_url IS NOT NULL) AND NOT EXISTS(SELECT 1 FROM pr_commons_media_jobs j WHERE j.item_id=i.id) ORDER BY v.value_score DESC,i.discovered_at DESC LIMIT 1");
+ if(state&&Number(state.attempted_today)>=24)return ok({ok:true,skipped:"daily_photo_search_limit"});
+ const selected=await q("SELECT i.id,i.title_original,i.title_ru,i.location_city,i.primary_category FROM pr_items i JOIN pr_editorial_value_reviews v ON v.item_id=i.id JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.status='candidate' AND i.duplicate_of IS NULL AND (i.primary_category<>'events' OR i.starts_at>now()) AND v.value_score>=55 AND d.status IN ('draft','needs_facts') AND length(d.source_context_used)>=160 AND NOT EXISTS(SELECT 1 FROM pr_media_assets a WHERE a.item_id=i.id AND a.media_type IN ('licensed_original','owned_original') AND a.rights_verified AND a.public_url IS NOT NULL AND a.status IN ('candidate','approved','generated')) AND NOT EXISTS(SELECT 1 FROM pr_commons_media_jobs j WHERE j.item_id=i.id) ORDER BY CASE WHEN i.primary_category='events' THEN 1 ELSE 0 END,v.value_score DESC,i.discovered_at DESC LIMIT 1");
  if(!selected.length)return ok({ok:true,skipped:"no_matching_article"});
  article=selected[0];
  const match=chooseQuery(article);
@@ -77,10 +81,17 @@ export default {async fetch(req){
   await q("UPDATE pr_commons_media_jobs SET status='none',reason='no_sufficiently_relevant_verified_licensed_landscape' WHERE item_id=$1::uuid",[article.id]);
   return ok({ok:true,matched:0,search_query:search,image_ready:false});
  }
- const chosen=approved[0],credit=(chosen.artist||"Public domain")+" · "+chosen.license;
- await q("INSERT INTO pr_media_assets(item_id,media_type,generation_model,generation_prompt,public_url,attribution,license_details,rights_verified,illustration_label_required,status) VALUES($1::uuid,'licensed_original','wikimedia_commons_license_lookup',$2,$3,$4,$5,true,true,'candidate')",[article.id,"Тематическое фото (НЕ фото конкретного события/новости): "+search,chosen.url,credit,chosen.license+" | "+chosen.licenseUrl+" | "+chosen.filePage]);
- await q("UPDATE pr_commons_media_jobs SET status='found',reason=$2 WHERE item_id=$1::uuid",[article.id,chosen.filePage]);
- await q("UPDATE pr_commons_media_scan SET licensed_matches=licensed_matches+1,last_error=NULL WHERE code='commons'");
- return ok({ok:true,image_ready_for_review:true,rights_metadata_present:true,article_id:article.id,file_page:chosen.filePage,approved:false,telegram_sent:0});
+ const ranking=approved.slice(0,3);
+ let added=0;
+ for(const chosen of ranking){
+  const credit=(chosen.artist||"Public domain")+" · "+chosen.license;
+  const duplicate=await q("SELECT id FROM pr_media_assets WHERE item_id=$1::uuid AND public_url=$2 LIMIT 1",[article.id,chosen.url]);
+  if(duplicate.length)continue;
+  await q("INSERT INTO pr_media_assets(item_id,media_type,generation_model,generation_prompt,public_url,attribution,license_details,rights_verified,illustration_label_required,status) VALUES($1::uuid,'licensed_original','wikimedia_commons_license_lookup',$2,$3,$4,$5,true,true,'candidate')",[article.id,"Тематическое фото (не кадр конкретной новости или мероприятия): "+search,chosen.url,credit,chosen.license+" | "+chosen.licenseUrl+" | "+chosen.filePage]);
+  added++;
+ }
+ await q("UPDATE pr_commons_media_jobs SET status='found',reason=$2 WHERE item_id=$1::uuid",[article.id,ranking[0].filePage]);
+ await q("UPDATE pr_commons_media_scan SET licensed_matches=licensed_matches+$1,last_error=NULL WHERE code='commons'",[added]);
+ return ok({ok:true,license_checked_photo_options:added,article_id:article.id,approved:false,telegram_sent:0});
  }catch(e){const why=String(e.message||e).slice(0,120);if(article?.id)await q("UPDATE pr_commons_media_jobs SET status='failed',reason=$2 WHERE item_id=$1::uuid",[article.id,why]).catch(()=>{});await q("UPDATE pr_commons_media_scan SET last_error=$1 WHERE code='commons'",[why]).catch(()=>{});return ok({ok:false,error:why},500)}
 }};
