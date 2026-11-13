@@ -121,6 +121,12 @@ input[type=search]{width:100%} .filters select{width:100%}
 @media(max-width:650px){#livePreview.pt-live-preview{padding:9px 3px}.pt-phone{height:620px;min-height:420px}.pt-search-commons .split{display:flex}}
 
 
+.pt-ai-cover{border:1px solid #b7d8d2;border-radius:12px;background:linear-gradient(135deg,#eef9f5,#f8fbfa);padding:14px;margin-top:14px}
+.pt-ai-cover-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.pt-ai-cover-head strong{color:#236e6b;font-weight:850}
+.pt-ai-cover-head span{font-size:11px;color:#4e8177;border-radius:8px;background:#fff;padding:5px 8px}
+.pt-ai-cover .btn{font-size:12px;padding:9px 11px}
+.pt-ai-label{display:inline-block;background:#fff2d3;color:#795000;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:800}
 </style></head>
 <body>
 <div class="layout">
@@ -199,7 +205,13 @@ input[type=search]{width:100%} .filters select{width:100%}
    <div class="split"><input class="input" type="search" id="commonsQuery" placeholder="Например: MAAT Lisboa museum exterior" aria-label="Единый поиск реальных фотографий"><button class="btn primary" id="commonsSearchBtn" type="button">🔍 Найти фото</button></div>
    <div id="commonsStatus" class="secondary" role="status"></div>
    <div class="pt-search-results" id="commonsResults"></div>
-   <p class="secondary" style="margin-top:10px">Показываем только фотографии с разрешённой лицензией, доступной ссылкой на оригинал и автором. При выборе фото сохраняется на ручную приёмку; генерации ИИ нет.</p>
+   <p class="secondary" style="margin-top:10px">Реальные фотографии — только с источником, автором и подходящей лицензией. AI-обложки создаются отдельно и всегда помечаются как иллюстрации.</p>
+  </div>
+  <div class="pt-ai-cover">
+   <div class="pt-ai-cover-head"><strong>🎨 AI-обложка по теме статьи</strong><span>Medium · JPEG · 1536×1024</span></div>
+   <p class="secondary">Создаёт одну оригинальную иллюстрацию по заголовку, содержанию и месту события. Не заменяет реальное фото автоматически, не изображает фальшивые документы или якобы документальные события.</p>
+   <div class="btns"><button class="btn primary" type="button" id="generateAiCoverBtn">🎨 Сгенерировать (Medium)</button><span class="secondary" id="aiCoverStatus" role="status"></span></div>
+   <p class="secondary" style="margin:7px 0 0">До 3 вариантов за сутки на статью. Выбрать и утвердить изображение можно в галерее выше. В Telegram оно будет подписано «AI-иллюстрация».</p>
   </div>
  </div>
 </div></div>
@@ -279,22 +291,22 @@ async function photoCall(path,options={}){
  return data;
 }
 function choosePreviewPhoto(){
- const i=current?.article||{},media=(current?.media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
+ const i=current?.article||{},media=(current?.media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
  return media.find(m=>m.id===previewPhotoId)||media.find(m=>m.public_url===i.photo_url&&m.status==="approved")||media.find(m=>m.status==="approved")||media.find(m=>m.public_url===i.photo_url)||media[0]||null;
 }
 function renderMedia(media){
- const area=$("mediaArea");const options=(media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
+ const area=$("mediaArea");const options=(media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
  if(!options.length){area.innerHTML='<div class="imagePending">🖼 Фотографий для этой статьи пока нет. Воспользуйтесь поиском ниже.</div>';return;}
  const chosen=choosePreviewPhoto(),canChange=!!me?.user?.edit&&current?.article?.status==="candidate";
  area.innerHTML='<div class="pt-photo-gallery">'+options.map(m=>{
   const active=chosen?.id===m.id;
   return '<button type="button" class="pt-photo-choice '+(active?"selected":"")+'" data-media-preview="'+escapeHtml(m.id)+'" aria-pressed="'+active+'" title="Показать в телефоне">'+
   '<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Вариант обложки">'+
-  '<span>'+(m.status==="approved"?"✓ Фото утверждено":"● Ожидает утверждения")+'</span></button>';
+  '<span>'+(m.media_type==='generated_illustration'?'🎨 AI-иллюстрация · ':'')+(m.status==="approved"?"✓ Утверждено":"● На проверке")+'</span></button>';
  }).join("")+'</div><div class="pt-photo-row"><span class="secondary">'+(chosen?chosen.status==="approved"?"✓ Выбрано утверждённое фото":"Выбрано фото-кандидат":"Выберите обложку")+'</span>'+
  (canChange&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
  (canChange&&chosen?.status==="approved"&&chosen.public_url!==current?.article?.photo_url?'<button type="button" class="btn primary" id="setApprovedCover">✓ Сделать обложкой</button>':"")+
- '</div>'+(chosen?.attribution?'<div class="faint">Автор и лицензия: '+escapeHtml(chosen.attribution)+'</div>':"");
+ '</div>'+(chosen?.attribution?'<div class="faint">'+(chosen.media_type==='generated_illustration'?'🎨 AI-иллюстрация · ':'Автор и лицензия: ')+escapeHtml(chosen.attribution)+'</div>':"");
  area.querySelectorAll("[data-media-preview]").forEach(button=>button.onclick=()=>{previewPhotoId=button.dataset.mediaPreview;renderMedia(current?.media);renderPreview();});
  const apply=$("applySelectedPhoto");
  if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
@@ -307,6 +319,23 @@ function renderMedia(media){
    await refreshSelected();toast("Обложка сохранена и будет использована в Telegram.");
   }catch(e){toast(e.message,true)}
  };
+}
+
+async function generateAiCover(){
+ if(!current?.article)return;
+ if(!me?.user?.edit){toast("Недостаточно прав для генерации.",true);return;}
+ if(dirty){toast("Сначала сохраните изменения текста статьи.",true);return;}
+ const b=$("generateAiCoverBtn"),note=$("aiCoverStatus");
+ if(!confirm("Сгенерировать одну AI-иллюстрацию качества Medium по теме статьи? Она будет добавлена как кандидат, без публикации."))return;
+ b.disabled=true;note.textContent="Генерация…";
+ try{
+  const r=await photoCall("/api/generate",{method:"POST",body:{item_id:current.article.id,quality:"medium"}});
+  previewPhotoId=r.media_id;
+  await refreshSelected();
+  note.textContent="Готово. AI-обложка добавлена в галерею для утверждения.";
+  toast("AI-обложка Medium создана; публикация не выполнялась.");
+ }catch(e){note.textContent=e.message;toast(e.message,true);}
+ finally{b.disabled=false;}
 }
 
 async function searchCommons(){
@@ -392,7 +421,7 @@ function renderPreview(){
  const full=(!dirty&&!previewPhotoId&&serverFull)?serverFull:localFull;
 
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
- const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Фотография публикации">':'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
+ const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">🎨 AI-иллюстрация · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
  const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full)+'</div>'+timestamp+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
@@ -502,6 +531,7 @@ function bind(){
  $("quickPhoto").onclick=()=>{$("photoPanel").scrollIntoView({behavior:"smooth",block:"center"});$("commonsQuery").focus()};
  $("quickSave").onclick=saveArticle;
  $("commonsSearchBtn").onclick=searchCommons;
+ $("generateAiCoverBtn").onclick=generateAiCover;
  $("commonsQuery").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchCommons()}});
 
 
