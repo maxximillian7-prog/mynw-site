@@ -20,9 +20,11 @@ function richBlocks(preparedText,photoUrl){
  const full=String(preparedText||"").trim();
  if(full.length<110||full.length>32000)throw Error("Full article length out of range");
  let url;try{url=new URL(photoUrl)}catch{throw Error("Approved photograph URL missing")}
- if(url.protocol!=="https:"||url.username||url.password||
-    !["upload.wikimedia.org","thumb.wikimedia.org","images.pexels.com","images.unsplash.com","cdn.pixabay.com"].includes(url.hostname))
-  throw Error("Photo is not hosted by an approved image provider");
+ const neonStore=process.env.AWS_ENDPOINT_URL_S3?new URL(process.env.AWS_ENDPOINT_URL_S3).hostname:"";
+ const approvedImage=["upload.wikimedia.org","thumb.wikimedia.org","images.pexels.com","images.unsplash.com","cdn.pixabay.com"].includes(url.hostname)
+  ||(neonStore&&url.hostname===neonStore&&url.pathname.startsWith("/pr-editorial-media/ai-covers/"));
+ if(url.protocol!=="https:"||url.username||url.password||!approvedImage)
+  throw Error("Photo must be a licensed image or stored AI illustration");
  const paragraphs=full.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean),title=paragraphs.shift();
  if(!title||title.length>255)throw Error("Article title missing or too long");
  const blocks=[{type:"photo",photo:{type:"photo",media:url.href}},{type:"heading",size:2,text:title}];
@@ -58,7 +60,8 @@ async function claim(){
    SELECT 1 FROM public.pr_media_assets a
    WHERE a.item_id=p.item_id AND a.public_url=q.approved_image_url
     AND a.status='approved' AND a.rights_verified
-    AND a.media_type IN ('licensed_original','owned_original')
+    AND a.media_type IN ('licensed_original','owned_original','generated_illustration')
+    AND (a.media_type<>'generated_illustration' OR (a.illustration_label_required AND a.storage_bucket='pr-editorial-media' AND a.storage_key IS NOT NULL))
  )
  ORDER BY p.created_at LIMIT 1 FOR UPDATE OF p SKIP LOCKED
  ), claimed AS (
