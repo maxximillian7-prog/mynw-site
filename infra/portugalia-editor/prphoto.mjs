@@ -99,6 +99,24 @@ async function attachOpenverse(itemId,imageId){
  return {media_id:mid,photo:image,needs_approval:true,provider:"openverse"};
 }
 
+async function searchAll(q){
+ const names=["commons","openverse"];
+ const tasks=await Promise.allSettled([
+  commons({generator:"search",gsrnamespace:"6",gsrlimit:"22",gsrsearch:q}),
+  openverse(q)
+ ]);
+ const warnings=[],photos=[],seen=new Set();
+ tasks.forEach((r,i)=>{
+  if(r.status!=="fulfilled"){warnings.push((names[i]==="commons"?"Wikimedia Commons":"Openverse")+" временно недоступен");return}
+  for(const img of r.value||[]){
+   const normalized=String(img.url||"").replace(/^https:\/\/(?:thumb|upload)\.wikimedia\.org/,"https://wikimedia.org").replace(/\?.*$/,"").replace(/\/thumb\//,"/");
+   const dedupe=String(img.file_page||img.url||normalized).toLowerCase().replace(/^https:\/\/commons\.wikimedia\.org\/wiki\/file:/,"https://commons.wikimedia.org/wiki/file:");
+   if(!img.url||seen.has(dedupe))continue;
+   seen.add(dedupe);photos.push({...img,provider:img.provider||names[i]});
+  }
+ });
+ return{photos,warnings};
+}
 async function checkItem(id){
 if(!uuid(id))throw bad("Неверная статья");const rows=await db("SELECT i.status,d.id draft_id,d.status draft_status FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[id]);const v=rows[0];
 if(!v||v.status!=="candidate"||!["draft","ready_for_review","needs_facts"].includes(v.draft_status))throw bad("Статья недоступна для смены фото",409);return v;
@@ -115,9 +133,9 @@ return {media_id:media,photo:found,needs_approval:true};
 }
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:4},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:5},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
-try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");const provider=u.searchParams.get("provider")||"commons";if(!["commons","openverse"].includes(provider))throw bad("Источник поиска не поддерживается");return result({photos:provider==="openverse"?await openverse(q):await commons({generator:"search",gsrnamespace:"6",gsrlimit:"22",gsrsearch:q})},200,origin);}
+try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/import"){const raw=await req.text();if(raw.length>2500)throw bad("Слишком длинный запрос");return result(await importFromStock(JSON.parse(raw||"{}")),200,origin);}
 return result({error:"Not found"},404,origin);
