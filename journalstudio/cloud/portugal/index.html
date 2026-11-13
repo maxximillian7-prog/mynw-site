@@ -169,7 +169,7 @@ function renderMedia(media){
  area.innerHTML=media.map(m=>{
   const preview=/^https:\/\//i.test(m.public_url||"")?'<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Тематическая иллюстрация">':"<p class='secondary'>Файл ещё не готов</p>";
   const can=m.public_url&&m.rights_verified&&["generated","candidate"].includes(m.status);
-  return'<div class="figure">'+preview+'<h4>'+escapeHtml(m.media_type==="generated_illustration"?"ИИ-иллюстрация":m.media_type)+" · "+escapeHtml(m.status)+'</h4><small>Права: '+(m.rights_verified?"подтверждены":"не проверены")+'</small><div class="figureActions">'+(me?.user?.can_edit&&can?'<button class="btn" data-media-approve="'+escapeHtml(m.id)+'">Одобрить изображение</button>':"")+(me?.user?.can_edit?'<button class="btn danger" data-media-reject="'+escapeHtml(m.id)+'">Отклонить</button>':"")+'</div></div>';
+  return'<div class="figure">'+preview+'<h4>'+escapeHtml(m.media_type==="generated_illustration"?"ИИ-иллюстрация":m.media_type==="brand_generic"?"Тематическая обложка рубрики":m.media_type)+" · "+escapeHtml(m.status)+'</h4><small>Права: '+(m.rights_verified?"подтверждены":"не проверены")+'</small><div class="figureActions">'+(me?.user?.can_edit&&can?'<button class="btn" data-media-approve="'+escapeHtml(m.id)+'">Одобрить изображение</button>':"")+(me?.user?.can_edit?'<button class="btn danger" data-media-reject="'+escapeHtml(m.id)+'">Отклонить</button>':"")+'</div></div>';
  }).join("");
  area.querySelectorAll("[data-media-approve]").forEach(b=>b.onclick=()=>sendAction("approve_media",{media_id:b.dataset.mediaApprove}));
  area.querySelectorAll("[data-media-reject]").forEach(b=>b.onclick=()=>{const why=prompt("Причина отклонения изображения:");if(why)sendAction("reject_media",{media_id:b.dataset.mediaReject,note:why})});
@@ -182,7 +182,7 @@ function renderPreview(){
  const f=gather(),i=current?.article||{},img=(current?.media||[]).find(x=>x.public_url&&["generated","approved"].includes(x.status));
  const source=i.source_name||"Источник";const url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
  $("livePreview").innerHTML='<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(source)+'</div>'+
- (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.illustration_label_required?"Иллюстрация, созданная ИИ":"Фото из источника")+'</div>':'<div class="imagePending">🖼 Тематическая обложка готовится или ожидает проверки прав. До утверждения здесь показана заглушка.</div>')+
+ (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.media_type==="brand_generic"?"Универсальная иллюстрация рубрики — не фото этого события":img.illustration_label_required?"Иллюстрация, созданная ИИ":"Фото из источника")+'</div>':'<div class="imagePending">🖼 Тематическая обложка готовится или ожидает проверки прав. До утверждения здесь показана заглушка.</div>')+
  '<h3 class="pheading">'+escapeHtml(f.headline_ru||"Заголовок")+'</h3>'+
  [f.hook_ru,f.lead_ru,f.story_ru,f.why_matters_ru].filter(Boolean).map(x=>'<p>'+escapeHtml(x)+'</p>').join("")+
  (url?'<div class="faint">Источник: '+escapeHtml(url)+'</div>':"");
