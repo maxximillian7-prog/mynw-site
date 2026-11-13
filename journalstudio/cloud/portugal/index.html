@@ -106,7 +106,7 @@ input[type=search]{width:100%} .filters select{width:100%}
   <div class="field"><label>Основной текст</label><textarea id="story" rows="10" placeholder="Основной текст статьи"></textarea></div>
   <div class="field"><label>Почему это важно / кому полезно</label><textarea id="why" rows="3"></textarea></div>
   <div class="controls"><label><input id="needsMoreFacts" type="checkbox"> Недостаточно фактов</label><label><input id="imageNeeded" type="checkbox"> Нужна иллюстрация</label></div>
-  <div class="field"><label>Изображение</label><select id="imageChoice"><option value="generated_illustration">ИИ-иллюстрация</option><option value="licensed_original">Лицензированное фото</option><option value="owned_original">Собственное фото</option><option value="generic_illustration">Фирменная обложка</option><option value="no_image">Без изображения</option></select></div>
+  <div class="field"><label>Изображение</label><select id="imageChoice"><option value="generated_illustration">Ранее созданная AI-иллюстрация (новые отключены)</option><option value="licensed_original">Лицензированное фото</option><option value="owned_original">Собственное фото</option><option value="generic_illustration">Существующая фирменная обложка</option><option value="no_image">Без изображения</option></select></div>
   <div class="field"><label>Если без изображения — укажите причину</label><input id="imageException" placeholder="Например, срочное текстовое предупреждение"></div>
   <div class="btns"><button id="saveBtn" class="btn primary">Сохранить правки</button><span class="secondary" id="saveStatus"></span></div>
  </div>
@@ -172,8 +172,9 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
 }
 function renderMedia(media){
  const area=$("mediaArea");
- if(!media?.length){area.textContent="Для материала пока нет изображения. Изображения создаются в серверной очереди генерации, если есть проверенный контекст.";return}
- area.innerHTML=media.map(m=>{
+ const options=(media||[]).filter(m=>m.public_url&&m.rights_verified&&!["rejected","failed"].includes(m.status));
+ if(!options.length){area.textContent="Для этой статьи пока нет подходящей фотографии с разрешёнными правами. Поиск ведётся среди существующих изображений и Wikimedia Commons; новые AI-изображения не генерируются.";return}
+ area.innerHTML=options.map(m=>{
   const preview=/^https:\/\//i.test(m.public_url||"")?'<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Тематическая иллюстрация">':"<p class='secondary'>Файл ещё не готов</p>";
   const can=m.public_url&&m.rights_verified&&["generated","candidate"].includes(m.status);
   const references=(m.license_details||"").split(" | ");
@@ -196,7 +197,7 @@ function renderPreview(){
  const fullText=String(i.telegram_text||"");
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  $("livePreview").innerHTML='<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(source)+'</div>'+
- (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.media_type==="brand_generic"?"Универсальная иллюстрация рубрики — не фото этого события":img.media_type==="licensed_original"?"Тематическое фото (не репортаж). Автор и лицензия: "+escapeHtml(img.attribution||"Wikimedia Commons"):img.illustration_label_required?"Иллюстрация, созданная ИИ":"Фото из источника")+'</div>':'<div class="imagePending">🖼 Тематическая обложка готовится или ожидает проверки прав. До утверждения здесь показана заглушка.</div>')+
+ (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.media_type==="brand_generic"?"Универсальная иллюстрация рубрики — не фото этого события":img.media_type==="licensed_original"?"Тематическое фото (не репортаж). Автор и лицензия: "+escapeHtml(img.attribution||"Wikimedia Commons"):img.illustration_label_required?"Иллюстрация, созданная ИИ":"Фото из источника")+'</div>':'<div class="imagePending">🖼 Подходящая фотография ещё не найдена или не проверена. Подбираем из готовых изображений без генерации.</div>')+
  '<h3 class="pheading">'+escapeHtml(f.headline_ru||"Заголовок")+'</h3>'+
  snippets.map(x=>'<p>'+escapeHtml(x)+'</p>').join("")+
  (url?'<div class="faint">Источник: '+escapeHtml(url)+'</div>':"")+
