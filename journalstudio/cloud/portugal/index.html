@@ -339,23 +339,81 @@ function renderRichArticleText(value){
   return '<p class="richParagraph">'+result+'</p>';
  }).join("");
 }
+function renderTelegramMessage(text){
+ const content=String(text||"").trim();
+ const idx=content.lastIndexOf("\n\nИсточник: ");
+ const body=idx>=0?content.slice(0,idx):content;
+ const footer=idx>=0?content.slice(idx+2):"";
+ const blocks=body.split(/\n\s*\n/).filter(Boolean);
+ const heading=blocks.shift()||"Публикация";
+ let html='<div class="pt-message-title">'+escapeHtml(heading)+'</div>'+blocks.map(renderRichArticleText).join("");
+ if(footer){
+  const lines=footer.split("\n");
+  html+='<div class="pt-source">'+lines.filter(x=>!x.startsWith("#")).map(escapeHtml).join("<br>")+'</div>'+
+   '<div class="pt-hashtags">'+lines.filter(x=>x.startsWith("#")).map(escapeHtml).join("<br>")+'</div>';
+ }
+ return html;
+}
+function activeTags(i){
+ return(Array.isArray(i.tags)?i.tags:[]).map(x=>String(x).trim().replace(/^#/,"").replace(/[^\p{L}\p{N}_]+/gu,"_").replace(/^_+|_+$/g,"")).filter(x=>x.length>1).filter(x=>!["португалия","новости","события"].includes(x.toLowerCase())).slice(0,4).map(x=>"#"+x).join(" ");
+}
 function renderPreview(){
- const f=gather(),i=current?.article||{};const imageOptions=current?.media||[];const img=imageOptions.find(x=>x.public_url&&["licensed_original","owned_original"].includes(x.media_type)&&x.rights_verified&&x.status==="approved")||imageOptions.find(x=>x.public_url&&["licensed_original","owned_original"].includes(x.media_type)&&x.rights_verified&&x.status==="candidate");
- const source=i.source_name||"Источник",url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
+ const root=$("livePreview");if(!root||!current)return;
+ const oldTop=$("ptChatScroll")?.scrollTop||0;
+ const f=gather(),i=current.article||{},img=choosePreviewPhoto();
+ const url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
  const tag=i.category_hashtag||categories.find(x=>x.code===i.primary_category)?.telegram_hashtag||"";
- const snippets=[f.hook_ru,f.lead_ru,f.story_ru,f.why_matters_ru].filter(Boolean);
- const fullText=String(i.telegram_text||"");
+ const topicTags=activeTags(i),credit=img?.attribution||i.photo_attribution||"";
+ const body=[f.headline_ru,f.hook_ru,f.lead_ru,f.story_ru,f.why_matters_ru].map(x=>String(x||"").trim()).filter(Boolean).join("\n\n");
+ const tail=["Источник: "+url,credit,topicTags,tag].filter(Boolean).join("\n");
+ const localFull=body+"\n\n"+tail;
+ const serverFull=String(i.telegram_text||"");
+ const full=(!dirty&&!previewPhotoId&&serverFull)?serverFull:localFull;
+ const captionLong=f.headline_ru+"\n\n"+String(f.lead_ru||"").trim()+"\n\n"+tail;
+ const captionShort=f.headline_ru+"\n\n"+tail;
+ const localCaption=(captionLong.length<=1024&&/[.!?…»)]$/.test(String(f.lead_ru||"").trim()))?captionLong:captionShort;
+ const caption=(!dirty&&!previewPhotoId&&i.telegram_caption)?String(i.telegram_caption):localCaption;
+ const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
+ const intro=f.lead_ru||f.hook_ru||"";
+ const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Фотография публикации">':'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
+ const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
+ const photoBubble=img?'<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full.length<=1024?full:caption)+'</div>'+timestamp+'</article>':"";
+ const textBubble=(!img||full.length>1024)?'<article class="pt-chat-post"><div class="pt-chat-body">'+renderTelegramMessage(full)+'</div>'+timestamp+'</article>':"";
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
- $("livePreview").innerHTML='<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(source)+'</div>'+
- (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.media_type==="brand_generic"?"Универсальная иллюстрация рубрики — не фото этого события":img.media_type==="licensed_original"?"Тематическое фото (не репортаж). Автор и лицензия: "+escapeHtml(img.attribution||"Wikimedia Commons"):img.illustration_label_required?"Иллюстрация, созданная ИИ":"Реальная фотография с проверяемым источником")+'</div>':'<div class="imagePending">🖼 Подходящая фотография ещё не найдена или не проверена. Подбираем из готовых изображений без генерации.</div>')+
- '<h3 class="pheading">'+escapeHtml(f.headline_ru||"Заголовок")+'</h3>'+
- snippets.map(renderRichArticleText).join("")+
- (url?'<div class="faint">Источник: '+escapeHtml(url)+'</div>':"")+
- (tag?'<p style="margin-top:15px;font-size:13px;font-weight:800;color:#187977">'+escapeHtml(tag)+'</p>':"");
- const previewChars=[f.headline_ru,...snippets,url?"Источник: "+url:"",tag].filter(Boolean).join("\n\n").length;
- $("tgLength").textContent=dirty?"Изменения не сохранены · приблизительно "+previewChars+" символов":"Готовый текст: "+fullText.length+" символов (лимит 4000)";
- $("copyTelegramBtn").disabled=!fullText||dirty||i.status!=="approved"||i.editorial_status!=="approved";
- if(current)$("saveStatus").textContent=dirty?"Есть несохранённые изменения":"";
+ $("modePhone").classList.toggle("selected",previewMode==="phone");$("modeArticle").classList.toggle("selected",previewMode==="article");
+ $("modePhone").setAttribute("aria-pressed",previewMode==="phone"?"true":"false");
+ $("modeArticle").setAttribute("aria-pressed",previewMode==="article"?"true":"false");
+ if(previewMode==="phone"){
+  root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone">'+
+   '<div class="pt-phone-status"><span>9:41</span><span>◕ ▰ ▴</span></div>'+
+   '<div class="pt-channel-head"><span class="pt-channel-back">‹</span><span class="pt-channel-avatar">🇵🇹</span><div class="pt-channel-meta"><strong>Португалия рядом</strong><small>Telegram · канал</small></div><span style="font-size:19px;color:#799994">⋮</span></div>'+
+   '<div class="pt-phone-chat" id="ptChatScroll"><div class="pt-day-chip">Предпросмотр</div>'+photoBubble+textBubble+'</div>'+
+   '<div class="pt-phone-bottom"><span>🔕</span><span style="flex:1;padding-left:18px;font-size:12px">Отключить звук</span><span>↗</span></div>'+
+   '</div></div>';
+  const scroller=$("ptChatScroll");if(scroller)scroller.scrollTop=oldTop;
+  $("previewHint").textContent=img?(full.length>1024?"Предпросмотр отправки: фотография с подписью и отдельный полный текст поста.":"Предпросмотр отправки: фотография с подписью."):"Предпросмотр текстового сообщения. Для приёмки требуется реальная фотография.";
+ }else{
+  root.innerHTML='<article class="pt-article-view">'+
+   '<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(catName)+'</div>'+
+   '<h2 class="pt-editor-section" data-edit-field="headline">'+escapeHtml(f.headline_ru||"Заголовок")+'</h2>'+
+   (img?'<img loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Иллюстрация" style="width:100%;border-radius:12px;aspect-ratio:16/9;object-fit:cover;margin:10px 0">':'<div class="imagePending">Фотография ещё не выбрана</div>')+
+   '<div class="pt-editor-section" data-edit-field="hook">'+renderRichArticleText(f.hook_ru)+'</div>'+
+   '<div class="pt-editor-section" data-edit-field="lead">'+renderRichArticleText(f.lead_ru)+'</div>'+
+   '<div class="pt-editor-section" data-edit-field="story">'+renderRichArticleText(f.story_ru)+'</div>'+
+   '<div class="pt-editor-section" data-edit-field="why">'+renderRichArticleText(f.why_matters_ru)+'</div>'+
+   '<p class="pt-source">Источник: '+escapeHtml(url)+'</p><p class="pt-hashtags">'+escapeHtml(topicTags+" "+tag)+'</p></article>';
+  root.querySelectorAll("[data-edit-field]").forEach(el=>el.onclick=()=>jumpEditor(el.dataset.editField));
+  $("previewHint").textContent="Режим удобного чтения: нажмите на раздел, чтобы быстро отредактировать его.";
+ }
+ const limit=4000,words=full.length;
+ $("tgLength").textContent=(dirty?"Есть несохранённые правки · ":"")+(img?"Фото + текст · ":"Текст · ")+words+" / "+limit+" символов";
+ $("tgLength").style.color=words>limit?"#ab3d38":"";
+ $("copyTelegramBtn").disabled=!serverFull||dirty||i.status!=="approved"||i.editorial_status!=="approved";
+ $("saveStatus").textContent=dirty?"Есть несохранённые изменения":"";
+}
+function jumpEditor(id){
+ const input=$(id);if(!input||input.disabled){toast("Сначала откройте статью для редактирования",true);return;}
+ input.scrollIntoView({behavior:"smooth",block:"center"});input.focus();
 }
 async function selectArticle(id){
  if(dirty&&!confirm("Остались несохранённые изменения. Перейти к другой статье?"))return;
