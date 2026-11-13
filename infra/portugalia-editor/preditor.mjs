@@ -1,4 +1,13 @@
-import {neon} from "./driver.mjs";
+// Self-contained Neon HTTP SQL driver for the editorial function.
+const neon=(conn)=>({query:async(query,params=[])=>{
+ const response=await fetch("https://"+new URL(conn).hostname+"/sql",{
+  method:"POST",headers:{"content-type":"application/json","Neon-Connection-String":conn},
+  body:JSON.stringify({query,params}),signal:AbortSignal.timeout(16000)
+ });
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok)throw Error("SQL request failed "+response.status);
+ return result.rows??result;
+}});
 const db=neon(process.env.DATABASE_URL),sql=(s,p=[])=>db.query(s,p);
 const studio="https://npsfaymjckcqhtyiafms.supabase.co",pub="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 const hosts=new Set(["https://mynw.app","https://www.mynw.app"]);
@@ -23,7 +32,7 @@ async function detail(id){
  const rows=await sql("SELECT i.*,s.name AS source_name,s.code AS source_code,s.verification_status,s.rights_policy,d.id AS draft_id,d.status AS editorial_status,d.style,d.headline_ru,d.hook_ru,d.lead_ru,d.story_ru,d.why_matters_ru,d.context_verified,d.needs_more_facts,d.image_needed,d.image_choice,d.image_exception_reason,d.target_subcategory,d.editorial_note,d.updated_at AS draft_updated_at,d.source_context_used,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score AS editorial_value_score,pr_telegram_hashtag(i.primary_category) AS category_hashtag,pr_build_telegram_post(i.id) AS telegram_text,pr_build_telegram_caption(i.id) AS telegram_caption FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id CROSS JOIN LATERAL pr_intake_check(i.id) q WHERE i.id=$1::uuid",[id]);
  if(!rows.length)throw err("Статья не найдена",404);
  const [media,evidence,comments,revisions]=await Promise.all([
-  sql("SELECT id,media_type,status,public_url,rights_verified,illustration_label_required,attribution,license_details,created_at FROM pr_media_assets WHERE item_id=$1::uuid ORDER BY CASE WHEN media_type='brand_generic' THEN 1 ELSE 0 END,created_at DESC",[id]),
+  sql("SELECT id,media_type,status,public_url,rights_verified,illustration_label_required,attribution,license_details,storage_bucket,storage_key,generation_model,created_at FROM pr_media_assets WHERE item_id=$1::uuid ORDER BY CASE WHEN media_type='brand_generic' THEN 1 ELSE 0 END,created_at DESC",[id]),
   sql("SELECT evidence_url,evidence_type,claim_summary,verified_at FROM pr_item_evidence WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 15",[id]),
   sql("SELECT id,actor_role,body,created_at FROM pr_editorial_comments WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 30",[id]),
   sql("SELECT id,action,note,created_at FROM pr_editorial_revisions WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 30",[id])]);
@@ -64,7 +73,8 @@ async function action(u,p){
  if(a==="approve_media"||a==="reject_media"){
   const m=media.find(x=>x.id===p.media_id);if(!m)throw err("Изображение не найдено",404);
   if(a==="approve_media"){
-   if(!m.public_url||!m.rights_verified||!["licensed_original","owned_original"].includes(m.media_type)||m.status!=="candidate"||m.media_type==="licensed_original"&&(!m.attribution||!m.license_details))throw err("Можно одобрить только уникальное реальное фото с проверенными правами, автором и лицензией",409);
+   const authorizedAI=m.media_type==="generated_illustration"&&m.illustration_label_required===true&&m.storage_bucket==="pr-editorial-media"&&!!m.storage_key&&m.generation_model==="neon-gpt5-image-medium";
+   if(!m.public_url||!m.rights_verified||!["licensed_original","owned_original"].includes(m.media_type)&&!authorizedAI||m.status!=="candidate"||m.media_type==="licensed_original"&&(!m.attribution||!m.license_details))throw err("Можно одобрить только реальное фото с проверенными правами либо AI-иллюстрацию с подтверждённым источником генерации",409);
    await sql("UPDATE pr_media_assets SET status='approved',approved_by=$2,approved_at=now() WHERE id=$1::uuid",[m.id,u.id]);
   }else{
    if(note.length<10)throw err("Укажите причину отказа");
@@ -86,7 +96,7 @@ async function action(u,p){
   if(!i.intake_ready)throw err("Материал ещё не прошёл полную подготовку: "+(i.intake_issues||[]).join("; ").slice(0,250),409);
   if(!i.draft_id||!i.lead_ru||!i.story_ru||!i.headline_ru)throw err("Нет полноценного текста",409);
   if(!i.context_verified||i.needs_more_facts||!i.source_fact_checked||!evidence.length)throw err("Сначала подтвердите факты и доработайте материал",409);
-  const good=media.some(m=>m.status==="approved"&&["licensed_original","owned_original"].includes(m.media_type)&&m.rights_verified&&m.public_url);
+  const good=media.some(m=>m.status==="approved"&&m.rights_verified&&m.public_url===i.photo_url&&(["licensed_original","owned_original"].includes(m.media_type)||(m.media_type==="generated_illustration"&&m.illustration_label_required&&m.storage_bucket==="pr-editorial-media"&&!!m.storage_key)));
   if(i.image_needed&&i.image_choice!=="no_image"&&!good)throw err("Утвердите изображение",409);
   if(i.image_needed&&i.image_choice==="no_image"&&String(i.image_exception_reason||"").length<12)throw err("Для выпуска без картинки нужна причина",409);
   await sql("UPDATE pr_story_drafts SET status='approved',reviewer=$2,reviewed_at=now(),updated_at=now() WHERE item_id=$1::uuid",[id,u.id]);
