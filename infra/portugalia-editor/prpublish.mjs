@@ -87,16 +87,23 @@ async function execute(){
  const promoted=await promote(),report={ok:true,format:"RichMessage",promoted:promoted.length,sent:0,failed:0,errors:[]};
  for(let i=0;i<4;i++){
   const post=await claim();if(!post)break;
-  try{
-   const messageId=await publish(post);
-   await query("UPDATE public.pr_posts SET status='sent',telegram_message_id=$2::bigint,telegram_photo_message_id=NULL,sent_at=now(),last_error=NULL WHERE id=$1::uuid AND status='sending'",[post.post_id,String(messageId)]);
-   report.sent++;
-  }catch(e){
+  let messageId;
+  try{messageId=await publish(post);}
+  catch(e){
    report.failed++;const reason=safe(e?.message||e);
    report.errors.push({post_id:post.post_id,error:reason});
    try{
     await query("UPDATE public.pr_posts SET status='failed',last_error=$2 WHERE id=$1::uuid AND status='sending'",[post.post_id,reason]);
    }catch(dbError){report.errors.push({post_id:post.post_id,needs_manual_reconciliation:true,error:safe(dbError?.message||dbError)});}
+   continue;
+  }
+  // The Telegram API has accepted the single Rich Message. Do not mark it
+  // failed or resend on a subsequent DB error: reconcile its message_id.
+  try{
+   await query("UPDATE public.pr_posts SET status='sent',telegram_message_id=$2::bigint,telegram_photo_message_id=NULL,sent_at=now(),last_error=NULL WHERE id=$1::uuid AND status='sending'",[post.post_id,String(messageId)]);
+   report.sent++;
+  }catch(e){
+   report.errors.push({post_id:post.post_id,needs_manual_reconciliation:true,telegram_message_id:messageId,error:safe(e?.message||e)});
   }
  }
  return report;
