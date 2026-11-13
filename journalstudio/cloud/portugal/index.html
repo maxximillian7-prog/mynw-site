@@ -285,19 +285,28 @@ function choosePreviewPhoto(){
 function renderMedia(media){
  const area=$("mediaArea");const options=(media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
  if(!options.length){area.innerHTML='<div class="imagePending">🖼 Фотографий для этой статьи пока нет. Воспользуйтесь поиском ниже.</div>';return;}
- const chosen=choosePreviewPhoto();
+ const chosen=choosePreviewPhoto(),canChange=!!me?.user?.edit&&current?.article?.status==="candidate";
  area.innerHTML='<div class="pt-photo-gallery">'+options.map(m=>{
   const active=chosen?.id===m.id;
   return '<button type="button" class="pt-photo-choice '+(active?"selected":"")+'" data-media-preview="'+escapeHtml(m.id)+'" aria-pressed="'+active+'" title="Показать в телефоне">'+
   '<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Вариант обложки">'+
   '<span>'+(m.status==="approved"?"✓ Фото утверждено":"● Ожидает утверждения")+'</span></button>';
  }).join("")+'</div><div class="pt-photo-row"><span class="secondary">'+(chosen?chosen.status==="approved"?"✓ Выбрано утверждённое фото":"Выбрано фото-кандидат":"Выберите обложку")+'</span>'+
- (me?.user?.edit&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
- '</div>'+(chosen?.attribution?'<div class="faint">Автор и лицензия: '+escapeHtml(chosen.attribution)+'</div>':"")+
- '<div class="pt-photo-row"><a target="_blank" rel="noopener noreferrer" href="https://commons.wikimedia.org/w/index.php?search='+encodeURIComponent(current?.article?.headline_ru||"Portugal")+'&title=Special:MediaSearch&type=image">Поиск на Wikimedia Commons ↗</a></div>';
+ (canChange&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
+ (canChange&&chosen?.status==="approved"&&chosen.public_url!==current?.article?.photo_url?'<button type="button" class="btn primary" id="setApprovedCover">✓ Сделать обложкой</button>':"")+
+ '</div>'+(chosen?.attribution?'<div class="faint">Автор и лицензия: '+escapeHtml(chosen.attribution)+'</div>':"");
  area.querySelectorAll("[data-media-preview]").forEach(button=>button.onclick=()=>{previewPhotoId=button.dataset.mediaPreview;renderMedia(current?.media);renderPreview();});
  const apply=$("applySelectedPhoto");
  if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
+ const cover=$("setApprovedCover");
+ if(cover)cover.onclick=async()=>{
+  if(dirty){toast("Сначала сохраните текст статьи.",true);return}
+  try{
+   const photo=choosePreviewPhoto();
+   await photoCall("/api/select",{method:"POST",body:{item_id:current.article.id,media_id:photo.id}});
+   await refreshSelected();toast("Обложка сохранена и будет использована в Telegram.");
+  }catch(e){toast(e.message,true)}
+ };
 }
 
 async function searchCommons(){
