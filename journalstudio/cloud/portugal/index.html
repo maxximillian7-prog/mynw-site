@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#123b40">
+<title>Португалия рядом — редакция | Journal Studio</title>
+<style>
+:root{--ink:#17343b;--deep:#123b40;--teal:#187977;--soft:#eaf5f3;--gold:#cc9553;--bg:#f5f7f7;--line:#dde7e5;--muted:#6c8284;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:#147677;text-decoration:none}button:disabled{cursor:not-allowed;opacity:.5}
+.layout{display:grid;grid-template-columns:230px minmax(300px,420px) minmax(480px,1fr);min-height:100vh;max-width:1800px;margin:auto}
+nav.side{background:var(--deep);color:#e7f4f1;padding:24px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:19px;font-weight:850;letter-spacing:-.4px;line-height:1.2;margin:4px 8px 20px}.brand small{display:block;font-size:11px;letter-spacing:1.6px;color:#a8cfca;font-weight:600;margin-top:10px}
+.back{font-size:12px;color:#d5eeea;padding:8px 11px;border:1px solid #477276;border-radius:10px;margin-bottom:10px}
+.navtitle{font-size:10px;letter-spacing:1.5px;color:#84b6b3;text-transform:uppercase;font-weight:800;margin:20px 11px 7px}
+.statusNav{border:0;text-align:left;width:100%;color:#d7e8e5;background:none;padding:11px 12px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.statusNav:hover,.statusNav.active{background:#23575b;color:white}
+.statusNav b{font-variant-numeric:tabular-nums;color:#c0dcda;font-size:12px}
+.sectionlist{background:#eff6f5;padding:20px 14px;min-height:100vh;border-right:1px solid var(--line);min-width:0;display:flex;flex-direction:column}
+.heading h1{font-size:21px;line-height:1.2;margin:0 0 7px}.heading p{font-size:12px;color:var(--muted);margin:0 0 18px}
+.filters{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+.input,select,textarea{border:1px solid #d7e3e1;background:white;border-radius:10px;padding:10px 12px;color:var(--ink);outline-color:var(--teal);max-width:100%}
+input[type=search]{width:100%} .filters select{width:100%}
+.listhead{font-size:12px;color:var(--muted);padding:4px 4px 9px;display:flex;justify-content:space-between}
+.items{overflow-y:auto;flex:1;min-height:140px;padding-bottom:10px}
+.articleRow{width:100%;background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;text-align:left;margin:0 0 9px;display:block;color:var(--ink);transition:.1s}
+.articleRow.active{border-color:#26928d;box-shadow:0 0 0 2px #cae9e6}.articleRow:hover{border-color:#9fc8c4}
+.articleRow strong{display:block;font-weight:750;font-size:13px;line-height:1.4;margin:7px 0}
+.articleRow .meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.pill{display:inline-block;border-radius:99px;background:#f0f4f3;color:#406260;padding:3px 8px;font-size:10px;font-weight:750}
+.pill.green{background:#e3f4ec;color:#287c57}.pill.amber{background:#fff2dd;color:#9a6a28}.pill.red{background:#fbe5e2;color:#a35043}
+.workspace{padding:24px 29px 70px;min-width:0}
+.workspaceHeader{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}.workspaceHeader .eyebrow{font-size:11px;font-weight:800;color:var(--teal);letter-spacing:1.2px;text-transform:uppercase}.workspaceHeader h2{margin:3px 0;font-size:23px;line-height:1.2}
+.secondary{color:var(--muted);font-size:12px}.btn{border:1px solid #bdd1ce;background:white;color:var(--ink);border-radius:10px;padding:10px 13px;font-weight:700}.btn:hover:not(:disabled){border-color:#26847f}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:white}.btn.danger{background:#fff4f2;color:#a64f41;border-color:#f1d0ca}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:19px;margin:0 0 17px;box-shadow:0 7px 25px #153f4310}
+.card h3{font-size:15px;margin:0 0 13px}.card p{margin:5px 0 10px}
+.field{display:flex;flex-direction:column;gap:5px;margin:12px 0}.field label{font-size:12px;color:#547275;font-weight:750}
+.field input,.field textarea,.field select{width:100%}.field textarea{resize:vertical;min-height:70px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.divider{border:0;border-top:1px solid var(--line);margin:18px 0}
+.editorStatus{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:9px 0 20px}
+.sourcebox{background:var(--soft);border:1px solid #cbe6e1;border-radius:12px;padding:13px;margin:12px 0;font-size:12px;word-break:break-word}
+.sourcebox a{text-decoration:underline}
+.preview{background:#f7fbfa;padding:16px;border-radius:12px;border:1px solid #dce9e7}
+.preview .pheading{font:800 24px/1.22 Georgia,serif;color:#18383c;margin:5px 0 10px}
+.preview p{white-space:pre-wrap;font-size:13px}
+.preview .pmeta{font-size:11px;color:var(--muted);margin-bottom:10px}
+.preview img{display:block;max-width:100%;border-radius:11px;aspect-ratio:16/9;object-fit:cover;margin:10px 0}
+.figure{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}.figure img{max-width:100%;max-height:240px;object-fit:contain;display:block;margin:auto}
+.figure h4{margin:7px 0;font-size:12px}.figure small{display:block;color:var(--muted);margin:6px 0}
+.figureActions{display:flex;gap:7px;flex-wrap:wrap}
+.controls{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;align-items:center}.controls label{display:flex;gap:6px;align-items:center;font-size:12px}
+.toast{position:fixed;bottom:22px;right:24px;background:#163f42;color:white;padding:14px 18px;border-radius:12px;box-shadow:0 10px 30px #1237;max-width:440px;z-index:25}
+.toast[hidden]{display:none}.toast.error{background:#a34b46}
+.notice{background:#fff7e8;border:1px solid #efd4ab;color:#775a2e;border-radius:10px;padding:12px;font-size:12px}
+.timeline{display:flex;flex-direction:column;gap:8px}.entry{border-left:3px solid #c1ddd8;background:#f7faf9;padding:10px;font-size:12px}.entry small{color:var(--muted);display:block}
+.overlay{position:fixed;inset:0;background:#103940dd;color:white;display:flex;align-items:center;justify-content:center;padding:20px;z-index:30}.overlay[hidden]{display:none}
+.loginBox{background:white;color:var(--ink);max-width:410px;width:100%;border-radius:20px;padding:30px;text-align:center}.loginBox h2{margin:0 0 12px}.loginBox p{color:var(--muted)}
+.headerRight{display:flex;gap:8px;align-items:center}
+.faint{font-size:11px;color:#899b9e}.hidden{display:none!important}
+@media(max-width:1350px){.layout{grid-template-columns:190px minmax(260px,360px) minmax(410px,1fr)}.workspace{padding:22px}}
+@media(max-width:1000px){.layout{grid-template-columns:185px minmax(280px,1fr)}.workspace{grid-column:2}.sectionlist{min-height:55vh}.side{grid-row:1/span 2}}
+@media(max-width:650px){.layout{display:block}nav.side{position:relative;height:auto;display:block;padding:13px 15px}.brand{margin:0 0 7px;font-size:17px}.brand small{display:none}.back{display:inline-block}.navtitle{display:none}.navStatuses{display:flex;overflow:auto;gap:6px;padding:7px 0}.statusNav{width:auto;flex:none;gap:8px;padding:7px 10px;font-size:11px}.sectionlist{min-height:400px;padding:17px 14px}.items{max-height:360px}.workspace{padding:18px 14px 60px}.split{display:block}.card{padding:15px}.workspaceHeader h2{font-size:20px}}
+</style></head>
+<body>
+<div class="layout">
+<nav class="side">
+ <div class="brand">🇵🇹 Португалия рядом<small>MYNOW · EDITORIAL STATION</small></div>
+ <a class="back" href="../">← Journal Studio</a>
+ <div class="navtitle">Редакционные очереди</div>
+ <div class="navStatuses" id="statusTabs">
+ <button class="statusNav active" data-status="all">Все материалы <b>•</b></button>
+ <button class="statusNav" data-status="incoming">Входящие <b id="countIncoming">0</b></button>
+ <button class="statusNav" data-status="needs_facts">Нужны факты <b id="countFacts">0</b></button>
+ <button class="statusNav" data-status="draft">Черновики <b id="countDraft">0</b></button>
+ <button class="statusNav" data-status="approved">Утверждены <b id="countApproved">0</b></button>
+ <button class="statusNav" data-status="queued">Очередь TG <b id="countQueued">0</b></button>
+ <button class="statusNav" data-status="rejected">Отклонены</button>
+ </div>
+ <div style="margin-top:auto;padding:14px 9px 5px"><div id="roleLabel" class="faint">Редакционный доступ</div><div class="faint">Статьи и изображения хранятся в отдельном Neon-проекте. Никаких автопубликаций.</div></div>
+</nav>
+<section class="sectionlist">
+ <div class="heading"><h1>Материалы редакции</h1><p>Проверка · Рерайт · Иллюстрации · Утверждение</p></div>
+ <div class="filters"><input class="input" type="search" id="search" placeholder="Найти статью, источник…" aria-label="Поиск материалов"><select id="categoryFilter"><option value="all">Все разделы</option></select></div>
+ <div class="listhead"><span id="itemsCount">Загрузка…</span><button class="btn" id="reload" style="padding:5px 9px">↻ Обновить</button></div>
+ <div id="items" class="items"></div>
+</section>
+<main class="workspace">
+<div class="workspaceHeader"><div><div class="eyebrow">Португалия рядом / редакция</div><h2 id="pageTitle">Выберите материал</h2><div class="secondary" id="pageSubtitle">Единая очередь всех входящих статей</div></div><div class="headerRight"><span id="connection" class="pill">Не подключено</span></div></div>
+<div id="emptyPanel" class="card"><h3>Откройте материал из списка</h3><p class="secondary">Здесь появятся оригинал, полный редактор на русском языке, обложки, источник, история согласования и кнопки утверждения.</p></div>
+<div id="editorPanel" class="hidden">
+ <div class="editorStatus"><span class="pill" id="storyStatus"></span><span class="pill" id="mainCategory"></span><span class="pill" id="storySource"></span><span class="pill amber" id="needsFactsBadge"></span></div>
+ <div class="card"><h3>① Первоисточник и факты</h3>
+  <div class="sourcebox"><strong id="originalTitle"></strong><div class="secondary" id="originalDate"></div><a id="originalLink" rel="noopener noreferrer" target="_blank">Открыть оригинал ↗</a><p id="originalExcerpt"></p></div>
+  <div class="notice">Проверьте факты по первоисточнику. Наличие перевода или текста GPT-6 Luna само по себе не подтверждает достоверность материала.</div>
+  <div class="field"><label for="evidence">Ссылка на подтверждающий источник</label><input id="evidence" placeholder="https://официальный-сайт…" type="url"></div>
+  <div class="field"><label for="note">Примечание редактора / обоснование решения</label><textarea id="note" rows="2" placeholder="Что проверено, что исправить или почему отклонить…"></textarea></div>
+  <div class="btns"><button id="verifyBtn" class="btn">✓ Факты проверены</button><span class="secondary" id="factState"></span></div>
+ </div>
+ <div class="card"><h3>② Редактирование публикации</h3>
+  <div class="split"><div class="field"><label>Формат</label><select id="style"><option value="short">Short — короткая новость</option><option value="standard">Standard — основной пост</option><option value="rich">Rich — расширенная история</option></select></div><div class="field"><label>Подрубрика</label><select id="subcategory"><option value="">Без подрубрики</option></select></div></div>
+  <div class="field"><label>Заголовок</label><input id="headline" maxlength="250" placeholder="Редакционный заголовок"></div>
+  <div class="field"><label>Короткая подводка</label><textarea id="hook" rows="2" placeholder="Первое предложение, которое заинтересует читателя"></textarea></div>
+  <div class="field"><label>Лид / краткое описание</label><textarea id="lead" rows="3"></textarea></div>
+  <div class="field"><label>Основной текст</label><textarea id="story" rows="10" placeholder="Основной текст статьи"></textarea></div>
+  <div class="field"><label>Почему это важно / кому полезно</label><textarea id="why" rows="3"></textarea></div>
+  <div class="controls"><label><input id="needsMoreFacts" type="checkbox"> Недостаточно фактов</label><label><input id="imageNeeded" type="checkbox"> Нужна иллюстрация</label></div>
+  <div class="field"><label>Изображение</label><select id="imageChoice"><option value="generated_illustration">ИИ-иллюстрация</option><option value="licensed_original">Лицензированное фото</option><option value="owned_original">Собственное фото</option><option value="generic_illustration">Фирменная обложка</option><option value="no_image">Без изображения</option></select></div>
+  <div class="field"><label>Если без изображения — укажите причину</label><input id="imageException" placeholder="Например, срочное текстовое предупреждение"></div>
+  <div class="btns"><button id="saveBtn" class="btn primary">Сохранить правки</button><span class="secondary" id="saveStatus"></span></div>
+ </div>
+ <div class="card"><h3>③ Предпросмотр Telegram</h3><div class="preview" id="livePreview"></div></div>
+ <div class="card"><h3>④ Фотографии и иллюстрации</h3><div id="mediaArea" class="secondary">Изображений нет</div></div>
+ <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
+  <div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button><button id="approveBtn" class="btn primary">✓ Утвердить статью</button></div>
+  <hr class="divider"><div class="split"><div class="field"><label>Куда поставить в очередь</label><select id="destination"><option value="main">Главная лента</option><option value="afisha">Афиша</option></select></div><div class="field" style="justify-content:end"><button id="queueBtn" class="btn">↗ В очередь Telegram</button></div></div>
+  <p class="secondary">Это только внутренняя очередь. Отправка в Telegram отключена до завершения настройки канала и бота.</p>
+ </div>
+ <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
+</div>
+</main>
+</div>
+<div id="loginOverlay" class="overlay" hidden><div class="loginBox"><h2>🇵🇹 Португалия рядом</h2><p id="loginMessage">Для входа требуется действующая редакционная сессия Journal Studio.</p><a class="btn primary" href="../" style="display:inline-block;margin-top:14px">Войти в Journal Studio</a></div></div>
+<div id="toast" class="toast" hidden></div>
+<script>
+"use strict";
+const API="https://br-young-paper-b972wmgd-preditor.compute.c-7.eu-central-1.aws.neon.tech";
+const S="https://npsfaymjckcqhtyiafms.supabase.co",KEY="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
+const $=id=>document.getElementById(id),escapeHtml=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const statuses={candidate:"Входящие",needs_facts:"Нужны факты",draft:"Черновик",ready_for_review:"На согласовании",approved:"Утверждено",rejected:"Отклонено",queued:"В очереди"};
+let session,me,categories=[],items=[],current=null,activeStatus="all",dirty=false,loading=false;
+let toastTimeout=0;
+function toast(msg,error=false){const el=$("toast");el.textContent=msg;el.classList.toggle("error",error);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.hidden=true,4800)}
+function login(message){$("loginMessage").textContent=message||"Войдите в Journal Studio и вернитесь в этот раздел.";$("loginOverlay").hidden=false}
+function iso(v){if(!v)return"—";try{return new Date(v).toLocaleString("ru-RU",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch{return v}}
+function badge(status){return status==="approved"?"green":status==="needs_facts"?"amber":status==="rejected"?"red":""}
+function authSession(){try{return JSON.parse(sessionStorage.getItem("journal_session")||"null")}catch{return null}}
+async function call(path,options={}){
+ if(!session?.access_token)throw Error("Войди в Journal Studio");
+ const fetcher=()=>fetch(API+path,{method:options.method||"GET",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:options.body?JSON.stringify(options.body):undefined,cache:"no-store"});
+ let r=await fetcher();
+ if(r.status===401&&session.refresh_token){const renew=await fetch(S+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{"apikey":KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:session.refresh_token})});if(renew.ok){session=await renew.json();sessionStorage.setItem("journal_session",JSON.stringify(session));r=await fetcher()}}
+ const d=await r.json().catch(()=>({}));
+ if(!r.ok)throw Error(d.error||"Ошибка редакционного сервера");
+ return d;
+}
+function gather(){return{style:$("style").value,target_subcategory:$("subcategory").value,headline_ru:$("headline").value,hook_ru:$("hook").value,lead_ru:$("lead").value,story_ru:$("story").value,why_matters_ru:$("why").value,needs_more_facts:$("needsMoreFacts").checked,image_needed:$("imageNeeded").checked,image_choice:$("imageChoice").value,image_exception_reason:$("imageException").value}}
+function fill(item){const i=item.article;const map={headline:i.headline_ru||i.title_ru||i.title_original,hook:i.hook_ru||"",lead:i.lead_ru||i.summary_ru||"",story:i.story_ru||"",why:i.why_matters_ru||"",style:i.style||"short",needsMoreFacts:i.draft_id?!!i.needs_more_facts:true,imageNeeded:!!i.image_needed,imageChoice:i.image_choice||"no_image",imageException:i.image_exception_reason||""};
+ $("headline").value=map.headline;$("hook").value=map.hook;$("lead").value=map.lead;$("story").value=map.story;$("why").value=map.why;$("style").value=map.style;$("needsMoreFacts").checked=map.needsMoreFacts;$("imageNeeded").checked=map.imageNeeded;$("imageChoice").value=map.imageChoice;$("imageException").value=map.imageException;
+ const children=categories.filter(x=>x.parent_code===i.primary_category);$("subcategory").innerHTML='<option value="">Без подрубрики</option>'+children.map(x=>'<option value="'+escapeHtml(x.code)+'">'+escapeHtml(x.name_ru)+'</option>').join("");$("subcategory").value=i.target_subcategory||"";
+ const secure=/^https:\/\//i.test(i.canonical_url||"");$("originalTitle").textContent=i.title_original||"Без заголовка";$("originalExcerpt").textContent=i.source_context_used||i.body_original||"Контекст источника ещё не получен";$("originalDate").textContent=iso(i.source_published_at||i.discovered_at);$("originalLink").href=secure?i.canonical_url:"#";$("originalLink").style.display=secure?"":"none";
+ $("pageTitle").textContent=i.headline_ru||i.title_ru||i.title_original;$("pageSubtitle").textContent=i.source_name+" • "+(i.location_city||"Португалия");
+ $("storyStatus").textContent=statuses[i.editorial_status||i.status]||"Входящее";$("storyStatus").className="pill "+badge(i.editorial_status||i.status);$("mainCategory").textContent=categories.find(x=>x.code===i.primary_category)?.name_ru||i.primary_category;
+ $("storySource").textContent=i.source_name;$("needsFactsBadge").textContent=i.needs_more_facts?"Требуется проверка фактов":i.context_verified?"Контекст проверен":"Не проверено";
+ $("evidence").value=i.canonical_url||"";$("factState").textContent=i.source_fact_checked?"✓ Проверено редактором":"Не подтверждено";
+ $("saveStatus").textContent="";$("note").value="";$("comment").value="";$("emptyPanel").classList.add("hidden");$("editorPanel").classList.remove("hidden");
+ const editable=me?.user?.can_edit&&!["approved","rejected"].includes(i.status)&&i.editorial_status!=="approved";
+ for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException","saveBtn"])$(id).disabled=!editable;
+ $("verifyBtn").disabled=!editable;
+ for(const id of ["changesBtn","rejectBtn","reopenBtn","approveBtn","queueBtn"])$(id).disabled=!me?.user?.can_approve;
+ $("changesBtn").disabled=!me?.user?.can_edit;
+ $("approveBtn").disabled=!me?.user?.can_approve||i.status==="approved";$("queueBtn").disabled=!me?.user?.can_approve||i.status!=="approved";
+ $("reopenBtn").disabled=!me?.user?.can_approve||!(i.status==="approved"||i.status==="rejected");
+ $("approvalWarning").textContent="Утверждение требует подтверждённых фактов и ссылки на источник. Если необходима обложка — её нужно одобрить отдельно.";
+ renderMedia(item.media);renderHistory(item);renderPreview();dirty=false;
+}
+function renderMedia(media){
+ const area=$("mediaArea");
+ if(!media?.length){area.textContent="Для материала пока нет изображения. Изображения создаются в серверной очереди генерации, если есть проверенный контекст.";return}
+ area.innerHTML=media.map(m=>{
+  const preview=/^https:\/\//i.test(m.public_url||"")?'<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Тематическая иллюстрация">':"<p class='secondary'>Файл ещё не готов</p>";
+  const can=m.public_url&&m.rights_verified&&["generated","candidate"].includes(m.status);
+  return'<div class="figure">'+preview+'<h4>'+escapeHtml(m.media_type==="generated_illustration"?"ИИ-иллюстрация":m.media_type)+" · "+escapeHtml(m.status)+'</h4><small>Права: '+(m.rights_verified?"подтверждены":"не проверены")+'</small><div class="figureActions">'+(me?.user?.can_edit&&can?'<button class="btn" data-media-approve="'+escapeHtml(m.id)+'">Одобрить изображение</button>':"")+(me?.user?.can_edit?'<button class="btn danger" data-media-reject="'+escapeHtml(m.id)+'">Отклонить</button>':"")+'</div></div>';
+ }).join("");
+ area.querySelectorAll("[data-media-approve]").forEach(b=>b.onclick=()=>sendAction("approve_media",{media_id:b.dataset.mediaApprove}));
+ area.querySelectorAll("[data-media-reject]").forEach(b=>b.onclick=()=>{const why=prompt("Причина отклонения изображения:");if(why)sendAction("reject_media",{media_id:b.dataset.mediaReject,note:why})});
+}
+function renderHistory(data){
+ const events=[...(data.comments||[]).map(x=>({kind:"Комментарий",when:x.created_at,desc:x.body})),...(data.revisions||[]).map(x=>({kind:x.action,when:x.created_at,desc:x.note||""}))].sort((a,b)=>String(b.when).localeCompare(String(a.when))).slice(0,30);
+ $("historyArea").innerHTML=events.length?events.map(x=>'<div class="entry"><b>'+escapeHtml(x.kind)+'</b><small>'+escapeHtml(iso(x.when))+'</small><div>'+escapeHtml(x.desc)+'</div></div>').join(""):'<p class="secondary">История редакционных решений появится здесь.</p>';
+}
+function renderPreview(){
+ const f=gather(),i=current?.article||{},img=(current?.media||[]).find(x=>x.public_url&&["generated","approved"].includes(x.status));
+ const source=i.source_name||"Источник";const url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
+ $("livePreview").innerHTML='<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(source)+'</div>'+
+ (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.illustration_label_required?"Иллюстрация, созданная ИИ":"Фото из источника")+'</div>':"")+
+ '<h3 class="pheading">'+escapeHtml(f.headline_ru||"Заголовок")+'</h3>'+
+ [f.hook_ru,f.lead_ru,f.story_ru,f.why_matters_ru].filter(Boolean).map(x=>'<p>'+escapeHtml(x)+'</p>').join("")+
+ (url?'<div class="faint">Источник: '+escapeHtml(url)+'</div>':"");
+ if(current)$("saveStatus").textContent=dirty?"Есть несохранённые изменения":"";
+}
+async function selectArticle(id){
+ if(dirty&&!confirm("Остались несохранённые изменения. Перейти к другой статье?"))return;
+ try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));current=item;fill(item);document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
+}
+async function list(){
+ const p=new URLSearchParams({status:activeStatus,category:$("categoryFilter").value,q:$("search").value});
+ try{const r=await call("/api/articles?"+p);items=r.articles||[];$("itemsCount").textContent=items.length+" материалов";
+ $("items").innerHTML=items.map(i=>'<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+badge(i.editorial_status)+'">'+escapeHtml(statuses[i.editorial_status||"candidate"]||"Входящий")+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at))+'</span></div><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div></button>').join("")||"<p class='secondary'>В этой очереди пока пусто.</p>";
+ document.querySelectorAll(".articleRow").forEach(x=>x.onclick=()=>selectArticle(x.dataset.id));
+ }catch(e){toast(e.message,true)}
+}
+async function counts(){try{const {summary:s}=await call("/api/summary");$("countIncoming").textContent=s.incoming;$("countFacts").textContent=s.needs_facts;$("countDraft").textContent=s.drafts;$("countApproved").textContent=s.approved;$("countQueued").textContent=s.queued}catch(e){toast(e.message,true)}}
+async function refreshSelected(){if(current){const id=current.article.id;current=await call("/api/article?id="+encodeURIComponent(id));fill(current)}await Promise.all([counts(),list()])}
+async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;await call("/api/save",{method:"POST",body:{item_id:current.article.id,fields:gather()}});dirty=false;toast("Изменения сохранены");await refreshSelected()}catch(e){toast(e.message,true)}finally{$("saveBtn").disabled=false}}
+async function sendAction(action,other={}){
+ if(!current)return;const note=other.note??$("note").value;
+ if(dirty&&action!=="comment"&&!confirm("Есть несохранённые правки. Выполнить действие без них?"))return;
+ try{const r=await call("/api/action",{method:"POST",body:{item_id:current.article.id,action,note,...other}});toast(action==="queue"?"Добавлено во внутреннюю очередь. Telegram не отправлен.":"Действие выполнено");await refreshSelected()}catch(e){toast(e.message,true)}
+}
+function bind(){
+ document.querySelectorAll("[data-status]").forEach(x=>x.onclick=async()=>{activeStatus=x.dataset.status;document.querySelectorAll("[data-status]").forEach(y=>y.classList.toggle("active",x===y));await list()});
+ let searchTimer=null;$("search").oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(list,250)};$("categoryFilter").onchange=list;$("reload").onclick=async()=>{await Promise.all([counts(),list()]);toast("Список обновлён")};
+ for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException"])$(id).addEventListener("input",()=>{dirty=true;renderPreview()});
+ $("saveBtn").onclick=saveArticle;
+ $("verifyBtn").onclick=()=>sendAction("verify_facts",{evidence_url:$("evidence").value});
+ $("changesBtn").onclick=()=>sendAction("request_changes");
+ $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
+ $("reopenBtn").onclick=()=>sendAction("reopen");
+ $("approveBtn").onclick=()=>{if(confirm("Факты, текст и изображение проверены. Утвердить?"))sendAction("approve")};
+ $("queueBtn").onclick=()=>sendAction("queue",{destination:$("destination").value});
+ $("commentBtn").onclick=async()=>{const note=$("comment").value;if(!note.trim())return;await sendAction("comment",{note})};
+ window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
+}
+async function start(){
+ bind();session=authSession();
+ if(!session?.access_token){login("Сначала войдите в Journal Studio. Редакция «Португалия рядом» использует тот же аккаунт.");return}
+ try{const [{user},cat]=await Promise.all([call("/api/me"),call("/api/categories")]);me={user};categories=cat.categories||[];$("roleLabel").textContent="Роль: "+user.role;$("connection").textContent="Подключено";$("connection").classList.add("green");
+ $("categoryFilter").innerHTML='<option value="all">Все разделы</option>'+categories.filter(x=>!x.parent_code).map(x=>'<option value="'+escapeHtml(x.code)+'">'+escapeHtml(x.name_ru)+'</option>').join("");
+ await Promise.all([counts(),list()]);$("loginOverlay").hidden=true;
+ }catch(e){login("Не удалось подтвердить доступ: "+e.message)}
+}
+start();
+</script>
+</body></html>
