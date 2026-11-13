@@ -197,12 +197,12 @@ function renderHistory(data){
  $("historyArea").innerHTML=events.length?events.map(x=>'<div class="entry"><b>'+escapeHtml(x.kind)+'</b><small>'+escapeHtml(iso(x.when))+'</small><div>'+escapeHtml(x.desc)+'</div></div>').join(""):'<p class="secondary">История редакционных решений появится здесь.</p>';
 }
 function renderRichArticleText(value){
- return String(value||"").split(/\\n\\s*\\n/).filter(Boolean).map(paragraph=>{
+ return String(value||"").split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
   const safe=escapeHtml(paragraph);
   const formatted=safe
-   .replace(/\\*\\*([^*\\n]+)\\*\\*/g,"<strong>$1</strong>")
-   .replace(/(^|[^*])\\*([^*\\n]+)\\*(?=[^*]|$)/g,"$1<em>$2</em>")
-   .replace(/\\n/g,"<br>");
+   .replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>")
+   .replace(/(^|[^*])\*([^*\n]+)\*(?=[^*]|$)/g,"$1<em>$2</em>")
+   .replace(/\n/g,"<br>");
   return '<p class="richParagraph">'+formatted+'</p>';
  }).join("");
 }
