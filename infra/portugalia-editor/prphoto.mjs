@@ -131,12 +131,24 @@ if(!media){const rows=await db("INSERT INTO pr_media_assets(item_id,story_id,med
 await db("UPDATE pr_items SET photo_url=$2,photo_rights='cc_licensed',photo_attribution=$3,photo_license=$4,photo_licence_url=$5,updated_at=now() WHERE id=$1::uuid",[id,found.url,attribution,found.license,found.license_url]);
 return {media_id:media,photo:found,needs_approval:true};
 }
+
+async function selectApproved(id,mediaId){
+ await checkItem(id);
+ if(!uuid(mediaId))throw bad("Неверное изображение");
+ const rows=await db("SELECT a.public_url,a.media_type,a.attribution,a.license_details FROM pr_media_assets a WHERE a.item_id=$1::uuid AND a.id=$2::uuid AND a.status='approved' AND a.rights_verified=true AND a.media_type IN ('licensed_original','owned_original') AND a.public_url ~ '^https://' LIMIT 1",[id,mediaId]);
+ const a=rows[0];if(!a)throw bad("Сначала утвердите фотографию в редакции",409);
+ const details=String(a.license_details||"").split(";").map(x=>x.trim());
+ const rights=a.media_type==="owned_original"?"owned":"cc_licensed";
+ await db("UPDATE pr_items SET photo_url=$2,photo_rights=$3,photo_attribution=$4,photo_license=$5,photo_licence_url=$6,updated_at=now() WHERE id=$1::uuid",[id,a.public_url,rights,a.attribution,details[0]||null,details[1]||null]);
+ return {selected:true,media_id:mediaId,photo_url:a.public_url};
+}
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:5},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:6},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
 try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/import"){const raw=await req.text();if(raw.length>2500)throw bad("Слишком длинный запрос");return result(await importFromStock(JSON.parse(raw||"{}")),200,origin);}
+if(req.method==="POST"&&u.pathname==="/api/select"){const raw=await req.text();if(raw.length>1200)throw bad("Слишком длинный запрос");const b=JSON.parse(raw||"{}");return result(await selectApproved(b.item_id,b.media_id),200,origin);}
 return result({error:"Not found"},404,origin);
 }catch(e){return result({error:String(e.message||e).slice(0,200)},e.status||500,origin);}}};
