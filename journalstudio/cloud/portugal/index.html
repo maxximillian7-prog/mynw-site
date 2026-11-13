@@ -121,17 +121,6 @@ input[type=search]{width:100%} .filters select{width:100%}
 @media(max-width:650px){#livePreview.pt-live-preview{padding:9px 3px}.pt-phone{height:620px;min-height:420px}.pt-search-commons .split{display:flex}}
 
 
-.pt-stock-links{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 13px}
-.pt-stock-links a{background:#fff;border:1px solid #bdded7;border-radius:9px;color:#186c66;font-weight:800;font-size:12px;padding:8px 11px}
-.pt-stock-links a:hover{background:#e6f5f1}
-.pt-stock-import{border:1px solid #d3e5df;border-radius:10px;margin:12px 0 0;padding:11px;background:#fff}
-.pt-stock-import summary{font-size:12px;font-weight:800;cursor:pointer;color:#225e5a}
-.pt-stock-import .field{margin:9px 0}
-.pt-license-confirm{display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.5;padding:9px;background:#f2f8f5;border-radius:8px;color:#295b57}
-.pt-license-confirm input{margin-top:3px;flex:none}
-.pt-stock-import a{font-size:11px;align-self:center}
-.pt-result-card .pt-result-name{font-weight:800;font-size:10px;color:#397b73}
-
 </style></head>
 <body>
 <div class="layout">
@@ -205,26 +194,12 @@ input[type=search]{width:100%} .filters select{width:100%}
   <p class="secondary">Нажмите на фотографию для мгновенного просмотра. Затем подтвердите выбранную обложку. До утверждения редактором изображение остаётся кандидатом.</p>
   <div id="mediaArea" class="secondary">Изображений нет</div>
   <div class="pt-search-commons">
-   <strong>Найти настоящее бесплатное фото</strong>
-   <p class="secondary">Автопоиск: Wikimedia Commons и Openverse. Дополнительно можно искать в Pexels, Unsplash и Pixabay. Все результаты требуют проверки соответствия статье, авторства и лицензии.</p>
-   <div class="split" style="margin:7px 0"><select id="photoProvider" aria-label="Каталог фотографий" style="max-width:165px;flex:none"><option value="all">Все каталоги</option><option value="commons">Wikimedia Commons</option><option value="openverse">Openverse</option></select><input class="input" type="search" id="commonsQuery" placeholder="Например: MAAT Lisboa museum exterior" aria-label="Поиск бесплатных фотографий"><button class="btn" id="commonsSearchBtn" type="button">Найти</button></div>
-   <div class="pt-stock-links" aria-label="Поиск в фотобанках">
-    <a id="pexelsLink" target="_blank" rel="noopener noreferrer" href="https://www.pexels.com/">Pexels ↗</a>
-    <a id="unsplashLink" target="_blank" rel="noopener noreferrer" href="https://unsplash.com/">Unsplash ↗</a>
-    <a id="pixabayLink" target="_blank" rel="noopener noreferrer" href="https://pixabay.com/">Pixabay ↗</a>
-   </div>
+   <strong>Поиск бесплатных фотографий</strong>
+   <p class="secondary">Один поиск по доступным открытым фотоколлекциям. Результаты объединяются, повторяющиеся фото скрываются. Источник, автор и лицензия показываются у каждого изображения.</p>
+   <div class="split"><input class="input" type="search" id="commonsQuery" placeholder="Например: MAAT Lisboa museum exterior" aria-label="Единый поиск реальных фотографий"><button class="btn primary" id="commonsSearchBtn" type="button">🔍 Найти фото</button></div>
    <div id="commonsStatus" class="secondary" role="status"></div>
    <div class="pt-search-results" id="commonsResults"></div>
-   <details class="pt-stock-import">
-    <summary>Добавить найденное фото с Pexels, Unsplash или Pixabay</summary>
-    <p class="secondary">Откройте изображение на сайте фотобанка, проверьте автора и тип лицензии. Укажите страницу конкретного фото и прямой адрес изображения. Новое фото попадёт в редакцию только кандидатом.</p>
-    <div class="field"><label for="stockProvider">Фотобанк</label><select id="stockProvider"><option value="pexels">Pexels</option><option value="unsplash">Unsplash</option><option value="pixabay">Pixabay</option></select></div>
-    <div class="field"><label for="stockPage">Ссылка на страницу конкретной фотографии</label><input id="stockPage" type="url" placeholder="https://www.pexels.com/photo/…"></div>
-    <div class="field"><label for="stockImage">Прямая ссылка на изображение</label><input id="stockImage" type="url" placeholder="https://images.pexels.com/photos/…"></div>
-    <div class="field"><label for="stockAuthor">Автор фотографии</label><input id="stockAuthor" placeholder="Имя автора на сайте"></div>
-    <label class="pt-license-confirm"><input type="checkbox" id="stockVerified"> Я проверил фото на странице источника, условия бесплатной коммерческой лицензии, авторство, отсутствие AI-генерации и соответствие статье.</label>
-    <div class="btns"><button type="button" class="btn primary" id="stockAddBtn">Добавить в статью на утверждение</button><a id="stockLicenseLink" target="_blank" rel="noopener noreferrer" href="https://www.pexels.com/license/">Правила лицензии ↗</a></div>
-   </details>
+   <p class="secondary" style="margin-top:10px">Показываем только фотографии с разрешённой лицензией, доступной ссылкой на оригинал и автором. При выборе фото сохраняется на ручную приёмку; генерации ИИ нет.</p>
   </div>
  </div>
 </div></div>
@@ -325,46 +300,16 @@ function renderMedia(media){
  if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
 }
 
-function updateStockLinks(){
- const currentArticle=current?.article||{};
- const fallback=[currentArticle.location_city,currentArticle.title_original||currentArticle.headline_ru||currentArticle.title_ru].filter(Boolean).join(" ").trim().slice(0,85);
- const query=$("commonsQuery").value.trim()||fallback||"Portugal";
- const q=encodeURIComponent(query);
- const links={
-  pexels:"https://www.pexels.com/search/"+q+"/",
-  unsplash:"https://unsplash.com/s/photos/"+q,
-  pixabay:"https://pixabay.com/images/search/"+q+"/"
- };
- for(const [provider,link] of Object.entries(links)){
-  const el=$(provider+"Link");if(el){el.href=link;el.title="Искать «"+query+"» на "+provider;}
- }
- const lic={
-  pexels:"https://www.pexels.com/license/",
-  unsplash:"https://unsplash.com/license",
-  pixabay:"https://pixabay.com/service/license-summary/"
- };
- $("stockLicenseLink").href=lic[$("stockProvider").value]||lic.pexels;
-}
 async function searchCommons(){
  const query=$("commonsQuery").value.trim(),area=$("commonsResults"),note=$("commonsStatus");
  if(query.length<3){note.textContent="Введите не менее трёх символов.";return;}
  $("commonsSearchBtn").disabled=true;
  note.textContent="Ищем настоящие фотографии с открытой лицензией…";area.innerHTML="";
- const selected=$("photoProvider").value;
- const providers=selected==="all"?["commons","openverse"]:[selected];
  try{
-  const results=await Promise.allSettled(providers.map(provider=>photoCall("/api/search?provider="+provider+"&q="+encodeURIComponent(query))));
-  const photos=[],issues=[],known=new Set();
-  results.forEach((result,n)=>{
-   const provider=providers[n];
-   if(result.status!=="fulfilled"){issues.push((provider==="commons"?"Wikimedia": "Openverse")+" недоступен");return;}
-   for(const photo of result.value.photos||[]){
-    const v={...photo,provider:photo.provider||provider};
-    if(!v.url||known.has(v.url))continue;known.add(v.url);photos.push(v);
-   }
-  });
+  const response=await photoCall("/api/search?q="+encodeURIComponent(query));
+  const photos=response.photos||[],issues=response.warnings||[];
   photoSearchResults=photos;
-  if(!photos.length){note.textContent="Нет подходящих изображений. "+issues.join("; ")+". Попробуйте новый запрос или Pexels, Unsplash, Pixabay.";return;}
+  if(!photos.length){note.textContent="Нет подходящих изображений. "+issues.join("; ")+". Попробуйте новый поисковый запрос.";return;}
   note.textContent="Найдено "+photos.length+" лицензированных вариантов"+(issues.length?". "+issues.join("; "):"")+". Перед выбором проверьте сюжет и автора.";
   area.innerHTML=photos.map((p,n)=>'<div class="pt-result-card"><div class="pt-result-name">'+escapeHtml(p.provider==="openverse"?"Openverse · "+(p.source||"открытая коллекция"):"Wikimedia Commons")+'</div>'+
    '<img loading="lazy" src="'+escapeHtml(p.preview_url||p.url)+'" alt="'+escapeHtml(p.title||"Фотография")+'">'+
@@ -390,23 +335,6 @@ async function attachCommons(index){
   toast("Фото добавлено, в Telegram ничего не опубликовано.");
  }catch(e){note.textContent=e.message;toast(e.message,true);}
 }
-async function importStockPhoto(){
- if(!current)return;
- if(dirty){toast("Сначала сохраните изменения статьи.",true);return;}
- const provider=$("stockProvider").value,page_url=$("stockPage").value.trim(),image_url=$("stockImage").value.trim(),author=$("stockAuthor").value.trim(),confirmed=$("stockVerified").checked;
- if(!page_url||!image_url||!author||!confirmed){toast("Нужны страница фото, прямая ссылка, автор и подтверждение проверки.",true);return;}
- const button=$("stockAddBtn"),note=$("commonsStatus");
- button.disabled=true;note.textContent="Сохраняем проверенные редактором сведения и фото-кандидат…";
- try{
-  const data=await photoCall("/api/import",{method:"POST",body:{item_id:current.article.id,provider,page_url,image_url,author,confirmed}});
-  previewPhotoId=data.media_id;await refreshSelected();
-  note.textContent="Фото из "+provider+" добавлено к статье. Проверьте предпросмотр и отдельно утвердите обложку.";
-  $("stockVerified").checked=false;
-  toast("Фотография добавлена как кандидат для ручной приёмки.");
- }catch(e){note.textContent=e.message;toast(e.message,true);}
- finally{button.disabled=false;}
-}
-
 function renderHistory(data){
  const events=[...(data.comments||[]).map(x=>({kind:"Комментарий",when:x.created_at,desc:x.body})),...(data.revisions||[]).map(x=>({kind:x.action,when:x.created_at,desc:x.note||""}))].sort((a,b)=>String(b.when).localeCompare(String(a.when))).slice(0,30);
  $("historyArea").innerHTML=events.length?events.map(x=>'<div class="entry"><b>'+escapeHtml(x.kind)+'</b><small>'+escapeHtml(iso(x.when))+'</small><div>'+escapeHtml(x.desc)+'</div></div>').join(""):'<p class="secondary">История редакционных решений появится здесь.</p>';
@@ -497,7 +425,7 @@ function jumpEditor(id){
 }
 async function selectArticle(id){
  if(dirty&&!confirm("Остались несохранённые изменения. Перейти к другой статье?"))return;
- try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));previewPhotoId=null;photoSearchResults=[];$("commonsResults").innerHTML="";$("commonsStatus").textContent="";current=item;$("commonsQuery").value=[item.article.location_city,item.article.title_original||item.article.headline_ru||item.article.title_ru].filter(Boolean).join(" ").trim().slice(0,85);fill(item);updateStockLinks();document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
+ try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));previewPhotoId=null;photoSearchResults=[];$("commonsResults").innerHTML="";$("commonsStatus").textContent="";current=item;$("commonsQuery").value=[item.article.location_city,item.article.title_original||item.article.headline_ru||item.article.title_ru].filter(Boolean).join(" ").trim().slice(0,85);fill(item);document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
 }
 async function list(){
  const p=new URLSearchParams({status:activeStatus,category:$("categoryFilter").value,q:$("search").value});
@@ -567,12 +495,7 @@ function bind(){
  $("quickPhoto").onclick=()=>{$("photoPanel").scrollIntoView({behavior:"smooth",block:"center"});$("commonsQuery").focus()};
  $("quickSave").onclick=saveArticle;
  $("commonsSearchBtn").onclick=searchCommons;
- $("commonsQuery").addEventListener("input",updateStockLinks);
  $("commonsQuery").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchCommons()}});
- $("stockProvider").addEventListener("change",updateStockLinks);
- $("stockAddBtn").onclick=importStockPhoto;
- for(const provider of ["pexels","unsplash","pixabay"])$(provider+"Link").addEventListener("click",()=>{$("stockProvider").value=provider;updateStockLinks()});
- updateStockLinks();
 
 
  $("changesBtn").onclick=()=>sendAction("request_changes");
