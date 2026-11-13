@@ -28,7 +28,7 @@ export default {async fetch(req){
   if(!tr){missing++;continue}
   const body=safe(tr.description),title=safe(tr.title,240);
   if(body.length<150||!/[А-Яа-яЁё]/.test(body)||!/[.!?…»)]$/.test(body)){incomplete++;continue}
-  if(body.length<=safe(item.summary_ru).length+15){withheld++;continue}
+  if(body.length<=safe(item.summary_ru).length){withheld++;continue}
   const edit=await sql("SELECT 1 FROM pr_editorial_revisions WHERE item_id=$1::uuid AND action IN ('save','verify_facts','approve','reopen') LIMIT 1",[item.id]);
   if(edit.length){withheld++;continue}
   await sql("UPDATE pr_items SET summary_ru=$2,title_ru=CASE WHEN title_ru IS NULL OR title_ru='' THEN $3 ELSE title_ru END,updated_at=now() WHERE id=$1::uuid AND status='candidate'",[item.id,body,title]);
