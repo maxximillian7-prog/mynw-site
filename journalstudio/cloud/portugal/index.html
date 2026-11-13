@@ -151,13 +151,14 @@ input[type=search]{width:100%} .filters select{width:100%}
 <div id="editorPanel" class="hidden">
  <div id="intakeDiagnostic" class="notice" style="margin:0 0 14px"></div>
  <div class="editorStatus"><span class="pill" id="storyStatus"></span><span class="pill" id="mainCategory"></span><span class="pill" id="storySource"></span><span class="pill amber" id="needsFactsBadge"></span></div>
- <div class="card"><h3>① Первоисточник и факты</h3>
+ <details class="card" style="padding:17px 19px"><summary style="cursor:pointer;font-weight:800;color:#236c68">① Первоисточник и проверка фактов (открыть)</summary>
   <div class="sourcebox"><strong id="originalTitle"></strong><div class="secondary" id="originalDate"></div><a id="originalLink" rel="noopener noreferrer" target="_blank">Открыть оригинал ↗</a><p id="originalExcerpt"></p></div>
   <div class="notice">Проверьте факты по первоисточнику. Наличие перевода или текста GPT-6 Luna само по себе не подтверждает достоверность материала.</div>
   <div class="field"><label for="evidence">Ссылка на подтверждающий источник</label><input id="evidence" placeholder="https://официальный-сайт…" type="url"></div>
   <div class="field"><label for="note">Примечание редактора / обоснование решения</label><textarea id="note" rows="2" placeholder="Что проверено, что исправить или почему отклонить…"></textarea></div>
   <p class="secondary">Подтверждение фактов включено в общую кнопку утверждения — отдельное действие не требуется. <strong id="factState"></strong></p>
- </div>
+ </details>
+<div class="editorEditingLayout"><div class="editorEditingColumn">
  <div class="card"><h3>② Редактирование публикации</h3>
   <div class="split"><div class="field"><label>Формат</label><select id="style"><option value="short">Short — короткая новость</option><option value="standard">Standard — основной пост</option><option value="rich">Rich — расширенная история</option></select></div><div class="field"><label>Подрубрика</label><select id="subcategory"><option value="">Без подрубрики</option></select></div></div>
   <div class="field"><label>Заголовок</label><input id="headline" maxlength="250" placeholder="Редакционный заголовок"></div>
@@ -170,8 +171,35 @@ input[type=search]{width:100%} .filters select{width:100%}
   <div class="field"><label>Если без изображения — укажите причину</label><input id="imageException" placeholder="Например, срочное текстовое предупреждение"></div>
   <div class="btns"><button id="saveBtn" class="btn primary">Сохранить правки</button><span class="secondary" id="saveStatus"></span></div>
  </div>
- <div class="card"><h3>③ Предпросмотр Telegram</h3><div class="sourcebox" style="margin-bottom:12px"><strong>Навигационный хештег: </strong><strong id="categoryTagPreview">—</strong><p class="secondary">Добавляется автоматически по основной рубрике и совпадает с закреплённой навигацией канала.</p></div><div class="preview" id="livePreview"></div><div class="btns"><button class="btn" id="copyTelegramBtn">Копировать готовый текст для Telegram</button><span class="secondary" id="tgLength">—</span></div><p class="secondary" style="margin-top:9px">Копирование разрешено после утверждения материала. Хештег добавляется сервером автоматически.</p></div>
- <div class="card"><h3>④ Фотографии и иллюстрации</h3><div id="mediaArea" class="secondary">Изображений нет</div></div>
+</div><div class="editorPreviewColumn">
+ <div class="card"><h3>③ Как будет выглядеть на телефоне</h3>
+  <div class="pt-mode-switch" role="group" aria-label="Режим предпросмотра">
+   <button type="button" id="modePhone" class="selected" aria-pressed="true">📱 Telegram</button>
+   <button type="button" id="modeArticle" aria-pressed="false">📰 Читать статью</button>
+  </div>
+  <div class="pt-quicktools">
+   <button class="btn" type="button" id="quickHeadline">✎ Заголовок</button>
+   <button class="btn" type="button" id="quickStory">✎ Текст</button>
+   <button class="btn" type="button" id="quickPhoto">▧ Фото</button>
+  </div>
+  <div class="preview pt-live-preview" id="livePreview"></div>
+  <div class="pt-screen-notice" id="previewHint">Мобильный макет Telegram на основе подготовленных текста и фотографии.</div>
+  <div class="sourcebox" style="margin:12px 0"><strong>Рубрика: </strong><strong id="categoryTagPreview">—</strong><div class="faint">Навигационный хештег всегда добавляется в конец публикации.</div></div>
+  <div class="btns"><button class="btn" id="copyTelegramBtn">Копировать готовый текст</button><span class="secondary" id="tgLength">—</span></div>
+  <p class="secondary" style="margin-top:9px">Предпросмотр обновляется при каждом изменении. Для копирования публикация должна быть утверждена.</p>
+ </div>
+ <div class="card" id="photoPanel"><h3>④ Фотографии — быстро выбрать и заменить</h3>
+  <p class="secondary">Нажмите на фотографию для мгновенного просмотра. Затем подтвердите выбранную обложку. До утверждения редактором изображение остаётся кандидатом.</p>
+  <div id="mediaArea" class="secondary">Изображений нет</div>
+  <div class="pt-search-commons">
+   <strong>Подобрать новое реальное фото</strong>
+   <p class="secondary">Поиск Wikimedia Commons. Сохраняются только фотографии с разрешённой лицензией и указанием автора. AI-фото не создаются.</p>
+   <div class="split"><input class="input" type="search" id="commonsQuery" placeholder="Например: MAAT Lisboa museum exterior" aria-label="Поиск фотографий Wikimedia Commons"><button class="btn" id="commonsSearchBtn" type="button">Найти</button></div>
+   <div id="commonsStatus" class="secondary" role="status"></div>
+   <div class="pt-search-results" id="commonsResults"></div>
+  </div>
+ </div>
+</div></div>
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
   <div class="split"><div class="field"><label>Канал публикации</label><select id="destination"><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field" style="justify-content:end"><button id="approveBtn" class="btn primary">✓ Утвердить и в очередь Telegram</button></div></div>
   <p class="secondary">Одно нажатие сохранит правки, подтвердит факты редактором по указанному первоисточнику, утвердит статью и поставит её в очередь. Проверка полноты текста, достоверности источника и прав на фото остаётся обязательной.</p>
