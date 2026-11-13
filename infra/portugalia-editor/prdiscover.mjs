@@ -61,7 +61,7 @@ export default {async fetch(req){
   const options=parseRSS(xml);let saved=0,promoted=0,rejected=0,duplicate=0;
   const limits=await sql("SELECT category_code,weekly_target_max FROM pr_editorial_priority WHERE enabled=true");
   const caps=new Map(limits.map(x=>[x.category_code,x.weekly_target_max]));
-  const current=await sql("SELECT recommended_category,count(*) AS n FROM pr_discovery_hits WHERE created_at>now()-interval '7 days' GROUP BY recommended_category");
+  const current=await sql("SELECT recommended_category,count(*) AS n FROM pr_discovery_hits WHERE stage IN ('research','promoted') AND created_at>now()-interval '7 days' GROUP BY recommended_category");
   const counts=new Map(current.map(x=>[x.recommended_category,Number(x.n)]));
   const usedThisScan=new Map();
   const candidates=[];
@@ -89,7 +89,10 @@ export default {async fetch(req){
     if(src){
      const external=SHA(x.url);
      const r=await sql("INSERT INTO pr_items(source_id,external_id,canonical_url,content_fingerprint,title_original,body_original,original_language,primary_category,source_published_at,importance,ingested_via,photo_rights,status) VALUES($1,$2,$3,$4,$5,$6,'pt',$7,$8,$9,'curated_rss','unverified','candidate') ON CONFLICT(source_id,external_id) DO NOTHING RETURNING id",[src.id,external,x.url,SHA(x.title.toLowerCase()),x.title,x.body.slice(0,7000),cat,x.when.toISOString(),x.val.score>=85?3:2]);
-     if(r.length){promoted++;await sql("UPDATE pr_discovery_hits SET stage='promoted',item_id=$2::uuid WHERE id=$1",[inserted.id,r[0].id])}
+     if(r.length){
+      promoted++;await sql("UPDATE pr_discovery_hits SET stage='promoted',item_id=$2::uuid WHERE id=$1",[inserted.id,r[0].id]);
+      await sql("INSERT INTO pr_editorial_value_reviews(item_id,value_score,reviewer_kind,decision,reason_ru,reviewed_at) VALUES($1::uuid,$2,'heuristic','keep',$3,now()) ON CONFLICT(item_id) DO NOTHING",[r[0].id,x.val.score,x.val.reason]);
+     }
     }
    }
   }
