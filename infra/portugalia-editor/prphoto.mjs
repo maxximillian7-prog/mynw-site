@@ -19,10 +19,10 @@ function decode(page){
 const i=page?.imageinfo?.[0],m=i?.extmetadata||{},license=plain(m.LicenseShortName?.value),author=plain(m.Artist?.value||i?.user).slice(0,150),src=i?.thumburl||i?.url;
 if(!i||!/^File:/.test(page.title)||!author||!src||!/^image\/(jpeg|png|webp)$/.test(i.mime)||i.width<800)return null;
 if(!/^(CC BY(?:-SA)? (?:2\.0|3\.0|4\.0)|CC0 1\.0|Public domain|PDM)$/i.test(license))return null;
-const u=new URL(src);if(u.hostname!=="upload.wikimedia.org"||!u.pathname.startsWith("/wikipedia/commons/"))return null;
+const u=new URL(src);if(!["upload.wikimedia.org","thumb.wikimedia.org"].includes(u.hostname)||u.protocol!=="https:"||!u.pathname.startsWith("/wikipedia/commons/"))return null;u.search="";
 if(!i.descriptionurl?.startsWith("https://commons.wikimedia.org/wiki/File:"))return null;
 const licenseUrl=plain(m.LicenseUrl?.value)||i.descriptionurl;
-return {title:page.title,url:src,file_page:i.descriptionurl,license,license_url:licenseUrl,author,width:i.width,height:i.height};
+return {title:page.title,url:u.href,file_page:i.descriptionurl,license,license_url:licenseUrl,author,width:i.width,height:i.height};
 }
 async function commons(params){
 const u=new URL("https://commons.wikimedia.org/w/api.php");
