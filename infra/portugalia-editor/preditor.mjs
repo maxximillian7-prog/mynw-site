@@ -143,7 +143,7 @@ export default {async fetch(req){
  AND ($3='' OR COALESCE(d.headline_ru,i.title_ru,i.title_original) ILIKE '%'||$3||'%' OR s.name ILIKE '%'||$3||'%')
 )
 SELECT * FROM matches WHERE ($1<>'incoming' OR category_rank<=5)
-ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,value_score DESC,discovered_at DESC LIMIT 80`,[status,cat,search]);
+ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,CASE WHEN $1='incoming' THEN category_rank ELSE 0 END,value_score DESC,discovered_at DESC LIMIT 80`,[status,cat,search]);
    return json({articles},200,origin);
   }
   if(req.method==="GET"&&route==="/api/article"){const id=u.searchParams.get("id");if(!uuid(id))throw err("Неверный ID");return json(await detail(id),200,origin)}
