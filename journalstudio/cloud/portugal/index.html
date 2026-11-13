@@ -417,7 +417,7 @@ function jumpEditor(id){
 }
 async function selectArticle(id){
  if(dirty&&!confirm("Остались несохранённые изменения. Перейти к другой статье?"))return;
- try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));current=item;fill(item);document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
+ try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));previewPhotoId=null;photoSearchResults=[];$("commonsResults").innerHTML="";$("commonsStatus").textContent="";current=item;fill(item);document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
 }
 async function list(){
  const p=new URLSearchParams({status:activeStatus,category:$("categoryFilter").value,q:$("search").value});
@@ -480,6 +480,14 @@ function bind(){
  for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException"])$(id).addEventListener("input",()=>{dirty=true;renderPreview()});
  $("copyTelegramBtn").onclick=async()=>{if(current?.article?.status!=="approved"||current?.article?.editorial_status!=="approved"){toast("Сначала утвердите материал в редакции",true);return}if(!current?.article?.telegram_text){toast("Нет готового текста",true);return}if(dirty){toast("Сначала сохраните изменения",true);return}try{await navigator.clipboard.writeText(current.article.telegram_text);toast("Готовый текст с хештегом скопирован")}catch(e){toast("Не удалось скопировать текст автоматически",true)}};
  $("saveBtn").onclick=saveArticle;
+ $("modePhone").onclick=()=>{previewMode="phone";renderPreview()};
+ $("modeArticle").onclick=()=>{previewMode="article";renderPreview()};
+ $("quickHeadline").onclick=()=>jumpEditor("headline");
+ $("quickStory").onclick=()=>jumpEditor("story");
+ $("quickPhoto").onclick=()=>{$("photoPanel").scrollIntoView({behavior:"smooth",block:"center"});$("commonsQuery").focus()};
+ $("commonsSearchBtn").onclick=searchCommons;
+ $("commonsQuery").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchCommons()}});
+
 
  $("changesBtn").onclick=()=>sendAction("request_changes");
  $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
