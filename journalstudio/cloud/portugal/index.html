@@ -381,13 +381,11 @@ function renderPreview(){
  const localFull=body+"\n\n"+tail;
  const serverFull=String(i.telegram_text||"");
  const full=(!dirty&&!previewPhotoId&&serverFull)?serverFull:localFull;
- const localCaption=localFull.length<=1024?localFull:"";
- const caption=(!dirty&&!previewPhotoId&&typeof i.telegram_caption==="string")?i.telegram_caption:localCaption;
+
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
  const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Фотография публикации">':'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
- const photoBubble=img?'<article class="pt-chat-post">'+image+(caption?'<div class="pt-chat-body">'+renderTelegramMessage(caption)+'</div>':'')+timestamp+'</article>':"";
- const textBubble=(!img||full.length>1024)?'<article class="pt-chat-post"><div class="pt-chat-body">'+renderTelegramMessage(full)+'</div>'+timestamp+'</article>':"";
+ const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full)+'</div>'+timestamp+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  $("modePhone").classList.toggle("selected",previewMode==="phone");$("modeArticle").classList.toggle("selected",previewMode==="article");
  $("modePhone").setAttribute("aria-pressed",previewMode==="phone"?"true":"false");
@@ -396,11 +394,11 @@ function renderPreview(){
   root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone">'+
    '<div class="pt-phone-status"><span>9:41</span><span>◕ ▰ ▴</span></div>'+
    '<div class="pt-channel-head"><span class="pt-channel-back">‹</span><span class="pt-channel-avatar">🇵🇹</span><div class="pt-channel-meta"><strong>Португалия рядом</strong><small>Telegram · канал</small></div><span style="font-size:19px;color:#799994">⋮</span></div>'+
-   '<div class="pt-phone-chat" id="ptChatScroll"><div class="pt-day-chip">Предпросмотр</div>'+photoBubble+textBubble+'</div>'+
+   '<div class="pt-phone-chat" id="ptChatScroll"><div class="pt-day-chip">Telegram Rich Message · одно сообщение</div>'+richBubble+'</div>'+
    '<div class="pt-phone-bottom"><span>🔕</span><span style="flex:1;padding-left:18px;font-size:12px">Отключить звук</span><span>↗</span></div>'+
    '</div></div>';
   const scroller=$("ptChatScroll");if(scroller)scroller.scrollTop=oldTop;
-  $("previewHint").textContent=img?(full.length>1024?"В Telegram: сначала фотография без подписи, сразу за ней — полная статья, без повторного предисловия.":"В Telegram: фотография и полный короткий текст одним сообщением."):"Предпросмотр текстового сообщения. Для приёмки требуется реальная фотография.";
+  $("previewHint").textContent=img?"Rich Message: фотография, заголовок, подзаголовки и полный текст — в одной публикации Telegram.":"Для полноценной публикации нужна утверждённая фотография.";
   if(full.length>4000)$("previewHint").textContent="⚠️ Текст длиннее 4000 символов — сократите его перед отправкой.";
  }else{
   root.innerHTML='<article class="pt-article-view">'+
@@ -414,7 +412,7 @@ function renderPreview(){
   $("previewHint").textContent="Режим удобного чтения: нажмите на раздел, чтобы быстро отредактировать его.";
  }
  const limit=4000,words=full.length;
- $("tgLength").textContent=(dirty?"Есть несохранённые правки · ":"")+(img?"Фото + текст · ":"Текст · ")+words+" / "+limit+" символов";
+ $("tgLength").textContent=(dirty?"Есть несохранённые правки · ":"")+(img?"Rich Message: 1 сообщение, фото + текст · ":"Нет фото · ")+words+" / "+limit+" символов";
  $("tgLength").style.color=words>limit?"#ab3d38":"";
  $("copyTelegramBtn").disabled=!serverFull||dirty||i.status!=="approved"||i.editorial_status!=="approved";
  $("saveStatus").textContent=dirty?"Есть несохранённые изменения":"";
