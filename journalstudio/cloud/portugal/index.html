@@ -96,7 +96,7 @@ input[type=search]{width:100%} .filters select{width:100%}
   <div class="notice">Проверьте факты по первоисточнику. Наличие перевода или текста GPT-6 Luna само по себе не подтверждает достоверность материала.</div>
   <div class="field"><label for="evidence">Ссылка на подтверждающий источник</label><input id="evidence" placeholder="https://официальный-сайт…" type="url"></div>
   <div class="field"><label for="note">Примечание редактора / обоснование решения</label><textarea id="note" rows="2" placeholder="Что проверено, что исправить или почему отклонить…"></textarea></div>
-  <div class="btns"><button id="verifyBtn" class="btn">✓ Факты проверены</button><span class="secondary" id="factState"></span></div>
+  <p class="secondary">Подтверждение фактов включено в общую кнопку утверждения — отдельное действие не требуется. <strong id="factState"></strong></p>
  </div>
  <div class="card"><h3>② Редактирование публикации</h3>
   <div class="split"><div class="field"><label>Формат</label><select id="style"><option value="short">Short — короткая новость</option><option value="standard">Standard — основной пост</option><option value="rich">Rich — расширенная история</option></select></div><div class="field"><label>Подрубрика</label><select id="subcategory"><option value="">Без подрубрики</option></select></div></div>
@@ -114,7 +114,7 @@ input[type=search]{width:100%} .filters select{width:100%}
  <div class="card"><h3>④ Фотографии и иллюстрации</h3><div id="mediaArea" class="secondary">Изображений нет</div></div>
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
   <div class="split"><div class="field"><label>Канал публикации</label><select id="destination"><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field" style="justify-content:end"><button id="approveBtn" class="btn primary">✓ Утвердить и в очередь Telegram</button></div></div>
-  <p class="secondary">Одно нажатие сохранит правки, утвердит проверенный материал и поставит его в выбранную очередь. Сервер проверит факты, полноту текста и права на фотографию. Непроверенные материалы не публикуются.</p>
+  <p class="secondary">Одно нажатие сохранит правки, подтвердит факты редактором по указанному первоисточнику, утвердит статью и поставит её в очередь. Проверка полноты текста, достоверности источника и прав на фото остаётся обязательной.</p>
   <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
@@ -162,7 +162,7 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  $("saveStatus").textContent="";$("note").value="";$("comment").value="";$("emptyPanel").classList.add("hidden");$("editorPanel").classList.remove("hidden");
  const editable=me?.user?.edit&&!["approved","rejected"].includes(i.status)&&i.editorial_status!=="approved";
  for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException","saveBtn"])$(id).disabled=!editable;
- $("verifyBtn").disabled=!editable;
+
  for(const id of ["changesBtn","rejectBtn","reopenBtn"])$(id).disabled=!me?.user?.approve;
  $("changesBtn").disabled=!me?.user?.edit;
  const isApproved=i.status==="approved"&&i.editorial_status==="approved";
@@ -242,6 +242,16 @@ async function approveAndQueue(){
   const latest=await call("/api/article?id="+encodeURIComponent(id));
   approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
   if(!approved){
+   // The editor's approval click records the factual sign-off. This is human
+   // attestation against a source, not an independent automated fact-check.
+   if(!latest.article.source_fact_checked||!latest.article.context_verified||!(latest.evidence||[]).length){
+    const evidenceUrl=$("evidence").value.trim();
+    let source;
+    try{source=new URL(evidenceUrl)}catch{}
+    if(!source||source.protocol!=="https:")throw Error("Укажите HTTPS-ссылку на проверенный первоисточник");
+    const verificationNote=note.trim().length>=12?note.trim():"Редактор подтвердил соответствие публикации указанному первоисточнику при утверждении.";
+    await call("/api/action",{method:"POST",body:{item_id:id,action:"verify_facts",evidence_url:evidenceUrl,note:verificationNote}});
+   }
    await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
    approved=true;
   }
@@ -265,7 +275,7 @@ function bind(){
  for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException"])$(id).addEventListener("input",()=>{dirty=true;renderPreview()});
  $("copyTelegramBtn").onclick=async()=>{if(current?.article?.status!=="approved"||current?.article?.editorial_status!=="approved"){toast("Сначала утвердите материал в редакции",true);return}if(!current?.article?.telegram_text){toast("Нет готового текста",true);return}if(dirty){toast("Сначала сохраните изменения",true);return}try{await navigator.clipboard.writeText(current.article.telegram_text);toast("Готовый текст с хештегом скопирован")}catch(e){toast("Не удалось скопировать текст автоматически",true)}};
  $("saveBtn").onclick=saveArticle;
- $("verifyBtn").onclick=()=>sendAction("verify_facts",{evidence_url:$("evidence").value});
+
  $("changesBtn").onclick=()=>sendAction("request_changes");
  $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
  $("reopenBtn").onclick=()=>sendAction("reopen");
