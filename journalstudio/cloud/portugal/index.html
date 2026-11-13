@@ -43,6 +43,10 @@ input[type=search]{width:100%} .filters select{width:100%}
 .preview{background:#f7fbfa;padding:16px;border-radius:12px;border:1px solid #dce9e7}
 .preview .pheading{font:800 24px/1.22 Georgia,serif;color:#18383c;margin:5px 0 10px}
 .preview p{white-space:pre-wrap;font-size:13px}
+.preview p.richParagraph{white-space:normal;line-height:1.65;margin:0 0 13px}
+.preview p.richParagraph strong{font-weight:800;color:#173b40}
+.preview p.richParagraph strong:first-child{font-weight:850}
+.preview p.richParagraph em{font-style:italic}
 .preview .pmeta{font-size:11px;color:var(--muted);margin-bottom:10px}
 .preview img{display:block;max-width:100%;border-radius:11px;aspect-ratio:16/9;object-fit:cover;margin:10px 0}
 .figure{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}.figure img{max-width:100%;max-height:240px;object-fit:contain;display:block;margin:auto}
@@ -192,6 +196,16 @@ function renderHistory(data){
  const events=[...(data.comments||[]).map(x=>({kind:"Комментарий",when:x.created_at,desc:x.body})),...(data.revisions||[]).map(x=>({kind:x.action,when:x.created_at,desc:x.note||""}))].sort((a,b)=>String(b.when).localeCompare(String(a.when))).slice(0,30);
  $("historyArea").innerHTML=events.length?events.map(x=>'<div class="entry"><b>'+escapeHtml(x.kind)+'</b><small>'+escapeHtml(iso(x.when))+'</small><div>'+escapeHtml(x.desc)+'</div></div>').join(""):'<p class="secondary">История редакционных решений появится здесь.</p>';
 }
+function renderRichArticleText(value){
+ return String(value||"").split(/\\n\\s*\\n/).filter(Boolean).map(paragraph=>{
+  const safe=escapeHtml(paragraph);
+  const formatted=safe
+   .replace(/\\*\\*([^*\\n]+)\\*\\*/g,"<strong>$1</strong>")
+   .replace(/(^|[^*])\\*([^*\\n]+)\\*(?=[^*]|$)/g,"$1<em>$2</em>")
+   .replace(/\\n/g,"<br>");
+  return '<p class="richParagraph">'+formatted+'</p>';
+ }).join("");
+}
 function renderPreview(){
  const f=gather(),i=current?.article||{};const imageOptions=current?.media||[];const img=imageOptions.find(x=>x.public_url&&["licensed_original","owned_original"].includes(x.media_type)&&x.rights_verified&&x.status==="approved")||imageOptions.find(x=>x.public_url&&["licensed_original","owned_original"].includes(x.media_type)&&x.rights_verified&&x.status==="candidate");
  const source=i.source_name||"Источник",url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
@@ -202,7 +216,7 @@ function renderPreview(){
  $("livePreview").innerHTML='<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(source)+'</div>'+
  (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.media_type==="brand_generic"?"Универсальная иллюстрация рубрики — не фото этого события":img.media_type==="licensed_original"?"Тематическое фото (не репортаж). Автор и лицензия: "+escapeHtml(img.attribution||"Wikimedia Commons"):img.illustration_label_required?"Иллюстрация, созданная ИИ":"Реальная фотография с проверяемым источником")+'</div>':'<div class="imagePending">🖼 Подходящая фотография ещё не найдена или не проверена. Подбираем из готовых изображений без генерации.</div>')+
  '<h3 class="pheading">'+escapeHtml(f.headline_ru||"Заголовок")+'</h3>'+
- snippets.map(x=>'<p>'+escapeHtml(x)+'</p>').join("")+
+ snippets.map(renderRichArticleText).join("")+
  (url?'<div class="faint">Источник: '+escapeHtml(url)+'</div>':"")+
  (tag?'<p style="margin-top:15px;font-size:13px;font-weight:800;color:#187977">'+escapeHtml(tag)+'</p>':"");
  const previewChars=[f.headline_ru,...snippets,url?"Источник: "+url:"",tag].filter(Boolean).join("\n\n").length;
