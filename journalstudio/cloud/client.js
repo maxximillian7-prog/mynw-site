@@ -25,7 +25,16 @@ async function call(path,method="GET",payload){
 }
 async function login(){
  const email=$("email").value.trim(),password=$("password").value;
- session=await auth("token?grant_type=password","POST",{email,password});
+ try{
+  session=await auth("token?grant_type=password","POST",{email,password});
+ }catch(error){
+  if(/invalid login credentials/i.test(String(error?.message||""))){
+   $("password").value="";
+   $("password").focus();
+   throw Error("Пароль не подошёл. Если Firefox подставил сохранённый пароль, введите его заново. Если не помните пароль, нажмите «Не получается войти? Установить / восстановить пароль» ниже. Повторно регистрироваться не нужно.");
+  }
+  throw error;
+ }
  sessionStorage.setItem("journal_session",JSON.stringify(session));
  await initialize();
 }
