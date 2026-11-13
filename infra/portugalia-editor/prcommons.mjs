@@ -29,7 +29,7 @@ function chooseQuery(item){
  if(!selected)return null;
  if(item.primary_category==="news"&&/polic|crime|assassin|acident|protest|detid|задерж|убийств|полици|катастроф|расследован|пожар|трагед/i.test(title))return null;
  if(item.primary_category==="news"&&!place&&selected.id==="heritage")return null;
- return {search:(place||"Portugal")+" Portugal "+selected.query,place,theme:selected};
+ return {search:(place?place+" Portugal ":"Portugal ")+selected.query,place,theme:selected};
 }
 function relevantImage(file,titleMatch){
  const lower=String(file.title||"").replace(/^File:/i,"");
@@ -39,7 +39,7 @@ function relevantImage(file,titleMatch){
   const place=titleMatch.place.toLowerCase();
   const alternate=place==="lisbon"?/lisbon|lisboa/i:place==="porto"?/porto/i:place==="cascais"?/cascais/i:place==="sintra"?/sintra/i:place==="algarve"?/algarve/i:/madeira/i;
   if(!alternate.test(lower))return false;
- }else if(!/portugal|portugu/i.test(lower))return false;
+ }else if(!/portugal|portugu|lisboa|lisbon|porto|cascais|sintra|braga|coimbra|faro|algarve|madeira|set[úu]bal|aveiro/i.test(lower))return false;
  return true;
 }
 export default {async fetch(req){
@@ -50,7 +50,7 @@ export default {async fetch(req){
  try{
  const [state]=await q("SELECT count(*)::integer AS attempted_today FROM pr_commons_media_jobs WHERE attempted_at>now()-interval '24 hours'");
  if(state&&Number(state.attempted_today)>=24)return ok({ok:true,skipped:"daily_photo_search_limit"});
- const selected=await q("SELECT i.id,i.title_original,i.title_ru,i.location_city,i.primary_category FROM pr_items i JOIN pr_editorial_value_reviews v ON v.item_id=i.id JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.status='candidate' AND i.duplicate_of IS NULL AND (i.primary_category<>'events' OR i.starts_at>now()) AND v.value_score>=55 AND d.status IN ('draft','needs_facts') AND length(d.source_context_used)>=160 AND NOT EXISTS(SELECT 1 FROM pr_media_assets a WHERE a.item_id=i.id AND a.media_type IN ('licensed_original','owned_original') AND a.rights_verified AND a.public_url IS NOT NULL AND a.status IN ('candidate','approved','generated')) AND NOT EXISTS(SELECT 1 FROM pr_commons_media_jobs j WHERE j.item_id=i.id) ORDER BY CASE WHEN i.primary_category='events' THEN 1 ELSE 0 END,v.value_score DESC,i.discovered_at DESC LIMIT 1");
+ const selected=await q("SELECT i.id,i.title_original,i.title_ru,i.location_city,i.primary_category FROM pr_items i JOIN pr_editorial_value_reviews v ON v.item_id=i.id JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.status='candidate' AND i.duplicate_of IS NULL AND (i.primary_category<>'events' OR i.starts_at>now()) AND v.value_score>=55 AND d.status='draft' AND d.needs_more_facts=false AND length(d.story_ru)>=180 AND d.story_ru ~ '[.!?…»)]$' AND length(d.source_context_used)>=160 AND NOT EXISTS(SELECT 1 FROM pr_media_assets a WHERE a.item_id=i.id AND a.media_type IN ('licensed_original','owned_original') AND a.rights_verified AND a.public_url IS NOT NULL AND a.status IN ('candidate','approved','generated')) AND NOT EXISTS(SELECT 1 FROM pr_commons_media_jobs j WHERE j.item_id=i.id) ORDER BY CASE WHEN i.primary_category='events' THEN 1 ELSE 0 END,v.value_score DESC,i.discovered_at DESC LIMIT 1");
  if(!selected.length)return ok({ok:true,skipped:"no_matching_article"});
  article=selected[0];
  const match=chooseQuery(article);
