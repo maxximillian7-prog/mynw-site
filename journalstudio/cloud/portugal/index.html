@@ -399,7 +399,7 @@ function renderPreview(){
    '</div></div>';
   const scroller=$("ptChatScroll");if(scroller)scroller.scrollTop=oldTop;
   $("previewHint").textContent=img?"Rich Message: фотография, заголовок, подзаголовки и полный текст — в одной публикации Telegram.":"Для полноценной публикации нужна утверждённая фотография.";
-  if(full.length>4000)$("previewHint").textContent="⚠️ Текст длиннее 4000 символов — сократите его перед отправкой.";
+  if(full.length>28000)$("previewHint").textContent="⚠️ Текст длиннее 28000 символов — сократите его перед отправкой.";
  }else{
   root.innerHTML='<article class="pt-article-view">'+
    '<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(catName)+'</div>'+
@@ -411,7 +411,7 @@ function renderPreview(){
   root.querySelectorAll("[data-edit-field]").forEach(el=>el.onclick=()=>jumpEditor(el.dataset.editField));
   $("previewHint").textContent="Режим удобного чтения: нажмите на раздел, чтобы быстро отредактировать его.";
  }
- const limit=4000,words=full.length;
+ const limit=28000,words=full.length;
  $("tgLength").textContent=(dirty?"Есть несохранённые правки · ":"")+(img?"Rich Message: 1 сообщение, фото + текст · ":"Нет фото · ")+words+" / "+limit+" символов";
  $("tgLength").style.color=words>limit?"#ab3d38":"";
  $("copyTelegramBtn").disabled=!serverFull||dirty||i.status!=="approved"||i.editorial_status!=="approved";
