@@ -108,7 +108,7 @@ input[type=search]{width:100%} .filters select{width:100%}
   <div class="field"><label>Если без изображения — укажите причину</label><input id="imageException" placeholder="Например, срочное текстовое предупреждение"></div>
   <div class="btns"><button id="saveBtn" class="btn primary">Сохранить правки</button><span class="secondary" id="saveStatus"></span></div>
  </div>
- <div class="card"><h3>③ Предпросмотр Telegram</h3><div class="sourcebox" style="margin-bottom:12px"><strong>Навигационный хештег: </strong><strong id="categoryTagPreview">—</strong><p class="secondary">Добавляется автоматически по основной рубрике и совпадает с закреплённой навигацией канала.</p></div><div class="preview" id="livePreview"></div><div class="btns"><button class="btn" id="copyTelegramBtn">Копировать готовый текст для Telegram</button><span class="secondary" id="tgLength">—</span></div></div>
+ <div class="card"><h3>③ Предпросмотр Telegram</h3><div class="sourcebox" style="margin-bottom:12px"><strong>Навигационный хештег: </strong><strong id="categoryTagPreview">—</strong><p class="secondary">Добавляется автоматически по основной рубрике и совпадает с закреплённой навигацией канала.</p></div><div class="preview" id="livePreview"></div><div class="btns"><button class="btn" id="copyTelegramBtn">Копировать готовый текст для Telegram</button><span class="secondary" id="tgLength">—</span></div><p class="secondary" style="margin-top:9px">Копирование разрешено после утверждения материала. Хештег добавляется сервером автоматически.</p></div>
  <div class="card"><h3>④ Фотографии и иллюстрации</h3><div id="mediaArea" class="secondary">Изображений нет</div></div>
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
   <div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button><button id="approveBtn" class="btn primary">✓ Утвердить статью</button></div>
@@ -193,7 +193,7 @@ function renderPreview(){
  (tag?'<p style="margin-top:15px;font-size:13px;font-weight:800;color:#187977">'+escapeHtml(tag)+'</p>':"");
  const previewChars=[f.headline_ru,...snippets,url?"Источник: "+url:"",tag].filter(Boolean).join("\n\n").length;
  $("tgLength").textContent=dirty?"Изменения не сохранены · приблизительно "+previewChars+" символов":"Готовый текст: "+fullText.length+" символов (лимит 4000)";
- $("copyTelegramBtn").disabled=!fullText||dirty;
+ $("copyTelegramBtn").disabled=!fullText||dirty||i.status!=="approved"||i.editorial_status!=="approved";
  if(current)$("saveStatus").textContent=dirty?"Есть несохранённые изменения":"";
 }
 async function selectArticle(id){
@@ -223,7 +223,7 @@ function bind(){
  document.querySelectorAll("[data-status]").forEach(x=>x.onclick=async()=>{activeStatus=x.dataset.status;document.querySelectorAll("[data-status]").forEach(y=>y.classList.toggle("active",x===y));await list()});
  let searchTimer=null;$("search").oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(list,250)};$("categoryFilter").onchange=list;$("reload").onclick=async()=>{await Promise.all([counts(),list()]);toast("Список обновлён")};
  for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException"])$(id).addEventListener("input",()=>{dirty=true;renderPreview()});
- $("copyTelegramBtn").onclick=async()=>{if(!current?.article?.telegram_text){toast("Нет готового текста",true);return}if(dirty){toast("Сначала сохраните изменения",true);return}try{await navigator.clipboard.writeText(current.article.telegram_text);toast("Готовый текст с хештегом скопирован")}catch(e){toast("Не удалось скопировать текст автоматически",true)}};
+ $("copyTelegramBtn").onclick=async()=>{if(current?.article?.status!=="approved"||current?.article?.editorial_status!=="approved"){toast("Сначала утвердите материал в редакции",true);return}if(!current?.article?.telegram_text){toast("Нет готового текста",true);return}if(dirty){toast("Сначала сохраните изменения",true);return}try{await navigator.clipboard.writeText(current.article.telegram_text);toast("Готовый текст с хештегом скопирован")}catch(e){toast("Не удалось скопировать текст автоматически",true)}};
  $("saveBtn").onclick=saveArticle;
  $("verifyBtn").onclick=()=>sendAction("verify_facts",{evidence_url:$("evidence").value});
  $("changesBtn").onclick=()=>sendAction("request_changes");
