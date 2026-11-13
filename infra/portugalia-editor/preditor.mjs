@@ -64,7 +64,7 @@ async function action(u,p){
  if(a==="approve_media"||a==="reject_media"){
   const m=media.find(x=>x.id===p.media_id);if(!m)throw err("Изображение не найдено",404);
   if(a==="approve_media"){
-   if(!m.public_url||!m.rights_verified||!["candidate","generated","approved"].includes(m.status))throw err("Нет подтверждённого изображения и прав",409);
+   if(!m.public_url||!m.rights_verified||!["licensed_original","owned_original"].includes(m.media_type)||m.status!=="candidate"||m.media_type==="licensed_original"&&(!m.attribution||!m.license_details))throw err("Можно одобрить только уникальное реальное фото с проверенными правами, автором и лицензией",409);
    await sql("UPDATE pr_media_assets SET status='approved',approved_by=$2,approved_at=now() WHERE id=$1::uuid",[m.id,u.id]);
   }else{
    if(note.length<10)throw err("Укажите причину отказа");
@@ -86,7 +86,7 @@ async function action(u,p){
   if(!i.intake_ready)throw err("Материал ещё не прошёл полную подготовку: "+(i.intake_issues||[]).join("; ").slice(0,250),409);
   if(!i.draft_id||!i.lead_ru||!i.story_ru||!i.headline_ru)throw err("Нет полноценного текста",409);
   if(!i.context_verified||i.needs_more_facts||!i.source_fact_checked||!evidence.length)throw err("Сначала подтвердите факты и доработайте материал",409);
-  const good=media.some(m=>m.status==="approved"&&m.rights_verified&&m.public_url);
+  const good=media.some(m=>m.status==="approved"&&["licensed_original","owned_original"].includes(m.media_type)&&m.rights_verified&&m.public_url);
   if(i.image_needed&&i.image_choice!=="no_image"&&!good)throw err("Утвердите изображение",409);
   if(i.image_needed&&i.image_choice==="no_image"&&String(i.image_exception_reason||"").length<12)throw err("Для выпуска без картинки нужна причина",409);
   await sql("UPDATE pr_story_drafts SET status='approved',reviewer=$2,reviewed_at=now(),updated_at=now() WHERE item_id=$1::uuid",[id,u.id]);
