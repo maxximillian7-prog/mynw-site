@@ -16,6 +16,8 @@ function textItems(xml){return [...xml.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/
 }).filter(x=>x.url&&x.title);}
 async function fetchRSS(code){const response=await fetch(feeds[code],{headers:{"accept":"application/rss+xml,application/xml,text/xml","user-agent":"PortugalRyadomEditorialEnrichment/1.0"},redirect:"error",signal:AbortSignal.timeout(17000)});if(!response.ok)throw Error("rss_http_"+response.status);const content=await response.text();if(content.length>2400000||!/<item\b/i.test(content))throw Error("invalid_rss");return textItems(content);}
 async function enrich(code){
+ // Reject pending pictures for events that have already started; do not burn API credits on stale listings.
+ await sql("UPDATE pr_media_assets a SET status='rejected',failure_reason='event_started_before_generation' FROM pr_items i JOIN pr_sources src ON src.id=i.source_id WHERE a.item_id=i.id AND src.code='trailyo_events' AND a.status='candidate' AND i.starts_at IS NOT NULL AND i.starts_at<now()");
  const items=await fetchRSS(code);let checked=0,updated=0,skip=0;const longer=[];
  const [src]=await sql("SELECT id FROM pr_sources WHERE code=$1 AND verification_status IN ('verified_editorial','verified_official')",[code]);
  if(!src)return result({ok:false,reason:"unknown_source"},403);
