@@ -113,9 +113,9 @@ input[type=search]{width:100%} .filters select{width:100%}
  <div class="card"><h3>③ Предпросмотр Telegram</h3><div class="sourcebox" style="margin-bottom:12px"><strong>Навигационный хештег: </strong><strong id="categoryTagPreview">—</strong><p class="secondary">Добавляется автоматически по основной рубрике и совпадает с закреплённой навигацией канала.</p></div><div class="preview" id="livePreview"></div><div class="btns"><button class="btn" id="copyTelegramBtn">Копировать готовый текст для Telegram</button><span class="secondary" id="tgLength">—</span></div><p class="secondary" style="margin-top:9px">Копирование разрешено после утверждения материала. Хештег добавляется сервером автоматически.</p></div>
  <div class="card"><h3>④ Фотографии и иллюстрации</h3><div id="mediaArea" class="secondary">Изображений нет</div></div>
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
-  <div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button><button id="approveBtn" class="btn primary">✓ Утвердить статью</button></div>
-  <hr class="divider"><div class="split"><div class="field"><label>Куда поставить в очередь</label><select id="destination"><option value="main">Главная лента</option><option value="afisha">Афиша</option></select></div><div class="field" style="justify-content:end"><button id="queueBtn" class="btn">↗ В очередь Telegram</button></div></div>
-  <p class="secondary">После утверждения редактором материал поступает в очередь Telegram. Доставка в выбранный канал проверяется автоматически каждые 5 минут. Черновики и материалы без проверенных прав на фото не публикуются.</p>
+  <div class="split"><div class="field"><label>Канал публикации</label><select id="destination"><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field" style="justify-content:end"><button id="approveBtn" class="btn primary">✓ Утвердить и в очередь Telegram</button></div></div>
+  <p class="secondary">Одно нажатие сохранит правки, утвердит проверенный материал и поставит его в выбранную очередь. Сервер проверит факты, полноту текста и права на фотографию. Непроверенные материалы не публикуются.</p>
+  <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
 </div>
@@ -130,7 +130,7 @@ const S="https://npsfaymjckcqhtyiafms.supabase.co",KEY="sb_publishable_-HPESNuXt
 const $=id=>document.getElementById(id),escapeHtml=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const statuses={candidate:"В обработке",needs_facts:"Нужны факты",draft:"Черновик",ready_for_review:"На согласовании",approved:"Утверждено",rejected:"Отклонено",queued:"В очереди"};
 let session,me,categories=[],items=[],current=null,activeStatus="incoming",dirty=false,loading=false;
-let toastTimeout=0;
+let toastTimeout=0,approvalPending=false;
 function toast(msg,error=false){const el=$("toast");el.textContent=msg;el.classList.toggle("error",error);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.hidden=true,4800)}
 function login(message){$("loginMessage").textContent=message||"Войдите в Journal Studio и вернитесь в этот раздел.";$("loginOverlay").hidden=false}
 function iso(v){if(!v)return"—";try{return new Date(v).toLocaleString("ru-RU",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch{return v}}
@@ -163,9 +163,12 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  const editable=me?.user?.edit&&!["approved","rejected"].includes(i.status)&&i.editorial_status!=="approved";
  for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException","saveBtn"])$(id).disabled=!editable;
  $("verifyBtn").disabled=!editable;
- for(const id of ["changesBtn","rejectBtn","reopenBtn","approveBtn","queueBtn"])$(id).disabled=!me?.user?.approve;
+ for(const id of ["changesBtn","rejectBtn","reopenBtn"])$(id).disabled=!me?.user?.approve;
  $("changesBtn").disabled=!me?.user?.edit;
- $("approveBtn").disabled=!me?.user?.approve||i.status==="approved";$("queueBtn").disabled=!me?.user?.approve||i.status!=="approved";
+ const isApproved=i.status==="approved"&&i.editorial_status==="approved";
+ $("approveBtn").textContent=isApproved?"↗ Поставить в очередь Telegram":"✓ Утвердить и в очередь Telegram";
+ $("approveBtn").disabled=!me?.user?.approve||approvalPending||i.status==="rejected"||i.status==="expired";
+ $("destination").disabled=!me?.user?.approve||approvalPending;
  $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected");
  $("approvalWarning").textContent=i.intake_ready?"Техническая приёмка пройдена. Перед окончательным утверждением редактор проверяет содержание, исходную ссылку и права на иллюстрацию.":"Неполный материал не может быть утверждён. Причины указаны вверху; ручное подтверждение фактов потребуется после исправлений.";
  dirty=false;renderMedia(item.media);renderHistory(item);renderPreview();
@@ -225,6 +228,32 @@ async function list(){
 async function counts(){try{const {summary:s}=await call("/api/summary");$("countIncoming").textContent=s.incoming;$("countFacts").textContent=s.needs_facts;$("countDraft").textContent=s.drafts;$("countApproved").textContent=s.approved;$("countQueued").textContent=s.queued}catch(e){toast(e.message,true)}}
 async function refreshSelected(){if(current){const id=current.article.id;current=await call("/api/article?id="+encodeURIComponent(id));fill(current)}await Promise.all([counts(),list()])}
 async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;await call("/api/save",{method:"POST",body:{item_id:current.article.id,fields:gather()}});dirty=false;toast("Изменения сохранены");await refreshSelected()}catch(e){toast(e.message,true)}finally{$("saveBtn").disabled=false}}
+async function approveAndQueue(){
+ if(!current||approvalPending||!me?.user?.approve)return;
+ const id=current.article.id,destination=$("destination").value,note=$("note").value;
+ let approved=current.article.status==="approved"&&current.article.editorial_status==="approved";
+ approvalPending=true;$("approveBtn").disabled=true;$("destination").disabled=true;
+ try{
+  if(dirty){
+   if(approved)throw Error("Утверждённую статью сначала нужно вернуть к правкам");
+   await call("/api/save",{method:"POST",body:{item_id:id,fields:gather()}});
+   dirty=false;
+  }
+  const latest=await call("/api/article?id="+encodeURIComponent(id));
+  approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
+  if(!approved){
+   await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
+   approved=true;
+  }
+  await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",destination,note}});
+  toast("Материал утверждён и поставлен в очередь Telegram");
+ }catch(e){
+  toast((approved?"Статья утверждена, но очередь не подтверждена: ":"Утверждение заблокировано: ")+e.message,true);
+ }finally{
+  approvalPending=false;
+  try{await refreshSelected()}catch(e){toast("Обновите карточку: "+e.message,true)}
+ }
+}
 async function sendAction(action,other={}){
  if(!current)return;const note=other.note??$("note").value;
  if(dirty&&action!=="comment"&&!confirm("Есть несохранённые правки. Выполнить действие без них?"))return;
@@ -240,8 +269,7 @@ function bind(){
  $("changesBtn").onclick=()=>sendAction("request_changes");
  $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
  $("reopenBtn").onclick=()=>sendAction("reopen");
- $("approveBtn").onclick=()=>{if(confirm("Факты, текст и изображение проверены. Утвердить?"))sendAction("approve")};
- $("queueBtn").onclick=()=>sendAction("queue",{destination:$("destination").value});
+ $("approveBtn").onclick=approveAndQueue;
  $("commentBtn").onclick=async()=>{const note=$("comment").value;if(!note.trim())return;await sendAction("comment",{note})};
  window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 }
