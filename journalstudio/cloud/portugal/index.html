@@ -23,7 +23,7 @@ input[type=search]{width:100%} .filters select{width:100%}
 .items{overflow-y:auto;flex:1;min-height:140px;padding-bottom:10px}
 .articleRow{width:100%;background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;text-align:left;margin:0 0 9px;display:block;color:var(--ink);transition:.1s}
 .articleRow.active{border-color:#26928d;box-shadow:0 0 0 2px #cae9e6}.articleRow:hover{border-color:#9fc8c4}
-.articleRow strong{display:block;font-weight:750;font-size:13px;line-height:1.4;margin:7px 0}
+.articleRow strong{display:block;font-weight:750;font-size:13px;line-height:1.4;margin:7px 0}.articleRow .articleSummary{color:#60787b;font-size:11px;line-height:1.45;margin:7px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.articleRow .articleHero{display:flex;gap:10px;align-items:flex-start}.articleRow .articleHero .copy{min-width:0;flex:1}.articleRow .thumb{width:76px;height:70px;border-radius:9px;object-fit:cover;flex:none;background:#e7f0ed}.articleRow .thumbPlaceholder{display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#d8e9e5,#bcd6d2);font-size:24px;color:#317c74}.imagePending{margin:10px 0;border:1px dashed #b9d6cf;color:#638580;border-radius:11px;padding:22px;text-align:center;background:#edf5f3;font-size:12px}
 .articleRow .meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
 .pill{display:inline-block;border-radius:99px;background:#f0f4f3;color:#406260;padding:3px 8px;font-size:10px;font-weight:750}
 .pill.green{background:#e3f4ec;color:#287c57}.pill.amber{background:#fff2dd;color:#9a6a28}.pill.red{background:#fbe5e2;color:#a35043}
@@ -182,7 +182,7 @@ function renderPreview(){
  const f=gather(),i=current?.article||{},img=(current?.media||[]).find(x=>x.public_url&&["generated","approved"].includes(x.status));
  const source=i.source_name||"Источник";const url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
  $("livePreview").innerHTML='<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(source)+'</div>'+
- (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.illustration_label_required?"Иллюстрация, созданная ИИ":"Фото из источника")+'</div>':"")+
+ (img?'<img src="'+escapeHtml(img.public_url)+'" alt="Редакционная иллюстрация"><div class="faint">'+(img.illustration_label_required?"Иллюстрация, созданная ИИ":"Фото из источника")+'</div>':'<div class="imagePending">🖼 Тематическая обложка готовится или ожидает проверки прав. До утверждения здесь показана заглушка.</div>')+
  '<h3 class="pheading">'+escapeHtml(f.headline_ru||"Заголовок")+'</h3>'+
  [f.hook_ru,f.lead_ru,f.story_ru,f.why_matters_ru].filter(Boolean).map(x=>'<p>'+escapeHtml(x)+'</p>').join("")+
  (url?'<div class="faint">Источник: '+escapeHtml(url)+'</div>':"");
@@ -195,7 +195,11 @@ async function selectArticle(id){
 async function list(){
  const p=new URLSearchParams({status:activeStatus,category:$("categoryFilter").value,q:$("search").value});
  try{const r=await call("/api/articles?"+p);items=r.articles||[];$("itemsCount").textContent=items.length+" материалов";
- $("items").innerHTML=items.map(i=>'<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+badge(i.editorial_status)+'">'+escapeHtml(statuses[i.editorial_status||"candidate"]||"Входящий")+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at))+'</span></div><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div></button>').join("")||"<p class='secondary'>В этой очереди пока пусто.</p>";
+ $("items").innerHTML=items.map(i=>{
+ const picture=/^https:\/\//i.test(i.media_preview_url||"")?'<img loading="lazy" class="thumb" src="'+escapeHtml(i.media_preview_url)+'" alt="Иллюстрация к статье">':
+ '<div class="thumb thumbPlaceholder" title="Иллюстрация пока не утверждена">'+(i.primary_category==="events"?"🎭":i.primary_category==="places"?"🌿":i.primary_category==="documents"?"📑":i.primary_category==="family"?"👨‍👩‍👧":i.primary_category==="life"?"🏡":"📰")+'</div>';
+ return '<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+badge(i.editorial_status)+'">'+escapeHtml(statuses[i.editorial_status||"candidate"]||"Входящий")+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at))+'</span></div><div class="articleHero">'+picture+'<div class="copy"><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong>'+(i.article_excerpt?'<div class="articleSummary">'+escapeHtml(i.article_excerpt)+'</div>':"")+'</div></div><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div></button>';
+ }).join("")||"<p class='secondary'>В этой очереди пока пусто.</p>";
  document.querySelectorAll(".articleRow").forEach(x=>x.onclick=()=>selectArticle(x.dataset.id));
  }catch(e){toast(e.message,true)}
 }
