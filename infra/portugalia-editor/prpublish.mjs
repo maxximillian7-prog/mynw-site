@@ -127,10 +127,7 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eve
    blocks.push({type:"heading",size:5,text:embeddedLinks(first)},{type:"paragraph",text:embeddedLinks(rest)});
   }else blocks.push({type:"paragraph",text:embeddedLinks(section)});
  }
- if(isAfisha){
-  blocks.push({type:"paragraph",text:"Больше событий в приложении"});
-  blocks.push({type:"buttons",buttons:[{text:"Trailyo",url:TRAILYO_APP_URL,style:"primary"}],align:"center"});
- }
+ if(isAfisha)blocks.push({type:"paragraph",text:["Больше событий в приложении ",richUrl("Trailyo",TRAILYO_APP_URL),"."]});
  if(blocks.length>500)throw Error("Article has too many rich blocks");
  return blocks;
 }
