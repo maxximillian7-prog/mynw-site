@@ -115,7 +115,11 @@ async function action(u,p){
   // Editorial routing follows the topic, not a manually editable destination.
   // All events belong in Afisha; news and articles go to Main.
   const destination=i.source_code==="trailyo_events"?"afisha":"main";
-  if(destination==="afisha"&&i.source_code!=="trailyo_events")throw err("Афиша принимает только опубликованные события из Trailyo",409);
+  if(destination==="afisha"){
+   if(i.source_code!=="trailyo_events")throw err("Афиша принимает только опубликованные события из Trailyo",409);
+   const [details]=await sql("SELECT source_type FROM pr_trailyo_event_details WHERE item_id=$1::uuid",[id]);
+   if(!details?.source_type||details.source_type==="partner")throw err("Партнёрские и неподтверждённые по типу источника события исключены из Афиши",409);
+  }
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_enqueue_publication_slot($1::uuid,$2::text)",[id,destination]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
   await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for});
@@ -156,6 +160,7 @@ export default {async fetch(req){
    const articles=await sql(`WITH matches AS (
  SELECT i.id,i.title_original,i.title_ru,i.primary_category,
  q.category_hashtag,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score,
+ td.is_free,td.price_known,td.price,td.source_type AS trailyo_source_type,td.event_category,
  i.location_city,i.source_published_at,i.discovered_at,s.name AS source_name,
  d.status AS editorial_status,d.style,d.headline_ru,d.needs_more_facts,d.image_needed,
  LEFT(COALESCE(NULLIF(d.lead_ru,''),NULLIF(i.summary_ru,''),NULLIF(i.body_original,''),''),180) AS article_excerpt,
@@ -163,13 +168,17 @@ export default {async fetch(req){
  ORDER BY CASE WHEN m.public_url IS NOT NULL THEN 0 ELSE 1 END, CASE WHEN m.media_type='brand_generic' THEN 1 ELSE 0 END,m.created_at DESC LIMIT 1) AS media_status,
  q.preview_image_url AS media_preview_url,
  (SELECT count(*) FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')) AS queued_count,
- ROW_NUMBER() OVER(PARTITION BY i.primary_category ORDER BY q.value_score DESC,i.discovered_at DESC) AS category_rank
+ ROW_NUMBER() OVER(PARTITION BY i.primary_category ORDER BY q.value_score DESC,i.discovered_at DESC) AS category_rank,
+ ROW_NUMBER() OVER(PARTITION BY CASE WHEN td.is_free IS TRUE AND td.price_known IS TRUE THEN 0 ELSE 1 END ORDER BY q.value_score DESC,i.discovered_at DESC) AS afisha_band_rank,
+ CASE WHEN td.is_free IS TRUE AND td.price_known IS TRUE THEN 0 ELSE 1 END AS afisha_band
  FROM pr_items i
  JOIN pr_sources s ON s.id=i.source_id
+ LEFT JOIN pr_trailyo_event_details td ON td.item_id=i.id
  LEFT JOIN pr_story_drafts d ON d.item_id=i.id
  CROSS JOIN LATERAL pr_intake_check(i.id) q
  WHERE i.duplicate_of IS NULL
  AND ((s.code='trailyo_events')=($4='afisha'))
+ AND ($4<>'afisha' OR td.source_type IS NULL OR td.source_type<>'partner')
  AND ($1='all' OR ($1='incoming' AND q.ready=true AND i.status='candidate')
  OR ($1='preparing' AND q.ready=false AND i.status='candidate')
  OR ($1='queued' AND EXISTS(SELECT 1 FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')))
@@ -178,7 +187,12 @@ export default {async fetch(req){
  AND ($3='' OR COALESCE(d.headline_ru,i.title_ru,i.title_original) ILIKE '%'||$3||'%' OR s.name ILIKE '%'||$3||'%')
 )
 SELECT * FROM matches WHERE ($1<>'incoming' OR $4='afisha' OR category_rank<=5)
-ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,CASE WHEN $1='incoming' THEN category_rank ELSE 0 END,value_score DESC,discovered_at DESC LIMIT 80`,[status,cat,search,channel]);
+ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,
+ CASE WHEN $4='afisha' THEN
+  CASE WHEN afisha_band=0 THEN floor((afisha_band_rank-1)::numeric/4)*5 + mod((afisha_band_rank-1)::numeric,4)
+       ELSE (afisha_band_rank-1)*5 + 4 END
+  ELSE CASE WHEN $1='incoming' THEN category_rank ELSE 0 END END ASC,
+ value_score DESC,discovered_at DESC LIMIT 80`,[status,cat,search,channel]);
    return json({articles},200,origin);
   }
   if(req.method==="GET"&&route==="/api/article"){const id=u.searchParams.get("id");if(!uuid(id))throw err("Неверный ID");return json(await detail(id),200,origin)}
