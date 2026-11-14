@@ -356,7 +356,7 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  $("destination").disabled=true; // Prevent cross-channel routing; server enforces category classification.
  $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected"||i.editorial_status==="approved");
  $("approvalWarning").textContent=me?.user?.role==="owner"
- ? (i.intake_ready?"Приёмка пройдена. Одно нажатие «Утвердить» сохранит решение и запланирует публикацию.":"Приёмка не пройдена: "+(reasons.join("; ")||"есть замечания")+". Нажатие «Утвердить» зафиксирует исключения под ответственность владельца и попытается запланировать публикацию. Если нет пригодного текста, даты или изображения, материал будет утверждён, но не отправлен.")
+ ? (isApproved&&!i.intake_ready?"Утверждено лично владельцем с исключениями: "+reasons.join("; ")+". Правила приёмки не менялись. При необходимости можно повторно поставить утверждённый материал в очередь.":i.intake_ready?"Приёмка пройдена. Одно нажатие «Утвердить» сохранит решение и запланирует публикацию.":"Приёмка не пройдена: "+(reasons.join("; ")||"есть замечания")+". Нажатие «Утвердить» зафиксирует исключения под ответственность владельца и попытается запланировать публикацию. Если отсутствует пригодный текст или фотография, материал будет утверждён, но не отправлен.")
  : (i.intake_ready?"Техническая приёмка пройдена.":"Приёмка не пройдена: "+reasons.join("; "));
  dirty=false;instagramCaptionCached="";renderMedia(item.media);renderHistory(item);renderPreview();refreshInstagramState(i.id);
 }
