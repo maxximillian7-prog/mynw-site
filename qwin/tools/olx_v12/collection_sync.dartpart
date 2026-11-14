@@ -1,0 +1,16 @@
+  @override void initState(){
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      if(mounted&&widget.mine)unawaited(_refreshMine());
+    });
+  }
+  Future<void> _refreshMine()async{
+    if(widget.mine&&widget.store.neon?.olxEnabled==true&&!widget.store.isGuest){
+      try{
+        await widget.store.neon!.olxAction('sync_statuses',data:{'limit':20});
+      }catch(_){
+        // Display cached status if OLX is temporarily unreachable.
+      }
+    }
+    await widget.store.refresh();
+  }
