@@ -136,11 +136,12 @@ return {media_id:media,photo:found,needs_approval:true};
 async function selectApproved(id,mediaId){
  await checkItem(id);
  if(!uuid(mediaId))throw bad("Неверное изображение");
- const rows=await db("SELECT a.public_url,a.media_type,a.attribution,a.license_details FROM pr_media_assets a WHERE a.item_id=$1::uuid AND a.id=$2::uuid AND a.status='approved' AND a.rights_verified=true AND a.media_type IN ('licensed_original','owned_original','generated_illustration') AND a.public_url ~ '^https://' AND (a.media_type<>'generated_illustration' OR (a.illustration_label_required AND a.storage_bucket='pr-editorial-media' AND a.storage_key IS NOT NULL)) LIMIT 1",[id,mediaId]);
+ const rows=await db("SELECT a.public_url,a.media_type,a.attribution,a.license_details,a.generation_model FROM pr_media_assets a JOIN pr_items i ON i.id=a.item_id JOIN pr_sources s ON s.id=i.source_id WHERE a.item_id=$1::uuid AND a.id=$2::uuid AND a.status='approved' AND a.public_url ~ '^https://' AND ((a.rights_verified=true AND a.media_type IN ('licensed_original','owned_original','generated_illustration') AND (a.media_type<>'generated_illustration' OR (a.illustration_label_required AND a.storage_bucket='pr-editorial-media' AND a.storage_key IS NOT NULL))) OR (a.media_type='brand_generic' AND a.generation_model='trailyo_existing_image_reference' AND a.approved_by IS NOT NULL AND i.primary_category='events' AND s.code='trailyo_events')) LIMIT 1",[id,mediaId]);
  const a=rows[0];if(!a)throw bad("Сначала утвердите фотографию в редакции",409);
  const details=String(a.license_details||"").split(";").map(x=>x.trim());
- const rights=["owned_original","generated_illustration"].includes(a.media_type)?"owned":"cc_licensed";
- await db("UPDATE pr_items SET photo_url=$2,photo_rights=$3,photo_attribution=$4,photo_license=$5,photo_licence_url=$6,updated_at=now() WHERE id=$1::uuid",[id,a.public_url,rights,a.attribution,a.media_type==="generated_illustration"?"AI-generated photorealistic image; not documentary":details[0]||null,a.media_type==="generated_illustration"?null:details[1]||null]);
+ const isTrailyo=a.media_type==="brand_generic"&&a.generation_model==="trailyo_existing_image_reference";
+ const rights=isTrailyo?"unverified":(["owned_original","generated_illustration"].includes(a.media_type)?"owned":"cc_licensed");
+ await db("UPDATE pr_items SET photo_url=$2,photo_rights=$3,photo_attribution=$4,photo_license=$5,photo_licence_url=$6,updated_at=now() WHERE id=$1::uuid",[id,a.public_url,rights,a.attribution,isTrailyo?"Изображение из Trailyo; лицензия не проверялась":a.media_type==="generated_illustration"?"AI-generated photorealistic image; not documentary":details[0]||null,isTrailyo?a.public_url:a.media_type==="generated_illustration"?null:details[1]||null]);
  return {selected:true,media_id:mediaId,photo_url:a.public_url};
 }
 
