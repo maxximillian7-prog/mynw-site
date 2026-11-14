@@ -245,7 +245,7 @@ input[type=search]{width:100%} .filters select{width:100%}
  </div>
 </div></div>
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
-  <div class="split"><div class="field"><label>Канал публикации (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field" style="justify-content:end"><button id="approveBtn" class="btn primary">✓ Утвердить и в очередь Telegram</button></div></div>
+  <div class="field"><label>Канал публикации (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field"><label for="publicationMode">Когда опубликовать?</label><select id="publicationMode"><option value="default">Автоматически — не раньше чем через 2 часа</option><option value="delay">Через 2 часа</option><option value="manual">Выбрать дату и время</option></select></div><div class="split hidden" id="publicationDateRow"><div class="field"><label for="publicationDate">Дата</label><input id="publicationDate" type="date"></div><div class="field"><label for="publicationTime">Время (Лиссабон)</label><input id="publicationTime" type="time" value="12:00"></div></div><div class="btns"><button id="approveBtn" class="btn primary">✓ Утвердить и запланировать</button></div>
   <p class="secondary">Одно нажатие сохранит правки, подтвердит факты редактором по указанному первоисточнику, утвердит статью и поставит её в очередь. Проверка полноты текста, достоверности источника и прав на фото остаётся обязательной.</p>
   <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
@@ -293,6 +293,7 @@ async function call(path,options={}){
  if(!r.ok)throw Error(d.error||"Ошибка редакционного сервера");
  return d;
 }
+function publicationSettings(){const mode=$("publicationMode").value;if(mode==="default")return {schedule_mode:"default"};if(mode==="delay")return {schedule_mode:"delay",schedule_delay_minutes:120};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString()}}function updatePublicationMode(){$("publicationDateRow").classList.toggle("hidden",$("publicationMode").value!=="manual")}
 function gather(){return{style:$("style").value,target_subcategory:$("subcategory").value,headline_ru:$("headline").value,hook_ru:$("hook").value,lead_ru:$("lead").value,story_ru:$("story").value,why_matters_ru:$("why").value,needs_more_facts:$("needsMoreFacts").checked,image_needed:$("imageNeeded").checked,image_choice:$("imageChoice").value,image_exception_reason:$("imageException").value}}
 function fill(item){const i=item.article;const map={headline:i.headline_ru||i.title_ru||i.title_original,hook:i.hook_ru||"",lead:i.lead_ru||i.summary_ru||"",story:i.story_ru||"",why:i.why_matters_ru||"",style:i.style||"short",needsMoreFacts:i.draft_id?!!i.needs_more_facts:true,imageNeeded:!!i.image_needed,imageChoice:i.image_choice||"no_image",imageException:i.image_exception_reason||""};
  $("headline").value=map.headline;$("hook").value=map.hook;$("lead").value=map.lead;$("story").value=map.story;$("why").value=map.why;$("style").value=map.style;$("needsMoreFacts").checked=map.needsMoreFacts;$("imageNeeded").checked=map.imageNeeded;$("imageChoice").value=map.imageChoice;$("imageException").value=map.imageException;
@@ -309,7 +310,7 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  $("storySource").textContent=i.source_name;$("needsFactsBadge").textContent=i.needs_more_facts?"Требуется проверка фактов":i.context_verified?"Контекст проверен":"Не проверено";
  const nextPublication=(item.publications||[]).find(p=>["queued","scheduled"].includes(p.status));
  $("scheduleBadge").hidden=!nextPublication;
- $("scheduleBadge").textContent=nextPublication?(nextPublication.destination_code==="afisha"?"🎭 Афиша · ближайшая отправка": "🕒 Главное · не раньше "+lisbonSchedule(nextPublication.scheduled_for)):"";
+ $("scheduleBadge").textContent=nextPublication?"🕒 Публикация: "+lisbonSchedule(nextPublication.scheduled_for):"";
  $("evidence").value=i.canonical_url||"";$("factState").textContent=i.source_fact_checked?"✓ Проверено редактором":"Не подтверждено";
  $("saveStatus").textContent="";$("note").value="";$("comment").value="";$("emptyPanel").classList.add("hidden");$("editorPanel").classList.remove("hidden");
  const editable=me?.user?.edit&&!["approved","rejected"].includes(i.status)&&i.editorial_status!=="approved";
@@ -318,7 +319,7 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  for(const id of ["changesBtn","rejectBtn","reopenBtn"])$(id).disabled=!me?.user?.approve;
  $("changesBtn").disabled=!me?.user?.edit;
  const isApproved=i.status==="approved"&&i.editorial_status==="approved";
- $("approveBtn").textContent=isApproved?"↗ Поставить в очередь Telegram":"✓ Утвердить и в очередь Telegram";
+ $("approveBtn").textContent=isApproved?"↗ Запланировать публикацию":"✓ Утвердить и запланировать";
  $("approveBtn").disabled=!me?.user?.approve||approvalPending||i.status==="rejected"||i.status==="expired";
  $("destination").disabled=true; // Prevent cross-channel routing; server enforces category classification.
  $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected");
@@ -573,7 +574,7 @@ async function refreshSelected(){if(current){const id=current.article.id;current
 async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;await call("/api/save",{method:"POST",body:{item_id:current.article.id,fields:gather()}});dirty=false;toast("Изменения сохранены");await refreshSelected()}catch(e){toast(e.message,true)}finally{$("saveBtn").disabled=false}}
 async function approveAndQueue(){
  if(!current||approvalPending||!me?.user?.approve)return;
- const id=current.article.id,destination=$("destination").value,note=$("note").value;
+ const id=current.article.id,destination=$("destination").value,note=$("note").value;let schedule;try{schedule=publicationSettings()}catch(e){toast(e.message,true);return}
  let approved=current.article.status==="approved"&&current.article.editorial_status==="approved";
  approvalPending=true;$("approveBtn").disabled=true;$("destination").disabled=true;
  try{
@@ -598,8 +599,9 @@ async function approveAndQueue(){
    await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
    approved=true;
   }
-  const scheduled=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",destination,note}});
-  toast(scheduled.destination==="afisha"?"🎭 Афиша: материал утверждён. Отправка при ближайшей проверке очереди.":"📰 Главное: не раньше "+lisbonSchedule(scheduled.scheduled_for)+" · интервал ≥2 часов, ночью 00:00–08:00 не отправляем.");
+  const scheduled=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",destination,note,...schedule}});
+  if(schedule.schedule_mode==="manual"&&(!scheduled.scheduled_for||Math.abs(Date.parse(scheduled.scheduled_for)-Date.parse(schedule.scheduled_for))>60000))throw Error("Сервер не подтвердил выбранное время; проверьте очередь.");
+   toast(scheduled.destination==="afisha"?"🎭 Афиша: материал утверждён. Отправка при ближайшей проверке очереди.":"📰 Главное: не раньше "+lisbonSchedule(scheduled.scheduled_for)+" · интервал ≥2 часов, ночью 00:00–08:00 не отправляем.");
  }catch(e){
   toast((approved?"Статья утверждена, но очередь не подтверждена: ":"Утверждение заблокировано: ")+e.message,true);
  }finally{
@@ -734,6 +736,7 @@ function bind(){
  $("changesBtn").onclick=()=>sendAction("request_changes");
  $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
  $("reopenBtn").onclick=()=>sendAction("reopen");
+ $("publicationMode").onchange=updatePublicationMode;updatePublicationMode();
  $("approveBtn").onclick=approveAndQueue;
  $("commentBtn").onclick=async()=>{const note=$("comment").value;if(!note.trim())return;await sendAction("comment",{note})};
  window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
