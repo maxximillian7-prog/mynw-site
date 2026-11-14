@@ -269,6 +269,13 @@ $xp=$xp.Substring(0,$finalStart)+$final
 if(-not $xp.Contains('QwinSellerCategorySearch(')){
   $xp=$xp.Replace("import 'qwin_seller_category_search.dart';"+[char]10,'')
 }
+# Remove a leftover eBay-only selector invocation from older Qwin builds.
+# Its widget definition was removed with the obsolete category step.
+$orphanCall='_wizardEbayCategorySelector()'
+if($xp.Contains($orphanCall) -and
+   -not ([regex]::IsMatch($xp,'(?m)^\s*Widget\s+_wizardEbayCategorySelector\s*\('))){
+  $xp=$xp.Replace($orphanCall,'const SizedBox.shrink()')
+}
 $staged['lib/ui/experience.dart']=$xp
 
 # Restore the OLX integration card even when the seller has not linked an account.
