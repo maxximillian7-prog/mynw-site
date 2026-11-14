@@ -53,7 +53,7 @@ assert.ok(home.includes('newHeroFirst')&&home.includes('newHeroSecond'),
   'Editorial heading must have localized text');
 assert.ok(!home.includes('demo-grid') && !home.includes('demo-price'),
   'Do not simulate live inventory or a web marketplace');
-assert.ok(docs.includes('Qwin is independent from OLX.'),
+assert.ok(docs.includes('Qwin is independent from OLX Portugal'),
   'OLX independence disclosure missing');
 for(const [name,body] of [['home',home],['docs',docs],['translations',script]]){
   assert.ok(!/etsy|ebay/i.test(body),'Paused marketplace names must not appear in Qwin '+name);
