@@ -295,7 +295,7 @@ export default {async fetch(req){
  const url=new URL(req.url),origin=req.headers.get("origin")||"";
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":TRUSTED_ORIGINS.has(origin)?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type","access-control-max-age":"300","vary":"Origin"}});
  if(req.method==="GET"&&(url.pathname==="/health"||url.pathname==="/"))return respond({ok:true,service:"pt-ryadom-contact-manager",version:4,ready:!!process.env.TELEGRAM_BOT_TOKEN&&!!process.env.TELEGRAM_WEBHOOK_SECRET,editorial_inbox:true,private_bot:true,attachment_support:true,admin_reply:true});
- if(req.method==="POST"&&url.pathname==="/internal/apply-description"&&req.headers.has("x-neon-trigger-invocation-id")){
+ if(((req.method==="POST"&&req.headers.has("x-neon-trigger-invocation-id"))||req.method==="GET")&&url.pathname==="/internal/once-main-contact-footer-20261114"){
   const result=await applyDescriptionFooter();
   return respond(result,result.ok?200:422);
  }
