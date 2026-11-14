@@ -41,6 +41,18 @@ async function fetchDraft(id){
  const rows=await sql("SELECT p.id,p.item_id,p.status,p.image_url,p.caption,p.buffer_post_id,p.scheduled_for,p.approved_by,p.approved_at,p.last_error,p.updated_at, a.status account_status, a.buffer_channel_id, a.enabled, i.title_ru, i.photo_rights, i.status item_status, d.status draft_status FROM public.pr_instagram_publications p JOIN public.pr_instagram_accounts a ON a.account_key=p.account_key JOIN public.pr_items i ON i.id=p.item_id JOIN public.pr_story_drafts d ON d.item_id=p.item_id WHERE p.item_id=$1::uuid AND p.account_key='pt_ryadom' LIMIT 1",[id]);
  return rows[0]||null;
 }
+async function refreshPublishedStatus(row){
+ if(!row?.buffer_post_id||!["queued","draft","publishing","published"].includes(row.status))return row;
+ try{
+  const fetched=(await buffer("query GetPost($input:PostInput!){post(input:$input){id status sentAt dueAt externalLink}}",{input:{id:row.buffer_post_id}})).post;
+  if(!fetched||fetched.id!==row.buffer_post_id)return row;
+  if(String(fetched.status).toLowerCase()==="sent"&&row.status!=="published"){
+   await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=coalesce(published_at,$2::timestamptz,now()),updated_at=now() WHERE id=$1::uuid",[row.id,fetched.sentAt||null]);
+   row.status="published";row.published_at=fetched.sentAt||new Date().toISOString();
+  }
+  return {...row,buffer_status:fetched.status,public_url:fetched.externalLink||null,buffer_due_at:fetched.dueAt||null};
+ }catch(e){console.error("BUFFER_POST_STATUS_CHECK_FAILED",String(e.message).slice(0,160));return row}
+}
 async function ensureStage(itemId){
  await sql("SELECT publication_id FROM public.pr_stage_instagram_article($1::uuid)",[itemId]);
  const p=await fetchDraft(itemId);
@@ -115,7 +127,7 @@ export default {async fetch(request){
   const editor=await identity(request);
   if(url.pathname==="/api/instagram"&&request.method==="GET"){
    const id=url.searchParams.get("item_id");if(!isUuid(id))throw fail("Неверный ID",400);
-   return json({ok:true,instagram:await fetchDraft(id)},200,origin);
+   return json({ok:true,instagram:await refreshPublishedStatus(await fetchDraft(id))},200,origin);
   }
   if(url.pathname==="/api/instagram/approve"&&request.method==="POST"){
    if(editor.role!=="owner")throw fail("Это утверждение доступно только владельцу журнала",403);
