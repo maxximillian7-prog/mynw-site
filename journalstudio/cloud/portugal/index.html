@@ -336,6 +336,8 @@ function fill(item){const i=item.article;
   lastArticleDestinationChoice=i.id;
   $("publishTelegram").checked=true;$("publishInstagram").checked=false;
   $("publishTargetsHint").textContent="Выбрано: Telegram";
+  $("publicationMode").value="default";
+  $("publicationDelay").value="120";
   previewMode="phone";
  }const map={headline:i.headline_ru||i.title_ru||i.title_original,hook:i.hook_ru||"",lead:i.lead_ru||i.summary_ru||"",story:i.story_ru||"",why:i.why_matters_ru||"",style:i.style||"short",needsMoreFacts:i.draft_id?!!i.needs_more_facts:true,imageNeeded:!!i.image_needed,imageChoice:i.image_choice||"no_image",imageException:i.image_exception_reason||""};
  $("headline").value=map.headline;$("hook").value=map.hook;$("lead").value=map.lead;$("story").value=map.story;$("why").value=map.why;$("style").value=map.style;$("needsMoreFacts").checked=map.needsMoreFacts;$("imageNeeded").checked=map.imageNeeded;$("imageChoice").value=map.imageChoice;$("imageException").value=map.imageException;
