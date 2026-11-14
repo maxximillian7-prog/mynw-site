@@ -104,10 +104,10 @@ $ex=[string]$staged[$experience]
 $begin=$ex.IndexOf('class _QwinMarketExperienceState')
 $end=$ex.IndexOf('class QwinProductCard')
 if($begin -lt 0 -or $end -le $begin){throw 'Market view layout not recognized. No files modified.'}
-$home=$ex.Substring($begin,$end-$begin)
-if(-not $home.Contains('QwinCategoryKeywordSearch(')){
+$marketSection=$ex.Substring($begin,$end-$begin)
+if(-not $marketSection.Contains('QwinCategoryKeywordSearch(')){
  $anchor='OlxCategoryPanel(catalog:widget.store.catalog,'
- $idx=$home.IndexOf($anchor)
+ $idx=$marketSection.IndexOf($anchor)
  if($idx -lt 0){throw 'Home category picker not found. No files modified.'}
  $insert=@'
 QwinCategoryKeywordSearch(
@@ -120,30 +120,30 @@ QwinCategoryKeywordSearch(
               }),
             const SizedBox(height:9),
 '@
- $home=$home.Insert($idx,$insert)
+ $marketSection=$marketSection.Insert($idx,$insert)
 }
 # Do not show even old cached external eBay items in the local feed.
 $oldWhere="items=items.where((x){"
 $newWhere="items=items.where((x){"+[char]10+"      if(x.isExternal&&x.externalSource=='ebay')return false;"
-if(-not $home.Contains("if(x.isExternal&&x.externalSource=='ebay')return false;")){
- if(-not $home.Contains($oldWhere)){throw 'Feed filter not found. No files modified.'}
- $home=$home.Replace($oldWhere,$newWhere)
+if(-not $marketSection.Contains("if(x.isExternal&&x.externalSource=='ebay')return false;")){
+ if(-not $marketSection.Contains($oldWhere)){throw 'Feed filter not found. No files modified.'}
+ $marketSection=$marketSection.Replace($oldWhere,$newWhere)
 }
-if($home.Contains('if(selectedOlxCategory==null&&widget.store.ebayBrowseAvailable&&')){
- $home=$home.Replace('if(selectedOlxCategory==null&&widget.store.ebayBrowseAvailable&&',
+if($marketSection.Contains('if(selectedOlxCategory==null&&widget.store.ebayBrowseAvailable&&')){
+ $marketSection=$marketSection.Replace('if(selectedOlxCategory==null&&widget.store.ebayBrowseAvailable&&',
      'if(widget.store.neon?.ebayEnabled==true&&selectedOlxCategory==null&&widget.store.ebayBrowseAvailable&&')
 }
 # The eBay buyer widget was separate from the seller gate: hide the entire sliver.
 $pattern='SliverToBoxAdapter[ \t\r\n]*\([ \t\r\n]*child[ \t]*:[ \t\r\n]*QwinEbayProductionSearch[ \t]*\('
-$m=[regex]::Match($home,$pattern)
+$m=[regex]::Match($marketSection,$pattern)
 if($m.Success){
  $start=[math]::Max(0,$m.Index-130)
- $prefix=$home.Substring($start,$m.Index-$start)
+ $prefix=$marketSection.Substring($start,$m.Index-$start)
  if(-not $prefix.Contains('ebayEnabled==true')){
-  $home=$home.Insert($m.Index,'if(widget.store.neon?.ebayEnabled==true) ')
+  $marketSection=$marketSection.Insert($m.Index,'if(widget.store.neon?.ebayEnabled==true) ')
  }
 }
-$ex=$ex.Substring(0,$begin)+$home+$ex.Substring($end)
+$ex=$ex.Substring(0,$begin)+$marketSection+$ex.Substring($end)
 # Old deep-links should not try to reopen disabled providers.
 $ex=$ex.Replace("if(uri.host=='ebay'){","if(uri.host=='ebay'&&widget.store.neon?.ebayEnabled==true){")
 $ex=$ex.Replace("if(uri.host=='etsy'){","if(uri.host=='etsy'&&widget.store.neon?.etsyEnabled==true){")
