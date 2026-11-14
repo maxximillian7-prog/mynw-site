@@ -154,6 +154,10 @@ BEGIN
                AND prior.sent_at > now()-interval '2 hours'
           ))
     )
+    AND (p.destination_code<>'afisha' OR EXISTS(
+       SELECT 1 FROM public.pr_items i JOIN public.pr_sources src ON src.id=i.source_id
+       WHERE i.id=p.item_id AND i.primary_category='events' AND src.code='trailyo_events'
+    ))
     AND EXISTS (
      SELECT 1 FROM public.pr_media_assets a
      WHERE a.item_id=p.item_id AND a.public_url=q.approved_image_url
