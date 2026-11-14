@@ -658,48 +658,59 @@ async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;a
 async function approveAndQueue(){
  if(!current||approvalPending||!me?.user?.approve)return;
  const id=current.article.id,note=$("note").value;
+ const sendTg=$("publishTelegram").checked,sendIg=$("publishInstagram").checked;
+ if(!sendTg&&!sendIg){toast("Выберите Telegram, Instagram или обе площадки",true);return}
  let schedule;
  try{schedule=publicationSettings()}catch(e){toast(e.message,true);return}
  approvalPending=true;$("approveBtn").disabled=true;
+ const completed=[],errors=[];
  try{
   if(dirty){
    if(current.article.status==="approved")throw Error("Утверждённую статью сначала нужно вернуть к правкам");
    await call("/api/save",{method:"POST",body:{item_id:id,fields:gather()}});
    dirty=false;
   }
+  const latest=await call("/api/article?id="+encodeURIComponent(id));
+  let approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
   if(me.user.role==="owner"){
-   // Exactly one editorial decision. The server records acceptance warnings
-   // unchanged, signs the owner's override, approves and queues atomically.
-   const result=await call("/api/action",{method:"POST",body:{
-    item_id:id,action:"approve_and_queue",note,...schedule
-   }});
-   if(result.sent){
-    toast("✓ Эта статья уже опубликована — повторная отправка не выполнялась.");
-   }else if(result.queued){
-    const exceptions=(result.issues||[]).length;
-    toast("✓ Утверждено"+(exceptions?" под ответственность редактора ("+exceptions+" замечаний приёмки сохранены)":"")+
-      ". Публикация: "+lisbonSchedule(result.scheduled_for)+".");
-   }else if(result.approved){
-    toast("✓ Материал утверждён. "+(result.warning||"Постановка в очередь ожидает исправления технической проблемы."),true);
-   }else{
-    throw Error("Сервер не подтвердил утверждение");
+   if(sendTg){
+    try{
+     const result=await call("/api/action",{method:"POST",body:{item_id:id,action:"approve_and_queue",note,...schedule}});
+     approved=!!result.approved||approved;
+     if(result.queued||result.sent)completed.push("Telegram"+(result.sent?" (уже опубликовано)":" — "+lisbonSchedule(result.scheduled_for)));
+     else errors.push("Telegram: "+(result.warning||"не подтверждена постановка в очередь"));
+    }catch(e){errors.push("Telegram: "+e.message)}
+   }else if(!approved){
+    // Instagram-only approval: never call the Telegram approve_and_queue action.
+    const result=await bufferCall("/api/instagram/approve",{method:"POST",body:{item_id:id,note}});
+    approved=!!result.approval?.approved;
+    if(!approved)throw Error("Сервер не подтвердил утверждение для Instagram");
    }
-  }else{
-   // Editors without owner privileges retain mandatory acceptance checks.
-   let latest=await call("/api/article?id="+encodeURIComponent(id));
+  }else if(!approved){
    if(!latest.article.intake_ready)throw Error("Не пройдена приёмка: "+(latest.article.intake_issues||[]).join("; "));
-   let approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
-   if(!approved){
-    if(!latest.article.source_fact_checked||!latest.article.context_verified||!(latest.evidence||[]).length){
-     const evidenceUrl=$("evidence").value.trim(),verificationNote=note.trim().length>=12?note.trim():"Редактор проверил содержание по первоисточнику.";
-     if(!/^https:\/\//i.test(evidenceUrl))throw Error("Укажите проверенный HTTPS-первоисточник");
-     await call("/api/action",{method:"POST",body:{item_id:id,action:"verify_facts",evidence_url:evidenceUrl,note:verificationNote}});
-    }
-    await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
+   if(!latest.article.source_fact_checked||!latest.article.context_verified||!(latest.evidence||[]).length){
+    const evidenceUrl=$("evidence").value.trim(),verificationNote=note.trim().length>=12?note.trim():"Редактор проверил содержание по первоисточнику.";
+    if(!/^https:\/\//i.test(evidenceUrl))throw Error("Укажите проверенный HTTPS-первоисточник");
+    await call("/api/action",{method:"POST",body:{item_id:id,action:"verify_facts",evidence_url:evidenceUrl,note:verificationNote}});
    }
-   const result=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",note,...schedule}});
-   toast("✓ Утверждено и запланировано: "+lisbonSchedule(result.scheduled_for));
+   await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
+   approved=true;
   }
+  if(approved&&sendTg&&me.user.role!=="owner"){
+   try{
+    const result=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",note,...schedule}});
+    completed.push("Telegram — "+lisbonSchedule(result.scheduled_for));
+   }catch(e){errors.push("Telegram: "+e.message)}
+  }
+  if(approved&&sendIg){
+   try{
+    const result=await bufferCall("/api/instagram/schedule",{method:"POST",body:{item_id:id,...schedule}});
+    completed.push("Instagram"+(result.already_scheduled?" (уже запланировано)":" — "+lisbonSchedule(result.scheduled_for)));
+   }catch(e){errors.push("Instagram: "+e.message)}
+  }
+  if(!approved)errors.push("Редакционное утверждение не подтверждено");
+  if(errors.length)toast((completed.length?"Готово: "+completed.join(" · ")+". ":"")+"Ошибка: "+errors.join("; "),true);
+  else toast("✓ Утверждено: "+completed.join(" · "));
  }catch(e){
   toast("Не удалось завершить согласование: "+e.message,true);
  }finally{
@@ -707,6 +718,7 @@ async function approveAndQueue(){
   try{await refreshSelected()}catch(e){toast("Обновите карточку: "+e.message,true)}
  }
 }
+
 async function sendAction(action,other={}){
  if(!current)return;const note=other.note??$("note").value;
  if(dirty&&action!=="comment"&&!confirm("Есть несохранённые правки. Выполнить действие без них?"))return;
