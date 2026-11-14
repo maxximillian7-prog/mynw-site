@@ -72,11 +72,13 @@ async function schedule(id,options,userId){
  const original=await ensureStage(id);
  if(original.item_status!=="approved"||original.draft_status!=="approved")throw fail("Сначала утвердите статью",409);
  if(original.account_status!=="connected"||original.buffer_channel_id!==CHANNEL)throw fail("Instagram не подключён",503);
- if(["queued","published","publishing","preparing","container_created"].includes(original.status))return {ok:true,already_scheduled:true,buffer_post_id:original.buffer_post_id,scheduled_for:original.scheduled_for};
- if(!["draft","awaiting_approval","failed"].includes(original.status))throw fail("Подготовка Instagram не завершена: "+original.status,409);
+ if(["published","publishing","preparing","container_created"].includes(original.status)||(original.status==="queued"&&options.schedule_mode!=="now"))return {ok:true,already_scheduled:true,buffer_post_id:original.buffer_post_id,scheduled_for:original.scheduled_for};
+ if(!["draft","awaiting_approval","failed","queued"].includes(original.status))throw fail("Подготовка Instagram не завершена: "+original.status,409);
  const media=await verifyMedia(original);
  let dueAt,mode=options.schedule_mode||"default";
- if(mode==="manual"){
+ const immediate=mode==="now";
+ if(immediate){dueAt=new Date().toISOString()}
+ else if(mode==="manual"){
   const value=String(options.publish_at||options.scheduled_for||"");
   if(!/^\d{4}-\d{2}-\d{2}T/.test(value)||!Number.isFinite(Date.parse(value))||Date.parse(value)<Date.now()+60000)throw fail("Укажите будущую дату для Instagram",400);
   dueAt=new Date(value).toISOString();
@@ -88,27 +90,31 @@ async function schedule(id,options,userId){
   const max=await sql("SELECT greatest(now()+interval '2 hours',coalesce(max(scheduled_for)+interval '2 hours',now()+interval '2 hours')) AS next FROM public.pr_instagram_publications WHERE status IN ('queued','publishing') AND scheduled_for>now()-interval '1 day'");
   dueAt=new Date(max[0].next).toISOString();
  }else throw fail("Неизвестный режим расписания",400);
- const acquired=await sql("UPDATE public.pr_instagram_publications SET status='preparing',attempts=attempts+1,last_error=NULL,updated_at=now() WHERE id=$1::uuid AND status IN ('draft','awaiting_approval','failed') RETURNING id",[original.id]);
+ const acquired=await sql("UPDATE public.pr_instagram_publications SET status='preparing',attempts=attempts+1,last_error=NULL,updated_at=now() WHERE id=$1::uuid AND status IN ('draft','awaiting_approval','failed','queued') RETURNING id",[original.id]);
  if(!acquired.length)return {ok:true,already_processing:true};
  try{
   let result;
   const metadata={instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:media.media_type==="generated_illustration"}};
+  const input={
+    text:original.caption,
+    schedulingType:"automatic",
+    mode:immediate?"shareNow":"customScheduled",
+    ...(!immediate?{dueAt}:{}),
+    saveToDraft:false,
+    metadata,
+    assets:[{image:{url:original.image_url}}]
+  };
   if(original.buffer_post_id){
-    result=(await buffer("mutation Schedule($input:EditPostInput!){editPost(input:$input){... on PostActionSuccess{post{id text status dueAt}} ... on MutationError{message}}}",{input:{
-      id:original.buffer_post_id,text:original.caption,schedulingType:"automatic",mode:"customScheduled",dueAt,saveToDraft:false,metadata,
-      assets:[{image:{url:original.image_url}}]
-    }})).editPost;
+    result=(await buffer("mutation Update($input:EditPostInput!){editPost(input:$input){... on PostActionSuccess{post{id text status dueAt}} ... on MutationError{message}}}",{input:{...input,id:original.buffer_post_id}})).editPost;
   }else{
-    result=(await buffer("mutation Schedule($input:CreatePostInput!){createPost(input:$input){... on PostActionSuccess{post{id text status dueAt}} ... on MutationError{message}}}",{input:{
-      channelId:CHANNEL,text:original.caption,schedulingType:"automatic",mode:"customScheduled",dueAt,saveToDraft:false,metadata,
-      assets:[{image:{url:original.image_url}}]
-    }})).createPost;
+    result=(await buffer("mutation Create($input:CreatePostInput!){createPost(input:$input){... on PostActionSuccess{post{id text status dueAt}} ... on MutationError{message}}}",{input:{...input,channelId:CHANNEL}})).createPost;
   }
   if(!result?.post?.id)throw fail("Buffer отказал: "+(result?.message||"публикация не создана"),502);
   if(result.post.text!==original.caption)throw fail("Buffer вернул текст с ошибкой кодировки; проверьте черновик вручную",502);
-  const saved=await sql("UPDATE public.pr_instagram_publications SET status='queued',buffer_post_id=$2,scheduled_for=$3::timestamptz,approved_by=$4::text,approved_at=now(),buffer_created_at=coalesce(buffer_created_at,now()),last_error=NULL,updated_at=now() WHERE id=$1::uuid RETURNING id",[original.id,result.post.id,dueAt,userId]);
-  await sql("INSERT INTO public.pr_instagram_delivery_events(publication_id,event_type,meta_object_id) VALUES($1::uuid,'buffer_scheduled',$2)",[original.id,result.post.id]);
-  return {ok:true,scheduled:true,buffer_post_id:result.post.id,scheduled_for:dueAt,status:result.post.status};
+  const published=String(result.post.status||"").toLowerCase()==="sent";
+  await sql("UPDATE public.pr_instagram_publications SET status=$5,buffer_post_id=$2,scheduled_for=$3::timestamptz,approved_by=$4::text,approved_at=now(),published_at=CASE WHEN $5='published' THEN now() ELSE NULL END,buffer_created_at=coalesce(buffer_created_at,now()),last_error=NULL,updated_at=now() WHERE id=$1::uuid",[original.id,result.post.id,dueAt,userId,published?"published":"queued"]);
+  await sql("INSERT INTO public.pr_instagram_delivery_events(publication_id,event_type,meta_object_id) VALUES($1::uuid,$2,$3)",[original.id,immediate?"buffer_share_now_requested":"buffer_scheduled",result.post.id]);
+  return {ok:true,scheduled:!immediate,dispatched:immediate,published,buffer_post_id:result.post.id,scheduled_for:dueAt,status:result.post.status};
  }catch(e){
   await sql("UPDATE public.pr_instagram_publications SET status='failed',last_error=$2,updated_at=now() WHERE id=$1::uuid",[original.id,String(e.message||"Buffer error").slice(0,250)]).catch(()=>{});
   throw e;
