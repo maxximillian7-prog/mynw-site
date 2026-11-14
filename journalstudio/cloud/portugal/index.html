@@ -548,14 +548,36 @@ function activeTags(i){
  return(Array.isArray(i.tags)?i.tags:[]).map(x=>String(x).trim().replace(/^#/,"").replace(/[^\p{L}\p{N}_]+/gu,"_").replace(/^_+|_+$/g,"")).filter(x=>x.length>1).filter(x=>!["португалия","новости","события"].includes(x.toLowerCase())).slice(0,4).map(x=>"#"+x).join(" ");
 }
 function instagramCaption(f,i,img){
+ // Approved/scheduled posts display the stored version, matching what Buffer received.
  if(!dirty&&current?.instagram?.caption&&!previewPhotoId)return current.instagram.caption;
- const parts=[String(f.headline_ru||"").trim(),String(f.lead_ru||"").trim(),String(f.why_matters_ru||"").trim()];
- if(i.primary_category==="events"&&i.starts_at)parts.push("Когда: "+lisbonSchedule(i.starts_at));
- if(i.primary_category==="events"&&i.location_city)parts.push("Где: "+i.location_city);
- parts.push("Полные материалы и источники — в Telegram @pt_ryadom");
- parts.push("#ПортугалияРядом "+activeTags(i));
- if(img?.media_type==="generated_illustration")parts.push("AI-иллюстрация, не документальное фото.");
- return parts.filter(Boolean).join("\n\n").slice(0,2150);
+ const ev=i.trailyo_event||{},isEvent=i.primary_category==="events";
+ const dateOnly=v=>{const d=String(v||"").slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d.slice(8,10)+"."+d.slice(5,7)+"."+d.slice(0,4):""};
+ const localDate=v=>{try{return new Intl.DateTimeFormat("ru-RU",{timeZone:"Europe/Lisbon",day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(v))}catch{return ""}};
+ const title=String(f.headline_ru||"").trim();
+ const lead=String(f.lead_ru||"").trim().slice(0,900);
+ const why=String(f.why_matters_ru||"").trim().slice(0,560);
+ const hashtags=["#ПортугалияРядом",activeTags(i)].filter(Boolean).join(" ").trim();
+ const details=[];
+ if(isEvent){
+  let date=dateOnly(ev.starts_on)||localDate(i.starts_at);
+  const dateEnd=dateOnly(ev.ends_on);
+  if(dateEnd&&dateEnd!==date)date+=" — "+dateEnd;
+  if(date)details.push("📅 "+date);
+  const place=[ev.venue,ev.city||i.location_city].map(v=>String(v||"").trim()).filter(Boolean).filter((v,j,a)=>a.findIndex(w=>w.toLowerCase()===v.toLowerCase())===j).join(", ");
+  if(place)details.push("📍 "+place);
+  const eventId=String(ev.event_id||"");
+  const link=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(eventId)?
+   "https://mynw.app/trailyo/event/?id="+eventId:
+   /^https:\/\/mynw\.app\/trailyo\/event\/\?id=[a-f0-9-]{36}$/i.test(i.canonical_url||"")?i.canonical_url:"";
+  if(link)details.push("🔗 Событие в Trailyo: "+link);
+ }else{
+  details.push("Полные материалы и источники — в Telegram @pt_ryadom");
+ }
+ if(hashtags)details.push(hashtags);
+ const footer=details.join("\n\n");
+ const raw=[title,lead,why].filter(Boolean).join("\n\n");
+ const allowed=Math.max(0,2150-footer.length-2);
+ return [raw.slice(0,allowed),footer].filter(Boolean).join("\n\n").slice(0,2150);
 }
 async function bufferCall(path,options={}){
  if(!session?.access_token)throw Error("Войдите в Journal Studio");
