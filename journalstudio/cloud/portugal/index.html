@@ -533,6 +533,36 @@ function renderTelegramMessage(text,isAfisha=false,event=null,approvedPhotoUrl=n
 function activeTags(i){
  return(Array.isArray(i.tags)?i.tags:[]).map(x=>String(x).trim().replace(/^#/,"").replace(/[^\p{L}\p{N}_]+/gu,"_").replace(/^_+|_+$/g,"")).filter(x=>x.length>1).filter(x=>!["португалия","новости","события"].includes(x.toLowerCase())).slice(0,4).map(x=>"#"+x).join(" ");
 }
+function instagramCaption(f,i,img){
+ if(!dirty&&current?.instagram?.caption&&!previewPhotoId)return current.instagram.caption;
+ const parts=[String(f.headline_ru||"").trim(),String(f.lead_ru||"").trim(),String(f.why_matters_ru||"").trim()];
+ if(i.primary_category==="events"&&i.starts_at)parts.push("Когда: "+lisbonSchedule(i.starts_at));
+ if(i.primary_category==="events"&&i.location_city)parts.push("Где: "+i.location_city);
+ parts.push("Полные материалы и источники — в Telegram @pt_ryadom");
+ parts.push("#ПортугалияРядом "+activeTags(i));
+ if(img?.media_type==="generated_illustration")parts.push("AI-иллюстрация, не документальное фото.");
+ return parts.filter(Boolean).join("\n\n").slice(0,2150);
+}
+async function bufferCall(path,options={}){
+ if(!session?.access_token)throw Error("Войдите в Journal Studio");
+ const res=await fetch(BUFFER_API+path,{method:options.method||"GET",
+  headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},
+  body:options.body?JSON.stringify(options.body):undefined,cache:"no-store"});
+ const result=await res.json().catch(()=>({}));
+ if(!res.ok)throw Error(result.error||"Buffer недоступен");
+ return result;
+}
+async function refreshInstagramState(id){
+ try{
+  const result=await bufferCall("/api/instagram?item_id="+encodeURIComponent(id));
+  if(current?.article?.id!==id)return;
+  current.instagram=result.instagram;
+  $("instagramQueueStatus").textContent=result.instagram?.buffer_post_id?
+   "Instagram: "+(result.instagram.status==="draft"?"черновик Buffer":result.instagram.status)+" · "+result.instagram.buffer_post_id:
+   result.instagram?.status?"Instagram: "+result.instagram.status:"Instagram: ещё не поставлено в очередь";
+  if(previewMode==="instagram")renderPreview();
+ }catch(e){if(current?.article?.id===id)$("instagramQueueStatus").textContent="Instagram: "+e.message}
+}
 function renderPreview(){
  const root=$("livePreview");if(!root||!current)return;
  const oldTop=$("ptChatScroll")?.scrollTop||0;
