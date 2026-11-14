@@ -267,7 +267,7 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  ? "✓ Готово к редакционной приёмке: русский заголовок и текст, завершённый рассказ, проверенный тип источника, разрешённая обложка, хештег и ценность для читателя."
  : "Материал пока в подготовке. Нужно исправить: "+(reasons.length?reasons.join(" · "):"недостающие элементы публикации");
  $("intakeDiagnostic").style.background=i.intake_ready?"#eff8f3":"#fff7e8";
- $("destination").value=i.primary_category==="events"?"afisha":"main";
+ $("destination").value=i.source_code==="trailyo_events"?"afisha":"main";
  $("storySource").textContent=i.source_name;$("needsFactsBadge").textContent=i.needs_more_facts?"Требуется проверка фактов":i.context_verified?"Контекст проверен":"Не проверено";
  const nextPublication=(item.publications||[]).find(p=>["queued","scheduled"].includes(p.status));
  $("scheduleBadge").hidden=!nextPublication;
@@ -449,7 +449,7 @@ function renderPreview(){
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
  const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">📷 AI-изображение · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
- const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.primary_category==="events")+'</div>'+timestamp+'</article>';
+ const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events")+'</div>'+timestamp+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  $("modePhone").classList.toggle("selected",previewMode==="phone");$("modeArticle").classList.toggle("selected",previewMode==="article");
  $("modePhone").setAttribute("aria-pressed",previewMode==="phone"?"true":"false");
