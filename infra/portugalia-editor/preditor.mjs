@@ -108,7 +108,8 @@ async function action(u,p){
  if(a==="queue"){
   if(i.status!=="approved"||i.editorial_status!=="approved")throw err("Сначала утвердите статью",409);
   const [gate]=await sql("SELECT allowed,reason FROM pr_item_publication_check($1::uuid)",[id]);if(!gate?.allowed)throw err("Публикация заблокирована: "+gate?.reason,409);
-  const destination=p.destination==="afisha"?"afisha":"main";
+  // Curated Trailyo events belong to the editorial Afisha channel, never Main.
+  const destination=i.source_code==="trailyo_events"?"afisha":(p.destination==="afisha"?"afisha":"main");
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_enqueue_publication_slot($1::uuid,$2::text)",[id,destination]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
   await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for});
