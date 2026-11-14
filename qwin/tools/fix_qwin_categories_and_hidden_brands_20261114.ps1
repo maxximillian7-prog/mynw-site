@@ -76,6 +76,9 @@ $staged[$gateway]=$g
 $experience='lib/ui/experience.dart'
 Replace-One $experience "import 'olx_category_picker.dart';" ("import 'olx_category_picker.dart';"+[char]10+"import 'qwin_category_keywords.dart';")
 Replace-One $experience 'QwinSellerCategorySearch(' 'QwinCategoryKeywordSearch('
+# Remove the obsolete widget import; otherwise the analyzer reports unused_import.
+$obsolete="import 'qwin_seller_category_search.dart';"+[char]10
+$staged[$experience]=([string]$staged[$experience]).Replace($obsolete,'')
 
 # Home: a keyword category search in all common user languages, using only actual OLX IDs.
 $ex=[string]$staged[$experience]
