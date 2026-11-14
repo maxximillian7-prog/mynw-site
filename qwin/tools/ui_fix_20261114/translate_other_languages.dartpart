@@ -1,0 +1,19 @@
+    if(!{'ru','en','pt'}.contains(locale)){
+      // Non-RU/EN translations are performed once on device and cached;
+      // an unavailable language pack never changes the official OLX IDs.
+      translating=true;notifyListeners();
+      try{
+        for(final category in pending){
+          try{
+            final translated=await QwinLocalTranslation.translate(
+              category.namePt,source:'pt',target:locale);
+            if(translated.trim().isNotEmpty&&translated.length<=120){
+              _labels['$locale:${category.id}']=translated.trim();
+            }
+          }catch(_){/* Keep original Portuguese category name. */}
+        }
+        final prefs=SharedPreferencesAsync();
+        await prefs.setString(_labelsStorage,jsonEncode(_labels));
+      }finally{translating=false;notifyListeners();}
+      return;
+    }
