@@ -98,7 +98,7 @@ async function loadAfishaMetadata(post){
  const rows=await query("SELECT city,venue,starts_on,ends_on,time_known,starts_at,ends_at,source_time_text,latitude,longitude FROM public.pr_trailyo_event_details WHERE item_id=$1::uuid",[post.item_id]);
  return rows[0]||null;
 }
-function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eventMetadata=null){
+function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eventMetadata=null,ownerPhotoAccepted=false){
  const full=String(preparedText||"").trim();
  if(full.length<110||full.length>32000)throw Error("Full article length out of range");
  const url=publicHttps(photoUrl);
@@ -108,7 +108,7 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eve
   ||(neonStore&&url.hostname===neonStore&&url.pathname.startsWith("/pr-editorial-media/ai-covers/"));
  // For Afisha, the database already requires a manually approved image
  // from a published Trailyo event. No licence assertion is added here.
- if(!usualImage&&!isAfisha)throw Error("Photo must be a licensed image or stored AI illustration");
+ if(!usualImage&&!isAfisha&&!ownerPhotoAccepted)throw Error("Photo must be a licensed image or explicitly accepted by the owner");
  const paragraphs=full.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean),title=paragraphs.shift();
  if(!title||title.length>255)throw Error("Article title missing or too long");
  const blocks=[{type:"photo",photo:{type:"photo",media:url.href}},{type:"heading",size:2,text:title}];
@@ -153,7 +153,13 @@ async function claim(){
 async function publish(post){
  if(!token)throw Error("Telegram bot token missing");
  const metadata=await loadAfishaMetadata(post);
- const blocks=richBlocks(post.prepared_text,post.approved_image_url,post.is_ai_generated===true,post.destination_code==="afisha",metadata);
+ // Owner's single-click exception is explicitly audited in Neon. This only
+ // extends the trusted photo-host gate; it never marks unknown rights verified.
+ const manual=(post.destination_code==="main"?
+   await query("SELECT public.pr_owner_override_active($1::uuid) AS allowed, EXISTS(SELECT 1 FROM public.pr_owner_approval_overrides a WHERE a.item_id=$1::uuid AND a.photo_url=$2::text) AS photo_matches",[post.item_id,post.approved_image_url]):
+   []);
+ const ownerPhotoAccepted=manual[0]?.allowed===true&&manual[0]?.photo_matches===true;
+ const blocks=richBlocks(post.prepared_text,post.approved_image_url,post.is_ai_generated===true,post.destination_code==="afisha",metadata,ownerPhotoAccepted);
  const body={chat_id:String(post.telegram_chat_id),rich_message:{blocks}};
  if(post.telegram_thread_id)body.message_thread_id=Number(post.telegram_thread_id);
  const response=await fetch("https://api.telegram.org/bot"+token+"/sendRichMessage",{
