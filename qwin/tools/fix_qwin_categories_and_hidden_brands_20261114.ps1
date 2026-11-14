@@ -57,6 +57,25 @@ if(Test-Path $modulePath){
 }
 $staged[$moduleRel]=$newModule
 
+# Install offline regression checks alongside the matcher.
+$testRel='test/qwin_category_keywords_test.dart'
+$testPath=Join-Path $root ($testRel -replace '/','\')
+$testUrl='https://raw.githubusercontent.com/maxximillian7-prog/mynw-site/main/qwin/tools/qwin_category_keywords_test_20261114.dart'
+$tmpTest=Join-Path $env:TEMP ('qwin_keyword_test_'+[guid]::NewGuid().ToString('N')+'.dart')
+try{
+ Invoke-WebRequest -Uri $testUrl -OutFile $tmpTest -UseBasicParsing
+ $testBody=[IO.File]::ReadAllText($tmpTest,[Text.Encoding]::UTF8)
+}finally{Remove-Item -LiteralPath $tmpTest -ErrorAction SilentlyContinue}
+if($testBody.Length -lt 1500 -or -not $testBody.Contains('Mi обогреватель')){
+ throw 'Category regression test download failed. No files changed.'
+}
+if(Test-Path $testPath){
+ $original[$testRel]=[IO.File]::ReadAllText($testPath,[Text.Encoding]::UTF8)
+} else {
+ $original[$testRel]=$null
+}
+$staged[$testRel]=$testBody
+
 # Marketplace feature gates: keep all URLs, credentials, records, sources.
 $gateway='lib/services/neon_gateway.dart'
 Replace-One $gateway 'bool get etsyEnabled=>etsyUrl.isNotEmpty;' 'bool get etsyEnabled=>false; // Temporarily disabled'
