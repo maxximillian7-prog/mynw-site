@@ -19,5 +19,5 @@ Photographers are credited in the homepage footer. All visuals are illustrations
 ## Technical notes
 - Image URLs are served by Unsplash image CDN via HTTPS, resized with `auto=format&fit=crop&w=...&h=...&q=...`.
 - HTML includes explicit dimensions, descriptive alt text, lazy loading outside the hero, and `referrerpolicy="no-referrer"` for photo requests.
-- Avoid uploading these photos to Etsy, eBay or OLX listings; those platforms require the actual seller's original/authorized product imagery.
+- Avoid uploading these illustrative photos to OLX or other marketplace listings; those platforms require the actual seller's original/authorized product imagery.
 - Current hero/category images are external. If a future deployment needs zero third-party runtime requests, self-host licensed optimized files with preserved source metadata.
