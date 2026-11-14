@@ -274,7 +274,8 @@ export default {async fetch(req){
    return result instanceof Response?result:respond(result,200,origin);
   }catch(e){return respond({error:short(e.message,240)},e.status||500,origin)}
  }
- if(req.method!=="POST"||!["/","/webhook"].includes(url.pathname))return respond({error:"Not found"},404);
+ // Telegram webhook may have been registered under an older path. The secret header, not the URL, authorizes updates.
+ if(req.method!=="POST")return respond({error:"Not found"},404);
  const expected=process.env.TELEGRAM_WEBHOOK_SECRET||"";
  const received=req.headers.get("X-Telegram-Bot-Api-Secret-Token")||"";
  const a=Buffer.from(expected),b=Buffer.from(received);
