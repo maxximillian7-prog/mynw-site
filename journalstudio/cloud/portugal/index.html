@@ -157,7 +157,7 @@ input[type=search]{width:100%} .filters select{width:100%}
 <div id="emptyPanel" class="card"><h3>Откройте материал из списка</h3><p class="secondary">Здесь появятся оригинал, полный редактор на русском языке, обложки, источник, история согласования и кнопки утверждения.</p></div>
 <div id="editorPanel" class="hidden">
  <div id="intakeDiagnostic" class="notice" style="margin:0 0 14px"></div>
- <div class="editorStatus"><span class="pill" id="storyStatus"></span><span class="pill" id="mainCategory"></span><span class="pill" id="storySource"></span><span class="pill amber" id="needsFactsBadge"></span></div>
+ <div class="editorStatus"><span class="pill" id="storyStatus"></span><span class="pill" id="mainCategory"></span><span class="pill" id="storySource"></span><span class="pill amber" id="needsFactsBadge"></span><span class="pill" id="scheduleBadge" hidden></span></div>
  <details class="card" style="padding:17px 19px"><summary style="cursor:pointer;font-weight:800;color:#236c68">① Первоисточник и проверка фактов (открыть)</summary>
   <div class="sourcebox"><strong id="originalTitle"></strong><div class="secondary" id="originalDate"></div><a id="originalLink" rel="noopener noreferrer" target="_blank">Открыть оригинал ↗</a><p id="originalExcerpt"></p></div>
   <div class="notice">Проверьте факты по первоисточнику. Наличие перевода или текста GPT-6 Luna само по себе не подтверждает достоверность материала.</div>
@@ -262,6 +262,9 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  : "Материал пока в подготовке. Нужно исправить: "+(reasons.length?reasons.join(" · "):"недостающие элементы публикации");
  $("intakeDiagnostic").style.background=i.intake_ready?"#eff8f3":"#fff7e8";
  $("storySource").textContent=i.source_name;$("needsFactsBadge").textContent=i.needs_more_facts?"Требуется проверка фактов":i.context_verified?"Контекст проверен":"Не проверено";
+ const nextPublication=(item.publications||[]).find(p=>["queued","scheduled"].includes(p.status));
+ $("scheduleBadge").hidden=!nextPublication;
+ $("scheduleBadge").textContent=nextPublication?"🕒 Telegram · не раньше "+iso(nextPublication.scheduled_for):"";
  $("evidence").value=i.canonical_url||"";$("factState").textContent=i.source_fact_checked?"✓ Проверено редактором":"Не подтверждено";
  $("saveStatus").textContent="";$("note").value="";$("comment").value="";$("emptyPanel").classList.add("hidden");$("editorPanel").classList.remove("hidden");
  const editable=me?.user?.edit&&!["approved","rejected"].includes(i.status)&&i.editorial_status!=="approved";
@@ -504,8 +507,8 @@ async function approveAndQueue(){
    await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
    approved=true;
   }
-  await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",destination,note}});
-  toast("Материал утверждён и поставлен в очередь Telegram");
+  const scheduled=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",destination,note}});
+  toast("Материал утверждён. Отправка не раньше "+iso(scheduled.scheduled_for)+" · интервал ≥2 часов.");
  }catch(e){
   toast((approved?"Статья утверждена, но очередь не подтверждена: ":"Утверждение заблокировано: ")+e.message,true);
  }finally{
@@ -516,7 +519,7 @@ async function approveAndQueue(){
 async function sendAction(action,other={}){
  if(!current)return;const note=other.note??$("note").value;
  if(dirty&&action!=="comment"&&!confirm("Есть несохранённые правки. Выполнить действие без них?"))return;
- try{const r=await call("/api/action",{method:"POST",body:{item_id:current.article.id,action,note,...other}});toast(action==="queue"?"Материал поставлен в очередь Telegram. После проверок он будет отправлен автоматически.":"Действие выполнено");await refreshSelected()}catch(e){toast(e.message,true)}
+ try{const r=await call("/api/action",{method:"POST",body:{item_id:current.article.id,action,note,...other}});toast(action==="queue"?"Статья в очереди: не раньше "+iso(r.scheduled_for)+" · интервал ≥2 часов.":"Действие выполнено");await refreshSelected()}catch(e){toast(e.message,true)}
 }
 function bind(){
  document.querySelectorAll("[data-status]").forEach(x=>x.onclick=async()=>{activeStatus=x.dataset.status;document.querySelectorAll("[data-status]").forEach(y=>y.classList.toggle("active",x===y));await list()});
