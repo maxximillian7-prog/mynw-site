@@ -108,12 +108,13 @@ async function action(u,p){
  if(a==="queue"){
   if(i.status!=="approved"||i.editorial_status!=="approved")throw err("Сначала утвердите статью",409);
   const [gate]=await sql("SELECT allowed,reason FROM pr_item_publication_check($1::uuid)",[id]);if(!gate?.allowed)throw err("Публикация заблокирована: "+gate?.reason,409);
-  // Curated Trailyo events belong to the editorial Afisha channel, never Main.
-  const destination=i.source_code==="trailyo_events"?"afisha":(p.destination==="afisha"?"afisha":"main");
+  // Editorial routing follows the topic, not a manually editable destination.
+  // All events belong in Afisha; news and articles go to Main.
+  const destination=i.primary_category==="events"?"afisha":"main";
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_enqueue_publication_slot($1::uuid,$2::text)",[id,destination]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
   await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for});
-  return{ok:true,queued:true,sent:false,post_id:reservation.post_id,scheduled_for:reservation.scheduled_for};
+  return{ok:true,queued:true,sent:false,destination,post_id:reservation.post_id,scheduled_for:reservation.scheduled_for};
  }
  throw err("Неизвестная операция");
 }
@@ -129,10 +130,24 @@ export default {async fetch(req){
    const categories=await sql("SELECT code,parent_code,name_ru,icon,sort_order,CASE WHEN parent_code IS NULL THEN telegram_hashtag ELSE pr_telegram_hashtag(code) END AS telegram_hashtag FROM pr_categories WHERE is_active=true ORDER BY sort_order,name_ru");return json({categories},200,origin);
   }
   if(req.method==="GET"&&route==="/api/summary"){
-   const [summary]=await sql("SELECT (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate') AS incoming,(SELECT count(*) FROM pr_story_drafts WHERE status='needs_facts') AS needs_facts,(SELECT count(*) FROM pr_story_drafts WHERE status='draft') AS drafts,(SELECT count(*) FROM pr_story_drafts WHERE status='approved') AS approved,(SELECT count(*) FROM pr_media_assets WHERE status='generated') AS images_to_approve,(SELECT count(*) FROM pr_posts WHERE status IN ('queued','scheduled')) AS queued,(SELECT count(*) FROM pr_posts WHERE status='sent') AS sent");return json({summary},200,origin);
+   const channel=u.searchParams.get("channel")==="afisha"?"afisha":"main";
+   const isAfisha="(i.primary_category='events') = ($1='afisha')";
+   const [summary]=await sql(`SELECT
+    (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate' AND i.primary_category<>'events') AS incoming_main,
+    (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate' AND i.primary_category='events') AS incoming_afisha,
+    (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND i.primary_category<>'events') AS total_main,
+    (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND i.primary_category='events') AS total_afisha,
+    (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='needs_facts' AND ${isAfisha}) AS needs_facts,
+    (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='draft' AND ${isAfisha}) AS drafts,
+    (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='approved' AND ${isAfisha}) AS approved,
+    (SELECT count(*) FROM pr_posts p JOIN pr_items i ON i.id=p.item_id WHERE p.status IN ('queued','scheduled') AND ${isAfisha}) AS queued,
+    (SELECT count(*) FROM pr_posts p JOIN pr_items i ON i.id=p.item_id WHERE p.status='sent' AND ${isAfisha}) AS sent
+   `,[channel]);
+   summary.incoming=channel==="afisha"?summary.incoming_afisha:summary.incoming_main;
+   return json({summary},200,origin);
   }
   if(req.method==="GET"&&route==="/api/articles"){
-   const status=["all","incoming","preparing","needs_facts","draft","approved","rejected","queued"].includes(u.searchParams.get("status"))?u.searchParams.get("status"):"all",cat=cut(u.searchParams.get("category")||"all",80),search=cut(u.searchParams.get("q")||"",90);
+   const status=["all","incoming","preparing","needs_facts","draft","approved","rejected","queued"].includes(u.searchParams.get("status"))?u.searchParams.get("status"):"all",cat=cut(u.searchParams.get("category")||"all",80),search=cut(u.searchParams.get("q")||"",90),channel=u.searchParams.get("channel")==="afisha"?"afisha":"main";
    const articles=await sql(`WITH matches AS (
  SELECT i.id,i.title_original,i.title_ru,i.primary_category,
  q.category_hashtag,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score,
@@ -149,6 +164,7 @@ export default {async fetch(req){
  LEFT JOIN pr_story_drafts d ON d.item_id=i.id
  CROSS JOIN LATERAL pr_intake_check(i.id) q
  WHERE i.duplicate_of IS NULL
+ AND ((i.primary_category='events')=($4='afisha'))
  AND ($1='all' OR ($1='incoming' AND q.ready=true AND i.status='candidate')
  OR ($1='preparing' AND q.ready=false AND i.status='candidate')
  OR ($1='queued' AND EXISTS(SELECT 1 FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')))
@@ -156,8 +172,8 @@ export default {async fetch(req){
  AND ($2='all' OR i.primary_category=$2)
  AND ($3='' OR COALESCE(d.headline_ru,i.title_ru,i.title_original) ILIKE '%'||$3||'%' OR s.name ILIKE '%'||$3||'%')
 )
-SELECT * FROM matches WHERE ($1<>'incoming' OR category_rank<=5)
-ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,CASE WHEN $1='incoming' THEN category_rank ELSE 0 END,value_score DESC,discovered_at DESC LIMIT 80`,[status,cat,search]);
+SELECT * FROM matches WHERE ($1<>'incoming' OR $4='afisha' OR category_rank<=5)
+ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,CASE WHEN $1='incoming' THEN category_rank ELSE 0 END,value_score DESC,discovered_at DESC LIMIT 80`,[status,cat,search,channel]);
    return json({articles},200,origin);
   }
   if(req.method==="GET"&&route==="/api/article"){const id=u.searchParams.get("id");if(!uuid(id))throw err("Неверный ID");return json(await detail(id),200,origin)}
