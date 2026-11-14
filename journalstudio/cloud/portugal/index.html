@@ -174,7 +174,7 @@ input[type=search]{width:100%} .filters select{width:100%}
   <div class="field"><label>Основной текст</label><textarea id="story" rows="10" placeholder="Основной текст статьи"></textarea></div>
   <div class="field"><label>Почему это важно / кому полезно</label><textarea id="why" rows="3"></textarea></div>
   <div class="controls"><label><input id="needsMoreFacts" type="checkbox"> Недостаточно фактов</label><label><input id="imageNeeded" type="checkbox"> Нужна иллюстрация</label></div>
-  <div class="field"><label>Изображение</label><select id="imageChoice"><option value="generated_illustration">Ранее созданная AI-иллюстрация (новые отключены)</option><option value="licensed_original">Лицензированное фото</option><option value="owned_original">Собственное фото</option><option value="generic_illustration">Существующая фирменная обложка</option><option value="no_image">Без изображения</option></select></div>
+  <div class="field"><label>Изображение</label><select id="imageChoice"><option value="generated_illustration">AI-изображение (генерация доступна ниже)</option><option value="licensed_original">Лицензированное фото</option><option value="owned_original">Собственное фото</option><option value="generic_illustration">Существующая фирменная обложка</option><option value="no_image">Без изображения</option></select></div>
   <div class="field"><label>Если без изображения — укажите причину</label><input id="imageException" placeholder="Например, срочное текстовое предупреждение"></div>
   <div class="btns"><button id="saveBtn" class="btn primary">Сохранить правки</button><span class="secondary" id="saveStatus"></span></div>
  </div>
@@ -211,7 +211,7 @@ input[type=search]{width:100%} .filters select{width:100%}
    <div class="pt-ai-cover-head"><strong>🎨 AI-обложка по теме статьи</strong><span>Medium · JPEG · 1536×1024</span></div>
    <p class="secondary">Создаёт одну оригинальную иллюстрацию по заголовку, содержанию и месту события. Не заменяет реальное фото автоматически, не изображает фальшивые документы или якобы документальные события.</p>
    <div class="btns"><button class="btn primary" type="button" id="generateAiCoverBtn">🎨 Сгенерировать (Medium)</button><span class="secondary" id="aiCoverStatus" role="status"></span></div>
-   <p class="secondary" style="margin:7px 0 0">До 3 вариантов за сутки на статью. Выбрать и утвердить изображение можно в галерее выше. В Telegram оно будет подписано «AI-иллюстрация».</p>
+   <p class="secondary" style="margin:7px 0 0">До 3 вариантов за сутки на статью. Выбрать и утвердить изображение можно в галерее выше. AI-изображения отмечаются отдельно и не считаются документальными фото.</p>
   </div>
  </div>
 </div></div>
@@ -302,11 +302,11 @@ function renderMedia(media){
   const active=chosen?.id===m.id;
   return '<button type="button" class="pt-photo-choice '+(active?"selected":"")+'" data-media-preview="'+escapeHtml(m.id)+'" aria-pressed="'+active+'" title="Показать в телефоне">'+
   '<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Вариант обложки">'+
-  '<span>'+(m.media_type==='generated_illustration'?'🎨 AI-иллюстрация · ':'')+(m.status==="approved"?"✓ Утверждено":"● На проверке")+'</span></button>';
+  '<span>'+(m.media_type==='generated_illustration'?'📷 AI-изображение · ':'')+(m.status==="approved"?"✓ Утверждено":"● На проверке")+'</span></button>';
  }).join("")+'</div><div class="pt-photo-row"><span class="secondary">'+(chosen?chosen.status==="approved"?"✓ Выбрано утверждённое фото":"Выбрано фото-кандидат":"Выберите обложку")+'</span>'+
  (canChange&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
  (canChange&&chosen?.status==="approved"&&chosen.public_url!==current?.article?.photo_url?'<button type="button" class="btn primary" id="setApprovedCover">✓ Сделать обложкой</button>':"")+
- '</div>'+(chosen?.attribution?'<div class="faint">'+(chosen.media_type==='generated_illustration'?'🎨 AI-иллюстрация · ':'Автор и лицензия: ')+escapeHtml(chosen.attribution)+'</div>':"");
+ '</div>'+(chosen?.attribution?'<div class="faint">'+(chosen.media_type==='generated_illustration'?'📷 AI-изображение · ':'Автор и лицензия: ')+escapeHtml(chosen.attribution)+'</div>':"");
  area.querySelectorAll("[data-media-preview]").forEach(button=>button.onclick=()=>{previewPhotoId=button.dataset.mediaPreview;renderMedia(current?.media);renderPreview();});
  const apply=$("applySelectedPhoto");
  if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
@@ -326,7 +326,7 @@ async function generateAiCover(){
  if(!me?.user?.edit){toast("Недостаточно прав для генерации.",true);return;}
  if(dirty){toast("Сначала сохраните изменения текста статьи.",true);return;}
  const b=$("generateAiCoverBtn"),note=$("aiCoverStatus");
- if(!confirm("Сгенерировать одну AI-иллюстрацию качества Medium по теме статьи? Она будет добавлена как кандидат, без публикации."))return;
+ if(!confirm("Сгенерировать одно фотореалистичное AI-изображение качества Medium по теме статьи? Оно будет добавлено как кандидат, без публикации."))return;
  b.disabled=true;note.textContent="Генерация…";
  try{
   const r=await photoCall("/api/generate",{method:"POST",body:{item_id:current.article.id,quality:"medium"}});
@@ -421,7 +421,7 @@ function renderPreview(){
  const full=(!dirty&&!previewPhotoId&&serverFull)?serverFull:localFull;
 
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
- const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">🎨 AI-иллюстрация · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
+ const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">📷 AI-изображение · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
  const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full)+'</div>'+timestamp+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
