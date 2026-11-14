@@ -138,7 +138,7 @@ async function promote(){
   JOIN LATERAL public.pr_item_publication_check(p.item_id) gate ON gate.allowed=true
   JOIN public.pr_story_drafts d ON d.item_id=p.item_id AND d.status='approved' AND d.context_verified AND d.needs_more_facts=false
   WHERE p.status='queued' AND (p.scheduled_for IS NULL OR p.scheduled_for<=now())
-  ORDER BY p.created_at LIMIT 8 FOR UPDATE OF p SKIP LOCKED
+  ORDER BY CASE WHEN p.schedule_mode='now' THEN 0 ELSE 1 END,p.created_at LIMIT 8 FOR UPDATE OF p SKIP LOCKED
  )
  UPDATE public.pr_posts p SET status='scheduled',scheduled_for=coalesce(p.scheduled_for,now())
  FROM todo WHERE p.id=todo.id RETURNING p.id`;
