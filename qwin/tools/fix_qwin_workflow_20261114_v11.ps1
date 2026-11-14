@@ -194,6 +194,37 @@ if($start -ge 0 -and $stop -gt $start){
   }
   $xp=$xp.Substring(0,$start)+$part+$xp.Substring($stop)
 }
+# OLX account state belongs to its own OAuth broker. Always re-check it
+# when the user presses Refresh on the marketplace choice step.
+$linkStart=$xp.IndexOf('Future<void> _loadPlatformConnections()')
+if($linkStart -ge 0){
+  $linkEnd=$xp.IndexOf('Future<void> _refreshDestinationCategory()',$linkStart)
+  if($linkEnd -gt $linkStart){
+    $linkBody=$xp.Substring($linkStart,$linkEnd-$linkStart)
+    if(-not $linkBody.Contains("final currentOlx=await neon.olxAction('status');")){
+      $mark='if(neon.etsyEnabled){'
+      $i=$linkBody.IndexOf($mark,[StringComparison]::Ordinal)
+      if($i -ge 0){
+        $block=@'
+if(neon.olxEnabled){
+      try{
+        final currentOlx=await neon.olxAction('status');
+        if(mounted&&neon.userId==accountId){
+          setState((){
+            olxLinked=currentOlx['connected']==true;
+            if(!olxLinked)inOlx=false;
+          });
+        }
+      }catch(_){/* Do not infer a disconnect on temporary API failures. */}
+    }
+    
+'@
+        $linkBody=$linkBody.Insert($i,$block)
+        $xp=$xp.Substring(0,$linkStart)+$linkBody+$xp.Substring($linkEnd)
+      }
+    }
+  }
+}
 $xp=$xp.Replace("if(uri.host=='ebay'){",
   "if(uri.host=='ebay'&&widget.store.neon?.ebayEnabled==true){")
 $xp=$xp.Replace("if(uri.host=='etsy'){",
@@ -299,6 +330,9 @@ $editor=$editor.Replace("if(platforms.containsKey('etsy'))",
 $staged['lib/ui/listing_editor.dart']=$editor
 
 # Strict preflight. Abort with all files unmodified if any required UI is absent.
+if(-not ([string]$staged['lib/ui/inbox.dart']).Contains("final title=thread['advert_title']")){
+  throw 'OLX conversation title patch not applied. No files changed.'
+}
 if(-not ([string]$staged['lib/ui/experience.dart']).Contains("Widget _categoryStep()=>") -or
    -not ([string]$staged['lib/ui/experience.dart']).Contains('QwinSellerCategoryPicker(') -or
    -not ([string]$staged['lib/ui/screens.dart']).Contains('olxAvailable') -or
