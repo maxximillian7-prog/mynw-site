@@ -137,8 +137,8 @@ if(-not $s.Contains('OLX auto-renew disabled')){
   if($chip -lt 0){throw 'Listing marketplace chips missing. No files changed'}
   $end=$s.IndexOf('            ]),',$chip)
   if($end -lt 0 -or $end-$chip -gt 300){throw 'Listing chip boundary changed. No files changed'}
-  $end+='            ]),'.Length
-  $s=$s.Insert($end,[char]10+$period.TrimEnd())
+  $end += ('            ]),').Length
+  $s=$s.Insert($end,([string][char]10)+$period.TrimEnd())
 }
 $s=$s.Replace('width:121,height:139,fit:BoxFit.cover))',
   'width:121,height:139,fit:BoxFit.contain))')
