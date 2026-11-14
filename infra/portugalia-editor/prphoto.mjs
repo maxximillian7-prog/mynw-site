@@ -140,7 +140,7 @@ async function selectApproved(id,mediaId){
  const a=rows[0];if(!a)throw bad("Сначала утвердите фотографию в редакции",409);
  const details=String(a.license_details||"").split(";").map(x=>x.trim());
  const rights=["owned_original","generated_illustration"].includes(a.media_type)?"owned":"cc_licensed";
- await db("UPDATE pr_items SET photo_url=$2,photo_rights=$3,photo_attribution=$4,photo_license=$5,photo_licence_url=$6,updated_at=now() WHERE id=$1::uuid",[id,a.public_url,rights,a.attribution,a.media_type==="generated_illustration"?"AI-generated editorial artwork; not documentary":details[0]||null,a.media_type==="generated_illustration"?null:details[1]||null]);
+ await db("UPDATE pr_items SET photo_url=$2,photo_rights=$3,photo_attribution=$4,photo_license=$5,photo_licence_url=$6,updated_at=now() WHERE id=$1::uuid",[id,a.public_url,rights,a.attribution,a.media_type==="generated_illustration"?"AI-generated photorealistic image; not documentary":details[0]||null,a.media_type==="generated_illustration"?null:details[1]||null]);
  return {selected:true,media_id:mediaId,photo_url:a.public_url};
 }
 
@@ -170,13 +170,13 @@ function coverPrompt(info){
  const city=plain(info.location_city||info.location_region||"Португалия").slice(0,100);
  const desc=plain(info.story_ru||info.summary_ru).slice(0,900);
  if(title.length<8||desc.length<80)throw bad("Для генерации нужен полноценный текст статьи",422);
- return "Create ONE attractive 3:2 landscape editorial cover image at medium quality for the Portuguese information magazine Portugal Ryadom. "+
- "The image MUST be clearly an original AI ILLUSTRATION, not a fabricated documentary photo. "+
- "Subject: "+title+". Location/context: "+city+". Key facts: "+desc+". "+
- "A single strong focal subject, calm sophisticated photographic-illustration aesthetic, authentic Portuguese setting where appropriate, soft natural light, detailed composition, suitable for a small mobile Telegram article cover. "+
- "NO text, NO readable writing, NO watermarks, NO labels or logos, NO fake passports, documents, ID cards, government forms or official seals. "+
- "Do not simulate real news photographs, protests, exact museum artworks, copyrighted artworks, or identifiable real people; if real events or institutions are discussed use conceptual symbolic illustration. "+
- "Professional editorial visual, not a collage, 1536x1024 landscape.";
+ return "Create ONE premium PHOTOREALISTIC 3:2 landscape editorial cover image, like a beautiful professional photograph for the Portuguese information magazine Portugal Ryadom. Render with natural camera realism, NOT as a painting, cartoon, drawing, digital illustration, collage, or 3D render. "+
+ "Subject: "+title+". Location/context: "+city+". Article context: "+desc+". "+
+ "Accurately portray a plausible authentic Portuguese setting and the article's main subject. Use a single unmistakable focal point, convincing real-world geometry, realistic people only where appropriate, natural skin and material textures, believable architecture, nuanced daylight and shadows, editorial composition, precise focus, realistic depth of field, fine detail, natural color and restrained contrast. "+
+ "Visual quality should resemble high-end travel, architecture, lifestyle or nature photography made with a full-frame camera; vivid but never oversaturated, no plastic skin, fantasy glow, artificial-looking faces, uncanny elements or fake lens effects. Frame the subject for a clear Telegram thumbnail. "+
+ "For a current event, named individual or institution, make a generic photorealistic conceptual scene or neutral location-based visual instead of fabricating a photograph of a real event or action. Do not depict identifiable real people or claim to record something that happened. "+
+ "NO text, NO readable writing, NO watermarks, NO logos, NO fake passports, documents, ID cards, government forms, official seals or copyrighted artwork. "+
+ "Image is an AI-generated photorealistic editorial visualization, not documentary evidence. Produce one professional JPEG image at 1536x1024 landscape; medium generation quality.";
 }
 async function generateMediumCover(itemId){
  const draft=await checkItem(itemId);
@@ -193,7 +193,7 @@ async function generateMediumCover(itemId){
  try{
   // The OpenAI API key belongs to the server, never to the Journal Studio browser.
   // This endpoint intentionally bypasses Neon AI Gateway; Neon is only the database and media store.
-  const request={model:AI_COVER_MODEL,prompt,n:1,size:"1536x1024",quality:"medium",output_format:"jpeg",output_compression:82};
+  const request={model:AI_COVER_MODEL,prompt,n:1,size:"1536x1024",quality:"medium",output_format:"jpeg",output_compression:90};
   const response=await fetch("https://api.openai.com/v1/images/generations",{
     method:"POST",headers:{"authorization":"Bearer "+token,"content-type":"application/json"},
     body:JSON.stringify(request),signal:AbortSignal.timeout(160000)
@@ -206,8 +206,8 @@ async function generateMediumCover(itemId){
   if(bytes.byteLength<12000||bytes.byteLength>3500000||bytes[0]!==0xff||bytes[1]!==0xd8)throw bad("OpenAI не вернул корректное JPEG-изображение",502);
   const key="ai-covers/"+itemId+"/"+mid+".jpg";
   const publicURL=await putCover(key,bytes);
-  const caption="AI-иллюстрация · создана для журнала «Португалия рядом»";
-  const details="AI-generated editorial illustration (Medium); OpenAI Images API; one image; not documentary; manual approval required";
+  const caption="AI-изображение · фотореалистичная визуализация для журнала «Португалия рядом»";
+  const details="AI-generated photorealistic editorial visualization (Medium); OpenAI Images API; JPEG; not documentary; manual approval required";
   await db("UPDATE pr_media_assets SET storage_bucket=$2,storage_key=$3,public_url=$4,attribution=$5,license_details=$6,rights_verified=true,status='candidate',failure_reason=NULL WHERE id=$1::uuid AND status='generating'",[mid,BKT,key,publicURL,caption,details]);
   return {media_id:mid,photo_url:publicURL,quality:"medium",media_type:"generated_illustration",ai_label:caption,needs_approval:true};
  }catch(e){
