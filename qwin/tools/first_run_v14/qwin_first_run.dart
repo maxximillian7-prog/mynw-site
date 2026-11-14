@@ -30,9 +30,11 @@ class QwinFirstRunGate extends StatefulWidget {
 class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
   static const String legalVersion = '2026-11-14';
   static const String acceptanceKey = 'qwin_legal_ack_20261114_v1';
+  static const String introSeenKey = 'qwin_intro_seen_v15';
 
   VideoPlayerController? _video;
   int _stage = -1; // -1 animation, 0/1 introduction, 2 legal, 3 Qwin
+  bool _legalPreviouslyAccepted = false;
   bool _terms = false;
   bool _privacy = false;
   bool _saving = false;
@@ -50,9 +52,11 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
 
   Future<void> _start() async {
     var previouslyAccepted = false;
+    var alreadySawUpdatedIntro = false;
     try {
       final prefs = await SharedPreferences.getInstance();
       previouslyAccepted = prefs.getBool(acceptanceKey) == true;
+      alreadySawUpdatedIntro = prefs.getBool(introSeenKey) == true;
       final savedLanguage = prefs.getString('qwin_locale_v1');
       final deviceLanguage =
           WidgetsBinding.instance.platformDispatcher.locale.languageCode;
@@ -108,7 +112,8 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
       }
     }
     if (!mounted) return;
-    setState(() => _stage = previouslyAccepted ? 3 : 0);
+    _legalPreviouslyAccepted = previouslyAccepted;
+    setState(() => _stage = previouslyAccepted && alreadySawUpdatedIntro ? 3 : 0);
     try {
       await _video?.pause();
     } catch (_) {}
@@ -139,6 +144,16 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
     }
   }
 
+  Future<void> _finishAlreadyAcceptedIntro() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(introSeenKey, true);
+    } catch (_) {
+      // Visual introduction is optional; never lock an already authorized user.
+    }
+    if (mounted) setState(() => _stage = 3);
+  }
+
   Future<void> _accept() async {
     if (!_terms || !_privacy || _saving) return;
     setState(() {
@@ -154,6 +169,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
         DateTime.now().toUtc().toIso8601String(),
       );
       final saved = await prefs.setBool(acceptanceKey, true);
+      await prefs.setBool(introSeenKey, true);
       if (!saved) throw StateError('Cannot save legal acknowledgement');
       if (mounted) setState(() => _stage = 3);
     } catch (_) {
@@ -336,7 +352,9 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
                 child: FilledButton(
                   onPressed: _stage == 2
                       ? (!_terms || !_privacy || _saving ? null : _accept)
-                      : () => setState(() => _stage += 1),
+                      : _stage == 1 && _legalPreviouslyAccepted
+                          ? _finishAlreadyAcceptedIntro
+                          : () => setState(() => _stage += 1),
                   style: FilledButton.styleFrom(
                     backgroundColor: QwinColors.green,
                     minimumSize: const Size.fromHeight(54),
@@ -361,7 +379,9 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
               ),
               if (_stage < 2)
                 TextButton(
-                  onPressed: () => setState(() => _stage = 2),
+                  onPressed: _legalPreviouslyAccepted
+                      ? _finishAlreadyAcceptedIntro
+                      : () => setState(() => _stage = 2),
                   child: Text(
                     tr('Пропустить знакомство', 'Saltar introdução',
                         'Skip introduction'),
