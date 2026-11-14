@@ -862,7 +862,7 @@ function bind(){
  function updateDestinations(){
   const tg=$("publishTelegram").checked,ig=$("publishInstagram").checked;
   $("publishTargetsHint").textContent="Выбрано: "+([tg?"Telegram":null,ig?"Instagram":null].filter(Boolean).join(" + ")||"ни одной площадки");
-  $("approveBtn").disabled=!(tg||ig)||approvalPending||!me?.user?.approve;
+  $("approveBtn").disabled=!(tg||ig)||approvalPending||!me?.user?.approve||["rejected","expired"].includes(current?.article?.status);
   if(ig&&!tg){previewMode="instagram";renderPreview()}
   else if(tg&&!ig&&previewMode==="instagram"){previewMode="phone";renderPreview()}
  }
