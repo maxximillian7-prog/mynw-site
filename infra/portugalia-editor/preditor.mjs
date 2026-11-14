@@ -5,7 +5,7 @@ const neon=(conn)=>({query:async(query,params=[])=>{
   body:JSON.stringify({query,params}),signal:AbortSignal.timeout(16000)
  });
  const result=await response.json().catch(()=>({}));
- if(!response.ok)throw Error("SQL request failed "+response.status);
+ if(!response.ok){const reason=typeof result?.message==="string"?result.message:typeof result?.error==="string"?result.error:"Не удалось выполнить запрос";throw Error("SQL "+response.status+": "+String(reason).replace(/[\r\n]+/g," ").slice(0,180))}
  return result.rows??result;
 }});
 const db=neon(process.env.DATABASE_URL),sql=(s,p=[])=>db.query(s,p);
@@ -62,7 +62,7 @@ async function action(u,p){
   if(note.length<2)throw err("Введите комментарий");
   await sql("INSERT INTO pr_editorial_comments(item_id,actor_user_id,actor_role,body) VALUES($1::uuid,$2::uuid,$3,$4)",[id,u.id,u.role,note]);await audit(id,u,a,note);return{ok:true};
  }
- access(u,["approve","reject","reopen","queue"].includes(a));
+ access(u,["approve","reject","reopen","queue","confirm_value"].includes(a));
  if(a==="verify_facts"){
   const url=cut(p.evidence_url,1200);let valid=false;try{valid=new URL(url).protocol==="https:"}catch{}
   if(!i.draft_id||!valid||note.length<12)throw err("Нужна HTTPS-ссылка на источник и пояснение (12+ символов)");
@@ -95,6 +95,19 @@ async function action(u,p){
   if(isRejected)await sql("INSERT INTO pr_editorial_reviews(item_id,reviewer,decision,rationale) VALUES($1::uuid,$2,'reject',$3)",[id,u.id,note]);
   await audit(id,u,a,note);return{ok:true};
  }
+ if(a==="confirm_value"){
+  if(p.confirm_value!==true)throw err("Необходимо явное подтверждение редактора",400);
+  if(i.status!=="candidate"||!i.draft_id)throw err("Подтверждение доступно только для неутверждённого материала",409);
+  const valueIssue="Полезность и интерес для читателей не подтверждены";
+  const others=(i.intake_issues||[]).filter(x=>x!==valueIssue);
+  if(others.length)throw err("Сначала исправьте другие проблемы: "+others.join("; ").slice(0,210),409);
+  const reason=cut(p.reason,600);
+  if(reason.length<18)throw err("Укажите причину редакторского подтверждения (от 18 символов)",400);
+  const reviewed=await sql("UPDATE public.pr_editorial_value_reviews SET decision='keep',reviewer_kind='editor',reason_ru=$2,reviewed_at=now(),updated_at=now() WHERE item_id=$1::uuid RETURNING value_score",[id,reason]);
+  if(!reviewed.length)throw err("Редакционная оценка отсутствует, требуется пересмотр материала",409);
+  await audit(id,u,"confirm_value",reason,{value_score:reviewed[0].value_score},{editor_confirmed:true});
+  return {ok:true,confirmed:true,value_score:reviewed[0].value_score};
+ }
  if(a==="approve"){
   if(!i.intake_ready)throw err("Материал ещё не прошёл полную подготовку: "+(i.intake_issues||[]).join("; ").slice(0,250),409);
   if(!i.draft_id||!i.lead_ru||!i.story_ru||!i.headline_ru)throw err("Нет полноценного текста",409);
@@ -120,9 +133,22 @@ async function action(u,p){
    const [details]=await sql("SELECT source_type FROM pr_trailyo_event_details WHERE item_id=$1::uuid",[id]);
    if(!details?.source_type||details.source_type==="partner")throw err("Партнёрские и неподтверждённые по типу источника события исключены из Афиши",409);
   }
-  const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_enqueue_publication_slot($1::uuid,$2::text)",[id,destination]);
+  const mode=p.schedule_mode??"default";
+  if(!["default","delay","manual"].includes(mode))throw err("Неизвестный режим публикации",400);
+  let delay=null,publishAt=null;
+  if(mode==="delay"){
+   delay=Number(p.delay_minutes??p.schedule_delay_minutes);
+   if(!Number.isInteger(delay)||delay<1||delay>525600)throw err("Неверная задержка публикации",400);
+  }
+  if(mode==="manual"){
+   const requested=p.publish_at??p.scheduled_for;
+   const requestedDate=new Date(requested);
+   if(typeof requested!=="string"||!/^\d{4}-\d{2}-\d{2}T/.test(requested)||!Number.isFinite(requestedDate.getTime()))throw err("Укажите корректные дату и время",400);
+   publishAt=requestedDate.toISOString();
+  }
+  const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_schedule_publication($1::uuid,$2::text,$3::integer,$4::timestamptz)",[id,destination,delay,publishAt]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
-  await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for});
+  await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for,schedule_mode:mode,requested_at:publishAt,delay_minutes:delay});
   return{ok:true,queued:true,sent:false,destination,post_id:reservation.post_id,scheduled_for:reservation.scheduled_for};
  }
  throw err("Неизвестная операция");
@@ -147,8 +173,8 @@ export default {async fetch(req){
     (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND NOT EXISTS(SELECT 1 FROM pr_sources sx WHERE sx.id=i.source_id AND sx.code='trailyo_events')) AS total_main,
     (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND EXISTS(SELECT 1 FROM pr_sources sx WHERE sx.id=i.source_id AND sx.code='trailyo_events')) AS total_afisha,
     (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='needs_facts' AND ${isAfisha}) AS needs_facts,
-    (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='draft' AND ${isAfisha}) AS drafts,
-    (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='approved' AND ${isAfisha}) AS approved,
+    (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE (d.status='draft' OR (d.status='approved' AND i.status<>'approved')) AND ${isAfisha}) AS drafts,
+    (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='approved' AND i.status='approved' AND ${isAfisha}) AS approved,
     (SELECT count(*) FROM pr_posts p JOIN pr_items i ON i.id=p.item_id WHERE p.status IN ('queued','scheduled') AND ${isAfisha}) AS queued,
     (SELECT count(*) FROM pr_posts p JOIN pr_items i ON i.id=p.item_id WHERE p.status='sent' AND ${isAfisha}) AS sent
    `,[channel]);
@@ -161,7 +187,7 @@ export default {async fetch(req){
  SELECT i.id,i.title_original,i.title_ru,i.primary_category,
  q.category_hashtag,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score,
  td.is_free,td.price_known,td.price,td.source_type AS trailyo_source_type,td.event_category,
- i.location_city,i.source_published_at,i.discovered_at,s.name AS source_name,
+ i.location_city,i.status AS item_status,i.source_published_at,i.discovered_at,s.name AS source_name,
  d.status AS editorial_status,d.style,d.headline_ru,d.needs_more_facts,d.image_needed,
  LEFT(COALESCE(NULLIF(d.lead_ru,''),NULLIF(i.summary_ru,''),NULLIF(i.body_original,''),''),180) AS article_excerpt,
  (SELECT m.status FROM pr_media_assets m WHERE m.item_id=i.id
@@ -182,7 +208,7 @@ export default {async fetch(req){
  AND ($1='all' OR ($1='incoming' AND q.ready=true AND i.status='candidate')
  OR ($1='preparing' AND q.ready=false AND i.status='candidate')
  OR ($1='queued' AND EXISTS(SELECT 1 FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')))
- OR d.status=$1)
+ OR ($1='approved' AND i.status='approved' AND d.status='approved') OR ($1='draft' AND (d.status='draft' OR (d.status='approved' AND i.status='candidate'))) OR ($1 IN ('needs_facts','rejected') AND d.status=$1))
  AND ($2='all' OR i.primary_category=$2)
  AND ($3='' OR COALESCE(d.headline_ru,i.title_ru,i.title_original) ILIKE '%'||$3||'%' OR s.name ILIKE '%'||$3||'%')
 )
