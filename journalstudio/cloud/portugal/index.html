@@ -66,6 +66,23 @@ input[type=search]{width:100%} .filters select{width:100%}
 @media(max-width:1000px){.layout{grid-template-columns:185px minmax(280px,1fr)}.workspace{grid-column:2}.sectionlist{min-height:55vh}.side{grid-row:1/span 2}}
 @media(max-width:650px){.layout{display:block}nav.side{position:relative;height:auto;display:block;padding:13px 15px}.brand{margin:0 0 7px;font-size:17px}.brand small{display:none}.back{display:inline-block}.navtitle{display:none}.navStatuses{display:flex;overflow:auto;gap:6px;padding:7px 0}.statusNav{width:auto;flex:none;gap:8px;padding:7px 10px;font-size:11px}.sectionlist{min-height:400px;padding:17px 14px}.items{max-height:360px}.workspace{padding:18px 14px 60px}.split{display:block}.card{padding:15px}.workspaceHeader h2{font-size:20px}}
 
+
+/* Independent destinations and Instagram-style device preview */
+.pt-destinations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pt-destinations label{display:flex;gap:9px;align-items:center;border:1px solid #d1e3df;border-radius:12px;background:#f7fbfa;padding:12px;font-weight:800;cursor:pointer}
+.pt-destinations label:has(input:checked){border-color:#19817a;background:#eaf6f2}
+.pt-destinations label small{display:block;font-weight:500;font-size:11px;color:#6a8580}
+.pt-destinations input{width:18px;height:18px;accent-color:#187977}
+.ig-phone{background:#fff;color:#1d2427}.ig-top{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #edf0f0;font-size:17px}
+.ig-author{height:56px;display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:12px}
+.ig-author strong{flex:1}.ig-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(35deg,#ffb74d,#e8588a,#6d55d3)}
+.ig-cover{width:100%;aspect-ratio:4/5;object-fit:cover;max-height:315px;background:#f0f0f0}
+.ig-no-photo{height:225px;display:grid;place-items:center;text-align:center;padding:20px;background:#eff2f0;color:#71827e;font-size:12px}
+.ig-actionbar{display:flex;justify-content:space-between;padding:9px 13px 6px;font-size:24px}
+.ig-caption{padding:5px 13px 17px;font-size:12px;line-height:1.5;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere;flex:1;min-height:0}
+.ig-caption strong{font-size:12px}.ig-bottom{height:41px;flex:none;text-align:center;padding:8px 5px 4px;border-top:1px solid #ececec;font-size:19px}
+@media(max-width:800px){.pt-destinations{grid-template-columns:1fr}}
+
 /* Mobile-first editorial preview, modelled on the NowGreen Journal Studio device viewer. */
 .editorEditingLayout{display:grid;grid-template-columns:minmax(0,1fr) minmax(345px,1fr);gap:15px;align-items:start}
 .editorEditingColumn,.editorPreviewColumn{min-width:0}
@@ -217,8 +234,9 @@ input[type=search]{width:100%} .filters select{width:100%}
 </div><div class="editorPreviewColumn">
  <div class="card"><h3>③ Как будет выглядеть на телефоне</h3>
   <div class="pt-mode-switch" role="group" aria-label="Режим предпросмотра">
-   <button type="button" id="modePhone" class="selected" aria-pressed="true">📱 Telegram</button>
-   <button type="button" id="modeArticle" aria-pressed="false">📰 Читать статью</button>
+   <button type="button" id="modePhone" class="selected" aria-pressed="true">✈ Telegram</button>
+   <button type="button" id="modeInstagram" aria-pressed="false">◎ Instagram</button>
+   <button type="button" id="modeArticle" aria-pressed="false">📰 Статья</button>
   </div>
   <div class="pt-quicktools">
    <button class="btn" type="button" id="quickHeadline">✎ Заголовок</button>
@@ -229,7 +247,7 @@ input[type=search]{width:100%} .filters select{width:100%}
   <div class="preview pt-live-preview" id="livePreview"></div>
   <div class="pt-screen-notice" id="previewHint">Мобильный макет Telegram на основе подготовленных текста и фотографии.</div>
   <div class="sourcebox" style="margin:12px 0"><strong>Рубрика: </strong><strong id="categoryTagPreview">—</strong><div class="faint">Навигационный хештег всегда добавляется в конец публикации.</div></div>
-  <div class="btns"><button class="btn" id="copyTelegramBtn">Копировать готовый текст</button><span class="secondary" id="tgLength">—</span></div>
+  <div class="btns"><button class="btn" id="copyTelegramBtn">Копировать текст Telegram</button><button class="btn hidden" id="copyInstagramBtn">Копировать подпись Instagram</button><span class="secondary" id="tgLength">—</span></div>
   <p class="secondary" style="margin-top:9px">Предпросмотр обновляется при каждом изменении. Для копирования публикация должна быть утверждена.</p>
  </div>
  <div class="card" id="photoPanel"><h3>④ Фотографии — быстро выбрать и заменить</h3>
@@ -252,8 +270,12 @@ input[type=search]{width:100%} .filters select{width:100%}
  </div>
 </div></div>
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
-  <div class="field"><label>Канал публикации (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field"><label for="publicationMode">Когда опубликовать?</label><select id="publicationMode"><option value="default">Автоматически — не раньше чем через 2 часа</option><option value="delay">Через 2 часа</option><option value="manual">Выбрать дату и время</option></select></div><div class="split hidden" id="publicationDateRow"><div class="field"><label for="publicationDate">Дата</label><input id="publicationDate" type="date"></div><div class="field"><label for="publicationTime">Время (Лиссабон)</label><input id="publicationTime" type="time" value="12:00"></div></div><div class="btns"><button id="approveBtn" class="btn primary">✓ Утвердить и запланировать</button></div>
-  <p class="secondary">Одно нажатие сохранит правки, подтвердит факты редактором по указанному первоисточнику, утвердит статью и поставит её в очередь. Проверка полноты текста, достоверности источника и прав на фото остаётся обязательной.</p>
+  <div class="field"><label>Куда отправить статью?</label><div class="pt-destinations" role="group" aria-label="Площадки публикации">
+<label><input id="publishTelegram" type="checkbox" checked><span>✈ Telegram <small>Основной канал / Афиша — по рубрике</small></span></label>
+<label><input id="publishInstagram" type="checkbox"><span>◎ Instagram <small>@pt_ryadom · отдельная очередь</small></span></label>
+</div><p class="secondary" id="publishTargetsHint" role="status">Выбрано: Telegram</p></div>
+<div class="field"><label>Канал Telegram (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field"><label for="publicationMode">Когда опубликовать?</label><select id="publicationMode"><option value="default">Автоматически — не раньше чем через 2 часа</option><option value="delay">Через заданное время</option><option value="manual">Выбрать дату и время</option></select></div><div class="field hidden" id="publicationDelayRow"><label for="publicationDelay">Через сколько?</label><select id="publicationDelay"><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="120" selected>2 часа</option><option value="180">3 часа</option><option value="360">6 часов</option><option value="720">12 часов</option><option value="1440">24 часа</option></select></div><div class="split hidden" id="publicationDateRow"><div class="field"><label for="publicationDate">Дата</label><input id="publicationDate" type="date"></div><div class="field"><label for="publicationTime">Время (Лиссабон)</label><input id="publicationTime" type="time" value="12:00"></div></div><div class="btns"><button id="approveBtn" class="btn primary">✓ Утвердить и запланировать</button></div><p id="instagramQueueStatus" class="secondary" role="status"></p>
+  <p class="secondary">Одно утверждение для выбранных площадок. Telegram и Instagram имеют независимые очереди. В Instagram отправляются только статьи с одобренным изображением и подтверждёнными правами.</p>
   <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
