@@ -10,6 +10,7 @@ void main() {
       const OlxCategory(id:1,namePt:'Casa e Jardim',isLeaf:false),
       const OlxCategory(id:11,parentId:1,namePt:'Aquecedores',isLeaf:true),
       const OlxCategory(id:12,parentId:1,namePt:'Aspiradores',isLeaf:true),
+      const OlxCategory(id:13,parentId:1,namePt:'Pilhas e Baterias',isLeaf:true),
       const OlxCategory(id:2,namePt:'Tecnologia',isLeaf:false),
       const OlxCategory(id:21,parentId:2,namePt:'Telemóveis',isLeaf:true),
       const OlxCategory(id:22,parentId:2,namePt:'Computadores Portáteis',isLeaf:true),
@@ -46,6 +47,12 @@ void main() {
     expect(QwinCategoryKeywords.find(catalog,'bike').first.id,41);
     expect(QwinCategoryKeywords.find(catalog,'пылесос').first.id,12);
     expect(QwinCategoryKeywords.find(catalog,'smartphone').first.id,21);
+  });
+
+  test('small batteries match verified batteries category',(){
+    expect(QwinCategoryKeywords.find(catalog,'батарейка').first.id,13);
+    expect(QwinCategoryKeywords.find(catalog,'pilhas').first.id,13);
+    expect(QwinCategoryKeywords.find(catalog,'battery').first.id,13);
   });
 
   test('never invent an ID for unknown product words',(){
