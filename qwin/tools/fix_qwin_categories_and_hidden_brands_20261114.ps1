@@ -202,6 +202,8 @@ $box=[regex]::Replace($box,
  '])')
 $box=[regex]::Replace($box,
  '\s*QwinEtsyAlertsTab\(store:store,locale:locale,active:active\),\s*QwinEbayMessagesTab\(store:store,locale:locale,active:active\),','')
+$box=$box.Replace("import 'etsy_notifications.dart';"+[char]10,'')
+$box=$box.Replace("import 'ebay_messages.dart';"+[char]10,'')
 $staged[$inbox]=$box
 
 # Editing previously-created listings must not expose a disabled Etsy toggle.
