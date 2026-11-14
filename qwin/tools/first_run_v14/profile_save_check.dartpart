@@ -1,0 +1,4 @@
+    if(phonePublic && contact!='message' && !_confirmedPublicPhone){
+      if(!await _confirmPhoneDisclosure())return;
+      _confirmedPublicPhone=true;
+    }
