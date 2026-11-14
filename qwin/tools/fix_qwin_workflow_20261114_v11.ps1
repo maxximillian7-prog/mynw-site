@@ -248,11 +248,11 @@ if(-not $xp.Contains('QwinSellerCategorySearch(')){
 $staged['lib/ui/experience.dart']=$xp
 
 # Restore the OLX integration card even when the seller has not linked an account.
-$profile=[string]$staged['lib/ui/screens.dart']
-$profile=Replace-Section $profile 'Widget _integrationScreen(){' '@override Widget build(BuildContext context){' $integrations
-$profile=$profile.Replace(('OLX '+[char]183+' Etsy '+[char]183+' eBay'),
+$profileSrc=[string]$staged['lib/ui/screens.dart']
+$profileSrc=Replace-Section $profileSrc 'Widget _integrationScreen(){' '@override Widget build(BuildContext context){' $integrations
+$profileSrc=$profileSrc.Replace(('OLX '+[char]183+' Etsy '+[char]183+' eBay'),
   'OLX Portugal')
-$staged['lib/ui/screens.dart']=$profile
+$staged['lib/ui/screens.dart']=$profileSrc
 
 # Remove deprecated provider mentions from home banner in all three UI languages.
 $l10n=[string]$staged['lib/l10n/qwin_strings.dart']
