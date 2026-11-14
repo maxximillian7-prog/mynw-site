@@ -158,7 +158,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
       backgroundColor: const Color(0xFFF5FBFA),
       body: SafeArea(child: Center(
         child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 510),
-          child: Padding(padding: const EdgeInsets.all(23),
+          child: SingleChildScrollView(child: Padding(padding: const EdgeInsets.all(23),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               const SizedBox(height: 24),
               Row(children: [
@@ -171,7 +171,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
                 Text((_stage + 1).toString() + ' / 3',
                     style: const TextStyle(color: Colors.blueGrey)),
               ]),
-              const Spacer(),
+              const SizedBox(height: 30),
               Icon(_stage == 0
                      ? Icons.travel_explore_rounded
                      : _stage == 1
@@ -221,7 +221,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Text(_error!, textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.red))),
-              const Spacer(),
+              const SizedBox(height: 30),
               FilledButton(
                 onPressed: _stage == 2
                   ? (!_terms || !_privacy || _saving ? null : _accept)
@@ -243,7 +243,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
                       'Saltar introdução', 'Skip introduction'))),
               const SizedBox(height: 12),
             ]),
-          ),
+          )),
         ),
       )),
     );
