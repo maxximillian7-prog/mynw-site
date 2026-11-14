@@ -16,7 +16,7 @@ async function query(q,params=[]){
  if(!response.ok)throw Error("Database request failed "+response.status+": "+safe(JSON.stringify(data)));
  return data.rows??data;
 }
-function richBlocks(preparedText,photoUrl){
+function richBlocks(preparedText,photoUrl,isAiGenerated=false){
  const full=String(preparedText||"").trim();
  if(full.length<110||full.length>32000)throw Error("Full article length out of range");
  let url;try{url=new URL(photoUrl)}catch{throw Error("Approved photograph URL missing")}
@@ -28,6 +28,7 @@ function richBlocks(preparedText,photoUrl){
  const paragraphs=full.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean),title=paragraphs.shift();
  if(!title||title.length>255)throw Error("Article title missing or too long");
  const blocks=[{type:"photo",photo:{type:"photo",media:url.href}},{type:"heading",size:2,text:title}];
+ if(isAiGenerated)blocks.push({type:"paragraph",text:"📷 AI-изображение · фотореалистичная визуализация, не документальное фото."});
  for(const section of paragraphs){
   if(section.startsWith("Источник:")){blocks.push({type:"footer",text:section});continue;}
   const newline=section.indexOf("\n"),first=newline>=0?section.slice(0,newline).trim():"",rest=newline>=0?section.slice(newline+1).trim():"";
@@ -53,7 +54,8 @@ async function promote(){
 }
 async function claim(){
  const sql=`WITH todo AS (
- SELECT p.id,q.post_id,q.item_id,q.destination_code,q.telegram_chat_id,q.prepared_text,q.approved_image_url
+ SELECT p.id,q.post_id,q.item_id,q.destination_code,q.telegram_chat_id,q.prepared_text,q.approved_image_url,
+ EXISTS(SELECT 1 FROM public.pr_media_assets ai WHERE ai.item_id=p.item_id AND ai.public_url=q.approved_image_url AND ai.status='approved' AND ai.media_type='generated_illustration') AS is_ai_generated
  FROM public.pr_posts p JOIN public.pr_telegram_delivery_queue q ON q.post_id=p.id
  WHERE p.status='scheduled' AND q.approved_image_url IS NOT NULL
  AND EXISTS(
@@ -73,7 +75,7 @@ async function claim(){
 }
 async function publish(post){
  if(!token)throw Error("Telegram bot token missing");
- const blocks=richBlocks(post.prepared_text,post.approved_image_url);
+ const blocks=richBlocks(post.prepared_text,post.approved_image_url,post.is_ai_generated===true);
  const body={chat_id:String(post.telegram_chat_id),rich_message:{blocks}};
  if(post.telegram_thread_id)body.message_thread_id=Number(post.telegram_thread_id);
  const response=await fetch("https://api.telegram.org/bot"+token+"/sendRichMessage",{
