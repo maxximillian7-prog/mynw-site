@@ -321,6 +321,21 @@ $leadingNew="          leading:(widget.source=='qwin'||thread['qwin_listing_id']
   "              listing:widget.store.listingFor((widget.source=='qwin'"+[char]10+
   "                ?thread['listing_id']:thread['qwin_listing_id'])?.toString()??'')):"
 if($inbox.Contains($leadingOld)){$inbox=$inbox.Replace($leadingOld,$leadingNew)}
+# Older Etsy/eBay notifications remain stored but are hidden in current UI.
+$notice="if(mounted)setState((){rows=result;error=null;});"
+if($inbox.Contains($notice)){
+  $safe=@'
+if(mounted)setState((){
+        rows=result.where((row){
+          final text=('${row['title']??''} ${row['preview']??''}')
+            .toLowerCase();
+          return !text.contains('etsy')&&!text.contains('ebay');
+        }).toList();
+        error=null;
+      });
+'@
+  $inbox=$inbox.Replace($notice,$safe.TrimEnd())
+}
 $staged['lib/ui/inbox.dart']=$inbox
 
 # Hide Etsy in editor but leave previously stored connection data untouched.
