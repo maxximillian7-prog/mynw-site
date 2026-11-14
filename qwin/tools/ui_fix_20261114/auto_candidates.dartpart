@@ -1,0 +1,9 @@
+      // Rank verified official OLX leaves from the product type before
+      // attempting remote suggestions. Brand logos must not override item kind.
+      for(final category in QwinCategoryKeywords.find(
+        official,taxonomyQuery,
+        description:productContext,locale:widget.locale,
+        sellerOnly:true,limit:12,prioritizeDescription:true)){
+        add(category);
+      }
+      
