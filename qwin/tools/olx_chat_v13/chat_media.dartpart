@@ -1,0 +1,9 @@
+                    if(widget.source=='olx'&&row['attachments'] is List)...[
+                      for(var pi=0;pi<(row['attachments'] as List).length&&pi<4;pi++)
+                        _OlxReceivedPhoto(gateway:widget.store.neon!,
+                          threadId:widget.threadId,
+                          messageId:(row['uuid']??row['id']).toString(),
+                          attachmentIndex:pi),
+                    ]else if(widget.source=='qwin'&&
+                        (row['attachment_url']?.toString().isNotEmpty??false))
+                      _ChatNetworkPhoto(url:row['attachment_url'].toString()),
