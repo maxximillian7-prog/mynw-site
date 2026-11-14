@@ -58,7 +58,49 @@ function footerLine(line){
  }
  return embeddedLinks(source);
 }
-function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false){
+const richBold=text=>({type:"bold",text});
+const dateOnly=value=>{const s=String(value||"").slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:null};
+function eventDateLabel(event){
+ const start=dateOnly(event?.starts_on),end=dateOnly(event?.ends_on);
+ if(!start)return "📅 Дата уточняется";
+ const fmt=d=>new Intl.DateTimeFormat("ru-RU",{timeZone:"UTC",day:"numeric",month:"long",year:"numeric"}).format(new Date(d+"T12:00:00Z"));
+ return "📅 "+fmt(start)+(end&&end!==start?" — "+fmt(end):"");
+}
+function eventClock(event){
+ if(event?.time_known!==true||!event.starts_at)return null;
+ const start=new Date(event.starts_at);
+ if(!Number.isFinite(start.getTime()))return null;
+ const clock=new Intl.DateTimeFormat("ru-RU",{timeZone:"Europe/Lisbon",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(start);
+ // Trailyo's old importer uses 23:59 as the default/placeholder
+ // even for records with time_known=true. Never present it as an actual show time.
+ if(clock==="23:59"&&!/23:59/.test(String(event.source_time_text||"")))return null;
+ return clock;
+}
+function eventLocation(event){
+ if(!event)return null;
+ const venue=String(event.venue||"").trim().slice(0,230);
+ const city=String(event.city||"").trim().slice(0,140);
+ const named=venue&&city&&!venue.toLocaleLowerCase().includes(city.toLocaleLowerCase())?venue+", "+city:venue||city;
+ if(!named)return null;
+ const lat=event.latitude==null?NaN:Number(event.latitude),lon=event.longitude==null?NaN:Number(event.longitude);
+ const valid=Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=-90&&lat<=90&&lon>=-180&&lon<=180;
+ const search=valid?lat.toFixed(6)+","+lon.toFixed(6):[venue,city,"Portugal"].filter(Boolean).join(", ");
+ const link="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(search);
+ return {label:"📍 "+named,url:link,has_exact_coordinates:valid};
+}
+function appendAfishaEventMetadata(blocks,event){
+ if(!event)return;
+ const clock=eventClock(event),timeLine=eventDateLabel(event)+" · 🕒 "+(clock?clock+" (Лиссабон)":"Время уточняется");
+ blocks.push({type:"paragraph",text:richBold(timeLine)});
+ const loc=eventLocation(event);
+ if(loc)blocks.push({type:"paragraph",text:richBold(richUrl(loc.label,loc.url))});
+}
+async function loadAfishaMetadata(post){
+ if(post.destination_code!=="afisha")return null;
+ const rows=await query("SELECT city,venue,starts_on,ends_on,time_known,starts_at,ends_at,source_time_text,latitude,longitude FROM public.pr_trailyo_event_details WHERE item_id=$1::uuid",[post.item_id]);
+ return rows[0]||null;
+}
+function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eventMetadata=null){
  const full=String(preparedText||"").trim();
  if(full.length<110||full.length>32000)throw Error("Full article length out of range");
  const url=publicHttps(photoUrl);
@@ -73,6 +115,7 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false){
  if(!title||title.length>255)throw Error("Article title missing or too long");
  const blocks=[{type:"photo",photo:{type:"photo",media:url.href}},{type:"heading",size:2,text:title}];
  if(isAiGenerated)blocks.push({type:"paragraph",text:"📷 AI-изображение · не документальное фото."});
+ if(isAfisha)appendAfishaEventMetadata(blocks,eventMetadata);
  for(const section of paragraphs){
   if(section.startsWith("Источник:")){
    for(const line of section.split("\n").map(s=>s.trim()).filter(Boolean)){
@@ -110,7 +153,8 @@ async function claim(){
 }
 async function publish(post){
  if(!token)throw Error("Telegram bot token missing");
- const blocks=richBlocks(post.prepared_text,post.approved_image_url,post.is_ai_generated===true,post.destination_code==="afisha");
+ const metadata=await loadAfishaMetadata(post);
+ const blocks=richBlocks(post.prepared_text,post.approved_image_url,post.is_ai_generated===true,post.destination_code==="afisha",metadata);
  const body={chat_id:String(post.telegram_chat_id),rich_message:{blocks}};
  if(post.telegram_thread_id)body.message_thread_id=Number(post.telegram_thread_id);
  const response=await fetch("https://api.telegram.org/bot"+token+"/sendRichMessage",{
@@ -154,8 +198,8 @@ export default {async fetch(req){
   try{
    const rows=await query("SELECT destination_code,count(*) FILTER(WHERE status IN ('queued','scheduled')) AS pending,min(scheduled_for) FILTER(WHERE status IN ('queued','scheduled')) AS next_due_at,max(sent_at) FILTER(WHERE status='sent') AS last_sent_at FROM public.pr_posts WHERE destination_code IN ('main','afisha') GROUP BY destination_code");
    const channels=Object.fromEntries(rows.map(r=>[r.destination_code,{pending:Number(r.pending||0),next_due_at:r.next_due_at||null,last_sent_at:r.last_sent_at||null}]));
-   return json({service:"portugalia-telegram-publisher",version:4,delivery_format:"RichMessage",ready:!!token&&!!dbConn,channels,policy:{main:{min_interval_minutes:120,quiet_hours_lisbon:"00:00-08:00"},afisha:{min_interval_minutes:0,quiet_hours_lisbon:null}},cron_every_minutes:5,photo_and_article_in_one:true});
-  }catch(e){return json({service:"portugalia-telegram-publisher",version:4,ready:false,error:safe(e.message)},503);}
+   return json({service:"portugalia-telegram-publisher",version:5,event_details_bold:true,event_location_maps:true,delivery_format:"RichMessage",ready:!!token&&!!dbConn,channels,policy:{main:{min_interval_minutes:120,quiet_hours_lisbon:"00:00-08:00"},afisha:{min_interval_minutes:0,quiet_hours_lisbon:null}},cron_every_minutes:5,photo_and_article_in_one:true});
+  }catch(e){return json({service:"portugalia-telegram-publisher",version:5,ready:false,error:safe(e.message)},503);}
  }
  if(path!=="/run"&&path!=="/")return json({error:"Route not found"},404);
  try{return json(await execute())}catch(e){return json({ok:false,error:safe(e?.message||e)},500)}
