@@ -55,9 +55,12 @@ assert.ok(!home.includes('demo-grid') && !home.includes('demo-price'),
   'Do not simulate live inventory or a web marketplace');
 assert.ok(docs.includes('Qwin is independent from OLX.'),
   'OLX independence disclosure missing');
-assert.ok(docs.includes("The term 'Etsy' is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc."),
-  'Etsy API disclaimer missing');
-assert.ok(!home.includes('<strong>Etsy</strong>') && !home.includes('<strong>eBay</strong>'), 'Paused brands must not be advertised');
+for(const [name,body] of [['home',home],['docs',docs],['translations',script]]){
+  assert.ok(!/etsy|ebay/i.test(body),'Paused marketplace names must not appear in Qwin '+name);
+}
+for(const name of ['privacySharing','privacySharingHeader','privacyRights','termsBody4','safe5','deleteBody2']){
+  assert.ok(docs.includes('data-t="'+name+'"'),'Essential legal disclosure is missing: '+name);
+}
 const landingCss=readFileSync(new URL('./landing-editorial.css',import.meta.url),'utf8');
 for(const selector of ['.hero-photo-group','.hero-grid','.feature-cards',
   '.editorial-grid','.category-photo-grid','.platform-grid','.closing-section']){
