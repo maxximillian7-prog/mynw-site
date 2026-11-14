@@ -53,25 +53,9 @@ async function promote(){
  return query(sql);
 }
 async function claim(){
- const sql=`WITH todo AS (
- SELECT p.id,q.post_id,q.item_id,q.destination_code,q.telegram_chat_id,q.prepared_text,q.approved_image_url,
- EXISTS(SELECT 1 FROM public.pr_media_assets ai WHERE ai.item_id=p.item_id AND ai.public_url=q.approved_image_url AND ai.status='approved' AND ai.media_type='generated_illustration') AS is_ai_generated
- FROM public.pr_posts p JOIN public.pr_telegram_delivery_queue q ON q.post_id=p.id
- WHERE p.status='scheduled' AND q.approved_image_url IS NOT NULL
- AND EXISTS(
-   SELECT 1 FROM public.pr_media_assets a
-   WHERE a.item_id=p.item_id AND a.public_url=q.approved_image_url
-    AND a.status='approved' AND a.rights_verified
-    AND a.media_type IN ('licensed_original','owned_original','generated_illustration')
-    AND (a.media_type<>'generated_illustration' OR (a.illustration_label_required AND a.storage_bucket='pr-editorial-media' AND a.storage_key IS NOT NULL))
- )
- ORDER BY p.created_at LIMIT 1 FOR UPDATE OF p SKIP LOCKED
- ), claimed AS (
-  UPDATE public.pr_posts p SET status='sending',attempts=p.attempts+1,last_error=NULL
-  FROM todo t WHERE p.id=t.id RETURNING p.id,p.attempts,p.telegram_thread_id
- )
- SELECT t.*,c.attempts,c.telegram_thread_id FROM todo t JOIN claimed c ON t.id=c.id`;
- return (await query(sql))[0]||null;
+ // Database serializes concurrent cron invocations and enforces 120 minutes
+ // since the LAST ACTUAL successful Telegram publication, across all channels.
+ return (await query("SELECT * FROM public.pr_claim_due_telegram_post()"))[0]||null;
 }
 async function publish(post){
  if(!token)throw Error("Telegram bot token missing");
@@ -117,9 +101,9 @@ export default {async fetch(req){
  const path=new URL(req.url).pathname;
  if(path==="/health"){
   try{
-   const rows=await query("SELECT count(*) n FROM public.pr_posts WHERE status='scheduled'");
-   return json({service:"portugalia-telegram-publisher",version:2,delivery_format:"RichMessage",ready:!!token&&!!dbConn,scheduled_count:Number(rows[0]?.n||0),photo_and_article_in_one:true});
-  }catch(e){return json({service:"portugalia-telegram-publisher",version:2,ready:false,error:safe(e.message)},503);}
+   const [rows]=await query("SELECT count(*) FILTER (WHERE status IN ('queued','scheduled')) AS pending, min(scheduled_for) FILTER (WHERE status IN ('queued','scheduled')) AS next_due_at, max(sent_at) FILTER (WHERE status='sent') AS last_sent_at FROM public.pr_posts");
+   return json({service:"portugalia-telegram-publisher",version:3,delivery_format:"RichMessage",ready:!!token&&!!dbConn,pending_count:Number(rows?.pending||0),next_due_at:rows?.next_due_at||null,last_sent_at:rows?.last_sent_at||null,min_interval_minutes:120,photo_and_article_in_one:true});
+  }catch(e){return json({service:"portugalia-telegram-publisher",version:3,ready:false,error:safe(e.message)},503);}
  }
  if(path!=="/run"&&path!=="/")return json({error:"Route not found"},404);
  try{return json(await execute())}catch(e){return json({ok:false,error:safe(e?.message||e)},500)}
