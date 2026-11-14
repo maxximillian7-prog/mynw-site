@@ -1,0 +1,34 @@
+  bool _confirmedPublicPhone=false;
+  String t(String key)=>QwinStrings.t(widget.locale,key);
+  String _phoneWarning()=>widget.locale=='ru'
+    ?'Не делитесь номером телефона без необходимости. Для общения безопаснее использовать сообщения Qwin. Если включить публичный контакт, номер увидят другие пользователи; при публикации в OLX он может быть передан OLX и показан по правилам площадки.'
+    :widget.locale=='pt'
+      ?'Evite partilhar o seu número de telefone sem necessidade. Prefira as mensagens Qwin. Se ativar o contacto público, outros utilizadores poderão ver o número; ao publicar no OLX, este pode ser enviado e apresentado segundo as regras da plataforma.'
+      :'Avoid sharing your phone number unless necessary. Prefer Qwin messages. If you enable public contact, other users may see your number; an OLX listing can send it to OLX under its own rules.';
+  Future<bool> _confirmPhoneDisclosure()async{
+    final agreed=await showDialog<bool>(context:context,builder:(ctx)=>AlertDialog(
+      title:Text(widget.locale=='ru'?'Публикация номера телефона':
+        widget.locale=='pt'?'Partilhar o número de telefone':'Share your phone number'),
+      content:Text(_phoneWarning()),
+      actions:[
+        TextButton(onPressed:()=>Navigator.pop(ctx,false),child:Text(t('cancel'))),
+        FilledButton(onPressed:()=>Navigator.pop(ctx,true),
+          child:Text(widget.locale=='ru'?'Публиковать номер':
+            widget.locale=='pt'?'Partilhar número':'Share number')),
+      ],
+    ));
+    return agreed==true;
+  }
+  Future<void> _changePhonePublic(bool requested)async{
+    if(!requested){
+      if(mounted)setState((){
+        phonePublic=false;_confirmedPublicPhone=false;
+      });
+      return;
+    }
+    final yes=await _confirmPhoneDisclosure();
+    if(mounted&&yes)setState((){
+      phonePublic=true;_confirmedPublicPhone=true;
+    });
+  }
+
