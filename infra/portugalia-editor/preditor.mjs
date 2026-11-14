@@ -114,7 +114,7 @@ async function action(u,p){
   const [gate]=await sql("SELECT allowed,reason FROM pr_item_publication_check($1::uuid)",[id]);if(!gate?.allowed)throw err("Публикация заблокирована: "+gate?.reason,409);
   // Editorial routing follows the topic, not a manually editable destination.
   // All events belong in Afisha; news and articles go to Main.
-  const destination=i.primary_category==="events"?"afisha":"main";
+  const destination=i.source_code==="trailyo_events"?"afisha":"main";
   if(destination==="afisha"&&i.source_code!=="trailyo_events")throw err("Афиша принимает только опубликованные события из Trailyo",409);
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_enqueue_publication_slot($1::uuid,$2::text)",[id,destination]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
@@ -136,12 +136,12 @@ export default {async fetch(req){
   }
   if(req.method==="GET"&&route==="/api/summary"){
    const channel=u.searchParams.get("channel")==="afisha"?"afisha":"main";
-   const isAfisha="(i.primary_category='events') = ($1='afisha')";
+   const isAfisha="(EXISTS(SELECT 1 FROM pr_sources sx WHERE sx.id=i.source_id AND sx.code='trailyo_events')) = ($1='afisha')";
    const [summary]=await sql(`SELECT
-    (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate' AND i.primary_category<>'events') AS incoming_main,
-    (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate' AND i.primary_category='events') AS incoming_afisha,
-    (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND i.primary_category<>'events') AS total_main,
-    (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND i.primary_category='events') AS total_afisha,
+    (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate' AND NOT EXISTS(SELECT 1 FROM pr_sources sx WHERE sx.id=i.source_id AND sx.code='trailyo_events')) AS incoming_main,
+    (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate' AND EXISTS(SELECT 1 FROM pr_sources sx WHERE sx.id=i.source_id AND sx.code='trailyo_events')) AS incoming_afisha,
+    (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND NOT EXISTS(SELECT 1 FROM pr_sources sx WHERE sx.id=i.source_id AND sx.code='trailyo_events')) AS total_main,
+    (SELECT count(*) FROM pr_items i WHERE i.duplicate_of IS NULL AND i.status IN ('candidate','approved') AND EXISTS(SELECT 1 FROM pr_sources sx WHERE sx.id=i.source_id AND sx.code='trailyo_events')) AS total_afisha,
     (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='needs_facts' AND ${isAfisha}) AS needs_facts,
     (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='draft' AND ${isAfisha}) AS drafts,
     (SELECT count(*) FROM pr_story_drafts d JOIN pr_items i ON i.id=d.item_id WHERE d.status='approved' AND ${isAfisha}) AS approved,
@@ -169,7 +169,7 @@ export default {async fetch(req){
  LEFT JOIN pr_story_drafts d ON d.item_id=i.id
  CROSS JOIN LATERAL pr_intake_check(i.id) q
  WHERE i.duplicate_of IS NULL
- AND ((i.primary_category='events')=($4='afisha'))
+ AND ((s.code='trailyo_events')=($4='afisha'))
  AND ($1='all' OR ($1='incoming' AND q.ready=true AND i.status='candidate')
  OR ($1='preparing' AND q.ready=false AND i.status='candidate')
  OR ($1='queued' AND EXISTS(SELECT 1 FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')))
