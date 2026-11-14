@@ -1,0 +1,119 @@
+Widget _categoryStep()=>Column(
+    crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+      _QwinSection(child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+        Row(children:[
+          const Icon(Icons.category_outlined,color:_leaf,size:22),
+          const SizedBox(width:9),
+          Expanded(child:Text(QwinStrings.t(widget.locale,'categories'),
+            style:const TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:_deep))),
+        ]),
+        const SizedBox(height:12),
+        if(loadingOlxSuggestions)
+          const LinearProgressIndicator(minHeight:2),
+        if(selectedCategoryId!=null)...[
+          Card(color:QwinColors.mint,child:Padding(
+            padding:const EdgeInsets.all(13),
+            child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+              Text(categoryConfirmed
+                ?_platformText('Категория подтверждена',
+                   'Categoria confirmada','Category confirmed')
+                :_platformText('Категория определена — подтвердите',
+                   'Categoria sugerida — confirme','Suggested category — confirm'),
+                style:const TextStyle(fontSize:12,fontWeight:FontWeight.w800,color:_deep)),
+              const SizedBox(height:8),
+              Text(widget.store.catalog.pathLabel(selectedCategoryId!,widget.locale),
+                style:const TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:_deep)),
+              if(!categoryConfirmed)...[
+                const SizedBox(height:12),
+                FilledButton.icon(
+                  onPressed:()=>setState((){
+                    categoryConfirmed=true;categoryAutoSuggested=false;
+                    manualPicking=false;
+                  }),
+                  icon:const Icon(Icons.check_circle_outline_rounded),
+                  label:Text(QwinStrings.t(widget.locale,'categoryApprove'))),
+              ],
+            ]))),
+          const SizedBox(height:10),
+        ]else...[
+          Text(loadingOlxSuggestions
+            ?_platformText('Подбираем категорию по названию и описанию…',
+               'A procurar pela descrição…',
+               'Matching category from the product description…')
+            :_platformText('Категория ещё не определена. Выберите вручную.',
+               'Categoria ainda não identificada. Escolha manualmente.',
+               'No category identified yet. Choose manually.'),
+            style:const TextStyle(fontSize:12,color:_quiet)),
+          const SizedBox(height:10),
+        ],
+        Row(children:[
+          Expanded(child:OutlinedButton.icon(
+            onPressed:()=>setState((){
+              manualPicking=!manualPicking;categoryPickerRevision++;
+            }),
+            icon:const Icon(Icons.edit_outlined),
+            label:Text(manualPicking
+              ?_platformText('Свернуть выбор','Fechar seleção','Close selector')
+              :QwinStrings.t(widget.locale,'categoryChange')))),
+          if(selectedCategoryId!=null)...[
+            const SizedBox(width:8),
+            TextButton.icon(
+              onPressed:(){
+                setState((){
+                  selectedCategoryId=null;draft.olxCategoryId=null;
+                  draft.category=QwinCategory.other;draft.categorySlug=null;
+                  selectedCategoryName=null;categoryConfirmed=false;
+                  categoryAutoSuggested=false;photoLimit=null;
+                  definitions=[];attributesLoaded=false;
+                  manualPicking=true;categoryPickerRevision++;
+                });
+              },
+              icon:const Icon(Icons.close_rounded,size:17),
+              label:Text(_platformText('Убрать','Remover','Clear'))),
+          ],
+        ]),
+        if(manualPicking)...[
+          const SizedBox(height:13),
+          QwinCategoryKeywordSearch(
+            catalog:widget.store.catalog,
+            locale:widget.locale,
+            productTitle:title.text,
+            productDescription:description.text,
+            visualEvidence:suggestion?.visibleEvidence??const <String>[],
+            sellerOnly:true,
+            onSelected:(node)=>unawaited(_confirmOlxLeaf(node))),
+          const SizedBox(height:7),
+          ExpansionTile(
+            tilePadding:EdgeInsets.zero,
+            title:Text(_platformText('Полный каталог категорий',
+              'Catálogo completo','Full category catalogue')),
+            children:[
+              QwinSellerCategoryPicker(
+                key:ValueKey(categoryPickerRevision),
+                catalog:widget.store.catalog,locale:widget.locale,
+                selectedId:selectedCategoryId,initiallyOpen:true,
+                onSelected:(node){
+                  if(node!=null)unawaited(_confirmOlxLeaf(node));
+                }),
+            ]),
+        ],
+        if(categoryConfirmed&&selectedCategoryId!=null)
+          Padding(padding:const EdgeInsets.only(top:12),
+            child:Row(children:[
+              const Icon(Icons.check_circle_rounded,color:_leaf,size:18),
+              const SizedBox(width:8),
+              Expanded(child:Text(QwinStrings.t(widget.locale,'categoryConfirmed'),
+                style:const TextStyle(color:_leaf,fontWeight:FontWeight.w800))),
+            ])),
+        if(widget.store.catalog.categories.isEmpty)...[
+          const SizedBox(height:10),
+          Text(QwinStrings.t(widget.locale,'categoryUnavailable'),
+            style:const TextStyle(color:Colors.deepOrange,fontSize:12)),
+          TextButton.icon(
+            onPressed:()=>widget.store.catalog.load(force:true),
+            icon:const Icon(Icons.refresh_rounded),
+            label:Text(QwinStrings.t(widget.locale,'tryAgain'))),
+        ],
+      ])),
+    ]);
+  
