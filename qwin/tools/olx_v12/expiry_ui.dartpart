@@ -1,0 +1,18 @@
+            if(olxValidTo!=null&&olxValidTo!.isNotEmpty)...[
+              const SizedBox(height:9),
+              Text(widget.locale=='ru'
+                  ?'OLX — действует до: ${olxValidTo!.split(' ').first}'
+                  :widget.locale=='pt'
+                    ?'OLX — válido até: ${olxValidTo!.split(' ').first}'
+                    :'OLX — valid until: ${olxValidTo!.split(' ').first}',
+                style:const TextStyle(color:Colors.white,fontSize:12)),
+            ],
+            if(olxAutoExtend!=null)
+              Text(olxAutoExtend==true
+                  ?(widget.locale=='ru'?'Автопродление OLX включено':
+                     widget.locale=='pt'?'Renovação OLX ativada':
+                     'OLX auto-renew enabled')
+                  :(widget.locale=='ru'?'Автопродление OLX выключено':
+                     widget.locale=='pt'?'Renovação OLX desativada':
+                     'OLX auto-renew disabled'),
+                style:const TextStyle(color:Colors.white70,fontSize:11)),
