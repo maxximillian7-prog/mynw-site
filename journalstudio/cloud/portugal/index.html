@@ -274,7 +274,7 @@ input[type=search]{width:100%} .filters select{width:100%}
 <label><input id="publishTelegram" type="checkbox" checked><span>✈ Telegram <small>Основной канал / Афиша — по рубрике</small></span></label>
 <label><input id="publishInstagram" type="checkbox"><span>◎ Instagram <small>@pt_ryadom · отдельная очередь</small></span></label>
 </div><p class="secondary" id="publishTargetsHint" role="status">Выбрано: Telegram</p></div>
-<div class="field"><label>Канал Telegram (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field"><label for="publicationMode">Когда опубликовать?</label><select id="publicationMode"><option value="default">Автоматически — не раньше чем через 2 часа</option><option value="delay">Через заданное время</option><option value="manual">Выбрать дату и время</option></select></div><div class="field hidden" id="publicationDelayRow"><label for="publicationDelay">Через сколько?</label><select id="publicationDelay"><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="120" selected>2 часа</option><option value="180">3 часа</option><option value="360">6 часов</option><option value="720">12 часов</option><option value="1440">24 часа</option></select></div><div class="split hidden" id="publicationDateRow"><div class="field"><label for="publicationDate">Дата</label><input id="publicationDate" type="date"></div><div class="field"><label for="publicationTime">Время (Лиссабон)</label><input id="publicationTime" type="time" value="12:00"></div></div><div class="btns"><button id="approveBtn" class="btn primary">✓ Утвердить и запланировать</button></div><p id="instagramQueueStatus" class="secondary" role="status"></p>
+<div class="field"><label>Канал Telegram (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field"><label for="publicationMode">Когда опубликовать?</label><select id="publicationMode"><option value="default">Автоматически — не раньше чем через 2 часа</option><option value="now">⚡ Опубликовать сейчас</option><option value="delay">Через заданное время</option><option value="manual">Выбрать дату и время</option></select></div><div class="field hidden" id="publicationDelayRow"><label for="publicationDelay">Через сколько?</label><select id="publicationDelay"><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="120" selected>2 часа</option><option value="180">3 часа</option><option value="360">6 часов</option><option value="720">12 часов</option><option value="1440">24 часа</option></select></div><div class="split hidden" id="publicationDateRow"><div class="field"><label for="publicationDate">Дата</label><input id="publicationDate" type="date"></div><div class="field"><label for="publicationTime">Время (Лиссабон)</label><input id="publicationTime" type="time" value="12:00"></div></div><div class="btns"><button id="approveBtn" class="btn primary">✓ Утвердить и запланировать</button></div><p id="instagramQueueStatus" class="secondary" role="status"></p>
   <p class="secondary">Одно утверждение для выбранных площадок. Telegram и Instagram имеют независимые очереди. В Instagram отправляются только статьи с одобренным изображением и подтверждёнными правами.</p>
   <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
@@ -324,7 +324,12 @@ async function call(path,options={}){
  if(!r.ok)throw Error(d.error||"Ошибка редакционного сервера");
  return d;
 }
-function publicationSettings(){const mode=$("publicationMode").value;if(mode==="default")return {schedule_mode:"default"};if(mode==="delay"){const mins=Number($("publicationDelay").value);return {schedule_mode:"delay",schedule_delay_minutes:mins,delay_minutes:mins}};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function updatePublicationMode(){$("publicationDateRow").classList.toggle("hidden",$("publicationMode").value!=="manual");$("publicationDelayRow").classList.toggle("hidden",$("publicationMode").value!=="delay")}
+function publicationSettings(){const mode=$("publicationMode").value;if(mode==="now")return {schedule_mode:"now"};if(mode==="default")return {schedule_mode:"default"};if(mode==="delay"){const mins=Number($("publicationDelay").value);return {schedule_mode:"delay",schedule_delay_minutes:mins,delay_minutes:mins}};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function updatePublicationMode(){
+ const mode=$("publicationMode").value;
+ $("publicationDateRow").classList.toggle("hidden",mode!=="manual");
+ $("publicationDelayRow").classList.toggle("hidden",mode!=="delay");
+ $("approveBtn").textContent=mode==="now"?"⚡ Утвердить и опубликовать сейчас":"✓ Утвердить и запланировать";
+}
 function gather(){return{style:$("style").value,target_subcategory:$("subcategory").value,headline_ru:$("headline").value,hook_ru:$("hook").value,lead_ru:$("lead").value,story_ru:$("story").value,why_matters_ru:$("why").value,needs_more_facts:$("needsMoreFacts").checked,image_needed:$("imageNeeded").checked,image_choice:$("imageChoice").value,image_exception_reason:$("imageException").value}}
 function fill(item){const i=item.article;
  if(i.id!==lastArticleDestinationChoice){
@@ -688,7 +693,9 @@ async function approveAndQueue(){
     try{
      const result=await call("/api/action",{method:"POST",body:{item_id:id,action:"approve_and_queue",note,...schedule}});
      approved=!!result.approved||approved;
-     if(result.queued||result.sent)completed.push("Telegram"+(result.sent?" (уже опубликовано)":" — "+lisbonSchedule(result.scheduled_for)));
+     if(result.queued||result.sent)completed.push(schedule.schedule_mode==="now"?
+ ("Telegram — "+(result.sent?"опубликовано":"отправка запущена")):
+ ("Telegram"+(result.sent?" (уже опубликовано)":" — "+lisbonSchedule(result.scheduled_for))));
      else errors.push("Telegram: "+(result.warning||"не подтверждена постановка в очередь"));
     }catch(e){errors.push("Telegram: "+e.message)}
    }else if(!approved){
@@ -710,13 +717,16 @@ async function approveAndQueue(){
   if(approved&&sendTg&&me.user.role!=="owner"){
    try{
     const result=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",note,...schedule}});
-    completed.push("Telegram — "+lisbonSchedule(result.scheduled_for));
+    completed.push(schedule.schedule_mode==="now"?"Telegram — "+(result.sent?"опубликовано":"отправка запущена"):"Telegram — "+lisbonSchedule(result.scheduled_for));
    }catch(e){errors.push("Telegram: "+e.message)}
   }
   if(approved&&sendIg){
    try{
     const result=await bufferCall("/api/instagram/schedule",{method:"POST",body:{item_id:id,...schedule}});
-    completed.push("Instagram"+(result.already_scheduled?" (уже запланировано)":" — "+lisbonSchedule(result.scheduled_for)));
+    completed.push(result.already_scheduled?
+ "Instagram (уже запланировано)":
+ schedule.schedule_mode==="now"?"Instagram — "+(result.published?"опубликовано":"команда немедленной отправки принята"):
+ "Instagram — "+lisbonSchedule(result.scheduled_for));
    }catch(e){errors.push("Instagram: "+e.message)}
   }
   if(!approved)errors.push("Редакционное утверждение не подтверждено");
