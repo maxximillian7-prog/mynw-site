@@ -31,12 +31,13 @@ async function audit(id,u,action,note="",before={},after={}){await sql("INSERT I
 async function detail(id){
  const rows=await sql("SELECT i.*,s.name AS source_name,s.code AS source_code,s.verification_status,s.rights_policy,d.id AS draft_id,d.status AS editorial_status,d.style,d.headline_ru,d.hook_ru,d.lead_ru,d.story_ru,d.why_matters_ru,d.context_verified,d.needs_more_facts,d.image_needed,d.image_choice,d.image_exception_reason,d.target_subcategory,d.editorial_note,d.updated_at AS draft_updated_at,d.source_context_used,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score AS editorial_value_score,pr_telegram_hashtag(i.primary_category) AS category_hashtag,pr_build_telegram_post(i.id) AS telegram_text,pr_build_telegram_caption(i.id) AS telegram_caption FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id CROSS JOIN LATERAL pr_intake_check(i.id) q WHERE i.id=$1::uuid",[id]);
  if(!rows.length)throw err("Статья не найдена",404);
- const [media,evidence,comments,revisions]=await Promise.all([
+ const [media,evidence,comments,revisions,publications]=await Promise.all([
   sql("SELECT id,media_type,status,public_url,rights_verified,illustration_label_required,attribution,license_details,storage_bucket,storage_key,generation_model,created_at FROM pr_media_assets WHERE item_id=$1::uuid ORDER BY CASE WHEN media_type='brand_generic' THEN 1 ELSE 0 END,created_at DESC",[id]),
   sql("SELECT evidence_url,evidence_type,claim_summary,verified_at FROM pr_item_evidence WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 15",[id]),
   sql("SELECT id,actor_role,body,created_at FROM pr_editorial_comments WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 30",[id]),
-  sql("SELECT id,action,note,created_at FROM pr_editorial_revisions WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 30",[id])]);
- return {article:rows[0],media,evidence,comments,revisions};
+  sql("SELECT id,action,note,created_at FROM pr_editorial_revisions WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 30",[id]),
+  sql("SELECT id,destination_code,status,scheduled_for,sent_at FROM pr_posts WHERE item_id=$1::uuid ORDER BY created_at DESC LIMIT 10",[id])]);
+ return {article:rows[0],media,evidence,comments,revisions,publications};
 }
 async function save(u,p){
  access(u);const id=p.item_id;if(!uuid(id))throw err("Неверный ID");
@@ -108,8 +109,10 @@ async function action(u,p){
   if(i.status!=="approved"||i.editorial_status!=="approved")throw err("Сначала утвердите статью",409);
   const [gate]=await sql("SELECT allowed,reason FROM pr_item_publication_check($1::uuid)",[id]);if(!gate?.allowed)throw err("Публикация заблокирована: "+gate?.reason,409);
   const destination=p.destination==="afisha"?"afisha":"main";
-  await sql("INSERT INTO pr_posts(item_id,destination_code,status) VALUES($1::uuid,$2,'queued') ON CONFLICT(item_id,destination_code) DO NOTHING",[id,destination]);
-  await audit(id,u,a,note,{}, {destination});return{ok:true,queued:true,sent:false};
+  const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_enqueue_publication_slot($1::uuid,$2::text)",[id,destination]);
+  if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
+  await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for});
+  return{ok:true,queued:true,sent:false,post_id:reservation.post_id,scheduled_for:reservation.scheduled_for};
  }
  throw err("Неизвестная операция");
 }
@@ -125,7 +128,7 @@ export default {async fetch(req){
    const categories=await sql("SELECT code,parent_code,name_ru,icon,sort_order,CASE WHEN parent_code IS NULL THEN telegram_hashtag ELSE pr_telegram_hashtag(code) END AS telegram_hashtag FROM pr_categories WHERE is_active=true ORDER BY sort_order,name_ru");return json({categories},200,origin);
   }
   if(req.method==="GET"&&route==="/api/summary"){
-   const [summary]=await sql("SELECT (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate') AS incoming,(SELECT count(*) FROM pr_story_drafts WHERE status='needs_facts') AS needs_facts,(SELECT count(*) FROM pr_story_drafts WHERE status='draft') AS drafts,(SELECT count(*) FROM pr_story_drafts WHERE status='approved') AS approved,(SELECT count(*) FROM pr_media_assets WHERE status='generated') AS images_to_approve,(SELECT count(*) FROM pr_posts WHERE status='queued') AS queued,(SELECT count(*) FROM pr_posts WHERE status='sent') AS sent");return json({summary},200,origin);
+   const [summary]=await sql("SELECT (SELECT count(*) FROM pr_editorial_intake_dashboard q JOIN pr_items i ON i.id=q.item_id WHERE q.ready=true AND i.status='candidate') AS incoming,(SELECT count(*) FROM pr_story_drafts WHERE status='needs_facts') AS needs_facts,(SELECT count(*) FROM pr_story_drafts WHERE status='draft') AS drafts,(SELECT count(*) FROM pr_story_drafts WHERE status='approved') AS approved,(SELECT count(*) FROM pr_media_assets WHERE status='generated') AS images_to_approve,(SELECT count(*) FROM pr_posts WHERE status IN ('queued','scheduled')) AS queued,(SELECT count(*) FROM pr_posts WHERE status='sent') AS sent");return json({summary},200,origin);
   }
   if(req.method==="GET"&&route==="/api/articles"){
    const status=["all","incoming","preparing","needs_facts","draft","approved","rejected","queued"].includes(u.searchParams.get("status"))?u.searchParams.get("status"):"all",cat=cut(u.searchParams.get("category")||"all",80),search=cut(u.searchParams.get("q")||"",90);
@@ -138,7 +141,7 @@ export default {async fetch(req){
  (SELECT m.status FROM pr_media_assets m WHERE m.item_id=i.id
  ORDER BY CASE WHEN m.public_url IS NOT NULL THEN 0 ELSE 1 END, CASE WHEN m.media_type='brand_generic' THEN 1 ELSE 0 END,m.created_at DESC LIMIT 1) AS media_status,
  q.preview_image_url AS media_preview_url,
- (SELECT count(*) FROM pr_posts p WHERE p.item_id=i.id AND p.status='queued') AS queued_count,
+ (SELECT count(*) FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')) AS queued_count,
  ROW_NUMBER() OVER(PARTITION BY i.primary_category ORDER BY q.value_score DESC,i.discovered_at DESC) AS category_rank
  FROM pr_items i
  JOIN pr_sources s ON s.id=i.source_id
@@ -147,7 +150,7 @@ export default {async fetch(req){
  WHERE i.duplicate_of IS NULL
  AND ($1='all' OR ($1='incoming' AND q.ready=true AND i.status='candidate')
  OR ($1='preparing' AND q.ready=false AND i.status='candidate')
- OR ($1='queued' AND EXISTS(SELECT 1 FROM pr_posts p WHERE p.item_id=i.id AND p.status='queued'))
+ OR ($1='queued' AND EXISTS(SELECT 1 FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')))
  OR d.status=$1)
  AND ($2='all' OR i.primary_category=$2)
  AND ($3='' OR COALESCE(d.headline_ru,i.title_ru,i.title_original) ILIKE '%'||$3||'%' OR s.name ILIKE '%'||$3||'%')
