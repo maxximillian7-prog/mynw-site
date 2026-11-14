@@ -144,7 +144,7 @@ async function selectApproved(id,mediaId){
  return {selected:true,media_id:mediaId,photo_url:a.public_url};
 }
 
-const BKT="pr-editorial-media",AI_COVER_MODEL="gpt-5",GENERATOR_NAME="neon-gpt5-image-medium";
+const BKT="pr-editorial-media",AI_COVER_MODEL="gpt-image-2.5-flare",GENERATOR_NAME="openai-gpt-image-2.5-flare-medium";
 const hashHex=x=>createHash("sha256").update(x).digest("hex");
 const hmac=(key,input)=>createHmac("sha256",key).update(input).digest();
 async function putCover(key,image){
@@ -188,25 +188,25 @@ async function generateMediumCover(itemId){
  const reserved=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,status,rights_verified,illustration_label_required) VALUES($1::uuid,$2::uuid,'generated_illustration',$3,$4,'generating',false,true) ON CONFLICT DO NOTHING RETURNING id",[itemId,draft.draft_id,GENERATOR_NAME,prompt.slice(0,2000)]);
  const mid=reserved[0]?.id;if(!mid)throw bad("Генерация для этой статьи уже выполняется",409);
  try{
-  const token=process.env.NEON_AI_GATEWAY_TOKEN,host=process.env.NEON_AI_GATEWAY_BASE_URL;
-  if(!token||!host)throw bad("Нейросетевая генерация Neon недоступна",503);
-  const request={model:AI_COVER_MODEL,input:prompt,tools:[{type:"image_generation",size:"1536x1024",quality:"medium",output_format:"jpeg",output_compression:82}],tool_choice:{type:"image_generation"},store:false};
-  const response=await fetch(host.replace(/\/$/,"")+"/openai/v1/responses",{
+  // The OpenAI API key belongs to the server, never to the Journal Studio browser.
+  // This endpoint intentionally bypasses Neon AI Gateway; Neon is only the database and media store.
+  const token=process.env.OPENAI_API_KEY;
+  if(!token)throw bad("Для генерации обложек не подключён OPENAI_API_KEY к функции prphoto",503);
+  const request={model:AI_COVER_MODEL,prompt,n:1,size:"1536x1024",quality:"medium",output_format:"jpeg",output_compression:82};
+  const response=await fetch("https://api.openai.com/v1/images/generations",{
     method:"POST",headers:{"authorization":"Bearer "+token,"content-type":"application/json"},
     body:JSON.stringify(request),signal:AbortSignal.timeout(160000)
   });
   const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw bad("Сервис генерации вернул "+response.status+": "+plain(data.error?.message||"ошибка провайдера").slice(0,120),503);
-  const imageCall=(data.output||[]).find(x=>x.type==="image_generation_call"&&x.status==="completed"&&x.result);
-  if(!imageCall)throw bad("Изображение не получено от AI Gateway",502);
-  const encoded=imageCall.result;
+  if(!response.ok)throw bad("OpenAI Images API: "+response.status+" — "+plain(data.error?.message||"ошибка провайдера").slice(0,120),response.status===429?429:503);
+  const encoded=data.data?.[0]?.b64_json;
   if(typeof encoded!=="string"||encoded.length<20000||encoded.length>5500000)throw bad("Некорректный размер созданной фотографии",502);
   const bytes=Buffer.from(encoded,"base64");
-  if(bytes.byteLength<12000||bytes.byteLength>3500000||bytes[0]!==0xff||bytes[1]!==0xd8)throw bad("AI Gateway не вернул корректное JPEG-изображение",502);
+  if(bytes.byteLength<12000||bytes.byteLength>3500000||bytes[0]!==0xff||bytes[1]!==0xd8)throw bad("OpenAI не вернул корректное JPEG-изображение",502);
   const key="ai-covers/"+itemId+"/"+mid+".jpg";
   const publicURL=await putCover(key,bytes);
   const caption="AI-иллюстрация · создана для журнала «Португалия рядом»";
-  const details="AI-generated editorial illustration (Medium); Neon AI Gateway; one image; not documentary; manual approval required";
+  const details="AI-generated editorial illustration (Medium); OpenAI Images API; one image; not documentary; manual approval required";
   await db("UPDATE pr_media_assets SET storage_bucket=$2,storage_key=$3,public_url=$4,attribution=$5,license_details=$6,rights_verified=true,status='candidate',failure_reason=NULL WHERE id=$1::uuid AND status='generating'",[mid,BKT,key,publicURL,caption,details]);
   return {media_id:mid,photo_url:publicURL,quality:"medium",media_type:"generated_illustration",ai_label:caption,needs_approval:true};
  }catch(e){
@@ -217,7 +217,7 @@ async function generateMediumCover(itemId){
 
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:8,medium_generation_configured:Boolean(process.env.NEON_AI_GATEWAY_TOKEN&&process.env.NEON_AI_GATEWAY_BASE_URL&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:9,image_provider:"openai",image_model:AI_COVER_MODEL,medium_generation_configured:Boolean(process.env.OPENAI_API_KEY&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
 try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
