@@ -1,0 +1,11 @@
+      if(inOlx)SwitchListTile.adaptive(
+        contentPadding:EdgeInsets.zero,
+        title:Text(_platformText('Автопродление объявления OLX',
+          'Renovação automática do anúncio OLX','Automatically renew OLX advert')),
+        subtitle:Text(_platformText(
+          'Выключено по умолчанию. OLX может взимать плату при продлении, если бесплатный лимит исчерпан.',
+          'Desativado por defeito. O OLX pode cobrar pela renovação se o limite gratuito for excedido.',
+          'Off by default. OLX may charge for renewal if your free limit is exceeded.'),
+          style:const TextStyle(fontSize:11)),
+        value:olxAutoExtend,
+        onChanged:(v)=>setState(()=>olxAutoExtend=v)),
