@@ -301,22 +301,22 @@ async function photoCall(path,options={}){
  return data;
 }
 function choosePreviewPhoto(){
- const i=current?.article||{},media=(current?.media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
+ const i=current?.article||{},media=(current?.media||[]).filter(m=>m.public_url&&((m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type))||(m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&current?.article?.source_code==="trailyo_events"))&&["candidate","approved"].includes(m.status));
  return media.find(m=>m.id===previewPhotoId)||media.find(m=>m.public_url===i.photo_url&&m.status==="approved")||media.find(m=>m.status==="approved")||media.find(m=>m.public_url===i.photo_url)||media[0]||null;
 }
 function renderMedia(media){
- const area=$("mediaArea");const options=(media||[]).filter(m=>m.public_url&&m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type)&&["candidate","approved"].includes(m.status));
+ const area=$("mediaArea");const options=(media||[]).filter(m=>m.public_url&&((m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type))||(m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&current?.article?.source_code==="trailyo_events"))&&["candidate","approved"].includes(m.status));
  if(!options.length){area.innerHTML='<div class="imagePending">🖼 Фотографий для этой статьи пока нет. Воспользуйтесь поиском ниже.</div>';return;}
  const chosen=choosePreviewPhoto(),canChange=!!me?.user?.edit&&current?.article?.status==="candidate";
  area.innerHTML='<div class="pt-photo-gallery">'+options.map(m=>{
   const active=chosen?.id===m.id;
   return '<button type="button" class="pt-photo-choice '+(active?"selected":"")+'" data-media-preview="'+escapeHtml(m.id)+'" aria-pressed="'+active+'" title="Показать в телефоне">'+
   '<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Вариант обложки">'+
-  '<span>'+(m.media_type==='generated_illustration'?'📷 AI-изображение · ':'')+(m.status==="approved"?"✓ Утверждено":"● На проверке")+'</span></button>';
+  '<span>'+(m.generation_model==="trailyo_existing_image_reference"?"🎭 Фото Trailyo · ":m.media_type==='generated_illustration'?'📷 AI-изображение · ':'')+(m.status==="approved"?"✓ Утверждено":"● На проверке")+'</span></button>';
  }).join("")+'</div><div class="pt-photo-row"><span class="secondary">'+(chosen?chosen.status==="approved"?"✓ Выбрано утверждённое фото":"Выбрано фото-кандидат":"Выберите обложку")+'</span>'+
  (canChange&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
  (canChange&&chosen?.status==="approved"&&chosen.public_url!==current?.article?.photo_url?'<button type="button" class="btn primary" id="setApprovedCover">✓ Сделать обложкой</button>':"")+
- '</div>'+(chosen?.attribution?'<div class="faint">'+(chosen.media_type==='generated_illustration'?'📷 AI-изображение · ':'Автор и лицензия: ')+escapeHtml(chosen.attribution)+'</div>':"");
+ '</div>'+(chosen?.attribution?'<div class="faint">'+(chosen.generation_model==="trailyo_existing_image_reference"?'Trailyo · изображение без проверки лицензии: ':chosen.media_type==='generated_illustration'?'📷 AI-изображение · ':'Автор и лицензия: ')+escapeHtml(chosen.attribution)+'</div>':"");
  area.querySelectorAll("[data-media-preview]").forEach(button=>button.onclick=()=>{previewPhotoId=button.dataset.mediaPreview;renderMedia(current?.media);renderPreview();});
  const apply=$("applySelectedPhoto");
  if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
@@ -399,7 +399,22 @@ function renderRichArticleText(value){
   return '<p class="richParagraph">'+result+'</p>';
  }).join("");
 }
-function renderTelegramMessage(text){
+function previewLink(word,href){
+ try{const u=new URL(href);if(u.protocol!=="https:"||u.username||u.password)return escapeHtml(word);
+  return '<a href="'+escapeHtml(u.href)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(word)+'</a>';
+ }catch{return escapeHtml(word)}
+}
+function previewFooterLine(text){
+ const line=String(text||"").trim(),urls=[...line.matchAll(/https:\/\/[^\s<>"']+/g)].map(m=>m[0].replace(/[.,;!?]+$/,""));
+ if(/^Источник\s*:/i.test(line)&&urls.length)return previewLink("Источник",urls[0]);
+ if(/^Фото\s*:/i.test(line)&&urls.length){
+  const url=urls.find(x=>/(?:файл|оригинал)\s*:\s*$/i.test(line.slice(0,line.indexOf(x))))||urls[urls.length-1];
+  const info=line.replace(/^Фото\s*:\s*/i,"").replace(url,"").replace(/(?:файл|оригинал)\s*:\s*/gi,"").trim().replace(/[;·,\s]+$/,"");
+  return previewLink("Фото",url)+(info?" — "+escapeHtml(info):"");
+ }
+ return escapeHtml(line).replace(/https:\/\/[^\s&<]+/g,m=>previewLink("Ссылка",m));
+}
+function renderTelegramMessage(text,isAfisha=false){
  const content=String(text||"").trim();
  const idx=content.lastIndexOf("\n\nИсточник: ");
  const body=idx>=0?content.slice(0,idx):content;
@@ -409,9 +424,10 @@ function renderTelegramMessage(text){
  let html='<div class="pt-message-title">'+escapeHtml(heading)+'</div>'+blocks.map(renderRichArticleText).join("");
  if(footer){
   const lines=footer.split("\n");
-  html+='<div class="pt-source">'+lines.filter(x=>!x.startsWith("#")).map(escapeHtml).join("<br>")+'</div>'+
+  html+='<div class="pt-source">'+lines.filter(x=>!x.startsWith("#")).map(previewFooterLine).join("<br>")+'</div>'+
    '<div class="pt-hashtags">'+lines.filter(x=>x.startsWith("#")).map(escapeHtml).join("<br>")+'</div>';
  }
+ if(isAfisha)html+='<div class="pt-source">Больше событий в приложении '+previewLink("Trailyo","https://apps.apple.com/us/app/trailyo-events-in-portugal/id6832330654")+'.</div>';
  return html;
 }
 function activeTags(i){
@@ -423,7 +439,7 @@ function renderPreview(){
  const f=gather(),i=current.article||{},img=choosePreviewPhoto();
  const url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
  const tag=i.category_hashtag||categories.find(x=>x.code===i.primary_category)?.telegram_hashtag||"";
- const topicTags=activeTags(i),credit=img?.attribution||i.photo_attribution||"";
+ const topicTags=activeTags(i),credit=img?.generation_model==="trailyo_existing_image_reference"?"Фото: "+(img.attribution||"Trailyo")+"; Файл: "+img.public_url:(img?.attribution||i.photo_attribution||"");
  const body=[f.headline_ru,f.story_ru,f.why_matters_ru].map(x=>String(x||"").trim()).filter(Boolean).join("\n\n");
  const tail=["Источник: "+url,credit,topicTags,tag].filter(Boolean).join("\n");
  const localFull=body+"\n\n"+tail;
@@ -433,7 +449,7 @@ function renderPreview(){
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
  const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">📷 AI-изображение · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
- const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full)+'</div>'+timestamp+'</article>';
+ const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.primary_category==="events")+'</div>'+timestamp+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  $("modePhone").classList.toggle("selected",previewMode==="phone");$("modeArticle").classList.toggle("selected",previewMode==="article");
  $("modePhone").setAttribute("aria-pressed",previewMode==="phone"?"true":"false");
