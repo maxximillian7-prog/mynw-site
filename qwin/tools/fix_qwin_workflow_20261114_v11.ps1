@@ -166,7 +166,31 @@ if(-not $market.Contains('_queueQwinServerSearch()')){
   # Legacy branch can still filter its in-memory Qwin feed.
   $market=$market.Replace('                            _queueQwinServerSearch();','')
 }
+# Hide the separate eBay Browse banner even if its URL exists in the build.
+$ebayWidget='SliverToBoxAdapter(child:QwinEbayProductionSearch('
+$widgetAt=$market.IndexOf($ebayWidget,[StringComparison]::Ordinal)
+if($widgetAt -ge 0){
+  $from=[Math]::Max(0,$widgetAt-135)
+  $recent=$market.Substring($from,$widgetAt-$from)
+  if(-not $recent.Contains('if(widget.store.neon?.ebayEnabled==true)')){
+    $market=$market.Insert($widgetAt,
+      'if(widget.store.neon?.ebayEnabled==true) ')
+  }
+}
 $xp=$xp.Substring(0,$marketStart)+$market+$xp.Substring($marketEnd)
+# Protect any old external eBay product tile and direct deep-link.
+$oldCard="if(listing.isExternal)const Text('eBay '+[char]183+' Portugal'"
+$newCard="if(listing.isExternal&&store.neon?.ebayEnabled==true)const Text('eBay '+[char]183+' Portugal'"
+$xp=$xp.Replace($oldCard,$newCard)
+$direct='if(item.isExternal)return _ebayItemDetail(item);'
+if($xp.Contains($direct)){
+  $replacement="if(item.isExternal){"+[char]10+
+    "      if(widget.store.neon?.ebayEnabled!=true)"+[char]10+
+    "        return Scaffold(appBar:AppBar(),"+[char]10+
+    "          body:Center(child:Text(QwinStrings.t(widget.locale,'itemUnavailable'))));"+[char]10+
+    "      return _ebayItemDetail(item);"+[char]10+"    }"
+  $xp=$xp.Replace($direct,$replacement)
+}
 
 # Seller category: one AI-selected official leaf, confirmation, manual change.
 $xp=Replace-Section $xp 'Widget _categoryStep()' 'List<String> _guidedQuestions()' $category
