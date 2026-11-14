@@ -328,11 +328,13 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  for(const id of ["changesBtn","rejectBtn","reopenBtn"])$(id).disabled=!me?.user?.approve;
  $("changesBtn").disabled=!me?.user?.edit;
  const isApproved=i.status==="approved"&&i.editorial_status==="approved";
- $("approveBtn").textContent=isApproved?"↗ Запланировать публикацию":"✓ Утвердить и запланировать";
+ $("approveBtn").textContent=isApproved?"↗ Запланировать публикацию":"✓ Утвердить";
  $("approveBtn").disabled=!me?.user?.approve||approvalPending||i.status==="rejected"||i.status==="expired";
  $("destination").disabled=true; // Prevent cross-channel routing; server enforces category classification.
  $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected"||i.editorial_status==="approved");
- $("approvalWarning").textContent=i.intake_ready?"Техническая приёмка пройдена. Перед окончательным утверждением редактор проверяет содержание, исходную ссылку и права на иллюстрацию.":(reasons.length===1&&reasons[0]==="Полезность и интерес для читателей не подтверждены"?"Автоматическая оценка интереса недостаточна. При утверждении владелец редакции сможет вручную подтвердить ценность материала после просмотра; оценка ИИ останется в истории.":"Неполный материал не может быть утверждён. Нужно исправить: "+reasons.join("; "));
+ $("approvalWarning").textContent=me?.user?.role==="owner"
+ ? (i.intake_ready?"Приёмка пройдена. Одно нажатие «Утвердить» сохранит решение и запланирует публикацию.":"Приёмка не пройдена: "+(reasons.join("; ")||"есть замечания")+". Нажатие «Утвердить» зафиксирует исключения под ответственность владельца и попытается запланировать публикацию. Если нет пригодного текста, даты или изображения, материал будет утверждён, но не отправлен.")
+ : (i.intake_ready?"Техническая приёмка пройдена.":"Приёмка не пройдена: "+reasons.join("; "));
  dirty=false;renderMedia(item.media);renderHistory(item);renderPreview();
 }
 const PHOTO_API="https://br-young-paper-b972wmgd-prphoto.compute.c-7.eu-central-1.aws.neon.tech";
@@ -585,47 +587,51 @@ async function refreshSelected(){if(current){const id=current.article.id;current
 async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;await call("/api/save",{method:"POST",body:{item_id:current.article.id,fields:gather()}});dirty=false;toast("Изменения сохранены");await refreshSelected()}catch(e){toast(e.message,true)}finally{$("saveBtn").disabled=false}}
 async function approveAndQueue(){
  if(!current||approvalPending||!me?.user?.approve)return;
- const id=current.article.id,destination=$("destination").value,note=$("note").value;let schedule;try{schedule=publicationSettings()}catch(e){toast(e.message,true);return}
- let approved=current.article.status==="approved"&&current.article.editorial_status==="approved";
- approvalPending=true;$("approveBtn").disabled=true;$("destination").disabled=true;
+ const id=current.article.id,note=$("note").value;
+ let schedule;
+ try{schedule=publicationSettings()}catch(e){toast(e.message,true);return}
+ approvalPending=true;$("approveBtn").disabled=true;
  try{
   if(dirty){
-   if(approved)throw Error("Утверждённую статью сначала нужно вернуть к правкам");
+   if(current.article.status==="approved")throw Error("Утверждённую статью сначала нужно вернуть к правкам");
    await call("/api/save",{method:"POST",body:{item_id:id,fields:gather()}});
    dirty=false;
   }
-  let latest=await call("/api/article?id="+encodeURIComponent(id));
-  approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
-  if(!approved&&!latest.article.intake_ready){
-   const issues=Array.isArray(latest.article.intake_issues)?latest.article.intake_issues:[];
-   const valueIssue="Полезность и интерес для читателей не подтверждены";
-   if(issues.length!==1||issues[0]!==valueIssue)throw Error("Сначала исправьте проблемы приёмки: "+(issues.join("; ")||"неполный материал"));
-   const score=Number(latest.article.editorial_value_score)||0;
-   const decision=confirm("Автоматическая оценка интереса для читателей — "+score+" баллов и ниже установленного порога. Вы лично изучили статью и подтверждаете её ценность для аудитории? В этом случае решение будет записано в историю редакции. Данные, факты и фото по-прежнему будут проверяться.");
-   if(!decision)throw Error("Редакционная ценность не подтверждена. Публикация не выполнялась.");
-   await call("/api/action",{method:"POST",body:{item_id:id,action:"confirm_value",confirm_value:true,reason:"Редактор изучил материал и лично подтвердил интерес для читателей, несмотря на низкую автоматическую оценку."}});
-   latest=await call("/api/article?id="+encodeURIComponent(id));
-   if(!latest.article.intake_ready)throw Error("Материал всё ещё не готов: "+(latest.article.intake_issues||[]).join("; "));
-  }
-  if(!approved){
-   // The editor's approval click records the factual sign-off. This is human
-   // attestation against a source, not an independent automated fact-check.
-   if(!latest.article.source_fact_checked||!latest.article.context_verified||!(latest.evidence||[]).length){
-    const evidenceUrl=$("evidence").value.trim();
-    let source;
-    try{source=new URL(evidenceUrl)}catch{}
-    if(!source||source.protocol!=="https:")throw Error("Укажите HTTPS-ссылку на проверенный первоисточник");
-    const verificationNote=note.trim().length>=12?note.trim():"Редактор подтвердил соответствие публикации указанному первоисточнику при утверждении.";
-    await call("/api/action",{method:"POST",body:{item_id:id,action:"verify_facts",evidence_url:evidenceUrl,note:verificationNote}});
+  if(me.user.role==="owner"){
+   // Exactly one editorial decision. The server records acceptance warnings
+   // unchanged, signs the owner's override, approves and queues atomically.
+   const result=await call("/api/action",{method:"POST",body:{
+    item_id:id,action:"approve_and_queue",note,...schedule
+   }});
+   if(result.sent){
+    toast("✓ Эта статья уже опубликована — повторная отправка не выполнялась.");
+   }else if(result.queued){
+    const exceptions=(result.issues||[]).length;
+    toast("✓ Утверждено"+(exceptions?" под ответственность редактора ("+exceptions+" замечаний приёмки сохранены)":"")+
+      ". Публикация: "+lisbonSchedule(result.scheduled_for)+".");
+   }else if(result.approved){
+    toast("✓ Материал утверждён. "+(result.warning||"Постановка в очередь ожидает исправления технической проблемы."),true);
+   }else{
+    throw Error("Сервер не подтвердил утверждение");
    }
-   await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
-   approved=true;
+  }else{
+   // Editors without owner privileges retain mandatory acceptance checks.
+   let latest=await call("/api/article?id="+encodeURIComponent(id));
+   if(!latest.article.intake_ready)throw Error("Не пройдена приёмка: "+(latest.article.intake_issues||[]).join("; "));
+   let approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
+   if(!approved){
+    if(!latest.article.source_fact_checked||!latest.article.context_verified||!(latest.evidence||[]).length){
+     const evidenceUrl=$("evidence").value.trim(),verificationNote=note.trim().length>=12?note.trim():"Редактор проверил содержание по первоисточнику.";
+     if(!/^https:\/\//i.test(evidenceUrl))throw Error("Укажите проверенный HTTPS-первоисточник");
+     await call("/api/action",{method:"POST",body:{item_id:id,action:"verify_facts",evidence_url:evidenceUrl,note:verificationNote}});
+    }
+    await call("/api/action",{method:"POST",body:{item_id:id,action:"approve",note}});
+   }
+   const result=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",note,...schedule}});
+   toast("✓ Утверждено и запланировано: "+lisbonSchedule(result.scheduled_for));
   }
-  const scheduled=await call("/api/action",{method:"POST",body:{item_id:id,action:"queue",destination,note,...schedule}});
-  if(schedule.schedule_mode==="manual"&&(!scheduled.scheduled_for||Math.abs(Date.parse(scheduled.scheduled_for)-Date.parse(schedule.scheduled_for))>60000))throw Error("Сервер не принял ручное время. Материал уже утверждён, но поставлен в автоматическую очередь. Не нажимайте повторно — требуется исправление API.");
-   toast(scheduled.destination==="afisha"?"🎭 Афиша: материал утверждён. Отправка при ближайшей проверке очереди.":"📰 Главное: не раньше "+lisbonSchedule(scheduled.scheduled_for)+" · интервал ≥2 часов, ночью 00:00–08:00 не отправляем.");
  }catch(e){
-  toast((approved?"Статья утверждена, но очередь не подтверждена: ":"Утверждение заблокировано: ")+e.message,true);
+  toast("Не удалось завершить согласование: "+e.message,true);
  }finally{
   approvalPending=false;
   try{await refreshSelected()}catch(e){toast("Обновите карточку: "+e.message,true)}
