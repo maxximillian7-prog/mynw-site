@@ -96,6 +96,13 @@ input[type=search]{width:100%} .filters select{width:100%}
 .pt-chat-body .pt-source{margin:10px 0 0;padding-top:7px;border-top:1px solid #eaf0ee;font-size:10.5px;color:#66807e;overflow-wrap:anywhere}
 .pt-chat-body .pt-hashtags{margin-top:8px;font-size:11.3px;color:#2080ad;word-break:break-word}
 .pt-message-footer{text-align:right;color:#839491;font-size:10px;padding:0 11px 8px}
+/* The real inline keyboard is attached after Telegram confirms delivery by ptnav. */
+.pt-post-nav-preview{display:flex;gap:1px;padding:1px;background:#e0eee8;border-top:1px solid #dbeae3}
+.pt-post-nav-preview a{flex:1;text-align:center;background:#f5fbf8;color:#16817d;font-size:11px;font-weight:750;padding:10px 3px;text-decoration:none}
+.pt-post-nav-preview a:first-child{border-bottom-left-radius:9px}
+.pt-post-nav-preview a:last-child{border-bottom-right-radius:9px}
+.pt-post-nav-preview a:hover{background:#d7f1e8}
+
 .pt-phone-bottom{background:#fff;border-top:1px solid #e2e9e7;height:51px;display:flex;justify-content:space-around;align-items:center;color:#7c9692;font-size:15px}
 .pt-photo-prompt{min-height:160px;display:grid;place-items:center;padding:20px;text-align:center;color:#597c76;font-size:12px}
 .pt-screen-notice{font-size:11px;color:#69817c;text-align:center;margin-top:9px}
@@ -515,7 +522,9 @@ function renderPreview(){
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
  const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">📷 AI-изображение · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
- const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events",i.trailyo_event,img?.public_url||i.photo_url)+'</div>'+timestamp+'</article>';
+ const mainNavPreview=i.source_code!=="trailyo_events"?
+   '<nav class="pt-post-nav-preview" aria-label="Кнопки после публикации"><a href="https://t.me/pt_afisha" target="_blank" rel="noopener noreferrer">🎭 Афиша</a><a href="https://t.me/pt_ryadom_chat" target="_blank" rel="noopener noreferrer">💬 Чат и темы</a></nav>':"";
+  const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events",i.trailyo_event,img?.public_url||i.photo_url)+'</div>'+timestamp+mainNavPreview+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  $("modePhone").classList.toggle("selected",previewMode==="phone");$("modeArticle").classList.toggle("selected",previewMode==="article");
  $("modePhone").setAttribute("aria-pressed",previewMode==="phone"?"true":"false");
@@ -528,7 +537,7 @@ function renderPreview(){
    '<div class="pt-phone-bottom"><span>🔕</span><span style="flex:1;padding-left:18px;font-size:12px">Отключить звук</span><span>↗</span></div>'+
    '</div></div>';
   const scroller=$("ptChatScroll");if(scroller)scroller.scrollTop=oldTop;
-  $("previewHint").textContent=img?"Rich Message: фотография, заголовок, подзаголовки и полный текст — в одной публикации Telegram.":"Для полноценной публикации нужна утверждённая фотография.";
+  $("previewHint").textContent=img?(i.source_code==="trailyo_events"?"Rich Message: фото и текст в одной публикации.":"Rich Message: фото, текст и навигационные кнопки. Кнопки прикрепляются после отправки в Telegram, обычно в течение минуты."):"Для полноценной публикации нужна утверждённая фотография.";
   if(full.length>28000)$("previewHint").textContent="⚠️ Текст длиннее 28000 символов — сократите его перед отправкой.";
  }else{
   root.innerHTML='<article class="pt-article-view">'+
