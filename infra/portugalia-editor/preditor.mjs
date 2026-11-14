@@ -74,7 +74,7 @@ async function action(u,p){
  if(a==="approve_media"||a==="reject_media"){
   const m=media.find(x=>x.id===p.media_id);if(!m)throw err("Изображение не найдено",404);
   if(a==="approve_media"){
-   const authorizedAI=m.media_type==="generated_illustration"&&m.illustration_label_required===true&&m.storage_bucket==="pr-editorial-media"&&!!m.storage_key&&["neon-gpt5-image-medium","openai-gpt-image-2.5-flare-medium"].includes(m.generation_model);
+   const authorizedAI=m.media_type==="generated_illustration"&&m.illustration_label_required===true&&m.storage_bucket==="pr-editorial-media"&&!!m.storage_key&&["neon-gpt5-image-medium","openai-gpt-image-2.5-flare-medium","trailyo_original_ai_import"].includes(m.generation_model);
    if(!m.public_url||!m.rights_verified||!["licensed_original","owned_original"].includes(m.media_type)&&!authorizedAI||m.status!=="candidate"||m.media_type==="licensed_original"&&(!m.attribution||!m.license_details))throw err("Можно одобрить только реальное фото с проверенными правами либо AI-иллюстрацию с подтверждённым источником генерации",409);
    await sql("UPDATE pr_media_assets SET status='approved',approved_by=$2,approved_at=now() WHERE id=$1::uuid",[m.id,u.id]);
   }else{
