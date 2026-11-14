@@ -42,20 +42,18 @@ function embeddedLinks(value){
  if(cursor<s.length)parts.push(s.slice(cursor));
  return parts.length>1?parts:(parts[0]??"");
 }
-function footerLine(line){
+function footerLine(line,approvedPhotoUrl){
  const source=String(line||"").trim();
  const matches=[...source.matchAll(/https:\/\/[^\s<>"']+/g)].map(x=>x[0].replace(/[.,;!?]+$/,"")).filter(x=>publicHttps(x));
- if(/^Источник\s*:/i.test(source)&&matches.length){
-  const url=matches[0];
-  const rest=source.replace(/^Источник\s*:\s*/i,"").replace(url,"").trim();
-  return rest?[richUrl("Источник",url)," — ",embeddedLinks(rest)]:richUrl("Источник",url);
+ if(/^Источник\s*:/i.test(source))return matches.length?richUrl("Источник",matches[0]):null;
+ if(/^Фото\s*:/i.test(source)){
+  // Media attribution, source notes, licences and long URL strings are
+  // preserved in the editorial DB, never printed in the Telegram post.
+  const photo=matches.find(x=>/(?:файл|оригинал)\s*:\s*$/i.test(source.slice(0,source.indexOf(x))))
+   ||publicHttps(approvedPhotoUrl)?.href||matches[matches.length-1];
+  return photo?richUrl("Фото",photo):null;
  }
- if(/^Фото\s*:/i.test(source)&&matches.length){
-  // Credit remains readable; the long direct media URL becomes one word.
-  const url=matches.find(x=>/(?:файл|оригинал)\s*:\s*$/.test(source.slice(0,source.indexOf(x)).toLowerCase()))||matches[matches.length-1];
-  const byline=source.replace(/^Фото\s*:\s*/i,"").replace(url,"").replace(/(?:файл|оригинал)\s*:\s*/gi,"").trim().replace(/[;·,\s]+$/,"");
-  return byline?[richUrl("Фото",url)," — ",embeddedLinks(byline)]:richUrl("Фото",url);
- }
+ if(/^#/.test(source))return source;
  return embeddedLinks(source);
 }
 const richBold=text=>({type:"bold",text});
@@ -119,7 +117,8 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eve
  for(const section of paragraphs){
   if(section.startsWith("Источник:")){
    for(const line of section.split("\n").map(s=>s.trim()).filter(Boolean)){
-    blocks.push({type:"footer",text:footerLine(line)});
+    const compact=footerLine(line,url.href);
+    if(compact)blocks.push({type:"footer",text:compact});
    }
    continue;
   }
@@ -128,7 +127,10 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eve
    blocks.push({type:"heading",size:5,text:embeddedLinks(first)},{type:"paragraph",text:embeddedLinks(rest)});
   }else blocks.push({type:"paragraph",text:embeddedLinks(section)});
  }
- if(isAfisha)blocks.push({type:"paragraph",text:["Больше событий в приложении ",richUrl("Trailyo",TRAILYO_APP_URL),"."]});
+ if(isAfisha){
+  blocks.push({type:"paragraph",text:"Больше событий в приложении"});
+  blocks.push({type:"buttons",buttons:[{text:"Trailyo",url:TRAILYO_APP_URL,style:"primary"}],align:"center"});
+ }
  if(blocks.length>500)throw Error("Article has too many rich blocks");
  return blocks;
 }
