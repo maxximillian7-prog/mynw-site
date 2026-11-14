@@ -16,26 +16,76 @@ async function query(q,params=[]){
  if(!response.ok)throw Error("Database request failed "+response.status+": "+safe(JSON.stringify(data)));
  return data.rows??data;
 }
-function richBlocks(preparedText,photoUrl,isAiGenerated=false){
+const TRAILYO_APP_URL="https://apps.apple.com/us/app/trailyo-events-in-portugal/id6832330654";
+const richUrl=(word,url)=>({type:"url",text:word,url});
+function publicHttps(source){
+ try{
+  const url=new URL(source);
+  const hostname=url.hostname.toLowerCase();
+  if(url.protocol!=="https:"||url.username||url.password||url.port||!hostname.includes(".")||
+     /^(localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(hostname))return null;
+  return url;
+ }catch{return null}
+}
+function embeddedLinks(value){
+ const s=String(value||""),regex=/https:\/\/[^\s<>"']+/g,parts=[];let cursor=0,match;
+ while((match=regex.exec(s))){
+  const pre=s.slice(cursor,match.index);
+  if(pre)parts.push(pre);
+  const raw=match[0],clean=raw.replace(/[.,;!?]+$/,"");
+  const link=publicHttps(clean);
+  if(link)parts.push(richUrl(/(?:файл|фото|изображение)\s*:\s*$/i.test(pre)?"Фото":/(?:билет|бронирование)\s*:\s*$/i.test(pre)?"Билеты":"Ссылка",link.href));
+  else parts.push(raw);
+  if(raw.length!==clean.length)parts.push(raw.slice(clean.length));
+  cursor=match.index+raw.length;
+ }
+ if(cursor<s.length)parts.push(s.slice(cursor));
+ return parts.length>1?parts:(parts[0]??"");
+}
+function footerLine(line){
+ const source=String(line||"").trim();
+ const matches=[...source.matchAll(/https:\/\/[^\s<>"']+/g)].map(x=>x[0].replace(/[.,;!?]+$/,"")).filter(x=>publicHttps(x));
+ if(/^Источник\s*:/i.test(source)&&matches.length){
+  const url=matches[0];
+  const rest=source.replace(/^Источник\s*:\s*/i,"").replace(url,"").trim();
+  return rest?[richUrl("Источник",url)," — ",embeddedLinks(rest)]:richUrl("Источник",url);
+ }
+ if(/^Фото\s*:/i.test(source)&&matches.length){
+  // Credit remains readable; the long direct media URL becomes one word.
+  const url=matches.find(x=>/(?:файл|оригинал)\s*:\s*$/.test(source.slice(0,source.indexOf(x)).toLowerCase()))||matches[matches.length-1];
+  const byline=source.replace(/^Фото\s*:\s*/i,"").replace(url,"").replace(/(?:файл|оригинал)\s*:\s*/gi,"").trim().replace(/[;·,\s]+$/,"");
+  return byline?[richUrl("Фото",url)," — ",embeddedLinks(byline)]:richUrl("Фото",url);
+ }
+ return embeddedLinks(source);
+}
+function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false){
  const full=String(preparedText||"").trim();
  if(full.length<110||full.length>32000)throw Error("Full article length out of range");
- let url;try{url=new URL(photoUrl)}catch{throw Error("Approved photograph URL missing")}
+ const url=publicHttps(photoUrl);
+ if(!url)throw Error("Approved photograph URL missing or unsafe");
  const neonStore=process.env.AWS_ENDPOINT_URL_S3?new URL(process.env.AWS_ENDPOINT_URL_S3).hostname:"";
- const approvedImage=["upload.wikimedia.org","thumb.wikimedia.org","images.pexels.com","images.unsplash.com","cdn.pixabay.com"].includes(url.hostname)
+ const usualImage=["upload.wikimedia.org","thumb.wikimedia.org","images.pexels.com","images.unsplash.com","cdn.pixabay.com"].includes(url.hostname)
   ||(neonStore&&url.hostname===neonStore&&url.pathname.startsWith("/pr-editorial-media/ai-covers/"));
- if(url.protocol!=="https:"||url.username||url.password||!approvedImage)
-  throw Error("Photo must be a licensed image or stored AI illustration");
+ // For Afisha, the database already requires a manually approved image
+ // from a published Trailyo event. No licence assertion is added here.
+ if(!usualImage&&!isAfisha)throw Error("Photo must be a licensed image or stored AI illustration");
  const paragraphs=full.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean),title=paragraphs.shift();
  if(!title||title.length>255)throw Error("Article title missing or too long");
  const blocks=[{type:"photo",photo:{type:"photo",media:url.href}},{type:"heading",size:2,text:title}];
- if(isAiGenerated)blocks.push({type:"paragraph",text:"📷 AI-изображение · фотореалистичная визуализация, не документальное фото."});
+ if(isAiGenerated)blocks.push({type:"paragraph",text:"📷 AI-изображение · не документальное фото."});
  for(const section of paragraphs){
-  if(section.startsWith("Источник:")){blocks.push({type:"footer",text:section});continue;}
+  if(section.startsWith("Источник:")){
+   for(const line of section.split("\n").map(s=>s.trim()).filter(Boolean)){
+    blocks.push({type:"footer",text:footerLine(line)});
+   }
+   continue;
+  }
   const newline=section.indexOf("\n"),first=newline>=0?section.slice(0,newline).trim():"",rest=newline>=0?section.slice(newline+1).trim():"";
   if(first.length>=5&&first.length<=100&&/[.!?:»)]$/.test(first)&&rest.length>=20){
-   blocks.push({type:"heading",size:5,text:first},{type:"paragraph",text:rest});
-  }else blocks.push({type:"paragraph",text:section});
+   blocks.push({type:"heading",size:5,text:embeddedLinks(first)},{type:"paragraph",text:embeddedLinks(rest)});
+  }else blocks.push({type:"paragraph",text:embeddedLinks(section)});
  }
+ if(isAfisha)blocks.push({type:"paragraph",text:["Больше событий в приложении ",richUrl("Trailyo",TRAILYO_APP_URL),"."]});
  if(blocks.length>500)throw Error("Article has too many rich blocks");
  return blocks;
 }
@@ -60,7 +110,7 @@ async function claim(){
 }
 async function publish(post){
  if(!token)throw Error("Telegram bot token missing");
- const blocks=richBlocks(post.prepared_text,post.approved_image_url,post.is_ai_generated===true);
+ const blocks=richBlocks(post.prepared_text,post.approved_image_url,post.is_ai_generated===true,post.destination_code==="afisha");
  const body={chat_id:String(post.telegram_chat_id),rich_message:{blocks}};
  if(post.telegram_thread_id)body.message_thread_id=Number(post.telegram_thread_id);
  const response=await fetch("https://api.telegram.org/bot"+token+"/sendRichMessage",{
