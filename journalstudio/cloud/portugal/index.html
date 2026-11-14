@@ -418,14 +418,38 @@ function previewFooterLine(text){
  }
  return escapeHtml(line).replace(/https:\/\/[^\s&<]+/g,m=>previewLink("Ссылка",m));
 }
-function renderTelegramMessage(text,isAfisha=false){
+function previewEventMetadata(event){
+ if(!event)return "";
+ const dateOnly=x=>/^\d{4}-\d{2}-\d{2}$/.test(String(x||"").slice(0,10))?String(x).slice(0,10):null;
+ const first=dateOnly(event.starts_on),last=dateOnly(event.ends_on);
+ const labelDate=x=>new Intl.DateTimeFormat("ru-RU",{timeZone:"UTC",day:"numeric",month:"long",year:"numeric"}).format(new Date(x+"T12:00:00Z"));
+ const dates=first?"📅 "+labelDate(first)+(last&&last!==first?" — "+labelDate(last):""):"📅 Дата уточняется";
+ let clock=null;
+ if(event.time_known===true&&event.starts_at){
+  const date=new Date(event.starts_at);
+  if(Number.isFinite(date.getTime())){
+   const t=new Intl.DateTimeFormat("ru-RU",{timeZone:"Europe/Lisbon",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(date);
+   if(t!=="23:59"||/23:59/.test(String(event.source_time_text||"")))clock=t;
+  }
+ }
+ const dateLine='<p class="richParagraph"><strong>'+escapeHtml(dates+" · 🕒 "+(clock?clock+" (Лиссабон)":"Время уточняется"))+'</strong></p>';
+ const venue=String(event.venue||"").trim(),city=String(event.city||"").trim();
+ const loc=venue&&city&&!venue.toLocaleLowerCase().includes(city.toLocaleLowerCase())?venue+", "+city:venue||city;
+ if(!loc)return dateLine;
+ const lat=event.latitude==null?NaN:Number(event.latitude),lon=event.longitude==null?NaN:Number(event.longitude);
+ const exact=Number.isFinite(lat)&&Number.isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180;
+ const key=exact?lat.toFixed(6)+","+lon.toFixed(6):[venue,city,"Portugal"].filter(Boolean).join(", ");
+ const url="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(key);
+ return dateLine+'<p class="richParagraph"><strong>'+previewLink("📍 "+loc,url)+'</strong></p>';
+}
+function renderTelegramMessage(text,isAfisha=false,event=null){
  const content=String(text||"").trim();
  const idx=content.lastIndexOf("\n\nИсточник: ");
  const body=idx>=0?content.slice(0,idx):content;
  const footer=idx>=0?content.slice(idx+2):"";
  const blocks=body.split(/\n\s*\n/).filter(Boolean);
  const heading=blocks.shift()||"Публикация";
- let html='<div class="pt-message-title">'+escapeHtml(heading)+'</div>'+blocks.map(renderRichArticleText).join("");
+ let html='<div class="pt-message-title">'+escapeHtml(heading)+'</div>'+(isAfisha?previewEventMetadata(event):"")+blocks.map(renderRichArticleText).join("");
  if(footer){
   const lines=footer.split("\n");
   html+='<div class="pt-source">'+lines.filter(x=>!x.startsWith("#")).map(previewFooterLine).join("<br>")+'</div>'+
@@ -453,7 +477,7 @@ function renderPreview(){
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
  const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">📷 AI-изображение · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
- const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events")+'</div>'+timestamp+'</article>';
+ const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events",i.trailyo_event)+'</div>'+timestamp+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  $("modePhone").classList.toggle("selected",previewMode==="phone");$("modeArticle").classList.toggle("selected",previewMode==="article");
  $("modePhone").setAttribute("aria-pressed",previewMode==="phone"?"true":"false");
