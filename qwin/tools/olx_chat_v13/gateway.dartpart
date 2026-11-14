@@ -1,0 +1,187 @@
+  Future<Map<String,dynamic>> uploadChatPhoto(String source,String threadId,Uint8List data)async{
+    if(!{'olx','qwin'}.contains(source))throw StateError('Invalid chat source');
+    if(uploadUrl.isEmpty)throw StateError('Chat photo storage unavailable');
+    final jpeg=data.length>=3&&data[0]==0xff&&data[1]==0xd8&&data[2]==0xff;
+    final png=data.length>=8&&data[0]==0x89&&data[1]==0x50&&data[2]==0x4e;
+    if((!jpeg&&!png)||data.length>4500000)throw StateError('JPEG/PNG up to 4.5 MB');
+    await refreshSession();
+    if(_jwt==null||userId==null)throw StateError('Sign in first');
+    final base=uploadUrl.replaceFirst(RegExp(r'/+
+  /// never travel to external marketplaces unless the seller resyncs there.
+  /// Photos are edited through the authenticated Neon storage broker.
+  Future<void> editPhoto(String listingId,String action,{
+    String? objectKey,Uint8List? photo,
+  })async{
+    const actions={'add_photo','replace_photo','remove_photo'};
+    if(!actions.contains(action))throw ArgumentError('Invalid photo operation');
+    if(uploadUrl.isEmpty)throw StateError('Photo upload service unavailable');
+    await refreshSession();
+    if(_jwt==null)throw StateError('Sign in to edit a photo');
+    if(action!='add_photo'&&(objectKey==null||objectKey.isEmpty)){
+      throw ArgumentError('Choose an existing photo');
+    }
+    if(action!='remove_photo' && (photo==null||photo.isEmpty)){
+      throw StateError('Choose a JPEG or PNG photo');
+    }
+    final base=uploadUrl.replaceFirst(RegExp(r'/+$'),'');
+    final uri=Uri.parse('$base/$action').replace(queryParameters:{
+      'listing_id':listingId,
+      if(objectKey!=null)'object_key':objectKey,
+    });
+    final response=await _http.post(uri,headers:{
+      'Authorization':'Bearer $_jwt',
+      'Content-Type':photo==null?'application/json':
+        (photo.length>=3&&photo[0]==0xff?'image/jpeg':'image/png'),
+    },body:photo??Uint8List(0)).timeout(const Duration(seconds:65));
+    _decode(response);
+  }
+
+  Future<void> deleteListingAndPhotos(String listingId) async {
+    if(uploadUrl.isEmpty)throw StateError('Photo storage is unavailable');
+    await refreshSession();
+    if(_jwt==null)throw StateError('Sign in to delete a listing');
+    final base=uploadUrl.replaceFirst(RegExp(r'/+$'),'');
+    final response=await _http.post(
+      Uri.parse('$base/delete_listing').replace(queryParameters:{
+        'listing_id':listingId,
+      }),headers:{
+        'Authorization':'Bearer $_jwt',
+        'Accept':'application/json',
+      }).timeout(const Duration(seconds:65));
+    _decode(response);
+  }
+  Future<Map<String,dynamic>> etsyAction(String action,{
+    Map<String,dynamic> data=const {},
+  }) async {
+    if(!etsyEnabled)throw StateError('Etsy is not configured');
+    await refreshSession();
+    if(_jwt==null||userId==null)throw StateError('Sign in first');
+    const allowed={'start','finish','status','verify_shop','disconnect','mappings',
+      'properties','dry_run','publish_draft','update','delete',
+      'seller_setup','suggest_categories'};
+    if(!allowed.contains(action))throw ArgumentError('Unknown Etsy action');
+    final base=etsyUrl.replaceFirst(RegExp(r'/+$'),'');
+    final response=await _http.post(Uri.parse('$base/$action'),
+      headers:{'Authorization':'Bearer $_jwt',
+        'Content-Type':'application/json','Accept':'application/json'},
+      body:jsonEncode(data)).timeout(const Duration(seconds:50));
+    final result=_decode(response);
+    if(result is! Map)throw StateError('Invalid Etsy response');
+    return Map<String,dynamic>.from(result);
+  }
+
+  Future<bool> isEtsyConfigured()async{
+    if(!etsyEnabled)return false;
+    try{
+      final uri=Uri.parse('${etsyUrl.replaceFirst(RegExp(r'/+$'),'')}/health');
+      final response=await _http.get(uri).timeout(const Duration(seconds:10));
+      if(response.statusCode!=200)return false;
+      final data=_decode(response);
+      return data is Map&&data['configured']==true;
+    }catch(_){return false;}
+  }
+  /// eBay seller OAuth and taxonomy use a JWT-authenticated Neon broker.
+  /// No eBay Client Secret, user token or refresh token is exposed to Flutter.
+  Future<Map<String,dynamic>> ebayAction(String action,{
+    Map<String,dynamic> data=const {},
+  }) async {
+    if(!ebayEnabled)throw StateError('eBay is not configured');
+    const allowed={'oauth/start','oauth/status','oauth/disconnect',
+      'categories/suggest','categories/aspects',
+      'messages/threads','messages/thread','messages/send','messages/read',
+       'messages/capabilities','messages/start',
+      'publishing/setup','publishing/status','publishing/submit'};
+    if(!allowed.contains(action))throw ArgumentError('Unknown eBay action');
+    await refreshSession();
+    if(_jwt==null||userId==null)throw StateError('Sign in first');
+    final base=ebayUrl.replaceFirst(RegExp(r'/+$'),'');
+    final uri=Uri.parse('$base/$action').replace(queryParameters:
+      action=='messages/thread'?{
+        'conversation_id':(data['conversation_id']??'').toString(),
+        'conversation_type':(data['conversation_type']??'FROM_MEMBERS').toString(),
+      }:null);
+    final response={'oauth/status','messages/threads','messages/thread',
+      'messages/capabilities'}.contains(action)
+      ?await _http.get(uri,headers:{
+          'Authorization':'Bearer $_jwt','Accept':'application/json',
+        }).timeout(const Duration(seconds:35))
+      :await _http.post(uri,headers:{
+          'Authorization':'Bearer $_jwt',
+          'Content-Type':'application/json','Accept':'application/json',
+        },body:jsonEncode(data)).timeout(const Duration(seconds:55));
+    final value=_decode(response);
+    if(value is! Map)throw StateError('Invalid eBay response');
+    return Map<String,dynamic>.from(value);
+  }
+  Future<bool> isEbayConfigured()async{
+    if(!ebayEnabled)return false;
+    try {
+      final uri=Uri.parse(ebayUrl.replaceFirst(RegExp(r'/+$'),'')+'/health');
+      final response=await _http.get(uri).timeout(const Duration(seconds:10));
+      if(response.statusCode!=200)return false;
+      final value=_decode(response);
+      return value is Map&&value['oauth_ready']==true;
+    }catch(_){return false;}
+  }
+  /// Read-only official OLX category tree; users can browse before signing in.
+  Future<Map<String,dynamic>> getOfficialOlxCatalog() async {
+    if(!olxEnabled)throw StateError('OLX catalog not configured');
+    final base=olxUrl.replaceFirst(RegExp(r'/+$'),'');
+    final response=await _http.get(Uri.parse('$base/catalog'),
+      headers:{'Accept':'application/json'})
+      .timeout(const Duration(seconds:35));
+    final value=_decode(response);
+    if(value is! Map || value['items'] is! List){
+      throw StateError('Invalid official OLX category catalog');
+    }
+    return Map<String,dynamic>.from(value);
+  }
+
+  /// OLX requests use the current Neon JWT; OLX tokens never reach Flutter.
+  Future<Map<String,dynamic>> olxAction(String action,{Map<String,dynamic> data=const {}}) async {
+    if (!olxEnabled) throw StateError('OLX не подключён к серверу Qwin');
+    await refreshSession();
+    if (_jwt == null || userId == null) throw StateError('Сначала войдите в Qwin');
+    if (!{'start','finish','status','disconnect','catalog','languages','suggest_categories','attributes','cities','city_districts','dry_run','publish',
+          'sync_status','sync_statuses','threads','thread_messages','thread_send','thread_mark_read','thread_attachment','account_profile','update_advert','delete_advert'}.contains(action)) {
+      throw StateError('Неизвестное действие OLX');
+    }
+    final base = olxUrl.replaceFirst(RegExp(r'/+$'), '');
+    final response = await _http.post(Uri.parse('$base/$action'), headers: {
+      'Authorization': 'Bearer $_jwt',
+      'Content-Type': 'application/json',
+    }, body: jsonEncode(data)).timeout(const Duration(seconds: 55));
+    final result = _decode(response);
+    if (result is! Map) throw StateError('Неверный ответ сервера OLX');
+    return Map<String,dynamic>.from(result);
+  }
+
+  /// A signed-in user calls the Neon Function; OpenAI keys never leave the server.
+  Future<Map<String,dynamic>> requestAi(Map<String,dynamic> payload) async {
+    if (aiUrl.isEmpty) throw StateError('AI-сервис Qwin пока не настроен');
+    await refreshSession();
+    if (_jwt == null || userId == null) {
+      throw StateError('Войдите в аккаунт и подтвердите email для использования AI');
+    }
+    final response = await _http.post(Uri.parse(aiUrl), headers: {
+      'Authorization': 'Bearer $_jwt',
+      'Content-Type': 'application/json',
+    }, body: jsonEncode(payload)).timeout(Duration(seconds: payload['action']=='photo_edit' ? 165 : 85));
+    final result = _decode(response);
+    if (result is! Map) throw StateError('Некорректный ответ AI');
+    return Map<String,dynamic>.from(result);
+  }
+
+}
+),'');
+    final uri=Uri.parse('$base/chat_photo').replace(
+      queryParameters:{'source':source,'thread_id':threadId});
+    final response=await _http.post(uri,headers:{
+      'Authorization':'Bearer $_jwt',
+      'Content-Type':jpeg?'image/jpeg':'image/png',
+    },body:data).timeout(const Duration(seconds:75));
+    final value=_decode(response);
+    if(value is! Map||value['media_id']==null||value['url']==null)
+      throw StateError('Chat photo upload failed');
+    return Map<String,dynamic>.from(value);
+  }
