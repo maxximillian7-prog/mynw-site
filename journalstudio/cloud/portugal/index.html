@@ -363,7 +363,7 @@ function fill(item){const i=item.article;
  for(const id of ["changesBtn","rejectBtn","reopenBtn"])$(id).disabled=!me?.user?.approve;
  $("changesBtn").disabled=!me?.user?.edit;
  const isApproved=i.status==="approved"&&i.editorial_status==="approved";
- $("approveBtn").textContent=isApproved?"↗ Запланировать публикацию":"✓ Утвердить";
+ $("approveBtn").textContent=isApproved?"↗ Запланировать публикацию":"✓ Утвердить";updatePublicationMode();
  $("approveBtn").disabled=!me?.user?.approve||approvalPending||i.status==="rejected"||i.status==="expired";
  $("destination").disabled=true; // Prevent cross-channel routing; server enforces category classification.
  $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected"||i.editorial_status==="approved");
