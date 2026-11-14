@@ -66,7 +66,7 @@ async function schedule(id,options,userId){
  let dueAt,mode=options.schedule_mode||"default";
  if(mode==="manual"){
   const value=String(options.publish_at||options.scheduled_for||"");
-  if(!/^\\d{4}-\\d{2}-\\d{2}T/.test(value)||!Number.isFinite(Date.parse(value))||Date.parse(value)<Date.now()+60000)throw fail("Укажите будущую дату для Instagram",400);
+  if(!/^\d{4}-\d{2}-\d{2}T/.test(value)||!Number.isFinite(Date.parse(value))||Date.parse(value)<Date.now()+60000)throw fail("Укажите будущую дату для Instagram",400);
   dueAt=new Date(value).toISOString();
  }else if(mode==="delay"){
   const mins=Number(options.delay_minutes||options.schedule_delay_minutes);
