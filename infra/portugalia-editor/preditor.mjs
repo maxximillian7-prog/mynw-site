@@ -42,7 +42,7 @@ async function detail(id){
 async function save(u,p){
  access(u);const id=p.item_id;if(!uuid(id))throw err("Неверный ID");
  const {article:i}=await detail(id);
- if(i.status==="approved"||i.status==="rejected"||i.editorial_status==="approved")throw err("Сначала верните статью в редактирование",409);
+ if(i.status==="approved"||i.status==="rejected")throw err("Сначала верните статью в редактирование",409);
  const f=p.fields||{},style=["short","standard","rich"].includes(f.style)?f.style:"short";
  const name=cut(f.headline_ru??i.headline_ru??i.title_ru,250),hook=cut(f.hook_ru??i.hook_ru,600),lead=cut(f.lead_ru??i.lead_ru,1100),story=cut(f.story_ru??i.story_ru,7000),why=cut(f.why_matters_ru??i.why_matters_ru,1000);
  const needs=!!f.needs_more_facts,image=!!f.image_needed,choice=["no_image","licensed_original","owned_original","generated_illustration","generic_illustration"].includes(f.image_choice)?f.image_choice:"no_image",reason=cut(f.image_exception_reason,750),category=cut(f.target_subcategory,100);
@@ -62,7 +62,7 @@ async function action(u,p){
   if(note.length<2)throw err("Введите комментарий");
   await sql("INSERT INTO pr_editorial_comments(item_id,actor_user_id,actor_role,body) VALUES($1::uuid,$2::uuid,$3,$4)",[id,u.id,u.role,note]);await audit(id,u,a,note);return{ok:true};
  }
- access(u,["approve","reject","reopen","queue","confirm_value"].includes(a));
+ access(u,["approve","reject","reopen","queue","confirm_value","approve_and_queue"].includes(a));
  if(a==="verify_facts"){
   const url=cut(p.evidence_url,1200);let valid=false;try{valid=new URL(url).protocol==="https:"}catch{}
   if(!i.draft_id||!valid||note.length<12)throw err("Нужна HTTPS-ссылка на источник и пояснение (12+ символов)");
@@ -94,6 +94,26 @@ async function action(u,p){
   await sql("UPDATE pr_posts SET status='cancelled' WHERE item_id=$1::uuid AND status='queued'",[id]);
   if(isRejected)await sql("INSERT INTO pr_editorial_reviews(item_id,reviewer,decision,rationale) VALUES($1::uuid,$2,'reject',$3)",[id,u.id,note]);
   await audit(id,u,a,note);return{ok:true};
+ }
+ if(a==="approve_and_queue"){
+  if(u.role!=="owner")throw err("Окончательное утверждение с исключениями доступно только владельцу",403);
+  const mode=p.schedule_mode??"default";
+  if(!["default","delay","manual"].includes(mode))throw err("Неверный режим времени",400);
+  let delay=null,publishAt=null;
+  if(mode==="delay"){
+   delay=Number(p.delay_minutes??p.schedule_delay_minutes);
+   if(!Number.isInteger(delay)||delay<1||delay>525600)throw err("Неверная задержка",400);
+  }
+  if(mode==="manual"){
+   const requested=p.publish_at??p.scheduled_for;
+   if(typeof requested!=="string"||!/^\\d{4}-\\d{2}-\\d{2}T/.test(requested))throw err("Укажите дату и время публикации",400);
+   const d=new Date(requested);
+   if(!Number.isFinite(d.getTime())||d.getTime()<Date.now()+60000)throw err("Укажите будущее время (не меньше минуты)",400);
+   publishAt=d.toISOString();
+  }
+  const rows=await sql("SELECT * FROM public.pr_owner_approve_and_queue($1::uuid,$2::uuid,$3::text,$4::integer,$5::timestamptz)",[id,u.id,note,delay,publishAt]);
+  if(!rows.length)throw err("Не удалось выполнить утверждение",500);
+  return {ok:true,...rows[0]};
  }
  if(a==="confirm_value"){
   if(p.confirm_value!==true)throw err("Необходимо явное подтверждение редактора",400);
