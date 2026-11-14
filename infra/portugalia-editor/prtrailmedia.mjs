@@ -46,7 +46,7 @@ async function syncEventDetails(item,event){
  const validMoment=v=>v&&/^\d{4}-\d{2}-\d{2}[T ]/.test(String(v))?String(v):null;
  const lat=Number(event.event_latitude),lon=Number(event.event_longitude);
  const coords=event.event_latitude!=null&&event.event_longitude!=null&&Number.isFinite(lat)&&Number.isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180;
- await db("INSERT INTO public.pr_trailyo_event_details(item_id,event_id,city,venue,starts_on,ends_on,time_known,starts_at,ends_at,source_time_text,latitude,longitude) VALUES($1::uuid,$2::uuid,$3,$4,$5::date,$6::date,$7,$8::timestamptz,$9::timestamptz,$10,$11::double precision,$12::double precision) ON CONFLICT(item_id) DO UPDATE SET event_id=excluded.event_id,city=excluded.city,venue=excluded.venue,starts_on=excluded.starts_on,ends_on=excluded.ends_on,time_known=excluded.time_known,starts_at=excluded.starts_at,ends_at=excluded.ends_at,source_time_text=excluded.source_time_text,latitude=excluded.latitude,longitude=excluded.longitude,updated_at=now()",[item.id,item.external_id,clean(event.city,140)||null,clean(event.venue,230)||null,validDate(event.starts_on),validDate(event.ends_on),event.time_known===true,validMoment(event.starts_at),validMoment(event.ends_at),clean(event.source_time_text,120)||null,coords?lat:null,coords?lon:null]);
+ await db("INSERT INTO public.pr_trailyo_event_details(item_id,event_id,city,venue,starts_on,ends_on,time_known,starts_at,ends_at,source_time_text,latitude,longitude,is_free,price_known,price,source_type,event_category) VALUES($1::uuid,$2::uuid,$3,$4,$5::date,$6::date,$7,$8::timestamptz,$9::timestamptz,$10,$11::double precision,$12::double precision,$13,$14,$15::numeric,$16,$17) ON CONFLICT(item_id) DO UPDATE SET event_id=excluded.event_id,city=excluded.city,venue=excluded.venue,starts_on=excluded.starts_on,ends_on=excluded.ends_on,time_known=excluded.time_known,starts_at=excluded.starts_at,ends_at=excluded.ends_at,source_time_text=excluded.source_time_text,latitude=excluded.latitude,longitude=excluded.longitude,is_free=excluded.is_free,price_known=excluded.price_known,price=excluded.price,source_type=excluded.source_type,event_category=excluded.event_category,updated_at=now()",[item.id,item.external_id,clean(event.city,140)||null,clean(event.venue,230)||null,validDate(event.starts_on),validDate(event.ends_on),event.time_known===true,validMoment(event.starts_at),validMoment(event.ends_at),clean(event.source_time_text,120)||null,coords?lat:null,coords?lon:null,event.is_free===true,event.price_known===true,event.price==null?null:Number(event.price),clean(event.source_type,80)||null,clean(event.category,80)||null]);
  return true;
 }
 async function scan(){
@@ -59,7 +59,7 @@ async function scan(){
  }
  const ids=items.map(i=>i.external_id).filter(uuid);
  const url=new URL(ROOT);
- url.searchParams.set("select","id,status,image_url,image_attribution,image_rights_status,city,venue,starts_at,ends_at,starts_on,ends_on,time_known,source_time_text,event_latitude,event_longitude");
+ url.searchParams.set("select","id,status,image_url,image_attribution,image_rights_status,city,venue,starts_at,ends_at,starts_on,ends_on,time_known,source_time_text,event_latitude,event_longitude,is_free,price_known,price,source_type,category");
  url.searchParams.set("id","in.("+ids.join(",")+")");
  url.searchParams.set("status","eq.published");url.searchParams.set("limit","40");
  const res=await fetch(url,{headers:{apikey:process.env.TRAILYO_PUBLISHABLE_KEY,accept:"application/json"},redirect:"error",signal:AbortSignal.timeout(20000)});
@@ -79,7 +79,7 @@ async function scan(){
 }
 export default {async fetch(req){
  const path=new URL(req.url).pathname;
- if(req.method==="GET"&&path==="/health")return reply({ok:true,service:"prtrailmedia",version:4,geo_and_event_time_sync:true,mode:"all_existing_published_trailyo_images",license_filter:false,rights_marked_unverified:true,requires_manual_editorial_approval:true,api_key_configured:Boolean(process.env.TRAILYO_PUBLISHABLE_KEY)});
+ if(req.method==="GET"&&path==="/health")return reply({ok:true,service:"prtrailmedia",version:6,afisha_price_metadata:true,geo_and_event_time_sync:true,mode:"all_existing_published_trailyo_images",license_filter:false,rights_marked_unverified:true,requires_manual_editorial_approval:true,api_key_configured:Boolean(process.env.TRAILYO_PUBLISHABLE_KEY)});
  if(req.method!=="POST"||!req.headers.get("x-neon-trigger-invocation-id"))return reply({error:"scheduled_only"},403);
  if(!process.env.TRAILYO_PUBLISHABLE_KEY)return reply({ok:true,skipped:"trailyo_key_missing"});
  try{return reply(await scan());}
