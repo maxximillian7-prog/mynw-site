@@ -1,0 +1,31 @@
+  Uint8List? stagedPhoto;
+  String? uploadedMediaId,uploadedMediaUrl;
+  final ImagePicker photoPicker=ImagePicker();
+  Future<void> _selectPhoto()async{
+    if(sending)return;
+    final source=await showModalBottomSheet<ImageSource>(context:context,
+      builder:(ctx)=>SafeArea(child:Column(mainAxisSize:MainAxisSize.min,children:[
+        ListTile(leading:const Icon(Icons.photo_library_outlined),
+          title:Text(widget.locale=='pt'?'Galeria':widget.locale=='ru'?'Галерея':'Gallery'),
+          onTap:()=>Navigator.pop(ctx,ImageSource.gallery)),
+        ListTile(leading:const Icon(Icons.camera_alt_outlined),
+          title:Text(widget.locale=='pt'?'Câmara':widget.locale=='ru'?'Камера':'Camera'),
+          onTap:()=>Navigator.pop(ctx,ImageSource.camera)),
+      ])));
+    if(source==null||!mounted)return;
+    try{
+      final picked=await photoPicker.pickImage(source:source,maxWidth:1600,imageQuality:78);
+      if(picked==null||!mounted)return;
+      final data=await picked.readAsBytes();
+      if(data.isEmpty||data.length>4500000)throw StateError('JPEG/PNG, 4.5 MB max');
+      final jpg=data.length>3&&data[0]==0xff&&data[1]==0xd8;
+      final png=data.length>7&&data[0]==0x89&&data[1]==0x50;
+      if(!jpg&&!png)throw StateError('JPEG/PNG required');
+      if(mounted)setState((){
+        stagedPhoto=data;uploadedMediaId=null;uploadedMediaUrl=null;
+      });
+    }catch(e){
+      if(mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('Photo: $e')));
+    }
+  }
+
