@@ -197,11 +197,13 @@ class QwinCategoryKeywords {
   }
 
   static List<OlxCategory> find(OlxCatalog catalog,String query,{
-      String description='',String locale='pt',bool sellerOnly=true,int limit=10}){
+      String description='',String locale='pt',bool sellerOnly=true,int limit=10,
+      bool prioritizeDescription=false}){
     if(query.trim().length<2&&description.trim().length<3)return const [];
     final fromDescription=portugueseTerms(description);
     final fromTitle=portugueseTerms(query);
-    final topics=fromDescription.isNotEmpty?fromDescription:fromTitle;
+    final topics=prioritizeDescription&&fromDescription.isNotEmpty
+      ?fromDescription:fromTitle.isNotEmpty?fromTitle:fromDescription;
     final found=<({OlxCategory category,int score})>[];
     for(final c in catalog.categories){
       if(sellerOnly&&!c.isLeaf)continue;
