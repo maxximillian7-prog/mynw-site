@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/olx_catalog.dart';
+import '../services/local_translation.dart';
 
 /// Offline aliases only. The catalogue itself and every selectable ID remain
 /// the official OLX taxonomy; Qwin never invents its own publishable category.
@@ -248,27 +249,52 @@ class _QwinCategoryKeywordSearchState
   final _controller=TextEditingController();
   Timer? _debounce;
   String _query='';
+  List<String> _translated=const [];
+  int _translationEpoch=0;
+  Future<void> _lookupTranslation(String q,int epoch)async{
+    if(q.length<2)return;
+    try{
+      final translations=await QwinLocalTranslation.searchVariants(q)
+        .timeout(const Duration(seconds:4));
+      if(!mounted||epoch!=_translationEpoch||_query!=q)return;
+      setState(()=>_translated=translations);
+    }catch(_){/* Local aliases and official taxonomy still work. */}
+  }
   @override void dispose(){
     _debounce?.cancel();
+    _translationEpoch++;
     _controller.dispose();
     super.dispose();
   }
   @override Widget build(BuildContext context){
     final ru=widget.locale=='ru',pt=widget.locale=='pt';
-    final rows=_query.length>=2
-      ?QwinCategoryKeywords.find(widget.catalog,_query,
-        description:widget.sellerOnly
-          ?widget.productDescription+' '+widget.visualEvidence.join(' ')
-          :'',
-        locale:widget.locale,sellerOnly:widget.sellerOnly,limit:8)
-      :<OlxCategory>[];
+    final all=<OlxCategory>[];
+    final seen=<int>{};
+    if(_query.length>=2){
+      final candidates=[_query,..._translated.take(4)];
+      for(final q in candidates){
+        for(final item in QwinCategoryKeywords.find(widget.catalog,q,
+          description:widget.sellerOnly
+            ?widget.productDescription+' '+widget.visualEvidence.join(' ')
+            :'',locale:widget.locale,
+          sellerOnly:widget.sellerOnly,limit:12)){
+          if(seen.add(item.id))all.add(item);
+        }
+      }
+    }
+    final rows=all.take(8).toList(growable:false);
     return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
       TextField(controller:_controller,
         textInputAction:TextInputAction.search,
         onChanged:(v){
           _debounce?.cancel();
+          final epoch=++_translationEpoch;
+          _translated=const [];
           _debounce=Timer(const Duration(milliseconds:220),(){
-            if(mounted)setState(()=>_query=v.trim());
+            if(!mounted)return;
+            final text=v.trim();
+            setState(()=>_query=text);
+            if(text.length>=2)_lookupTranslation(text,epoch);
           });
         },
         decoration:InputDecoration(
@@ -284,7 +310,8 @@ class _QwinCategoryKeywordSearchState
             onPressed:(){
               _controller.clear();
               _debounce?.cancel();
-              setState(()=>_query='');
+              _translationEpoch++;
+              setState((){_query='';_translated=const [];});
             }),
         )),
       if(_query.length>=2&&rows.isEmpty)
@@ -307,7 +334,8 @@ class _QwinCategoryKeywordSearchState
           onTap:(){
             widget.onSelected(c);
             _controller.clear();
-            setState(()=>_query='');
+            _translationEpoch++;
+            setState((){_query='';_translated=const [];});
           }),
     ]);
   }
