@@ -20,6 +20,13 @@ class QwinCategoryKeywords {
   }
 
   static const Map<String,List<String>> _concepts={
+    'bateri':[
+      'батарейка','батарейки','аккумулятор','аккумуляторы',
+      'батарейка для пульта','батарейка для часов','элемент питания',
+      'батарейка','акумулятор','battery','batteries','rechargeable battery',
+      'pile','batterie','pilha','pilhas','bateria','baterias',
+      'pila','pilas','akku','batteria'
+    ],
     'aquecedor':[
       'обогревател','электрообогревател','обігрівач','нагрівач',
       'калорифер','конвектор','тепловентилятор','радиатор отопления',
