@@ -1,0 +1,57 @@
+class _ChatNetworkPhoto extends StatelessWidget{
+  final String url;
+  const _ChatNetworkPhoto({required this.url});
+  @override Widget build(BuildContext context){
+    final uri=Uri.tryParse(url);
+    if(uri==null||uri.scheme!='https'||uri.host.isEmpty){
+      return const Icon(Icons.broken_image_outlined);
+    }
+    return Padding(padding:const EdgeInsets.only(bottom:6),
+      child:InkWell(onTap:()=>showDialog<void>(
+        context:context,builder:(ctx)=>Dialog(
+          child:InteractiveViewer(child:Image.network(url,fit:BoxFit.contain)))),
+        child:Image.network(url,width:215,height:170,fit:BoxFit.contain,
+          errorBuilder:(_,__,___)=>const Icon(Icons.broken_image_outlined))));
+  }
+}
+class _OlxReceivedPhoto extends StatefulWidget{
+  final NeonGateway gateway;
+  final String threadId,messageId;
+  final int attachmentIndex;
+  const _OlxReceivedPhoto({required this.gateway,required this.threadId,
+    required this.messageId,required this.attachmentIndex});
+  @override State<_OlxReceivedPhoto> createState()=>_OlxReceivedPhotoState();
+}
+class _OlxReceivedPhotoState extends State<_OlxReceivedPhoto>{
+  late final Future<Uint8List> photo;
+  @override void initState(){super.initState();photo=_load();}
+  Future<Uint8List> _load()async{
+    final response=await widget.gateway.olxAction('thread_attachment',data:{
+      'thread_id':widget.threadId,'message_id':widget.messageId,
+      'index':widget.attachmentIndex,
+    });
+    final value=response['image_base64']?.toString();
+    if(value==null)throw StateError('Attachment unavailable');
+    return base64Decode(value);
+  }
+  @override Widget build(BuildContext context)=>FutureBuilder<Uint8List>(
+    future:photo,builder:(ctx,snapshot){
+      if(snapshot.connectionState!=ConnectionState.done){
+        return const Padding(padding:EdgeInsets.all(8),
+          child:SizedBox(width:24,height:24,
+            child:CircularProgressIndicator(strokeWidth:2)));
+      }
+      if(!snapshot.hasData){
+        return const Padding(padding:EdgeInsets.all(6),
+          child:Icon(Icons.broken_image_outlined));
+      }
+      final data=snapshot.data!;
+      return Padding(padding:const EdgeInsets.only(bottom:6),
+        child:InkWell(
+          onTap:()=>showDialog<void>(context:context,
+            builder:(ctx)=>Dialog(child:InteractiveViewer(
+              child:Image.memory(data,fit:BoxFit.contain)))),
+          child:Image.memory(data,width:215,height:170,fit:BoxFit.contain)));
+    });
+}
+
