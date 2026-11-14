@@ -66,7 +66,7 @@ try{
  Invoke-WebRequest -Uri $testUrl -OutFile $tmpTest -UseBasicParsing
  $testBody=[IO.File]::ReadAllText($tmpTest,[Text.Encoding]::UTF8)
 }finally{Remove-Item -LiteralPath $tmpTest -ErrorAction SilentlyContinue}
-if($testBody.Length -lt 1500 -or -not $testBody.Contains('Mi обогреватель')){
+if($testBody.Length -lt 1500 -or -not $testBody.Contains('Russian electric heater with Mi logo')){
  throw 'Category regression test download failed. No files changed.'
 }
 if(Test-Path $testPath){
@@ -204,7 +204,7 @@ if($pos -ge 0){
 $screen=[regex]::Replace($screen,
  'if\s*\(\s*signedIn\s*\)\s*EbayConnectionPanel\s*\(',
  'if(signedIn&&widget.store.neon?.ebayEnabled==true)EbayConnectionPanel(')
-$screen=$screen.Replace('OLX · Etsy · eBay','OLX Portugal')
+$screen=$screen.Replace(('OLX '+[char]183+' Etsy '+[char]183+' eBay'),'OLX Portugal')
 $screen=$screen.Replace('OLX / Etsy / eBay','OLX Portugal')
 $screen=$screen.Replace('OLX, Etsy, eBay','OLX Portugal')
 $staged[$screens]=$screen
