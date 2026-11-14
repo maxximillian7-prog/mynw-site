@@ -1,0 +1,53 @@
+Widget _platformStep()=>Column(
+    crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+      _QwinSection(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+        Text(_platformText('На каких площадках разместить?',
+          'Onde pretende publicar?','Where would you like to publish?'),
+          style:const TextStyle(fontWeight:FontWeight.w900,fontSize:18,color:_deep)),
+        const SizedBox(height:7),
+        Text(_platformText('Выберите Qwin Market, OLX Portugal или обе площадки.',
+          'Escolha o Qwin Market, o OLX Portugal ou ambos.',
+          'Choose Qwin Market, OLX Portugal or both.'),
+          style:const TextStyle(fontSize:12,color:_quiet)),
+        const SizedBox(height:12),
+        CheckboxListTile(
+          contentPadding:EdgeInsets.zero,
+          title:const Text('Qwin Market',
+            style:TextStyle(fontWeight:FontWeight.w800)),
+          subtitle:Text(_platformText('Внутренняя площадка Qwin',
+            'Marketplace interno Qwin','Qwin internal marketplace')),
+          value:inQwin,onChanged:(v)=>setState(()=>inQwin=v??false)),
+        const Divider(height:6),
+        CheckboxListTile(
+          contentPadding:EdgeInsets.zero,
+          title:const Text('OLX Portugal',
+            style:TextStyle(fontWeight:FontWeight.w800)),
+          subtitle:Text(olxLinked
+            ?_platformText('Подключено · можно публиковать',
+              'Ligado · publicação disponível','Connected · ready to publish')
+            :_platformText('Подключите OLX в профиле',
+              'Ligue o OLX no perfil','Connect OLX in your profile')),
+          value:inOlx,
+          onChanged:olxLinked?(v)=>setState(()=>inOlx=v??false):null),
+        const SizedBox(height:10),
+        Wrap(spacing:8,runSpacing:6,children:[
+          TextButton.icon(
+            onPressed:_loadPlatformConnections,
+            icon:const Icon(Icons.refresh_rounded),
+            label:Text(_platformText('Проверить OLX',
+              'Verificar OLX','Check OLX'))),
+          if(!olxLinked)TextButton.icon(
+            onPressed:widget.onLogin,
+            icon:const Icon(Icons.link_rounded),
+            label:Text(_platformText('Подключить OLX',
+              'Ligar OLX','Connect OLX'))),
+        ]),
+        if(!inQwin&&!inOlx)Padding(
+          padding:const EdgeInsets.only(top:9),
+          child:Text(_platformText('Выберите хотя бы одну площадку.',
+            'Selecione pelo menos uma plataforma.',
+            'Select at least one marketplace.'),
+            style:const TextStyle(color:Colors.deepOrange,fontSize:12))),
+      ])),
+    ]);
+  
