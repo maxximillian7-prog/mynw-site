@@ -250,6 +250,10 @@ export default {async fetch(req){
  WHERE i.duplicate_of IS NULL
  AND ((s.code='trailyo_events')=($4='afisha'))
  AND ($4<>'afisha' OR td.source_type IS NULL OR td.source_type<>'partner')
+ -- Keep ongoing multi-day events available in the editorial intake.
+ -- Single-day announcements starting in 1..6 days stay in All Materials.
+ AND ($4<>'afisha' OR $1 NOT IN ('incoming','preparing')
+       OR i.status<>'candidate' OR public.pr_afisha_advance_notice_ok(i.id))
  AND ($1='all' OR ($1='incoming' AND q.ready=true AND i.status='candidate')
  OR ($1='preparing' AND q.ready=false AND i.status='candidate')
  OR ($1='queued' AND EXISTS(SELECT 1 FROM pr_posts p WHERE p.item_id=i.id AND p.status IN ('queued','scheduled')))
