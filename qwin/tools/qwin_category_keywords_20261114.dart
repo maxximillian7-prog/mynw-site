@@ -206,9 +206,21 @@ class QwinCategoryKeywords {
     final topics=prioritizeDescription&&fromDescription.isNotEmpty
       ?fromDescription:fromTitle.isNotEmpty?fromTitle:fromDescription;
     final found=<({OlxCategory category,int score})>[];
+    // Build one index instead of scanning the complete taxonomy at every
+    // parent lookup; keeps typing responsive on large official OLX trees.
+    final indexed={for(final c in catalog.categories)c.id:c};
+    String pathOf(OlxCategory item){
+      final names=<String>[];
+      OlxCategory? cursor=item;
+      for(var depth=0;cursor!=null&&depth<8;depth++){
+        names.insert(0,cursor.namePt);
+        cursor=cursor.parentId==null?null:indexed[cursor.parentId];
+      }
+      return names.join(' ');
+    }
     for(final c in catalog.categories){
       if(sellerOnly&&!c.isLeaf)continue;
-      final path=catalog.pathTo(c.id).map((x)=>x.namePt).join(' ');
+      final path=pathOf(c);
       final translated=catalog.label(c,locale);
       var score=_score(query,c.namePt,path,topics,translated);
       if(score<=0)continue;
