@@ -183,15 +183,16 @@ async function generateMediumCover(itemId){
  const [info]=await db("SELECT i.title_original,i.title_ru,i.summary_ru,i.primary_category,i.location_city,i.location_region,d.headline_ru,d.story_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
  if(!info)throw bad("Черновик не найден",404);
  const prompt=coverPrompt(info);
- const [counter]=await db("SELECT count(*)::int AS n FROM pr_media_assets WHERE item_id=$1::uuid AND media_type='generated_illustration' AND created_at>now()-interval '24 hours'",[itemId]);
+ // Check server configuration before reserving an asset or consuming a generation attempt.
+ const token=process.env.OPENAI_API_KEY;
+ if(!token)throw bad("OpenAI API не подключён к функции prphoto: задайте OPENAI_API_KEY в её серверных настройках",503);
+ const [counter]=await db("SELECT count(*)::int AS n FROM pr_media_assets WHERE item_id=$1::uuid AND media_type='generated_illustration' AND status IN ('generating','candidate','approved') AND created_at>now()-interval '24 hours'",[itemId]);
  if(Number(counter?.n||0)>=3)throw bad("Лимит: максимум 3 AI-варианта на статью за 24 часа",429);
  const reserved=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,status,rights_verified,illustration_label_required) VALUES($1::uuid,$2::uuid,'generated_illustration',$3,$4,'generating',false,true) ON CONFLICT DO NOTHING RETURNING id",[itemId,draft.draft_id,GENERATOR_NAME,prompt.slice(0,2000)]);
  const mid=reserved[0]?.id;if(!mid)throw bad("Генерация для этой статьи уже выполняется",409);
  try{
   // The OpenAI API key belongs to the server, never to the Journal Studio browser.
   // This endpoint intentionally bypasses Neon AI Gateway; Neon is only the database and media store.
-  const token=process.env.OPENAI_API_KEY;
-  if(!token)throw bad("Для генерации обложек не подключён OPENAI_API_KEY к функции prphoto",503);
   const request={model:AI_COVER_MODEL,prompt,n:1,size:"1536x1024",quality:"medium",output_format:"jpeg",output_compression:82};
   const response=await fetch("https://api.openai.com/v1/images/generations",{
     method:"POST",headers:{"authorization":"Bearer "+token,"content-type":"application/json"},
@@ -217,7 +218,7 @@ async function generateMediumCover(itemId){
 
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:9,image_provider:"openai",image_model:AI_COVER_MODEL,medium_generation_configured:Boolean(process.env.OPENAI_API_KEY&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:9,image_provider:"openai",image_model:AI_COVER_MODEL,openai_key_configured:Boolean(process.env.OPENAI_API_KEY),storage_configured:Boolean(process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3),medium_generation_configured:Boolean(process.env.OPENAI_API_KEY&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
 try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
