@@ -1,10 +1,33 @@
 -- Portugal Ryadom Journal: 120-minute spacing across Main and Afisha Telegram posts.
--- Applied in Neon production project restless-pine-73362851, branch br-young-paper-b972wmgd on 2026-11-14.
--- pr_enqueue_publication_slot reserves globally ordered timestamps atomically.
--- pr_claim_due_telegram_post enforces at least two hours since the last actual successful send
--- and blocks overlapping cron/manual dispatches via the same transaction-scoped advisory lock.
--- The Neon prpublish cron runs every 5 minutes and only sends editor-approved material.
--- Re-running the CREATE OR REPLACE statements below is idempotent.
+-- Quiet hours 00:00-08:00 Europe/Lisbon. Safe-send margin 23:58-00:00.
+-- Production Neon project restless-pine-73362851, branch br-young-paper-b972wmgd.
+-- The global advisory lock serializes editor queue reservations and publisher claims.
+-- Each claim checks the previous actual send and local quiet hours.
+-- PostgreSQL Europe/Lisbon handles DST changes automatically.
+-- The existing prpublish cron runs every 5 minutes, only for approved content.
+-- All CREATE OR REPLACE statements are idempotent.
+
+CREATE OR REPLACE FUNCTION public.pr_next_portugal_publication_slot(p_requested timestamptz)
+RETURNS timestamptz
+LANGUAGE plpgsql
+STABLE
+AS $portugal$
+DECLARE
+ local_date date := (p_requested AT TIME ZONE 'Europe/Lisbon')::date;
+ local_clock time := (p_requested AT TIME ZONE 'Europe/Lisbon')::time;
+BEGIN
+ IF p_requested IS NULL THEN RETURN NULL; END IF;
+ IF local_clock < time '08:00' THEN
+  RETURN (local_date + time '08:00') AT TIME ZONE 'Europe/Lisbon';
+ END IF;
+ -- A two-minute safety margin keeps a Telegram API request
+ -- started before midnight from completing inside the quiet hours.
+ IF local_clock >= time '23:58' THEN
+  RETURN ((local_date + 1) + time '08:00') AT TIME ZONE 'Europe/Lisbon';
+ END IF;
+ RETURN p_requested;
+END;
+$portugal$;
 
 CREATE OR REPLACE FUNCTION public.pr_claim_due_telegram_post()
  RETURNS TABLE(post_id uuid, item_id uuid, destination_code text, telegram_chat_id bigint, prepared_text text, approved_image_url text, is_ai_generated boolean, attempts integer, telegram_thread_id bigint)
@@ -13,6 +36,12 @@ AS $function$
 BEGIN
  -- Serialize parallel cron and manual invocations across both channels.
  PERFORM pg_advisory_xact_lock(8412026, 201);
+ -- Quiet hours: no Telegram delivery from 00:00 to 08:00 Lisbon time.
+ -- Additionally avoid opening a new send during the last 2 minutes before midnight.
+ IF (now() AT TIME ZONE 'Europe/Lisbon')::time < time '08:00'
+    OR (now() AT TIME ZONE 'Europe/Lisbon')::time >= time '23:58' THEN
+  RETURN;
+ END IF;
  -- A publication or unresolved delivery in progress blocks a second send.
  IF EXISTS (SELECT 1 FROM public.pr_posts p WHERE p.status='sending')
  OR EXISTS (SELECT 1 FROM public.pr_posts p
@@ -91,6 +120,7 @@ BEGIN
    AND (p.status<>'sent' OR p.sent_at > now() - interval '30 days');
  next_slot := greatest(now() + interval '1 minute',
                       coalesce(last_reserved + interval '2 hours',now() + interval '1 minute'));
+ next_slot := public.pr_next_portugal_publication_slot(next_slot);
  INSERT INTO public.pr_posts(item_id,destination_code,status,scheduled_for)
  VALUES(p_item_id,p_destination,'queued',next_slot) RETURNING * INTO inserted_post;
  RETURN QUERY SELECT inserted_post.id, inserted_post.scheduled_for;
