@@ -547,6 +547,7 @@ function renderTelegramMessage(text,isAfisha=false,event=null,approvedPhotoUrl=n
 function activeTags(i){
  return(Array.isArray(i.tags)?i.tags:[]).map(x=>String(x).trim().replace(/^#/,"").replace(/[^\p{L}\p{N}_]+/gu,"_").replace(/^_+|_+$/g,"")).filter(x=>x.length>1).filter(x=>!["португалия","новости","события"].includes(x.toLowerCase())).slice(0,4).map(x=>"#"+x).join(" ");
 }
+function isEventPreview(i){return i?.primary_category==="events";}
 function instagramCaption(f,i,img){
  // Approved/scheduled posts display the stored version, matching what Buffer received.
  if(!dirty&&current?.instagram?.caption&&!previewPhotoId)return current.instagram.caption;
@@ -641,7 +642,7 @@ function renderPreview(){
    '<div class="ig-caption"><strong>pt_ryadom</strong> '+escapeHtml(caption)+'</div>'+
    '<div class="ig-bottom">⌂　　　 ⌕　　　 ⊞　　　 ♡　　　 ◉</div></div></div>';
   $("previewHint").textContent=img&&!approvedMedia?"⚠️ Фото видно для предпросмотра, но не подтверждено для Instagram":
-   img?"Предпросмотр Instagram. Публикация через Buffer, текст редактируется вместе со статьёй.":"⚠️ Для Instagram требуется изображение. Для Telegram фото необязательно.";
+   img?(isEventPreview(i)?"Афиша: дата без времени, место и ссылка на Trailyo в подписи. Кликабельная геометка Instagram потребует подключения через Facebook-страницу.":"Предпросмотр Instagram. Публикация через Buffer, текст редактируется вместе со статьёй."):"⚠️ Для Instagram требуется изображение. Для Telegram фото необязательно.";
   $("tgLength").textContent=caption.length+" / 2200 символов · "+(approvedMedia?"фото утверждено":"фото не подтверждено");
  }else if(previewMode==="phone"){
   root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone">'+
