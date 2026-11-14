@@ -1,0 +1,18 @@
+          if(stagedPhoto!=null)Padding(
+            padding:const EdgeInsets.fromLTRB(4,4,4,10),
+            child:Row(children:[
+              ClipRRect(borderRadius:BorderRadius.circular(10),
+                child:Image.memory(stagedPhoto!,width:76,height:76,fit:BoxFit.cover)),
+              const SizedBox(width:10),
+              Expanded(child:Text(widget.locale=='ru'?'Фото готово к отправке':
+                widget.locale=='pt'?'Foto pronta a enviar':'Photo ready to send',
+                style:const TextStyle(fontSize:12))),
+              IconButton(tooltip:'Remove photo',
+                onPressed:sending?null:()=>setState((){
+                  stagedPhoto=null;uploadedMediaId=null;uploadedMediaUrl=null;
+                }),icon:const Icon(Icons.close)),
+            ])),
+          Row(children:[
+            IconButton(tooltip:'Attach photo',
+              onPressed:sending?null:_selectPhoto,
+              icon:const Icon(Icons.add_photo_alternate_outlined)),
