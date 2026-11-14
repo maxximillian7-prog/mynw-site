@@ -389,7 +389,11 @@ function renderHistory(data){
 }
 function renderRichArticleText(value){
  return String(value||"").split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
-  const safe=escapeHtml(paragraph);
+  const safe=String(paragraph).split(/(https:\/\/[^\s<>"']+)/g).map(piece=>{
+   if(!piece.startsWith("https://"))return escapeHtml(piece);
+   const url=piece.replace(/[.,;!?]+$/,"");
+   return previewLink("Ссылка",url)+escapeHtml(piece.slice(url.length));
+  }).join("");
   const formatted=safe
    .replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>")
    .replace(/(^|[^*])\*([^*\n]+)\*(?=[^*]|$)/g,"$1<em>$2</em>")
