@@ -306,7 +306,7 @@ class _QwinCategoryKeywordSearchState
             if(!mounted)return;
             final text=v.trim();
             setState(()=>_query=text);
-            if(text.length>=2)_lookupTranslation(text,epoch);
+            if(text.length>=2)unawaited(_lookupTranslation(text,epoch));
           });
         },
         decoration:InputDecoration(
