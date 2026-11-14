@@ -1,0 +1,36 @@
+  Future<void> send()async{
+    final text=field.text.trim();
+    if((text.isEmpty&&stagedPhoto==null)||sending)return;
+    if(mounted)setState(()=>sending=true);
+    try{
+      final neon=widget.store.neon!;
+      if(stagedPhoto!=null&&uploadedMediaId==null){
+        final uploaded=await neon.uploadChatPhoto(
+          widget.source,widget.threadId,stagedPhoto!);
+        uploadedMediaId=uploaded['media_id']?.toString();
+        uploadedMediaUrl=uploaded['url']?.toString();
+      }
+      final caption=text.isNotEmpty?text:
+        widget.locale=='ru'?'Фото':widget.locale=='pt'?'Foto':'Photo';
+      if(widget.source=='olx'){
+        await neon.olxAction('thread_send',data:{
+          'thread_id':widget.threadId,'text':caption,
+          if(uploadedMediaId!=null)'media_id':uploadedMediaId,
+        });
+      }else{
+        await neon.api('qwin_thread_messages',method:'POST',json:{
+          'thread_id':widget.threadId,'sender_id':widget.store.currentUserId,
+          'body':caption,
+          if(uploadedMediaUrl!=null)'attachment_url':uploadedMediaUrl,
+        });
+      }
+      originalDraft=null;field.clear();
+      if(mounted)setState((){
+        stagedPhoto=null;uploadedMediaId=null;uploadedMediaUrl=null;
+      });
+      await load();
+    }catch(e){
+      if(mounted)ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content:Text('Message/photo: $e')));
+    }finally{if(mounted)setState(()=>sending=false);}
+  }
