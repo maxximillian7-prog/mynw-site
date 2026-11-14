@@ -46,7 +46,7 @@ async function refreshPublishedStatus(row){
  try{
   const fetched=(await buffer("query GetPost($input:PostInput!){post(input:$input){id status sentAt dueAt externalLink}}",{input:{id:row.buffer_post_id}})).post;
   if(!fetched||fetched.id!==row.buffer_post_id)return row;
-  if(String(fetched.status).toLowerCase()==="sent"&&row.status!=="published"){
+  if(String(fetched.status).toLowerCase()==="sent"&&(row.status!=="published"||!row.published_at)){
    await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=coalesce(published_at,$2::timestamptz,now()),updated_at=now() WHERE id=$1::uuid",[row.id,fetched.sentAt||null]);
    row.status="published";row.published_at=fetched.sentAt||new Date().toISOString();
   }
