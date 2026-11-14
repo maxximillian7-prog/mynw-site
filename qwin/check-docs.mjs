@@ -53,10 +53,11 @@ assert.ok(home.includes('newHeroFirst')&&home.includes('newHeroSecond'),
   'Editorial heading must have localized text');
 assert.ok(!home.includes('demo-grid') && !home.includes('demo-price'),
   'Do not simulate live inventory or a web marketplace');
-assert.ok(docs.includes('Qwin is independent from OLX, Etsy and eBay'),
-  'Platform independence disclosure missing');
+assert.ok(docs.includes('Qwin is independent from OLX.'),
+  'OLX independence disclosure missing');
 assert.ok(docs.includes("The term 'Etsy' is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc."),
   'Etsy API disclaimer missing');
+assert.ok(!home.includes('<strong>Etsy</strong>') && !home.includes('<strong>eBay</strong>'), 'Paused brands must not be advertised');
 const landingCss=readFileSync(new URL('./landing-editorial.css',import.meta.url),'utf8');
 for(const selector of ['.hero-photo-group','.hero-grid','.feature-cards',
   '.editorial-grid','.category-photo-grid','.platform-grid','.closing-section']){
