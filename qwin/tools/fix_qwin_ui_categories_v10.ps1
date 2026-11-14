@@ -222,6 +222,20 @@ $src=[regex]::Replace($src,
   '')
 $src=$src.Replace("import 'etsy_notifications.dart';"+[char]10,'')
 $src=$src.Replace("import 'ebay_messages.dart';"+[char]10,'')
+# Do not surface historical Etsy/eBay notifications on current Qwin screens.
+$notice="if(mounted)setState((){rows=result;error=null;});"
+if($src.Contains($notice)){
+  $safe=@'
+if(mounted)setState((){
+        rows=result.where((row){
+          final text=(row['title']?.toString()??'').toLowerCase();
+          return !text.contains('etsy')&&!text.contains('ebay');
+        }).toList();
+        error=null;
+      });
+'@
+  $src=$src.Replace($notice,$safe.TrimEnd())
+}
 $staged[$rel]=$src
 $rel='lib/ui/listing_editor.dart'
 $src=[string]$staged[$rel]
