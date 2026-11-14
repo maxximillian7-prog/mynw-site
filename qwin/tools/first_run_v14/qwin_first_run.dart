@@ -47,7 +47,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
       _locale = _safeLang(WidgetsBinding.instance.platformDispatcher.locale.languageCode);
     }
     if (widget.showVideo) {
-      final controller = VideoPlayerController.asset('assets/intro/qwin_intro_3s.mp4');
+      final controller = VideoPlayerController.asset('assets/intro/qwin_intro_5s.mp4');
       _video = controller;
       try {
         await controller.initialize().timeout(const Duration(seconds: 2));
@@ -58,7 +58,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate> {
       } catch (_) {
         // Never block sign-in or legal access because a video codec failed.
       }
-      await Future<void>.delayed(const Duration(seconds: 3));
+      await Future<void>.delayed(const Duration(seconds: 5));
     }
     if (!mounted) return;
     setState(() => _stage = previouslyAccepted ? 3 : 0);
