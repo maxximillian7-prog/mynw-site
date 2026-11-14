@@ -263,10 +263,42 @@ async function adminRequest(req,url,user){
  }
  throw Object.assign(new Error("Unknown endpoint"),{status:404});
 }
+// One-time, database-authorized description update, initiated by an internal Neon scheduled invocation.
+// Never accepts a channel ID or description from the HTTP caller. Job has a fixed destination and footer.
+async function applyDescriptionFooter(){
+ const [job]=await sql("UPDATE public.pr_bot_description_updates SET status='running',attempted_at=now(),error=NULL WHERE job_key='main-contact-footer-20261114' AND status='pending' RETURNING job_key,destination_code,footer");
+ if(!job)return {ok:true,skipped:"no_pending_authorized_description_change"};
+ try{
+  if(job.destination_code!=="main"||job.footer!=="По всем вопросам: @pt_ryadom_bot")throw Error("Unrecognized authorized description");
+  const [destination]=await sql("SELECT telegram_chat_id FROM public.pr_destinations WHERE code='main' AND is_enabled=true");
+  if(!destination?.telegram_chat_id)throw Error("Main channel is not configured");
+  const chatId=destination.telegram_chat_id;
+  const before=await tg("getChat",{chat_id:chatId});
+  const original=String(before.description||"").trim();
+  const exists=original.includes("@pt_ryadom_bot");
+  const next=exists?original:[original,job.footer].filter(Boolean).join("\n\n");
+  if([...next].length>255)throw Error("Channel description is too long to append without removing existing text");
+  if(!exists){
+   await tg("setChatDescription",{chat_id:chatId,description:next});
+  }
+  const verification=await tg("getChat",{chat_id:chatId});
+  if(!String(verification.description||"").includes("@pt_ryadom_bot"))throw Error("Telegram did not confirm updated description");
+  await sql("UPDATE public.pr_bot_description_updates SET status=$2,old_description=$3,new_description=$4,completed_at=now(),error=NULL WHERE job_key=$1",["main-contact-footer-20261114",exists?"already_present":"completed",original,String(verification.description||"")]);
+  return {ok:true,updated:!exists,channel:"main",verified:true};
+ }catch(e){
+  const error=short(e?.message||"Telegram description change failed",180);
+  await sql("UPDATE public.pr_bot_description_updates SET status='failed',error=$2,completed_at=now() WHERE job_key=$1",["main-contact-footer-20261114",error]);
+  return {ok:false,error};
+ }
+}
 export default {async fetch(req){
  const url=new URL(req.url),origin=req.headers.get("origin")||"";
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":TRUSTED_ORIGINS.has(origin)?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type","access-control-max-age":"300","vary":"Origin"}});
  if(req.method==="GET"&&(url.pathname==="/health"||url.pathname==="/"))return respond({ok:true,service:"pt-ryadom-contact-manager",version:4,ready:!!process.env.TELEGRAM_BOT_TOKEN&&!!process.env.TELEGRAM_WEBHOOK_SECRET,editorial_inbox:true,private_bot:true,attachment_support:true,admin_reply:true});
+ if(req.method==="POST"&&url.pathname==="/internal/apply-description"&&req.headers.has("x-neon-trigger-invocation-id")){
+  const result=await applyDescriptionFooter();
+  return respond(result,result.ok?200:422);
+ }
  if(url.pathname.startsWith("/api/")){
   try{
    const user=await privateAdmin(req);
