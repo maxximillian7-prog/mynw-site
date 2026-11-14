@@ -1,0 +1,9 @@
+      // The AI has already produced seller text. Preselect exactly one real
+      // OLX leaf now; the user must explicitly confirm it on the category step.
+      if(selectedCategoryId==null&&matches.isNotEmpty){
+        final candidate=official.byId(
+          int.tryParse((matches.first['id']??'').toString()));
+        if(candidate!=null&&candidate.isLeaf){
+          unawaited(_confirmOlxLeaf(candidate,fromAuto:true));
+        }
+      }
