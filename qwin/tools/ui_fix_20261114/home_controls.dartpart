@@ -1,0 +1,43 @@
+Row(children:[
+              Expanded(child:OutlinedButton.icon(
+                onPressed:_filters,
+                icon:const Icon(Icons.tune_rounded),
+                label:Text(t('filters')),
+                style:OutlinedButton.styleFrom(
+                  minimumSize:const Size(0,49),
+                  foregroundColor:_deep,backgroundColor:Colors.white,
+                  shape:RoundedRectangleBorder(
+                    borderRadius:BorderRadius.circular(13))))),
+              const SizedBox(width:10),
+              Expanded(child:OutlinedButton.icon(
+                onPressed:(){
+                  showModalBottomSheet<void>(
+                    context:context,isScrollControlled:true,showDragHandle:true,
+                    builder:(sheetContext)=>SafeArea(child:FractionallySizedBox(
+                      heightFactor:.86,
+                      child:SingleChildScrollView(
+                        padding:const EdgeInsets.fromLTRB(16,9,16,25),
+                        child:OlxCategoryPanel(
+                          catalog:widget.store.catalog,locale:widget.locale,
+                          selectedId:selectedOlxCategory,allowAll:true,
+                          initiallyOpen:true,
+                          onSelected:(node){
+                            setState(()=>selectedOlxCategory=node?.id);
+                            _queueQwinServerSearch();
+                            Navigator.of(sheetContext).pop();
+                          })))));},
+                icon:const Icon(Icons.category_outlined),
+                label:Text(selectedOlxCategory==null
+                  ?t('categories')
+                  :widget.store.catalog.label(
+                     widget.store.catalog.byId(selectedOlxCategory!)!,
+                     widget.locale),
+                  maxLines:1,overflow:TextOverflow.ellipsis),
+                style:OutlinedButton.styleFrom(
+                  minimumSize:const Size(0,49),
+                  foregroundColor:_deep,backgroundColor:Colors.white,
+                  shape:RoundedRectangleBorder(
+                    borderRadius:BorderRadius.circular(13))))),
+            ]),
+            const SizedBox(height:21),
+            
