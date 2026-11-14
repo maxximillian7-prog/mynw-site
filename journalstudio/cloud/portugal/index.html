@@ -868,7 +868,7 @@ function bind(){
   $("editorPanel").classList.add("hidden");$("emptyPanel").classList.remove("hidden");
   $("pageTitle").textContent="Выберите материал";$("pageSubtitle").textContent=next==="afisha"?"Приёмка канала «Афиша»":"Приёмка основного канала";
   $("listHeading").textContent=next==="afisha"?"🎭 Приёмка афиши":"📰 Приёмка основного канала";
-  $("listIntro").textContent=next==="afisha"?"Опубликованные события Trailyo и проверенные мероприятия. Изображения и текст утверждаются редактором.":"Новости, статьи и полезная информация. Только полностью подготовленные материалы с проверенным изображением и источником.";
+  $("listIntro").textContent=next==="afisha"?"Опубликованные события Trailyo: новые мероприятия минимум за 7 дней, а уже начавшиеся многодневные — пока они продолжаются. Изображения и текст утверждаются редактором.":"Новости, статьи и полезная информация. Только полностью подготовленные материалы с проверенным изображением и источником.";
   document.querySelectorAll("[data-channel]").forEach(b=>b.classList.toggle("active",b.dataset.channel===next));
   document.querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="incoming"));
   await Promise.all([counts(),list()]);
