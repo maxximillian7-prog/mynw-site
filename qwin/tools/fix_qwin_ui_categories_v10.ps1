@@ -114,7 +114,7 @@ QwinCategoryKeywordSearch(
                sellerOnly:false,
                onSelected:(node)=>setState(()=>selectedOlxCategory=node.id)),
              const SizedBox(height:11),
-             '@
+'@
   $marketText=$marketText.Insert($where,$injection)
 }
 $filter='items=items.where((x){'
@@ -144,7 +144,7 @@ QwinCategoryKeywordSearch(
          sellerOnly:true,
          onSelected:(node)=>unawaited(_confirmOlxLeaf(node))),
        const SizedBox(height:10),
-       '@
+'@
   $sellerText=$sellerText.Insert($pick.Index,$injection)
 }
 $src=$section.Before+$sellerText+$section.After
@@ -177,7 +177,7 @@ final verifiedLocal=QwinCategoryKeywords.find(
       }
       return;
     }
-    '@
+'@
       $chunk=$chunk.Replace($anchor,$addition+$anchor)
       $src=$src.Substring(0,$start)+$chunk+$src.Substring($stop)
     }else{Write-Warning 'AI suggestions structure changed: manual category search will still work'}
