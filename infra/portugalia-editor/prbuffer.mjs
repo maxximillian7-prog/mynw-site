@@ -68,6 +68,19 @@ async function verifyMedia(p){
  if(m.media_type==="generated_illustration"&&(!m.illustration_label_required||!m.storage_key))throw fail("Для AI-обложки требуется маркировка и сохранённый файл",409);
  return m;
 }
+async function verifiedInstagramGeolocation(itemId){
+ // Buffer requires a Facebook Page connection and a real Facebook location ID.
+ // No coordinates-to-ID conversion or guessed place IDs are permitted.
+ const locations=await sql(
+  "SELECT g.facebook_place_id,g.place_name FROM public.pr_items i "+
+  "JOIN public.pr_trailyo_event_details ev ON ev.item_id=i.id "+
+  "JOIN public.pr_instagram_event_geotags g ON g.event_id=ev.event_id AND g.verified_at IS NOT NULL "+
+  "JOIN public.pr_instagram_accounts a ON a.account_key='pt_ryadom' AND a.buffer_connection_route='facebook_page' "+
+  "WHERE i.id=$1::uuid AND i.primary_category='events' LIMIT 1",
+  [itemId]
+ );
+ return locations[0]?{id:locations[0].facebook_place_id,text:locations[0].place_name}:null;
+}
 async function schedule(id,options,userId){
  const original=await ensureStage(id);
  if(original.item_status!=="approved"||original.draft_status!=="approved")throw fail("Сначала утвердите статью",409);
@@ -94,7 +107,8 @@ async function schedule(id,options,userId){
  if(!acquired.length)return {ok:true,already_processing:true};
  try{
   let result;
-  const metadata={instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:media.media_type==="generated_illustration"}};
+  const geolocation=await verifiedInstagramGeolocation(original.item_id);
+  const metadata={instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:media.media_type==="generated_illustration",...(geolocation?{geolocation}:{})}};
   const input={
     text:original.caption,
     schedulingType:"automatic",
