@@ -262,6 +262,7 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  ? "✓ Готово к редакционной приёмке: русский заголовок и текст, завершённый рассказ, проверенный тип источника, разрешённая обложка, хештег и ценность для читателя."
  : "Материал пока в подготовке. Нужно исправить: "+(reasons.length?reasons.join(" · "):"недостающие элементы публикации");
  $("intakeDiagnostic").style.background=i.intake_ready?"#eff8f3":"#fff7e8";
+ if(i.source_code==="trailyo_events"&&i.primary_category==="events")$("destination").value="afisha";
  $("storySource").textContent=i.source_name;$("needsFactsBadge").textContent=i.needs_more_facts?"Требуется проверка фактов":i.context_verified?"Контекст проверен":"Не проверено";
  const nextPublication=(item.publications||[]).find(p=>["queued","scheduled"].includes(p.status));
  $("scheduleBadge").hidden=!nextPublication;
