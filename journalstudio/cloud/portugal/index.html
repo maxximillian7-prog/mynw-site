@@ -300,13 +300,14 @@ input[type=search]{width:100%} .filters select{width:100%}
 "use strict";
 const API="https://br-young-paper-b972wmgd-preditor.compute.c-7.eu-central-1.aws.neon.tech";
 const BOT_API="https://br-young-paper-b972wmgd-ptbot.compute.c-7.eu-central-1.aws.neon.tech";
+const BUFFER_API="https://br-young-paper-b972wmgd-prbuffer.compute.c-7.eu-central-1.aws.neon.tech";
 const S="https://npsfaymjckcqhtyiafms.supabase.co",KEY="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 const $=id=>document.getElementById(id),escapeHtml=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const statuses={candidate:"В обработке",needs_facts:"Нужны факты",draft:"Черновик",ready_for_review:"На согласовании",approved:"Утверждено",rejected:"Отклонено",queued:"В очереди"};
 let session,me,categories=[],items=[],current=null,activeStatus="incoming",activeChannel="main",dirty=false,loading=false;
 let contactMode=false,selectedContactId=null,contactPairCommand="";
 let toastTimeout=0,approvalPending=false;
-let previewMode="phone",previewPhotoId=null,photoSearchResults=[];
+let previewMode="phone",previewPhotoId=null,photoSearchResults=[],instagramCaptionCached="";
 function toast(msg,error=false){const el=$("toast");el.textContent=msg;el.classList.toggle("error",error);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.hidden=true,4800)}
 function login(message){$("loginMessage").textContent=message||"Войдите в Journal Studio и вернитесь в этот раздел.";$("loginOverlay").hidden=false}
 function iso(v){if(!v)return"—";try{return new Date(v).toLocaleString("ru-RU",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch{return v}}
@@ -322,7 +323,7 @@ async function call(path,options={}){
  if(!r.ok)throw Error(d.error||"Ошибка редакционного сервера");
  return d;
 }
-function publicationSettings(){const mode=$("publicationMode").value;if(mode==="default")return {schedule_mode:"default"};if(mode==="delay")return {schedule_mode:"delay",schedule_delay_minutes:120,delay_minutes:120};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function updatePublicationMode(){$("publicationDateRow").classList.toggle("hidden",$("publicationMode").value!=="manual")}
+function publicationSettings(){const mode=$("publicationMode").value;if(mode==="default")return {schedule_mode:"default"};if(mode==="delay"){const mins=Number($("publicationDelay").value);return {schedule_mode:"delay",schedule_delay_minutes:mins,delay_minutes:mins}};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function updatePublicationMode(){$("publicationDateRow").classList.toggle("hidden",$("publicationMode").value!=="manual");$("publicationDelayRow").classList.toggle("hidden",$("publicationMode").value!=="delay")}
 function gather(){return{style:$("style").value,target_subcategory:$("subcategory").value,headline_ru:$("headline").value,hook_ru:$("hook").value,lead_ru:$("lead").value,story_ru:$("story").value,why_matters_ru:$("why").value,needs_more_facts:$("needsMoreFacts").checked,image_needed:$("imageNeeded").checked,image_choice:$("imageChoice").value,image_exception_reason:$("imageException").value}}
 function fill(item){const i=item.article;const map={headline:i.headline_ru||i.title_ru||i.title_original,hook:i.hook_ru||"",lead:i.lead_ru||i.summary_ru||"",story:i.story_ru||"",why:i.why_matters_ru||"",style:i.style||"short",needsMoreFacts:i.draft_id?!!i.needs_more_facts:true,imageNeeded:!!i.image_needed,imageChoice:i.image_choice||"no_image",imageException:i.image_exception_reason||""};
  $("headline").value=map.headline;$("hook").value=map.hook;$("lead").value=map.lead;$("story").value=map.story;$("why").value=map.why;$("style").value=map.style;$("needsMoreFacts").checked=map.needsMoreFacts;$("imageNeeded").checked=map.imageNeeded;$("imageChoice").value=map.imageChoice;$("imageException").value=map.imageException;
@@ -357,7 +358,7 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  $("approvalWarning").textContent=me?.user?.role==="owner"
  ? (i.intake_ready?"Приёмка пройдена. Одно нажатие «Утвердить» сохранит решение и запланирует публикацию.":"Приёмка не пройдена: "+(reasons.join("; ")||"есть замечания")+". Нажатие «Утвердить» зафиксирует исключения под ответственность владельца и попытается запланировать публикацию. Если нет пригодного текста, даты или изображения, материал будет утверждён, но не отправлен.")
  : (i.intake_ready?"Техническая приёмка пройдена.":"Приёмка не пройдена: "+reasons.join("; "));
- dirty=false;renderMedia(item.media);renderHistory(item);renderPreview();
+ dirty=false;instagramCaptionCached="";renderMedia(item.media);renderHistory(item);renderPreview();refreshInstagramState(i.id);
 }
 const PHOTO_API="https://br-young-paper-b972wmgd-prphoto.compute.c-7.eu-central-1.aws.neon.tech";
 async function photoCall(path,options={}){
@@ -773,6 +774,7 @@ function bind(){
  $("copyTelegramBtn").onclick=async()=>{if(current?.article?.status!=="approved"||current?.article?.editorial_status!=="approved"){toast("Сначала утвердите материал в редакции",true);return}if(!current?.article?.telegram_text){toast("Нет готового текста",true);return}if(dirty){toast("Сначала сохраните изменения",true);return}try{await navigator.clipboard.writeText(current.article.telegram_text);toast("Готовый текст с хештегом скопирован")}catch(e){toast("Не удалось скопировать текст автоматически",true)}};
  $("saveBtn").onclick=saveArticle;
  $("modePhone").onclick=()=>{previewMode="phone";renderPreview()};
+ $("modeInstagram").onclick=()=>{previewMode="instagram";renderPreview()};
  $("modeArticle").onclick=()=>{previewMode="article";renderPreview()};
  $("quickHeadline").onclick=()=>jumpEditor("headline");
  $("quickStory").onclick=()=>jumpEditor("story");
@@ -787,6 +789,17 @@ function bind(){
  $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
  $("reopenBtn").onclick=()=>sendAction("reopen");
  $("publicationMode").onchange=updatePublicationMode;updatePublicationMode();
+ function updateDestinations(){
+  const tg=$("publishTelegram").checked,ig=$("publishInstagram").checked;
+  $("publishTargetsHint").textContent="Выбрано: "+([tg?"Telegram":null,ig?"Instagram":null].filter(Boolean).join(" + ")||"ни одной площадки");
+  $("approveBtn").disabled=!(tg||ig)||approvalPending||!me?.user?.approve;
+  if(ig&&!tg){previewMode="instagram";renderPreview()}
+  else if(tg&&!ig&&previewMode==="instagram"){previewMode="phone";renderPreview()}
+ }
+ $("publishTelegram").onchange=updateDestinations;
+ $("publishInstagram").onchange=updateDestinations;
+ $("copyInstagramBtn").onclick=async()=>{if(!instagramCaptionCached){toast("Нет подписи Instagram",true);return}try{await navigator.clipboard.writeText(instagramCaptionCached);toast("Подпись Instagram скопирована")}catch{toast("Не удалось скопировать текст",true)}};
+ updateDestinations();
  $("approveBtn").onclick=approveAndQueue;
  $("commentBtn").onclick=async()=>{const note=$("comment").value;if(!note.trim())return;await sendAction("comment",{note})};
  window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
