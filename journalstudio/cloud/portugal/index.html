@@ -583,10 +583,27 @@ function renderPreview(){
    '<nav class="pt-post-nav-preview" aria-label="Кнопки после публикации"><a href="https://t.me/pt_afisha" target="_blank" rel="noopener noreferrer">🎭 Афиша</a><a href="https://t.me/pt_ryadom_chat" target="_blank" rel="noopener noreferrer">💬 Чат и темы</a></nav>':"";
   const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events",i.trailyo_event,img?.public_url||i.photo_url)+'</div>'+timestamp+mainNavPreview+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
- $("modePhone").classList.toggle("selected",previewMode==="phone");$("modeArticle").classList.toggle("selected",previewMode==="article");
- $("modePhone").setAttribute("aria-pressed",previewMode==="phone"?"true":"false");
- $("modeArticle").setAttribute("aria-pressed",previewMode==="article"?"true":"false");
- if(previewMode==="phone"){
+ for(const [id,mode] of [["modePhone","phone"],["modeInstagram","instagram"],["modeArticle","article"]]){
+  $(id).classList.toggle("selected",previewMode===mode);
+  $(id).setAttribute("aria-pressed",previewMode===mode?"true":"false");
+ }
+ $("copyTelegramBtn").classList.toggle("hidden",previewMode==="instagram");
+ $("copyInstagramBtn").classList.toggle("hidden",previewMode!=="instagram");
+ if(previewMode==="instagram"){
+  const caption=instagramCaption(f,i,img);instagramCaptionCached=caption;
+  const approvedMedia=img?.status==="approved"&&img?.rights_verified===true;
+  root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone ig-phone">'+
+   '<div class="pt-phone-status"><span>9:41</span><span>◕ ▰ ▴</span></div>'+
+   '<div class="ig-top"><span>‹</span><strong>Instagram</strong><span>⋯</span></div>'+
+   '<div class="ig-author"><span class="ig-avatar">🇵🇹</span><strong>pt_ryadom</strong><span>⋯</span></div>'+
+   (img?'<img class="ig-cover" src="'+escapeHtml(img.public_url)+'" alt="Изображение Instagram">':'<div class="ig-no-photo">Для Instagram нужна утверждённая фотография или AI-иллюстрация</div>')+
+   '<div class="ig-actionbar"><span>♡　♧　➤</span><span>▢</span></div>'+
+   '<div class="ig-caption"><strong>pt_ryadom</strong> '+escapeHtml(caption)+'</div>'+
+   '<div class="ig-bottom">⌂　　　 ⌕　　　 ⊞　　　 ♡　　　 ◉</div></div></div>';
+  $("previewHint").textContent=img&&!approvedMedia?"⚠️ Фото видно для предпросмотра, но не подтверждено для Instagram":
+   img?"Предпросмотр Instagram. Публикация через Buffer, текст редактируется вместе со статьёй.":"⚠️ Для Instagram требуется изображение. Для Telegram фото необязательно.";
+  $("tgLength").textContent=caption.length+" / 2200 символов · "+(approvedMedia?"фото утверждено":"фото не подтверждено");
+ }else if(previewMode==="phone"){
   root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone">'+
    '<div class="pt-phone-status"><span>9:41</span><span>◕ ▰ ▴</span></div>'+
    '<div class="pt-channel-head"><span class="pt-channel-back">‹</span><span class="pt-channel-avatar">🇵🇹</span><div class="pt-channel-meta"><strong>Португалия рядом</strong><small>Telegram · канал</small></div><span style="font-size:19px;color:#799994">⋮</span></div>'+
