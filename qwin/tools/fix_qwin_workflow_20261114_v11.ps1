@@ -185,7 +185,7 @@ $xp=$xp.Replace($oldCard,$newCard)
 $direct='if(item.isExternal)return _ebayItemDetail(item);'
 if($xp.Contains($direct)){
   $replacement="if(item.isExternal){"+[char]10+
-    "      if(widget.store.neon?.ebayEnabled!=true)"+[char]10+
+    "      if(item.externalSource=='ebay'&&widget.store.neon?.ebayEnabled!=true)"+[char]10+
     "        return Scaffold(appBar:AppBar(),"+[char]10+
     "          body:Center(child:Text(QwinStrings.t(widget.locale,'itemUnavailable'))));"+[char]10+
     "      return _ebayItemDetail(item);"+[char]10+"    }"
