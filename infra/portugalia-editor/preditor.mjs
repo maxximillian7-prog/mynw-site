@@ -54,6 +54,21 @@ async function save(u,p){
  await audit(id,u,"save","",prev,{headline_ru:name,lead_ru:lead,story_ru:story,style,needs_more_facts:needs,image_choice:choice});
  return{ok:true,saved:true};
 }
+
+async function dispatchTelegramNow(postId){
+ // Dispatch is attempted immediately, and the existing scheduled publisher is the fallback.
+ // Never claim success before querying the saved delivery state.
+ try{
+  const response=await fetch("https://br-young-paper-b972wmgd-prpublish.compute.c-7.eu-central-1.aws.neon.tech/run",{method:"POST",signal:AbortSignal.timeout(55000)});
+  if(!response.ok)console.error("Immediate Telegram dispatch returned HTTP",response.status);
+ }catch(e){console.error("Immediate Telegram dispatch unavailable",String(e.message||e).slice(0,120))}
+ const rows=await sql("SELECT status,last_error,sent_at FROM public.pr_posts WHERE id=$1::uuid",[postId]);
+ const r=rows[0]||{};
+ return {sent:r.status==="sent",queued:["queued","scheduled","sending"].includes(r.status),
+  telegram_status:r.status||"unknown",
+  ...(r.status==="failed"?{warning:"Telegram: "+String(r.last_error||"отправка завершилась ошибкой").slice(0,160)}:{})};
+}
+
 async function action(u,p){
  const id=p.item_id,a=p.action,note=cut(p.note,1500);
  if(!uuid(id))throw err("Неверный ID");
@@ -98,8 +113,10 @@ async function action(u,p){
  if(a==="approve_and_queue"){
   if(u.role!=="owner")throw err("Окончательное утверждение с исключениями доступно только владельцу",403);
   const mode=p.schedule_mode??"default";
-  if(!["default","delay","manual"].includes(mode))throw err("Неверный режим времени",400);
+  if(!["default","delay","manual","now"].includes(mode))throw err("Неверный режим времени",400);
   let delay=null,publishAt=null;
+  if(mode==="now")delay=0;
+  if(mode==="now")delay=0;
   if(mode==="delay"){
    delay=Number(p.delay_minutes??p.schedule_delay_minutes);
    if(!Number.isInteger(delay)||delay<1||delay>525600)throw err("Неверная задержка",400);
@@ -113,6 +130,10 @@ async function action(u,p){
   }
   const rows=await sql("SELECT * FROM public.pr_owner_approve_and_queue($1::uuid,$2::uuid,$3::text,$4::integer,$5::timestamptz)",[id,u.id,note,delay,publishAt]);
   if(!rows.length)throw err("Не удалось выполнить утверждение",500);
+  if(mode==="now"&&rows[0].post_id&&rows[0].queued){
+   const delivery=await dispatchTelegramNow(rows[0].post_id);
+   return {ok:true,...rows[0],...delivery};
+  }
   return {ok:true,...rows[0]};
  }
  if(a==="confirm_value"){
@@ -154,7 +175,7 @@ async function action(u,p){
    if(!details?.source_type||details.source_type==="partner")throw err("Партнёрские и неподтверждённые по типу источника события исключены из Афиши",409);
   }
   const mode=p.schedule_mode??"default";
-  if(!["default","delay","manual"].includes(mode))throw err("Неизвестный режим публикации",400);
+  if(!["default","delay","manual","now"].includes(mode))throw err("Неизвестный режим публикации",400);
   let delay=null,publishAt=null;
   if(mode==="delay"){
    delay=Number(p.delay_minutes??p.schedule_delay_minutes);
@@ -169,6 +190,10 @@ async function action(u,p){
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_schedule_publication($1::uuid,$2::text,$3::integer,$4::timestamptz)",[id,destination,delay,publishAt]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
   await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for,schedule_mode:mode,requested_at:publishAt,delay_minutes:delay});
+  if(mode==="now"){
+   const delivery=await dispatchTelegramNow(reservation.post_id);
+   return {ok:true,destination,post_id:reservation.post_id,scheduled_for:reservation.scheduled_for,...delivery};
+  }
   return{ok:true,queued:true,sent:false,destination,post_id:reservation.post_id,scheduled_for:reservation.scheduled_for};
  }
  throw err("Неизвестная операция");
