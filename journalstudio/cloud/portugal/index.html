@@ -564,9 +564,13 @@ async function refreshInstagramState(id){
   const result=await bufferCall("/api/instagram?item_id="+encodeURIComponent(id));
   if(current?.article?.id!==id)return;
   current.instagram=result.instagram;
-  $("instagramQueueStatus").textContent=result.instagram?.buffer_post_id?
-   "Instagram: "+(result.instagram.status==="draft"?"черновик Buffer":result.instagram.status)+" · "+result.instagram.buffer_post_id:
-   result.instagram?.status?"Instagram: "+result.instagram.status:"Instagram: ещё не поставлено в очередь";
+  const status=result.instagram?.status;
+  const statusLabel=status==="published"?"опубликовано":status==="queued"?"в очереди Buffer":status==="draft"?"черновик":status==="awaiting_approval"?"ожидает выбора":"ещё не запланировано";
+  const link=String(result.instagram?.public_url||"");
+  $("instagramQueueStatus").textContent="Instagram: "+statusLabel+(result.instagram?.buffer_status?" ("+result.instagram.buffer_status+")":"");
+  if(status==="published"&&/^https:\/\//.test(link)){
+   const a=document.createElement("a");a.href=link;a.target="_blank";a.rel="noopener noreferrer";a.textContent=" · Открыть опубликованный пост";$("instagramQueueStatus").append(a);
+  }
   if(previewMode==="instagram")renderPreview();
  }catch(e){if(current?.article?.id===id)$("instagramQueueStatus").textContent="Instagram: "+e.message}
 }
