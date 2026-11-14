@@ -307,7 +307,9 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  const children=categories.filter(x=>x.parent_code===i.primary_category);$("subcategory").innerHTML='<option value="">Без подрубрики</option>'+children.map(x=>'<option value="'+escapeHtml(x.code)+'">'+escapeHtml(x.name_ru)+'</option>').join("");$("subcategory").value=i.target_subcategory||"";
  const secure=/^https:\/\//i.test(i.canonical_url||"");$("originalTitle").textContent=i.title_original||"Без заголовка";$("originalExcerpt").textContent=i.source_context_used||i.body_original||"Контекст источника ещё не получен";$("originalDate").textContent=iso(i.source_published_at||i.discovered_at);$("originalLink").href=secure?i.canonical_url:"#";$("originalLink").style.display=secure?"":"none";
  $("pageTitle").textContent=i.headline_ru||i.title_ru||i.title_original;$("pageSubtitle").textContent=i.source_name+" • "+(i.location_city||"Португалия");
- $("storyStatus").textContent=statuses[i.editorial_status||i.status]||"Входящее";$("storyStatus").className="pill "+badge(i.editorial_status||i.status);$("mainCategory").textContent=categories.find(x=>x.code===i.primary_category)?.name_ru||i.primary_category;
+ const fullyApproved=i.status==="approved"&&i.editorial_status==="approved";
+ $("storyStatus").textContent=fullyApproved?"Утверждено":(i.editorial_status==="approved"?"Ожидает утверждения":statuses[i.editorial_status||i.status]||"В обработке");
+ $("storyStatus").className="pill "+(fullyApproved?"green":badge(i.status));$("mainCategory").textContent=categories.find(x=>x.code===i.primary_category)?.name_ru||i.primary_category;
  const reasons=Array.isArray(i.intake_issues)?i.intake_issues:[];
  $("intakeDiagnostic").textContent=i.intake_ready
  ? "✓ Готово к редакционной приёмке: русский заголовок и текст, завершённый рассказ, проверенный тип источника, разрешённая обложка, хештег и ценность для читателя."
@@ -329,8 +331,8 @@ function fill(item){const i=item.article;const map={headline:i.headline_ru||i.ti
  $("approveBtn").textContent=isApproved?"↗ Запланировать публикацию":"✓ Утвердить и запланировать";
  $("approveBtn").disabled=!me?.user?.approve||approvalPending||i.status==="rejected"||i.status==="expired";
  $("destination").disabled=true; // Prevent cross-channel routing; server enforces category classification.
- $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected");
- $("approvalWarning").textContent=i.intake_ready?"Техническая приёмка пройдена. Перед окончательным утверждением редактор проверяет содержание, исходную ссылку и права на иллюстрацию.":"Неполный материал не может быть утверждён. Причины указаны вверху; ручное подтверждение фактов потребуется после исправлений.";
+ $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected"||i.editorial_status==="approved");
+ $("approvalWarning").textContent=i.intake_ready?"Техническая приёмка пройдена. Перед окончательным утверждением редактор проверяет содержание, исходную ссылку и права на иллюстрацию.":(reasons.length===1&&reasons[0]==="Полезность и интерес для читателей не подтверждены"?"Автоматическая оценка интереса недостаточна. При утверждении владелец редакции сможет вручную подтвердить ценность материала после просмотра; оценка ИИ останется в истории.":"Неполный материал не может быть утверждён. Нужно исправить: "+reasons.join("; "));
  dirty=false;renderMedia(item.media);renderHistory(item);renderPreview();
 }
 const PHOTO_API="https://br-young-paper-b972wmgd-prphoto.compute.c-7.eu-central-1.aws.neon.tech";
@@ -572,7 +574,7 @@ async function list(){
  const picture=/^https:\/\//i.test(i.media_preview_url||"")?'<img loading="lazy" class="thumb" src="'+escapeHtml(i.media_preview_url)+'" alt="Иллюстрация к статье">':
  '<div class="thumb thumbPlaceholder" title="Иллюстрация пока не утверждена">'+(i.primary_category==="events"?"🎭":i.primary_category==="places"?"🌿":i.primary_category==="documents"?"📑":i.primary_category==="family"?"👨‍👩‍👧":i.primary_category==="life"?"🏡":"📰")+'</div>';
  const pub=(i.publications||[]).find(p=>["queued","scheduled"].includes(p.status));const when=i.scheduled_for||pub?.scheduled_for;
- return '<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+(i.intake_ready?"green":badge(i.editorial_status))+'">'+escapeHtml(i.intake_ready?"На приёмку":(statuses[i.editorial_status||"candidate"]||"В подготовке"))+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at)+costLabel)+'</span></div><div class="articleHero">'+picture+'<div class="copy"><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong>'+(i.article_excerpt?'<div class="articleSummary">'+escapeHtml(i.article_excerpt)+'</div>':"")+(i.category_hashtag?'<div class="faint">'+escapeHtml(i.category_hashtag)+'</div>':"")+'</div></div><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div>'+(['queued','approved'].includes(activeStatus)?'<div class="meta" style="font-weight:700;color:#12666b" data-publication-id="'+escapeHtml(i.id)+'">'+(pub?'🕒 Запланировано: '+escapeHtml(when?lisbonSchedule(when):'уточняется…'):'🕒 Проверяем статус публикации…')+'</div>':'')+'</button>';
+ return '<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+(i.intake_ready?"green":badge(i.editorial_status))+'">'+escapeHtml(i.item_status==="approved"&&i.editorial_status==="approved"?"Утверждено":i.intake_ready?"На приёмку":i.editorial_status==="approved"?"Ожидает согласования":(statuses[i.editorial_status||"candidate"]||"В подготовке"))+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at)+costLabel)+'</span></div><div class="articleHero">'+picture+'<div class="copy"><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong>'+(i.article_excerpt?'<div class="articleSummary">'+escapeHtml(i.article_excerpt)+'</div>':"")+(i.category_hashtag?'<div class="faint">'+escapeHtml(i.category_hashtag)+'</div>':"")+'</div></div><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div>'+(['queued','approved'].includes(activeStatus)?'<div class="meta" style="font-weight:700;color:#12666b" data-publication-id="'+escapeHtml(i.id)+'">'+(pub?'🕒 Запланировано: '+escapeHtml(when?lisbonSchedule(when):'уточняется…'):'🕒 Проверяем статус публикации…')+'</div>':'')+'</button>';
  }).join("")||"<p class='secondary'>В этой очереди пока пусто.</p>";
  document.querySelectorAll(".articleRow").forEach(x=>x.onclick=()=>selectArticle(x.dataset.id));
  if(["queued","approved"].includes(activeStatus)){await Promise.all(items.map(async i=>{const node=document.querySelector('[data-publication-id="'+i.id+'"]');if(!node)return;try{const d=await call("/api/article?id="+encodeURIComponent(i.id));const pubs=d.publications||[];const sent=pubs.filter(p=>p.status==="sent").sort((a,b)=>Date.parse(b.sent_at||0)-Date.parse(a.sent_at||0))[0];const scheduled=pubs.filter(p=>["queued","scheduled","sending"].includes(p.status)).sort((a,b)=>Date.parse(a.scheduled_for||0)-Date.parse(b.scheduled_for||0))[0];node.textContent=sent?"✓ Опубликовано: "+lisbonSchedule(sent.sent_at||sent.scheduled_for):scheduled?"🕒 Запланировано: "+lisbonSchedule(scheduled.scheduled_for):"⚠ Утверждено, но не поставлено в очередь";node.style.color=!sent&&!scheduled?"#ad4e22":"#12666b"}catch(e){node.textContent="⚠ Статус публикации недоступен"}}))}
@@ -592,8 +594,19 @@ async function approveAndQueue(){
    await call("/api/save",{method:"POST",body:{item_id:id,fields:gather()}});
    dirty=false;
   }
-  const latest=await call("/api/article?id="+encodeURIComponent(id));
+  let latest=await call("/api/article?id="+encodeURIComponent(id));
   approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
+  if(!approved&&!latest.article.intake_ready){
+   const issues=Array.isArray(latest.article.intake_issues)?latest.article.intake_issues:[];
+   const valueIssue="Полезность и интерес для читателей не подтверждены";
+   if(issues.length!==1||issues[0]!==valueIssue)throw Error("Сначала исправьте проблемы приёмки: "+(issues.join("; ")||"неполный материал"));
+   const score=Number(latest.article.editorial_value_score)||0;
+   const decision=confirm("Автоматическая оценка интереса для читателей — "+score+" баллов и ниже установленного порога. Вы лично изучили статью и подтверждаете её ценность для аудитории? В этом случае решение будет записано в историю редакции. Данные, факты и фото по-прежнему будут проверяться.");
+   if(!decision)throw Error("Редакционная ценность не подтверждена. Публикация не выполнялась.");
+   await call("/api/action",{method:"POST",body:{item_id:id,action:"confirm_value",confirm_value:true,reason:"Редактор изучил материал и лично подтвердил интерес для читателей, несмотря на низкую автоматическую оценку."}});
+   latest=await call("/api/article?id="+encodeURIComponent(id));
+   if(!latest.article.intake_ready)throw Error("Материал всё ещё не готов: "+(latest.article.intake_issues||[]).join("; "));
+  }
   if(!approved){
    // The editor's approval click records the factual sign-off. This is human
    // attestation against a source, not an independent automated fact-check.
