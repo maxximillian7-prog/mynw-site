@@ -24,9 +24,9 @@ async function identity(request){
   fetch(STUDIO+"/functions/v1/studio-api/projects",{headers,signal:AbortSignal.timeout(12000)})]);
  if(!userResponse.ok||!projectsResponse.ok)throw fail("Редакционная сессия истекла",401);
  const user=await userResponse.json(),projects=await projectsResponse.json();
- if(!isUuid(user.id)||!(projects.projects||[]).some(p=>p.slug==="nowgreen"&&["owner","chief_editor"].includes(p.role)))
-  throw fail("Недостаточно прав на публикацию",403);
- return user.id;
+ const member=(projects.projects||[]).find(p=>p.slug==="nowgreen"&&["owner","chief_editor"].includes(p.role));
+ if(!isUuid(user.id)||!member)throw fail("Недостаточно прав на публикацию",403);
+ return {id:user.id,role:member.role};
 }
 async function buffer(query,variables={}){
  if(!process.env.BUFFER_API_KEY)throw fail("Buffer API не подключён",503);
@@ -117,10 +117,17 @@ export default {async fetch(request){
    const id=url.searchParams.get("item_id");if(!isUuid(id))throw fail("Неверный ID",400);
    return json({ok:true,instagram:await fetchDraft(id)},200,origin);
   }
+  if(url.pathname==="/api/instagram/approve"&&request.method==="POST"){
+   if(editor.role!=="owner")throw fail("Это утверждение доступно только владельцу журнала",403);
+   const data=await request.json().catch(()=>({}));
+   if(!isUuid(data.item_id))throw fail("Неверный ID статьи",400);
+   const result=await sql("SELECT * FROM public.pr_owner_approve_for_instagram($1::uuid,$2::uuid,$3::text)",[data.item_id,editor.id,String(data.note||"").slice(0,1500)]);
+   return json({ok:true,approval:result[0]||null},200,origin);
+  }
   if(url.pathname==="/api/instagram/schedule"&&request.method==="POST"){
    const data=await request.json().catch(()=>({}));
    if(!isUuid(data.item_id))throw fail("Неверный ID статьи",400);
-   const result=await schedule(data.item_id,data,editor);
+   const result=await schedule(data.item_id,data,editor.id);
    return json(result,200,origin);
   }
   return json({error:"not_found"},404,origin);
