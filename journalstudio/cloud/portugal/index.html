@@ -127,6 +127,28 @@ input[type=search]{width:100%} .filters select{width:100%}
 .pt-ai-cover-head span{font-size:11px;color:#4e8177;border-radius:8px;background:#fff;padding:5px 8px}
 .pt-ai-cover .btn{font-size:12px;padding:9px 11px}
 .pt-ai-label{display:inline-block;background:#fff2d3;color:#795000;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:800}
+
+
+/* PRIVATE JOURNAL CONTACT INBOX */
+.contactDesk{grid-column:2 / 4;min-width:0;padding:23px;background:#f4f9f7;min-height:100vh}
+.contactHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:18px}
+.contactHeader h2{margin:0 0 6px;color:#225a57}
+.contactGrid{display:grid;grid-template-columns:minmax(260px,360px) minmax(380px,1fr);gap:14px;align-items:start}
+.contactListPane,.contactThreadPane{background:white;border:1px solid #dce8e3;border-radius:14px;padding:15px;min-width:0;box-shadow:0 5px 18px #153f4310}
+.contactListPane{max-height:calc(100vh - 130px);overflow:auto}
+.contactRow{display:block;width:100%;text-align:left;background:white;color:#244b48;border:1px solid #dae7e3;border-radius:10px;padding:11px;margin:0 0 7px;cursor:pointer}
+.contactRow.active{border-color:#138c86;background:#effaf6}
+.contactRow strong{display:block;font-size:13px;margin-bottom:4px}
+.contactRow .secondary{margin-top:4px;display:block}
+.contactMessage{border:1px solid #dfe9e6;background:#f3f7f6;padding:10px 13px;border-radius:11px;margin:9px 0;max-width:90%;white-space:pre-wrap;overflow-wrap:anywhere}
+.contactMessage.out{margin-left:auto;background:#eaf8f0;border-color:#c8e9da}
+.contactMessage small{font-size:10px;color:#738987;display:block;margin:0 0 6px}
+.contactThreadPane textarea{width:100%;min-height:105px}
+.contactPair pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border-radius:8px;background:#e5f6f0}
+.contactMeta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.contactActions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+@media(max-width:1000px){.contactDesk{grid-column:2;grid-row:auto}.contactGrid{grid-template-columns:minmax(0,1fr)}.contactListPane{max-height:380px}}
+@media(max-width:650px){.contactDesk{padding:15px}.contactHeader{display:block}.contactGrid{display:block}.contactListPane{margin-bottom:12px}}
 </style></head>
 <body>
 <div class="layout">
@@ -138,6 +160,8 @@ input[type=search]{width:100%} .filters select{width:100%}
  <button class="statusNav active" data-channel="main">📰 Основной канал <b id="countMainInbox">0</b></button>
  <button class="statusNav" data-channel="afisha">🎭 Афиша <b id="countAfishaInbox">0</b></button>
  </div>
+ <div class="navtitle">Связь с читателями</div>
+ <div class="navStatuses"><button id="contactNav" class="statusNav" type="button">📩 Обращения <b id="countContacts">0</b></button></div>
  <div class="navtitle">Этап редакции</div>
  <div class="navStatuses" id="statusTabs">
  <button class="statusNav" data-status="all">Все материалы <b>•</b></button>
@@ -228,16 +252,30 @@ input[type=search]{width:100%} .filters select{width:100%}
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
 </div>
 </main>
+<section id="contactDesk" class="contactDesk hidden" aria-label="Обращения к редакции">
+ <div class="contactHeader"><div><div class="eyebrow">Португалия рядом / связь с читателями</div><h2>📩 Обращения через @pt_ryadom_bot</h2><div class="secondary">Вопросы, реклама, предложения, жалобы, сотрудничество и сообщения о событиях. Ответы уходят через бота.</div></div><div class="contactActions"><button class="btn" id="contactRefresh">↻ Обновить</button><button class="btn" id="contactPairButton">Подключить свой Telegram</button></div></div>
+ <div id="contactPair" class="contactPair card hidden"><strong>Подключение Telegram-аккаунта администратора</strong><p class="secondary">Откройте <a href="https://t.me/pt_ryadom_bot" target="_blank" rel="noopener noreferrer">@pt_ryadom_bot</a> и отправьте команду ниже. Код одноразовый, действует 10 минут. После подключения уведомления придут в личный чат, и вы сможете ответить реплаем на сообщение.</p><pre id="contactPairCode"></pre><button class="btn" id="copyContactPairCode">Скопировать команду</button></div>
+ <div class="contactGrid">
+  <div class="contactListPane"><div class="filters"><select id="contactStatus"><option value="all">Все обращения</option><option value="open">Новые / открытые</option><option value="replied">Отвеченные</option><option value="closed">Закрытые</option></select><select id="contactCategory"><option value="all">Все темы</option><option value="question">❓ Вопрос</option><option value="ad">📣 Реклама</option><option value="suggestion">💡 Предложение</option><option value="complaint">⚠️ Жалоба</option><option value="partnership">🤝 Сотрудничество</option><option value="event">🎭 Событие</option><option value="other">✉️ Другое</option></select></div><div id="contactCounts" class="secondary" style="margin:10px 0">Загрузка…</div><div id="contactList" aria-live="polite">Выберите «Обращения»</div></div>
+  <div class="contactThreadPane"><div id="contactEmpty"><strong>Выберите обращение слева</strong><p class="secondary">Здесь будут история сообщений, вложения, ответ через бота и ссылка на прямой контакт, если пользователь указал Telegram username.</p></div>
+  <div id="contactThread" class="hidden"><div class="contactMeta" id="contactThreadMeta"></div><div id="contactThreadMessages"></div>
+    <label class="field"><span>Ответить через @pt_ryadom_bot</span><textarea id="contactReply" maxlength="4000" placeholder="Напишите ответ пользователю…"></textarea></label>
+    <div class="contactActions"><button class="btn primary" id="contactSendReply">✉ Отправить через бота</button><button class="btn" id="contactClose">Закрыть</button><button class="btn hidden" id="contactReopen">Открыть повторно</button><a class="btn hidden" id="contactDirectLink" target="_blank" rel="noopener noreferrer">Написать напрямую в Telegram</a></div>
+   </div></div>
+ </div>
+</section>
 </div>
 <div id="loginOverlay" class="overlay" hidden><div class="loginBox"><h2>🇵🇹 Португалия рядом</h2><p id="loginMessage">Для входа требуется действующая редакционная сессия Journal Studio.</p><a class="btn primary" href="../" style="display:inline-block;margin-top:14px">Войти в Journal Studio</a></div></div>
 <div id="toast" class="toast" hidden></div>
 <script>
 "use strict";
 const API="https://br-young-paper-b972wmgd-preditor.compute.c-7.eu-central-1.aws.neon.tech";
+const BOT_API="https://br-young-paper-b972wmgd-ptbot.compute.c-7.eu-central-1.aws.neon.tech";
 const S="https://npsfaymjckcqhtyiafms.supabase.co",KEY="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 const $=id=>document.getElementById(id),escapeHtml=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const statuses={candidate:"В обработке",needs_facts:"Нужны факты",draft:"Черновик",ready_for_review:"На согласовании",approved:"Утверждено",rejected:"Отклонено",queued:"В очереди"};
 let session,me,categories=[],items=[],current=null,activeStatus="incoming",activeChannel="main",dirty=false,loading=false;
+let contactMode=false,selectedContactId=null,contactPairCommand="";
 let toastTimeout=0,approvalPending=false;
 let previewMode="phone",previewPhotoId=null,photoSearchResults=[];
 function toast(msg,error=false){const el=$("toast");el.textContent=msg;el.classList.toggle("error",error);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.hidden=true,4800)}
@@ -571,9 +609,97 @@ async function sendAction(action,other={}){
  if(dirty&&action!=="comment"&&!confirm("Есть несохранённые правки. Выполнить действие без них?"))return;
  try{const r=await call("/api/action",{method:"POST",body:{item_id:current.article.id,action,note,...other}});toast(action==="queue"?(r.destination==="afisha"?"🎭 Афиша: в очереди, ближайшая автоматическая проверка.":"📰 Главное: не раньше "+lisbonSchedule(r.scheduled_for)+" · интервал ≥2 часов, ночью не отправляем."):"Действие выполнено");await refreshSelected()}catch(e){toast(e.message,true)}
 }
+
+async function contactFetch(path,options={}){
+ if(!session?.access_token)throw Error("Войдите в Journal Studio");
+ const request=()=>fetch(BOT_API+path,{method:options.method||"GET",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"},body:options.body?JSON.stringify(options.body):undefined,cache:"no-store"});
+ let result=await request();
+ if(result.status===401){await call("/api/me");result=await request()}
+ if(options.binary){
+  if(!result.ok)throw Error("Не удалось загрузить вложение");
+  return result.blob();
+ }
+ const data=await result.json().catch(()=>({}));
+ if(!result.ok)throw Error(data.error||"Ошибка обращения");
+ return data;
+}
+function showContactMode(show){
+ contactMode=!!show;
+ document.querySelector(".sectionlist").classList.toggle("hidden",contactMode);
+ document.querySelector("main.workspace").classList.toggle("hidden",contactMode);
+ $("contactDesk").classList.toggle("hidden",!contactMode);
+ $("contactNav").classList.toggle("active",contactMode);
+}
+const contactNames={question:"❓ Вопрос",ad:"📣 Реклама",suggestion:"💡 Предложение",complaint:"⚠️ Жалоба",partnership:"🤝 Сотрудничество",event:"🎭 Событие",other:"✉️ Другое"};
+async function contactListLoad(){
+ const status=$("contactStatus").value,category=$("contactCategory").value;
+ const data=await contactFetch("/api/contacts?status="+encodeURIComponent(status)+"&category="+encodeURIComponent(category));
+ const counts=data.counts||{};
+ $("contactCounts").textContent="Новые: "+(counts.open_count||0)+" · Ответы: "+(counts.replied_count||0)+" · Закрытые: "+(counts.closed_count||0);
+ $("countContacts").textContent=counts.open_count||0;
+ $("contactList").innerHTML=(data.threads||[]).map(t=>
+  '<button class="contactRow '+(t.id===selectedContactId?"active":"")+'" data-contact-id="'+escapeHtml(t.id)+'">'+
+  '<strong>№'+escapeHtml(t.ticket_no)+" · "+escapeHtml(contactNames[t.category]||t.category)+'</strong>'+
+  '<span>'+escapeHtml(t.username?"@"+t.username:t.display_name||"Читатель")+' · '+escapeHtml(t.status==="open"?"Новое":t.status==="replied"?"Отвечено":"Закрыто")+'</span>'+
+  '<span class="secondary">'+escapeHtml(String(t.preview||"Вложение").slice(0,180))+'</span></button>'
+ ).join("")||'<div class="secondary">Обращений с такими фильтрами нет.</div>';
+ $("contactList").querySelectorAll("[data-contact-id]").forEach(x=>x.onclick=()=>openContact(x.dataset.contactId));
+}
+function messageDetail(m){
+ let result='<div class="contactMessage '+(m.direction==="out"?"out":"")+'"><small>'+(m.direction==="out"?"Редактор":"Читатель")+' · '+escapeHtml(iso(m.created_at))+' · '+escapeHtml(m.media_type||"text")+'</small>';
+ if(m.body)result+='<div>'+escapeHtml(m.body)+'</div>';
+ if(m.has_attachment)result+='<div style="margin-top:8px"><button class="btn" data-contact-media="'+escapeHtml(m.id)+'">📎 '+escapeHtml(m.media_name||"Открыть вложение")+'</button></div>';
+ if(m.media_type==="location"&&Number.isFinite(Number(m.media_metadata?.location?.latitude))&&Number.isFinite(Number(m.media_metadata?.location?.longitude))){
+  const map='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m.media_metadata.location.latitude+','+m.media_metadata.location.longitude);
+  result+='<div><a href="'+escapeHtml(map)+'" target="_blank" rel="noopener noreferrer">📍 Геопозиция на карте</a></div>';
+ }
+ return result+"</div>";
+}
+async function openContact(id){
+ if(!/^[0-9a-f-]{36}$/i.test(id))return;
+ selectedContactId=id;const data=await contactFetch("/api/contact?id="+encodeURIComponent(id));
+ const t=data.thread;
+ $("contactEmpty").classList.add("hidden");$("contactThread").classList.remove("hidden");
+ $("contactThreadMeta").innerHTML='<strong>Обращение №'+escapeHtml(t.ticket_no)+'</strong><span>'+escapeHtml(contactNames[t.category]||t.category)+'</span><span class="pill">'+escapeHtml(t.status)+'</span><span>'+escapeHtml(t.username?"@"+t.username:t.display_name||"Читатель")+'</span>';
+ $("contactThreadMessages").innerHTML=(data.messages||[]).map(messageDetail).join("");
+ $("contactReply").value="";$("contactReply").disabled=t.status==="closed";$("contactSendReply").disabled=t.status==="closed";
+ $("contactClose").classList.toggle("hidden",t.status==="closed");$("contactReopen").classList.toggle("hidden",t.status!=="closed");
+ const direct=$("contactDirectLink");direct.classList.toggle("hidden",!data.private_chat_url);if(data.private_chat_url)direct.href=data.private_chat_url;
+ $("contactThreadMessages").querySelectorAll("[data-contact-media]").forEach(b=>b.onclick=async()=>{
+  try{
+   b.disabled=true;
+   const file=await contactFetch("/api/contact/media?message_id="+encodeURIComponent(b.dataset.contactMedia),{binary:true});
+   const address=URL.createObjectURL(file);
+   const link=document.createElement("a");link.href=address;link.download=(b.textContent||"attachment").replace(/^📎\s*/,"").slice(0,100)||"telegram-attachment";
+   document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(address),30000);
+  }catch(e){toast(e.message,true)}finally{b.disabled=false}
+ });
+ $("contactList").querySelectorAll("[data-contact-id]").forEach(x=>x.classList.toggle("active",x.dataset.contactId===id));
+}
+function bindContacts(){
+ $("contactNav").onclick=async()=>{if(dirty&&!confirm("Есть несохранённые изменения статьи. Перейти к обращениям?"))return;showContactMode(true);try{await contactListLoad();if(selectedContactId)await openContact(selectedContactId)}catch(e){toast(e.message,true)}};
+ $("contactRefresh").onclick=async()=>{try{await contactListLoad();if(selectedContactId)await openContact(selectedContactId)}catch(e){toast(e.message,true)}};
+ $("contactStatus").onchange=()=>contactListLoad().catch(e=>toast(e.message,true));
+ $("contactCategory").onchange=()=>contactListLoad().catch(e=>toast(e.message,true));
+ $("contactPairButton").onclick=async()=>{
+  try{const data=await contactFetch("/api/contact/admin-code",{method:"POST",body:{}});contactPairCommand=data.command;$("contactPairCode").textContent=contactPairCommand;$("contactPair").classList.remove("hidden");toast("Код действует 10 минут. Отправьте команду боту.")}catch(e){toast(e.message,true)}
+ };
+ $("copyContactPairCode").onclick=()=>navigator.clipboard.writeText(contactPairCommand).then(()=>toast("Команда скопирована")).catch(()=>toast("Выделите и скопируйте команду вручную",true));
+ $("contactSendReply").onclick=async()=>{
+  const text=$("contactReply").value.trim();if(!selectedContactId||!text)return toast("Введите текст ответа",true);
+  if(!confirm("Отправить ответ пользователю через Telegram-бота?"))return;
+  $("contactSendReply").disabled=true;
+  try{await contactFetch("/api/contact/reply",{method:"POST",body:{thread_id:selectedContactId,text}});toast("Ответ отправлен через бота");await Promise.all([contactListLoad(),openContact(selectedContactId)])}catch(e){toast(e.message,true)}finally{$("contactSendReply").disabled=false}
+ };
+ $("contactClose").onclick=async()=>{if(!selectedContactId)return;try{await contactFetch("/api/contact/status",{method:"POST",body:{thread_id:selectedContactId,status:"closed"}});toast("Обращение закрыто");await Promise.all([contactListLoad(),openContact(selectedContactId)])}catch(e){toast(e.message,true)}};
+ $("contactReopen").onclick=async()=>{if(!selectedContactId)return;try{await contactFetch("/api/contact/status",{method:"POST",body:{thread_id:selectedContactId,status:"open"}});toast("Обращение открыто");await Promise.all([contactListLoad(),openContact(selectedContactId)])}catch(e){toast(e.message,true)}};
+}
+
 function bind(){
+ bindContacts();
  document.querySelectorAll("[data-channel]").forEach(x=>x.onclick=async()=>{
   const next=x.dataset.channel;
+  if(contactMode){showContactMode(false);if(next===activeChannel)return}
   if(next===activeChannel)return;
   if(dirty&&!confirm("Есть несохранённые правки. Переключить канал без сохранения?"))return;
   activeChannel=next;activeStatus="incoming";dirty=false;current=null;items=[];
@@ -586,7 +712,7 @@ function bind(){
   document.querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="incoming"));
   await Promise.all([counts(),list()]);
  });
- document.querySelectorAll("[data-status]").forEach(x=>x.onclick=async()=>{activeStatus=x.dataset.status;document.querySelectorAll("[data-status]").forEach(y=>y.classList.toggle("active",x===y));await list()});
+ document.querySelectorAll("[data-status]").forEach(x=>x.onclick=async()=>{if(contactMode)showContactMode(false);activeStatus=x.dataset.status;document.querySelectorAll("[data-status]").forEach(y=>y.classList.toggle("active",x===y));await list()});
  let searchTimer=null;$("search").oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(list,250)};$("categoryFilter").onchange=list;$("reload").onclick=async()=>{await Promise.all([counts(),list()]);toast("Список обновлён")};
  for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException"])$(id).addEventListener("input",()=>{dirty=true;renderPreview()});
  $("copyTelegramBtn").onclick=async()=>{if(current?.article?.status!=="approved"||current?.article?.editorial_status!=="approved"){toast("Сначала утвердите материал в редакции",true);return}if(!current?.article?.telegram_text){toast("Нет готового текста",true);return}if(dirty){toast("Сначала сохраните изменения",true);return}try{await navigator.clipboard.writeText(current.article.telegram_text);toast("Готовый текст с хештегом скопирован")}catch(e){toast("Не удалось скопировать текст автоматически",true)}};
@@ -612,9 +738,12 @@ function bind(){
 async function start(){
  bind();session=authSession();
  if(!session?.access_token){login("Сначала войдите в Journal Studio. Редакция «Португалия рядом» использует тот же аккаунт.");return}
- try{const [{user},cat]=await Promise.all([call("/api/me"),call("/api/categories")]);me={user};categories=cat.categories||[];$("roleLabel").textContent="Роль: "+user.role;$("connection").textContent="Подключено";$("connection").classList.add("green");
+ try{const [{user},cat]=await Promise.all([call("/api/me"),call("/api/categories")]);me={user};categories=cat.categories||[];$("contactNav").classList.toggle("hidden",!user.approve);$("roleLabel").textContent="Роль: "+user.role;$("connection").textContent="Подключено";$("connection").classList.add("green");
  $("categoryFilter").innerHTML='<option value="all">Все разделы</option>'+categories.filter(x=>!x.parent_code).map(x=>'<option value="'+escapeHtml(x.code)+'">'+escapeHtml(x.name_ru)+'</option>').join("");
- await Promise.all([counts(),list()]);$("loginOverlay").hidden=true;
+ await Promise.all([counts(),list()]);
+ if(user.approve)contactFetch("/api/contacts?status=open").then(d=>{$("countContacts").textContent=d.counts?.open_count||0}).catch(()=>{});
+ if(location.hash==="#contacts"&&user.approve){showContactMode(true);await contactListLoad();}
+ $("loginOverlay").hidden=true;
  }catch(e){login("Не удалось подтвердить доступ: "+e.message)}
 }
 start();
