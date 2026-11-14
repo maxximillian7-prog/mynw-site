@@ -75,7 +75,9 @@ async function action(u,p){
   const m=media.find(x=>x.id===p.media_id);if(!m)throw err("Изображение не найдено",404);
   if(a==="approve_media"){
    const authorizedAI=m.media_type==="generated_illustration"&&m.illustration_label_required===true&&m.storage_bucket==="pr-editorial-media"&&!!m.storage_key&&["neon-gpt5-image-medium","openai-gpt-image-2.5-flare-medium","trailyo_original_ai_import"].includes(m.generation_model);
-   if(!m.public_url||!m.rights_verified||!["licensed_original","owned_original"].includes(m.media_type)&&!authorizedAI||m.status!=="candidate"||m.media_type==="licensed_original"&&(!m.attribution||!m.license_details))throw err("Можно одобрить только реальное фото с проверенными правами либо AI-иллюстрацию с подтверждённым источником генерации",409);
+   const trailyoImage=i.source_code==="trailyo_events"&&i.primary_category==="events"&&m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&m.public_url?.startsWith("https://");
+   const licensed=(m.rights_verified===true&&(["licensed_original","owned_original"].includes(m.media_type)||authorizedAI));
+   if(!m.public_url||m.status!=="candidate"||(!licensed&&!trailyoImage)||m.media_type==="licensed_original"&&(!m.attribution||!m.license_details))throw err("Для других материалов нужна проверенная лицензия; изображение Trailyo допускается после ручного просмотра",409);
    await sql("UPDATE pr_media_assets SET status='approved',approved_by=$2,approved_at=now() WHERE id=$1::uuid",[m.id,u.id]);
   }else{
    if(note.length<10)throw err("Укажите причину отказа");
@@ -97,12 +99,14 @@ async function action(u,p){
   if(!i.intake_ready)throw err("Материал ещё не прошёл полную подготовку: "+(i.intake_issues||[]).join("; ").slice(0,250),409);
   if(!i.draft_id||!i.lead_ru||!i.story_ru||!i.headline_ru)throw err("Нет полноценного текста",409);
   if(!i.context_verified||i.needs_more_facts||!i.source_fact_checked||!evidence.length)throw err("Сначала подтвердите факты и доработайте материал",409);
-  const good=media.some(m=>m.status==="approved"&&m.rights_verified&&m.public_url===i.photo_url&&(["licensed_original","owned_original"].includes(m.media_type)||(m.media_type==="generated_illustration"&&m.illustration_label_required&&m.storage_bucket==="pr-editorial-media"&&!!m.storage_key)));
+  const verifiedPhoto=media.some(m=>m.status==="approved"&&m.rights_verified&&m.public_url===i.photo_url&&(["licensed_original","owned_original"].includes(m.media_type)||(m.media_type==="generated_illustration"&&m.illustration_label_required&&m.storage_bucket==="pr-editorial-media"&&!!m.storage_key)));
+  const trailyoManuallyApproved=media.some(m=>m.status==="approved"&&m.approved_by&&m.public_url===i.photo_url&&m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&i.source_code==="trailyo_events"&&i.primary_category==="events");
+  const good=verifiedPhoto||trailyoManuallyApproved;
   if(i.image_needed&&i.image_choice!=="no_image"&&!good)throw err("Утвердите изображение",409);
   if(i.image_needed&&i.image_choice==="no_image"&&String(i.image_exception_reason||"").length<12)throw err("Для выпуска без картинки нужна причина",409);
   await sql("UPDATE pr_story_drafts SET status='approved',reviewer=$2,reviewed_at=now(),updated_at=now() WHERE item_id=$1::uuid",[id,u.id]);
   await sql("UPDATE pr_items SET status='approved',reviewed_by=$2,reviewed_at=now(),updated_at=now() WHERE id=$1::uuid",[id,u.id]);
-  await sql("INSERT INTO pr_editorial_reviews(item_id,reviewer,decision,rationale,claim_verified,rights_verified) VALUES($1::uuid,$2,'approve',$3,true,$4)",[id,u.id,note,good||!i.image_needed||i.image_choice==="no_image"]);
+  await sql("INSERT INTO pr_editorial_reviews(item_id,reviewer,decision,rationale,claim_verified,rights_verified) VALUES($1::uuid,$2,'approve',$3,true,$4)",[id,u.id,note,verifiedPhoto||!i.image_needed||i.image_choice==="no_image"]);
   await audit(id,u,a,note);return{ok:true,approved:true};
  }
  if(a==="queue"){
@@ -111,6 +115,7 @@ async function action(u,p){
   // Editorial routing follows the topic, not a manually editable destination.
   // All events belong in Afisha; news and articles go to Main.
   const destination=i.primary_category==="events"?"afisha":"main";
+  if(destination==="afisha"&&i.source_code!=="trailyo_events")throw err("Афиша принимает только опубликованные события из Trailyo",409);
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_enqueue_publication_slot($1::uuid,$2::text)",[id,destination]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
   await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for});
