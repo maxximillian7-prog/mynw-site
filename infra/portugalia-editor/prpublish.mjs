@@ -53,8 +53,9 @@ async function promote(){
  return query(sql);
 }
 async function claim(){
- // Database serializes concurrent cron invocations and enforces 120 minutes
- // since the LAST ACTUAL successful Telegram publication, across all channels.
+ // Database serializes concurrent cron invocations.
+ // MAIN: >=120 min since last actual Main send, no sends 00:00-08:00 Lisbon.
+ // AFISHA: no scheduling interval and no quiet hours; still approval-gated.
  return (await query("SELECT * FROM public.pr_claim_due_telegram_post()"))[0]||null;
 }
 async function publish(post){
@@ -101,9 +102,10 @@ export default {async fetch(req){
  const path=new URL(req.url).pathname;
  if(path==="/health"){
   try{
-   const [rows]=await query("SELECT count(*) FILTER (WHERE status IN ('queued','scheduled')) AS pending, min(scheduled_for) FILTER (WHERE status IN ('queued','scheduled')) AS next_due_at, max(sent_at) FILTER (WHERE status='sent') AS last_sent_at FROM public.pr_posts");
-   return json({service:"portugalia-telegram-publisher",version:3,delivery_format:"RichMessage",ready:!!token&&!!dbConn,pending_count:Number(rows?.pending||0),next_due_at:rows?.next_due_at||null,last_sent_at:rows?.last_sent_at||null,min_interval_minutes:120,photo_and_article_in_one:true});
-  }catch(e){return json({service:"portugalia-telegram-publisher",version:3,ready:false,error:safe(e.message)},503);}
+   const rows=await query("SELECT destination_code,count(*) FILTER(WHERE status IN ('queued','scheduled')) AS pending,min(scheduled_for) FILTER(WHERE status IN ('queued','scheduled')) AS next_due_at,max(sent_at) FILTER(WHERE status='sent') AS last_sent_at FROM public.pr_posts WHERE destination_code IN ('main','afisha') GROUP BY destination_code");
+   const channels=Object.fromEntries(rows.map(r=>[r.destination_code,{pending:Number(r.pending||0),next_due_at:r.next_due_at||null,last_sent_at:r.last_sent_at||null}]));
+   return json({service:"portugalia-telegram-publisher",version:4,delivery_format:"RichMessage",ready:!!token&&!!dbConn,channels,policy:{main:{min_interval_minutes:120,quiet_hours_lisbon:"00:00-08:00"},afisha:{min_interval_minutes:0,quiet_hours_lisbon:null}},cron_every_minutes:5,photo_and_article_in_one:true});
+  }catch(e){return json({service:"portugalia-telegram-publisher",version:4,ready:false,error:safe(e.message)},503);}
  }
  if(path!=="/run"&&path!=="/")return json({error:"Route not found"},404);
  try{return json(await execute())}catch(e){return json({ok:false,error:safe(e?.message||e)},500)}
