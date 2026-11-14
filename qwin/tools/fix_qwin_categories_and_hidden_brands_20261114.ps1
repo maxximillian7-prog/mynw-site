@@ -97,7 +97,7 @@ QwinCategoryKeywordSearch(
                 _queueQwinServerSearch();
               }),
             const SizedBox(height:9),
-            '@
+'@
  $home=$home.Insert($idx,$insert)
 }
 # Do not show even old cached external eBay items in the local feed.
@@ -150,7 +150,7 @@ if(-not $ex.Contains('QwinCategoryKeywords.find(official,query,')){
             official.pathLabel(node.id,'pt')))continue;
         matches.add({'id':node.id,'is_leaf':true,'name':node.namePt});
       }
-      '@
+'@
  if(-not $ex.Contains($semanticMarker)){throw 'Seller category search changed; no files modified.'}
  $ex=$ex.Replace($semanticMarker,$semantic+$semanticMarker)
 }
