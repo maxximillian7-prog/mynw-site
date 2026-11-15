@@ -29,14 +29,25 @@ function access(user,chief=false){if(chief?!user.approve:!user.edit)throw err("�
 async function input(req){const raw=await req.text();if(raw.length>28000)throw err("Слишком большой запрос",413);try{return JSON.parse(raw||"{}")}catch{throw err("Неверный JSON")}}
 async function audit(id,u,action,note="",before={},after={}){await sql("INSERT INTO pr_editorial_revisions(item_id,actor_user_id,action,note,before_state,after_state) VALUES($1::uuid,$2::uuid,$3,$4,$5::jsonb,$6::jsonb)",[id,u.id,action,cut(note,1000),JSON.stringify(before),JSON.stringify(after)])}
 async function detail(id){
- const rows=await sql("SELECT i.*,s.name AS source_name,s.code AS source_code,s.verification_status,s.rights_policy,d.id AS draft_id,d.status AS editorial_status,d.style,d.headline_ru,d.hook_ru,d.lead_ru,d.story_ru,d.why_matters_ru,d.context_verified,d.needs_more_facts,d.image_needed,d.image_choice,d.image_exception_reason,d.target_subcategory,d.editorial_note,d.updated_at AS draft_updated_at,d.source_context_used,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score AS editorial_value_score,pr_telegram_hashtag(i.primary_category) AS category_hashtag,(SELECT row_to_json(ev) FROM public.pr_trailyo_event_details ev WHERE ev.item_id=i.id) AS trailyo_event,pr_build_telegram_post(i.id) AS telegram_text,pr_build_telegram_caption(i.id) AS telegram_caption FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id CROSS JOIN LATERAL pr_intake_check(i.id) q WHERE i.id=$1::uuid",[id]);
+ const rows=await sql("SELECT i.*,s.name AS source_name,s.code AS source_code,s.verification_status,s.rights_policy,d.id AS draft_id,d.status AS editorial_status,d.style,d.headline_ru,d.hook_ru,d.lead_ru,d.story_ru,d.why_matters_ru,d.context_verified,d.needs_more_facts,d.image_needed,d.image_choice,d.image_exception_reason,d.target_subcategory,d.editorial_note,d.updated_at AS draft_updated_at,d.source_context_used,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score AS editorial_value_score,pr_telegram_hashtag(i.primary_category) AS category_hashtag,(SELECT row_to_json(ev) FROM public.pr_trailyo_event_details ev WHERE ev.item_id=i.id) AS trailyo_event,pr_build_telegram_post(i.id) AS telegram_text,pr_build_telegram_caption(i.id) AS telegram_caption,g.allowed AS publication_allowed,g.reason AS publication_block_reason,
+ (SELECT EXISTS(SELECT 1 FROM pr_media_assets m WHERE m.item_id=i.id AND m.public_url=i.photo_url
+   AND m.status IN ('approved','candidate')
+   AND m.media_type IN ('licensed_original','owned_original','generated_illustration','brand_generic')
+   AND (m.rights_verified OR public.pr_editor_accepted_unverified_photo(i.id,m.public_url)
+     OR (m.media_type='brand_generic' AND m.generation_model='trailyo_existing_image_reference'
+       AND m.approved_by IS NOT NULL AND s.code='trailyo_events'))
+   AND (m.media_type<>'generated_illustration' OR
+    (m.illustration_label_required AND m.storage_bucket='pr-editorial-media' AND m.storage_key IS NOT NULL))
+ )) AS photo_delivery_ready
+ FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id
+ CROSS JOIN LATERAL pr_intake_check(i.id) q LEFT JOIN LATERAL pr_item_publication_check(i.id) g ON true WHERE i.id=$1::uuid",[id]);
  if(!rows.length)throw err("Статья не найдена",404);
  const [media,evidence,comments,revisions,publications]=await Promise.all([
   sql("SELECT id,media_type,status,public_url,rights_verified,illustration_label_required,attribution,license_details,storage_bucket,storage_key,generation_model,created_at FROM pr_media_assets WHERE item_id=$1::uuid ORDER BY CASE WHEN media_type='brand_generic' THEN 1 ELSE 0 END,created_at DESC",[id]),
   sql("SELECT evidence_url,evidence_type,claim_summary,verified_at FROM pr_item_evidence WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 15",[id]),
   sql("SELECT id,actor_role,body,created_at FROM pr_editorial_comments WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 30",[id]),
   sql("SELECT id,action,note,created_at FROM pr_editorial_revisions WHERE item_id=$1::uuid ORDER BY id DESC LIMIT 30",[id]),
-  sql("SELECT id,destination_code,status,scheduled_for,sent_at FROM pr_posts WHERE item_id=$1::uuid ORDER BY created_at DESC LIMIT 10",[id])]);
+  sql("SELECT id,destination_code,status,scheduled_for,sent_at,last_error,telegram_message_id,attempts FROM pr_posts WHERE item_id=$1::uuid ORDER BY created_at DESC LIMIT 10",[id])]);
  return {article:rows[0],media,evidence,comments,revisions,publications};
 }
 async function save(u,p){
