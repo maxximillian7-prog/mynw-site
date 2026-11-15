@@ -136,7 +136,7 @@ async function promote(){
   SELECT p.id FROM public.pr_posts p
   JOIN public.pr_destinations dst ON dst.code=p.destination_code AND dst.is_enabled AND dst.telegram_chat_id IS NOT NULL
   JOIN LATERAL public.pr_item_publication_check(p.item_id) gate ON gate.allowed=true
-  JOIN public.pr_story_drafts d ON d.item_id=p.item_id AND d.status='approved' AND d.context_verified AND d.needs_more_facts=false
+  JOIN public.pr_story_drafts d ON d.item_id=p.item_id AND d.status='approved' AND ((d.context_verified AND d.needs_more_facts=false) OR public.pr_owner_override_active(p.item_id))
   WHERE p.status='queued' AND (p.scheduled_for IS NULL OR p.scheduled_for<=now())
   ORDER BY CASE WHEN p.schedule_mode='now' THEN 0 ELSE 1 END,p.created_at LIMIT 8 FOR UPDATE OF p SKIP LOCKED
  )
