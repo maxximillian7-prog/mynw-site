@@ -216,3 +216,6 @@ export default {async fetch(request){
   return json({error:"not_found"},404,origin);
  }catch(e){return json({ok:false,error:String(e.message||"Ошибка соединения").slice(0,320)},e.status||500,origin)}
 }};
+
+// Exported for deterministic regression tests; authenticated routes remain unchanged.
+export { instagramImageUrl };
