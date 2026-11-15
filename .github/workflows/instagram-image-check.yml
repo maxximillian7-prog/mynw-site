@@ -1,0 +1,24 @@
+name: Instagram photo sizing regression
+on:
+  push:
+    paths:
+      - "infra/portugalia-editor/prbuffer.mjs"
+      - "infra/portugalia-editor/prbuffer-media.test.mjs"
+      - ".github/workflows/instagram-image-check.yml"
+  pull_request:
+    paths:
+      - "infra/portugalia-editor/prbuffer.mjs"
+      - "infra/portugalia-editor/prbuffer-media.test.mjs"
+      - ".github/workflows/instagram-image-check.yml"
+jobs:
+  image-delivery:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Validate Instagram image variants without third-party requests
+        run: node --test infra/portugalia-editor/prbuffer-media.test.mjs
