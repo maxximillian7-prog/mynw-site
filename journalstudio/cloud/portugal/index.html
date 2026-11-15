@@ -571,9 +571,9 @@ function instagramCaption(f,i,img){
    "https://mynw.app/trailyo/event/?id="+eventId:
    /^https:\/\/mynw\.app\/trailyo\/event\/\?id=[a-f0-9-]{36}$/i.test(i.canonical_url||"")?i.canonical_url:"";
   if(link)details.push("🔗 Событие в Trailyo: "+link);
- }else{
-  details.push("Полные материалы и источники — в Telegram @pt_ryadom");
  }
+ // Full Telegram URL is required in every Instagram caption, including event posts.
+ details.push("Полные материалы и источники — в Telegram: https://t.me/pt_ryadom");
  if(hashtags)details.push(hashtags);
  const footer=details.join("\n\n");
  const raw=[title,lead,why].filter(Boolean).join("\n\n");
