@@ -69,10 +69,13 @@ input[type=search]{width:100%} .filters select{width:100%}
 
 /* Independent destinations and Instagram-style device preview */
 .pt-destinations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.pt-destinations label{display:flex;gap:9px;align-items:center;border:1px solid #d1e3df;border-radius:12px;background:#f7fbfa;padding:12px;font-weight:800;cursor:pointer}
-.pt-destinations label:has(input:checked){border-color:#19817a;background:#eaf6f2}
-.pt-destinations label small{display:block;font-weight:500;font-size:11px;color:#6a8580}
-.pt-destinations input{width:18px;height:18px;accent-color:#187977}
+.pt-dest-card{display:flex;flex-direction:column;gap:5px;border:1px solid #d1e3df;border-radius:12px;background:#f7fbfa;padding:12px}
+.pt-dest-card strong{font-weight:800}
+.pt-dest-card small{font-weight:500;font-size:11px;color:#6a8580}
+.pt-dest-card .secondary{font-size:12px;margin:0}
+.pt-approval-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pt-approval-actions .btn{white-space:normal;min-height:48px}
+@media(max-width:650px){.pt-destinations,.pt-approval-actions{grid-template-columns:1fr}}
 .ig-phone{background:#fff;color:#1d2427}.ig-top{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #edf0f0;font-size:17px}
 .ig-author{height:56px;display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:12px}
 .ig-author strong{flex:1}.ig-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(35deg,#ffb74d,#e8588a,#6d55d3)}
@@ -270,12 +273,15 @@ input[type=search]{width:100%} .filters select{width:100%}
  </div>
 </div></div>
  <div class="card"><h3>⑤ Согласование и выпуск</h3><div id="approvalWarning" class="notice">Редактор проверяет факты, текст, источник и права на изображение до утверждения.</div>
-  <div class="field"><label>Куда отправить статью?</label><div class="pt-destinations" role="group" aria-label="Площадки публикации">
-<label><input id="publishTelegram" type="checkbox" checked><span>✈ Telegram <small>Основной канал / Афиша — по рубрике</small></span></label>
-<label><input id="publishInstagram" type="checkbox"><span>◎ Instagram <small>@pt_ryadom · отдельная очередь</small></span></label>
-</div><p class="secondary" id="publishTargetsHint" role="status">Выбрано: Telegram</p></div>
-<div class="field"><label>Канал Telegram (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field"><label for="publicationMode">Когда опубликовать?</label><select id="publicationMode"><option value="default">Автоматически — не раньше чем через 2 часа</option><option value="now">⚡ Опубликовать сейчас</option><option value="delay">Через заданное время</option><option value="manual">Выбрать дату и время</option></select></div><div class="field hidden" id="publicationDelayRow"><label for="publicationDelay">Через сколько?</label><select id="publicationDelay"><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="120" selected>2 часа</option><option value="180">3 часа</option><option value="360">6 часов</option><option value="720">12 часов</option><option value="1440">24 часа</option></select></div><div class="split hidden" id="publicationDateRow"><div class="field"><label for="publicationDate">Дата</label><input id="publicationDate" type="date"></div><div class="field"><label for="publicationTime">Время (Лиссабон)</label><input id="publicationTime" type="time" value="12:00"></div></div><div class="btns"><button id="approveBtn" class="btn primary">✓ Утвердить и запланировать</button></div><p id="instagramQueueStatus" class="secondary" role="status"></p>
-  <p class="secondary">Одно утверждение для выбранных площадок. Telegram и Instagram имеют независимые очереди. В Instagram отправляются только статьи с одобренным изображением и подтверждёнными правами.</p>
+  <div class="field"><label>Статус по площадкам</label><div class="pt-destinations" role="group" aria-label="Независимое утверждение публикаций">
+<div class="pt-dest-card"><strong>✈ Telegram</strong><small>Основной канал / Афиша — по рубрике</small><p id="telegramQueueStatus" class="secondary" role="status">Ещё не запланировано</p></div>
+<div class="pt-dest-card"><strong>◎ Instagram</strong><small>@pt_ryadom · независимая публикация</small><p id="instagramQueueStatus" class="secondary" role="status">Ещё не запланировано</p></div>
+</div></div>
+<div class="field"><label>Канал Telegram (по категории)</label><select id="destination" disabled><option value="main">📰 Новости — главный канал</option><option value="afisha">🎭 Афиша</option></select></div><div class="field"><label for="publicationMode">Когда опубликовать?</label><select id="publicationMode"><option value="default">Автоматически — не раньше чем через 2 часа</option><option value="now">⚡ Опубликовать сейчас</option><option value="delay">Через заданное время</option><option value="manual">Выбрать дату и время</option></select></div><div class="field hidden" id="publicationDelayRow"><label for="publicationDelay">Через сколько?</label><select id="publicationDelay"><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="120" selected>2 часа</option><option value="180">3 часа</option><option value="360">6 часов</option><option value="720">12 часов</option><option value="1440">24 часа</option></select></div><div class="split hidden" id="publicationDateRow"><div class="field"><label for="publicationDate">Дата</label><input id="publicationDate" type="date"></div><div class="field"><label for="publicationTime">Время (Лиссабон)</label><input id="publicationTime" type="time" value="12:00"></div></div><div class="pt-approval-actions">
+<button id="approveBtn" class="btn primary" type="button">✓ Утвердить для Telegram</button>
+<button id="approveInstagramBtn" class="btn primary" type="button">✓ Утвердить для Instagram</button>
+</div>
+<p class="secondary">Нажмите кнопку нужной площадки один раз. Telegram и Instagram утверждаются отдельно; в Instagram требуется одобренное фото с проверенными правами. Выбранное время применяется только к площадке, кнопку которой вы нажали.</p>
   <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
@@ -324,18 +330,36 @@ async function call(path,options={}){
  if(!r.ok)throw Error(d.error||"Ошибка редакционного сервера");
  return d;
 }
-function publicationSettings(){const mode=$("publicationMode").value;if(mode==="now")return {schedule_mode:"now"};if(mode==="default")return {schedule_mode:"default"};if(mode==="delay"){const mins=Number($("publicationDelay").value);return {schedule_mode:"delay",schedule_delay_minutes:mins,delay_minutes:mins}};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function updatePublicationMode(){
+function publicationSettings(){const mode=$("publicationMode").value;if(mode==="now")return {schedule_mode:"now"};if(mode==="default")return {schedule_mode:"default"};if(mode==="delay"){const mins=Number($("publicationDelay").value);return {schedule_mode:"delay",schedule_delay_minutes:mins,delay_minutes:mins}};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function instagramReadyPhoto(){
+ const i=current?.article||{};
+ return ["owned","cc_licensed","permission_confirmed"].includes(i.photo_rights)&&
+  (current?.media||[]).some(m=>m.public_url===i.photo_url&&m.status==="approved"&&m.rights_verified===true&&
+   ["owned_original","licensed_original","generated_illustration"].includes(m.media_type)&&
+   (m.media_type!=="generated_illustration"||(m.illustration_label_required===true&&!!m.storage_key)));
+}
+function updateApprovalButtons(){
+ const i=current?.article||{},ig=current?.instagram||{},mode=$("publicationMode").value;
+ const unavailable=!current||approvalPending||!me?.user?.approve||["rejected","expired"].includes(i.status);
+ const tgDone=(current?.publications||[]).find(p=>["queued","scheduled","sending","sent"].includes(p.status));
+ $("approveBtn").disabled=unavailable||!!tgDone;
+ $("approveBtn").textContent=tgDone?(tgDone.status==="sent"?"✓ Telegram опубликован":"✓ Telegram уже в очереди"):
+  mode==="now"?"⚡ Опубликовать в Telegram":"✓ Утвердить для Telegram";
+ const igDone=["queued","published","publishing","preparing","container_created"].includes(ig.status);
+ const ready=instagramReadyPhoto();
+ $("approveInstagramBtn").disabled=unavailable||igDone||!ready;
+ $("approveInstagramBtn").textContent=igDone?(ig.status==="published"?"✓ Instagram опубликован":"✓ Instagram уже в очереди"):
+  !ready?"🖼 Сначала утвердите фото":mode==="now"?"⚡ Опубликовать в Instagram":"✓ Утвердить для Instagram";
+}
+function updatePublicationMode(){
  const mode=$("publicationMode").value;
  $("publicationDateRow").classList.toggle("hidden",mode!=="manual");
  $("publicationDelayRow").classList.toggle("hidden",mode!=="delay");
- $("approveBtn").textContent=mode==="now"?"⚡ Утвердить и опубликовать сейчас":"✓ Утвердить и запланировать";
+ updateApprovalButtons();
 }
 function gather(){return{style:$("style").value,target_subcategory:$("subcategory").value,headline_ru:$("headline").value,hook_ru:$("hook").value,lead_ru:$("lead").value,story_ru:$("story").value,why_matters_ru:$("why").value,needs_more_facts:$("needsMoreFacts").checked,image_needed:$("imageNeeded").checked,image_choice:$("imageChoice").value,image_exception_reason:$("imageException").value}}
 function fill(item){const i=item.article;
  if(i.id!==lastArticleDestinationChoice){
   lastArticleDestinationChoice=i.id;
-  $("publishTelegram").checked=true;$("publishInstagram").checked=false;
-  $("publishTargetsHint").textContent="Выбрано: Telegram";
   $("publicationMode").value="default";
   $("publicationDelay").value="120";
   previewMode="phone";
@@ -365,8 +389,9 @@ function fill(item){const i=item.article;
  for(const id of ["changesBtn","rejectBtn","reopenBtn"])$(id).disabled=!me?.user?.approve;
  $("changesBtn").disabled=!me?.user?.edit;
  const isApproved=i.status==="approved"&&i.editorial_status==="approved";
- $("approveBtn").textContent=isApproved?"↗ Запланировать публикацию":"✓ Утвердить";updatePublicationMode();
- $("approveBtn").disabled=!me?.user?.approve||approvalPending||i.status==="rejected"||i.status==="expired";
+ const tgStatus=(item.publications||[]).find(p=>["queued","scheduled","sending","sent"].includes(p.status));
+ $("telegramQueueStatus").textContent=tgStatus?(tgStatus.status==="sent"?"✓ Опубликовано":"✓ Запланировано: "+lisbonSchedule(tgStatus.scheduled_for)):"Ещё не запланировано";
+ updatePublicationMode();
  $("destination").disabled=true; // Prevent cross-channel routing; server enforces category classification.
  $("reopenBtn").disabled=!me?.user?.approve||!(i.status==="approved"||i.status==="rejected"||i.editorial_status==="approved");
  $("approvalWarning").textContent=me?.user?.role==="owner"
@@ -595,14 +620,15 @@ async function refreshInstagramState(id){
   if(current?.article?.id!==id)return;
   current.instagram=result.instagram;
   const status=result.instagram?.status;
-  const statusLabel=status==="published"?"опубликовано":status==="queued"?"в очереди Buffer":status==="draft"?"черновик":status==="awaiting_approval"?"ожидает выбора":"ещё не запланировано";
+  const statusLabel=status==="published"?"опубликовано":status==="queued"?"запланировано в Buffer":status==="awaiting_media"?"нужно утвердить фото":status==="awaiting_approval"?"готово к отправке":status==="failed"?"предыдущая отправка не удалась":status==="draft"?"готово к отправке":"ещё не запланировано";
   const link=String(result.instagram?.public_url||"");
   $("instagramQueueStatus").textContent="Instagram: "+statusLabel+(result.instagram?.buffer_status?" ("+result.instagram.buffer_status+")":"");
   if(status==="published"&&/^https:\/\//.test(link)){
    const a=document.createElement("a");a.href=link;a.target="_blank";a.rel="noopener noreferrer";a.textContent=" · Открыть опубликованный пост";$("instagramQueueStatus").append(a);
   }
+  updateApprovalButtons();
   if(previewMode==="instagram")renderPreview();
- }catch(e){if(current?.article?.id===id)$("instagramQueueStatus").textContent="Instagram: "+e.message}
+ }catch(e){if(current?.article?.id===id){$("instagramQueueStatus").textContent="Instagram: "+e.message;updateApprovalButtons()}}
 }
 function renderPreview(){
  const root=$("livePreview");if(!root||!current)return;
@@ -705,14 +731,15 @@ node.style.color=!sent&&(!scheduled||blocked||overdue)?"#ad4e22":"#12666b"}catch
 async function counts(){try{const {summary:s}=await call("/api/summary?channel="+encodeURIComponent(activeChannel));$("countIncoming").textContent=s.incoming;$("countFacts").textContent=s.needs_facts;$("countDraft").textContent=s.drafts;$("countApproved").textContent=s.approved;$("countQueued").textContent=s.queued;$("countMainInbox").textContent=s.total_main;$("countAfishaInbox").textContent=s.total_afisha}catch(e){toast(e.message,true)}}
 async function refreshSelected(){if(current){const id=current.article.id;current=await call("/api/article?id="+encodeURIComponent(id));fill(current)}await Promise.all([counts(),list()])}
 async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;await call("/api/save",{method:"POST",body:{item_id:current.article.id,fields:gather()}});dirty=false;toast("Изменения сохранены");await refreshSelected()}catch(e){toast(e.message,true)}finally{$("saveBtn").disabled=false}}
-async function approveAndQueue(){
+async function approveAndQueue(target="telegram"){
  if(!current||approvalPending||!me?.user?.approve)return;
  const id=current.article.id,note=$("note").value;
- const sendTg=$("publishTelegram").checked,sendIg=$("publishInstagram").checked;
- if(!sendTg&&!sendIg){toast("Выберите Telegram, Instagram или обе площадки",true);return}
+ const sendTg=target==="telegram",sendIg=target==="instagram";
+ if(!sendTg&&!sendIg){toast("Неизвестная площадка",true);return}
+ if(sendIg&&!instagramReadyPhoto()){toast("Для Instagram сначала выберите и утвердите изображение в галерее выше",true);return}
  let schedule;
  try{schedule=publicationSettings()}catch(e){toast(e.message,true);return}
- approvalPending=true;$("approveBtn").disabled=true;
+ approvalPending=true;updateApprovalButtons();
  const completed=[],errors=[];
  try{
   if(dirty){
@@ -764,13 +791,14 @@ async function approveAndQueue(){
    }catch(e){errors.push("Instagram: "+e.message)}
   }
   if(!approved)errors.push("Редакционное утверждение не подтверждено");
-  if(errors.length)toast((completed.length?"Готово: "+completed.join(" · ")+". ":"")+"Ошибка: "+errors.join("; "),true);
-  else toast("✓ Утверждено: "+completed.join(" · "));
+  if(errors.length)toast((completed.length?"✓ "+completed.join(" · ")+". ":"")+"Ошибка "+(sendIg?"Instagram":"Telegram")+": "+errors.map(x=>x.replace(/^(Instagram|Telegram):\s*/,"")).join("; "),true);
+  else toast("✓ "+completed.join(" · "));
  }catch(e){
   toast("Не удалось завершить согласование: "+e.message,true);
  }finally{
   approvalPending=false;
   try{await refreshSelected()}catch(e){toast("Обновите карточку: "+e.message,true)}
+  updateApprovalButtons();
  }
 }
 
@@ -903,18 +931,11 @@ function bind(){
  $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
  $("reopenBtn").onclick=()=>sendAction("reopen");
  $("publicationMode").onchange=updatePublicationMode;updatePublicationMode();
- function updateDestinations(){
-  const tg=$("publishTelegram").checked,ig=$("publishInstagram").checked;
-  $("publishTargetsHint").textContent="Выбрано: "+([tg?"Telegram":null,ig?"Instagram":null].filter(Boolean).join(" + ")||"ни одной площадки");
-  $("approveBtn").disabled=!(tg||ig)||approvalPending||!me?.user?.approve||["rejected","expired"].includes(current?.article?.status);
-  if(ig&&!tg){previewMode="instagram";renderPreview()}
-  else if(tg&&!ig&&previewMode==="instagram"){previewMode="phone";renderPreview()}
- }
- $("publishTelegram").onchange=updateDestinations;
- $("publishInstagram").onchange=updateDestinations;
+ 
  $("copyInstagramBtn").onclick=async()=>{if(!instagramCaptionCached){toast("Нет подписи Instagram",true);return}try{await navigator.clipboard.writeText(instagramCaptionCached);toast("Подпись Instagram скопирована")}catch{toast("Не удалось скопировать текст",true)}};
- updateDestinations();
- $("approveBtn").onclick=approveAndQueue;
+ updateApprovalButtons();
+ $("approveBtn").onclick=()=>approveAndQueue("telegram");
+ $("approveInstagramBtn").onclick=()=>{previewMode="instagram";renderPreview();approveAndQueue("instagram")};
  $("commentBtn").onclick=async()=>{const note=$("comment").value;if(!note.trim())return;await sendAction("comment",{note})};
  window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 }
