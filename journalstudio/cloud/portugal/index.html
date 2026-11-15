@@ -618,7 +618,7 @@ function renderPreview(){
  const full=(!dirty&&!previewPhotoId&&serverFull)?serverFull:localFull;
 
  const catName=categories.find(x=>x.code===i.primary_category)?.name_ru||"Статья";
- const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">'+(img.media_type==='generated_illustration'?'<div class="pt-ai-label" style="margin:5px 10px">📷 AI-изображение · не документальное фото</div>':''):'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
+ const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">':'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
  const mainNavPreview=i.source_code!=="trailyo_events"?
    '<nav class="pt-post-nav-preview" aria-label="Кнопки после публикации"><a href="https://t.me/pt_afisha" target="_blank" rel="noopener noreferrer">🎭 Афиша</a><a href="https://t.me/pt_ryadom_chat" target="_blank" rel="noopener noreferrer">💬 Чат и темы</a></nav>':"";
