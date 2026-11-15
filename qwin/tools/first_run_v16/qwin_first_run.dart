@@ -30,7 +30,7 @@ class _QwinFirstRunGateState extends State<QwinFirstRunGate>
     with SingleTickerProviderStateMixin {
   static const String legalVersion = '2026-11-14';
   static const String acceptanceKey = 'qwin_legal_ack_20261114_v1';
-  static const String introSeenKey = 'qwin_intro_seen_v15';
+  static const String introSeenKey = 'qwin_intro_seen_v16';
 
   late final AnimationController _logoFade;
   int _stage = -1; // -1 animation, 0/1 introduction, 2 legal, 3 Qwin
