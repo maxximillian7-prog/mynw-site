@@ -68,6 +68,54 @@ async function verifyMedia(p){
  if(m.media_type==="generated_illustration"&&(!m.illustration_label_required||!m.storage_key))throw fail("Для AI-обложки требуется маркировка и сохранённый файл",409);
  return m;
 }
+// Buffer/Instagram accepts images up to 5000px wide. Never mutate the approved
+// original or its license/attribution: supply an optimized delivery URL only.
+const IG_MAX_WIDTH=5000,IG_DELIVERY_WIDTH=1600;
+async function instagramImageUrl(approvedUrl){
+ const parsed=new URL(approvedUrl);
+ if(parsed.protocol!=="https:"||parsed.username||parsed.password)throw fail("Некорректная HTTPS-ссылка на изображение",422);
+ if(parsed.hostname==="upload.wikimedia.org"){
+  const m=parsed.pathname.match(/^\/wikipedia\/commons\/[0-9a-f]\/([0-9a-f]{2})\/([^/]+)$/i);
+  if(!m)throw fail("Неизвестный путь фото Wikimedia Commons — выберите другое изображение",422);
+  let filename;
+  try{filename=decodeURIComponent(m[2]).replace(/_/g," ")}catch{throw fail("Некорректное имя файла Wikimedia",422)}
+  if(!filename||filename.length>250||filename.includes("/")||filename.includes("\\")||filename.includes(":"))throw fail("Некорректное имя файла Wikimedia",422);
+  const api=new URL("https://commons.wikimedia.org/w/api.php");
+  for(const [k,v] of Object.entries({action:"query",format:"json",prop:"imageinfo",iiprop:"url|size|mime",iiurlwidth:String(IG_DELIVERY_WIDTH),titles:"File:"+filename}))api.searchParams.set(k,v);
+  let data;
+  try{
+   const response=await fetch(api.href,{headers:{accept:"application/json"},signal:AbortSignal.timeout(18000)});
+   if(!response.ok)throw Error("HTTP "+response.status);
+   data=await response.json();
+  }catch(e){throw fail("Не удалось подготовить фотографию Wikimedia для Instagram: "+String(e.message).slice(0,75),503)}
+  const page=Object.values(data.query?.pages||{})[0],info=page?.imageinfo?.[0];
+  if(!info||!Number.isFinite(info.width)||!Number.isFinite(info.height)||info.width<320||info.height<320)throw fail("Размер изображения Wikimedia не подтверждён",422);
+  if(info.width<=IG_MAX_WIDTH&&info.height<=IG_MAX_WIDTH&&info.size<=8000000)return approvedUrl;
+  if(!info.thumburl||!Number.isFinite(info.thumbwidth)||!Number.isFinite(info.thumbheight)||
+     info.thumbwidth>IG_MAX_WIDTH||info.thumbheight>IG_MAX_WIDTH||
+     info.thumbwidth<320||info.thumbheight<320)throw fail("Wikimedia не смогла создать пригодное изображение до 5000 px",422);
+  const thumbnail=new URL(info.thumburl);
+  if(thumbnail.protocol!=="https:"||!["thumb.wikimedia.org","upload.wikimedia.org"].includes(thumbnail.hostname)||thumbnail.username||thumbnail.password)throw fail("Небезопасный адрес миниатюры Wikimedia",422);
+  // Strip tracking parameters; the file is identical and Buffer reads it directly.
+  thumbnail.search="";
+  return thumbnail.href;
+ }
+ // Trusted image CDNs provide width-aware photo variants without reupload.
+ if(parsed.hostname==="images.unsplash.com"&&parsed.pathname.startsWith("/photo-")){
+  parsed.searchParams.set("w",String(IG_DELIVERY_WIDTH));
+  parsed.searchParams.set("fit","max");
+  parsed.searchParams.set("fm","jpg");
+  parsed.searchParams.set("q","85");
+  return parsed.href;
+ }
+ if(parsed.hostname==="images.pexels.com"&&/^\/photos\/\d+\//.test(parsed.pathname)){
+  parsed.searchParams.set("w",String(IG_DELIVERY_WIDTH));
+  parsed.searchParams.set("auto","compress");
+  return parsed.href;
+ }
+ // Existing Neon AI covers are generated at 1536x1024 and already fit.
+ return approvedUrl;
+}
 async function verifiedInstagramGeolocation(itemId){
  // Buffer requires a Facebook Page connection and a real Facebook location ID.
  // No coordinates-to-ID conversion or guessed place IDs are permitted.
@@ -107,7 +155,10 @@ async function schedule(id,options,userId){
  if(!acquired.length)return {ok:true,already_processing:true};
  try{
   let result;
-  const geolocation=await verifiedInstagramGeolocation(original.item_id);
+  const [geolocation,deliveryImageUrl]=await Promise.all([
+    verifiedInstagramGeolocation(original.item_id),
+    instagramImageUrl(original.image_url)
+  ]);
   const metadata={instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:media.media_type==="generated_illustration",...(geolocation?{geolocation}:{})}};
   const input={
     text:original.caption,
@@ -116,7 +167,7 @@ async function schedule(id,options,userId){
     ...(!immediate?{dueAt}:{}),
     saveToDraft:false,
     metadata,
-    assets:[{image:{url:original.image_url}}]
+    assets:[{image:{url:deliveryImageUrl}}]
   };
   if(original.buffer_post_id){
     result=(await buffer("mutation Update($input:EditPostInput!){editPost(input:$input){... on PostActionSuccess{post{id text status dueAt}} ... on MutationError{message}}}",{input:{...input,id:original.buffer_post_id}})).editPost;
@@ -128,7 +179,7 @@ async function schedule(id,options,userId){
   const published=String(result.post.status||"").toLowerCase()==="sent";
   await sql("UPDATE public.pr_instagram_publications SET status=$5,buffer_post_id=$2,scheduled_for=$3::timestamptz,approved_by=$4::text,approved_at=now(),published_at=CASE WHEN $5='published' THEN now() ELSE NULL END,buffer_created_at=coalesce(buffer_created_at,now()),last_error=NULL,updated_at=now() WHERE id=$1::uuid",[original.id,result.post.id,dueAt,userId,published?"published":"queued"]);
   await sql("INSERT INTO public.pr_instagram_delivery_events(publication_id,event_type,meta_object_id) VALUES($1::uuid,$2,$3)",[original.id,immediate?"buffer_share_now_requested":"buffer_scheduled",result.post.id]);
-  return {ok:true,scheduled:!immediate,dispatched:immediate,published,buffer_post_id:result.post.id,scheduled_for:dueAt,status:result.post.status};
+  return {ok:true,scheduled:!immediate,dispatched:immediate,published,buffer_post_id:result.post.id,scheduled_for:dueAt,status:result.post.status,optimized_image:deliveryImageUrl!==original.image_url};
  }catch(e){
   await sql("UPDATE public.pr_instagram_publications SET status='failed',last_error=$2,updated_at=now() WHERE id=$1::uuid",[original.id,String(e.message||"Buffer error").slice(0,250)]).catch(()=>{});
   throw e;
@@ -137,7 +188,7 @@ async function schedule(id,options,userId){
 export default {async fetch(request){
  const url=new URL(request.url),origin=ALLOWED.has(request.headers.get("origin"))?request.headers.get("origin"):"";
  if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":origin,"access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"Authorization,Content-Type","access-control-max-age":"600"}});
- if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
+ if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:2,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
  if(request.method==="POST"&&url.pathname==="/verify"){
   if(!process.env.PR_BUFFER_SETUP_SECRET||request.headers.get("x-pr-buffer-secret")!==process.env.PR_BUFFER_SETUP_SECRET)return json({error:"unauthorized"},401,origin);
   try{const r=await buffer('query{channel(input:{id:"'+CHANNEL+'"}){id name service}}'); const c=r.channel;return json({ok:!!c&&c.id===CHANNEL,channel_id:c?.id,name:c?.name,service:c?.service},200,origin)}
