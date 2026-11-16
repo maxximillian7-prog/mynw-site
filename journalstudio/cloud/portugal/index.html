@@ -288,6 +288,14 @@ input[type=search]{width:100%} .filters select{width:100%}
 #ptFinalPublicationDialog .pt-final-actions button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:650px){#ptFinalPublicationDialog .pt-final-actions{flex-wrap:wrap}#ptFinalPublicationDialog .pt-final-actions button{flex:1}}
 
+
+
+/* PT_AFISHA_NIGHT_WINDOW_20261116 */
+#ptAfishaNightWindow{margin:11px 0 14px;border:1px solid #accfca;border-left:4px solid #16817b;border-radius:10px;background:#eef8f5;padding:11px 14px;color:#275e57;line-height:1.45;font-size:12px}
+#ptAfishaNightWindow strong{display:block;font-size:13px;margin:0 0 4px}
+#ptAfishaNightWindow .pt-night-detail{display:block;margin-top:5px;color:#566d69;font-weight:600}
+#ptAfishaNightWindow .pt-night-shift{display:block;color:#8f4a16;background:#fff1df;border:1px solid #e6cba7;border-radius:6px;padding:7px 9px;margin:8px 0 2px;font-weight:700}
+
 </style></head>
 <body>
 <div class="layout">
@@ -1372,9 +1380,12 @@ async function start(){
   const dialog=ensureDialog(),check=renderFinal(target);
   finalState={target,id:current.article.id,text:JSON.stringify(gather()),schedule:publicationSnapshot()};
   $f('ptFinalInfo').textContent=scheduleLabel(schedule)+' · Просмотр модели публикации (без публикации до подтверждения).';
+  const quietPlan=(target==='telegram'&&current?.article?.source_code==='trailyo_events')?window.prAfishaQuietScheduleMessage?.(schedule):null;
+  if(quietPlan?.note)$f('ptFinalInfo').textContent+=' 🌙 '+quietPlan.note;
   const confirm=$f('ptFinalConfirm');
   confirm.disabled=check.blocked;
   confirm.textContent=schedule.schedule_mode==='now'?'⚡ Подтвердить немедленную отправку':'✓ Подтвердить и запланировать';
+  if(quietPlan?.shifted)confirm.textContent='✓ Подтвердить перенос на 08:00';
   if(!dialog.open)dialog.showModal();
  }
  function preferredTarget(){return previewMode==='instagram'?'instagram':'telegram'}
@@ -1427,6 +1438,99 @@ async function start(){
   updateBottom();
  };
 })();
+
+
+/* PT_AFISHA_NIGHT_WINDOW_20261116: Lisbon 00:00–08:00 blackout, 23:58 safety cutoff.
+   The publication scheduler and sender independently enforce this on Neon.
+   This UI announces the actual adjusted plan; Instagram is unaffected. */
+(function(){
+ const isAfisha=()=>current?.article?.source_code==='trailyo_events';
+ const p=id=>document.getElementById(id);
+ const fmt=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+ function civilParts(date){
+  const obj={};
+  for(const x of fmt.formatToParts(date))if(x.type!=='literal')obj[x.type]=x.value;
+  return obj;
+ }
+ function plan(s){
+  if(!s)return {note:'Выберите режим публикации.',shifted:false};
+  let date=null,base='';
+  if(s.schedule_mode==='manual'){date=new Date(s.scheduled_for);base='Выбранное время'}
+  else if(s.schedule_mode==='now'){date=new Date();base='Отправка сейчас'}
+  else if(s.schedule_mode==='delay'){date=new Date(Date.now()+60000*(s.schedule_delay_minutes||s.delay_minutes||0));base='Отложенная отправка'}
+  else return {note:'Автоматическая очередь также соблюдает ночной запрет 00:00–08:00 (Лиссабон).',shifted:false};
+  if(!Number.isFinite(date?.getTime()))return {note:'Время публикации не распознано.',shifted:false};
+  const z=civilParts(date),clock=z.hour+':'+z.minute;
+  const night=clock<'08:00'||clock>='23:58';
+  if(!night)return {note:base+' запланирована вне ночного запрета.',shifted:false};
+  const nextDay=clock>='23:58';
+  const day=nextDay?new Date(Date.UTC(+z.year,+z.month-1,+z.day+1)):new Date(Date.UTC(+z.year,+z.month-1,+z.day));
+  const localDate=String(day.getUTCDate()).padStart(2,'0')+'.'+String(day.getUTCMonth()+1).padStart(2,'0')+'.'+day.getUTCFullYear();
+  return {note:base+' попадает в запрещённое время. Фактическая отправка Telegram «Афиша» перенесена на '+localDate+' в 08:00 (Лиссабон).',shifted:true};
+ }
+ function getPendingSchedule(){
+  const mode=p('publicationMode')?.value;
+  if(mode==='manual'){
+   const date=p('publicationDate')?.value,time=p('publicationTime')?.value;
+   if(!date||!time)return null;
+   // For the banner only, derive civil date directly; avoids date-time parsing
+   // failures on DST weekends. Real validation remains in publicationSettings().
+   const localTime=time.substring(0,5),y=+date.substring(0,4),m=+date.substring(5,7),d=+date.substring(8,10);
+   if(localTime<'08:00'||localTime>='23:58'){
+    const next=localTime>='23:58'?new Date(Date.UTC(y,m-1,d+1)):new Date(Date.UTC(y,m-1,d));
+    const when=String(next.getUTCDate()).padStart(2,'0')+'.'+String(next.getUTCMonth()+1).padStart(2,'0')+'.'+next.getUTCFullYear();
+    return {note:'Выбрано ночное время: публикация Telegram «Афиша» автоматически переносится на '+when+' в 08:00 (Лиссабон).',shifted:true};
+   }
+   return {note:'Выбрано разрешённое время публикации.',shifted:false};
+  }
+  return plan(mode==='delay'?{schedule_mode:'delay',delay_minutes:Number(p('publicationDelay')?.value||0)}:{schedule_mode:mode==='now'?'now':'default'});
+ }
+ function ensureNotice(){
+  let n=p('ptAfishaNightWindow');
+  if(n)return n;
+  const before=p('publicationDateRow')||p('approveBtn');
+  if(!before)return null;
+  n=document.createElement('div');
+  n.id='ptAfishaNightWindow';
+  n.setAttribute('role','status');
+  n.innerHTML='<strong>🌙 Ночной запрет Telegram «Афиша»: 00:00–08:00</strong><span>По времени Лиссабона. Автоматические и ручные отправки ночью запрещены; для безопасности отправка останавливается уже в 23:58.</span><span class="pt-night-detail"></span>';
+  const row=before.closest('#publicationDateRow');
+  if(row)row.insertAdjacentElement('afterend',n);else before.parentElement.insertBefore(n,before);
+  return n;
+ }
+ function renderNight(){
+  const n=ensureNotice();
+  if(!n)return;
+  n.classList.toggle('hidden',!isAfisha());
+  if(!isAfisha())return;
+  const details=n.querySelector('.pt-night-detail');
+  const result=getPendingSchedule();
+  details.textContent=result?.note||'Укажите дату и время, чтобы увидеть проверку ночного окна.';
+  details.classList.toggle('pt-night-shift',!!result?.shifted);
+ }
+ window.prAfishaQuietScheduleMessage=plan;
+ const prevRender=renderPreview;
+ renderPreview=function(){prevRender();renderNight();};
+ const prevUpdate=updatePublicationMode;
+ updatePublicationMode=function(){prevUpdate();renderNight();};
+ const prevApproval=updateApprovalButtons;
+ updateApprovalButtons=function(){prevApproval();renderNight();};
+ const prevBind=bind;
+ bind=function(){
+  prevBind();
+  ensureNotice();
+  for(const id of ['publicationMode','publicationDelay','publicationDate','publicationTime']){
+   const el=p(id);
+   if(el&&!el.dataset.ptAfishaNightBind){
+    el.dataset.ptAfishaNightBind='1';
+    el.addEventListener('input',renderNight);
+    el.addEventListener('change',renderNight);
+   }
+  }
+  renderNight();
+ };
+})();
+
 start();
 </script>
 </body></html>
