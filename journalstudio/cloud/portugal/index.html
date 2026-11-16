@@ -188,6 +188,79 @@ input[type=search]{width:100%} .filters select{width:100%}
 #livePreview .pt-inline-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 #livePreview .pt-inline-actions button{padding:5px 9px;border:1px solid #acc9c5;border-radius:6px;background:white;color:#145d57;font:700 12px system-ui;cursor:pointer}
 #livePreview .pt-inline-actions .pt-inline-save{color:white;background:#187977;border-color:#187977}
+
+/* PT_PHOTO_VERTICAL_PREVIEW_20261116 */
+#livePreview.pt-photo-adjust-enabled .pt-photo-adjustable {
+  display:block;
+  width:100%;
+  object-fit:cover!important;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+#livePreview.pt-photo-adjust-enabled .pt-photo-adjustable.pt-photo-dragging {cursor:grabbing}
+#livePreview .pt-photo-height-handle {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:0 auto;
+  height:18px;
+  padding:0;
+  background:linear-gradient(90deg,transparent,#cfe9e4 25%,#cfe9e4 75%,transparent);
+  cursor:ns-resize;
+  touch-action:none;
+  user-select:none;
+  border-radius:0 0 7px 7px;
+  position:relative;
+  z-index:4;
+}
+#livePreview .pt-photo-height-handle:after {
+  content:"↕";
+  line-height:14px;
+  padding:0 18px;
+  border-radius:6px;
+  background:#187977;
+  color:white;
+  font-weight:750;
+  font-size:13px;
+}
+#livePreview .pt-photo-crop-tools {
+  background:#f0f8f6;
+  border:1px solid #d5eae6;
+  color:#35615b;
+  font-size:11px;
+  line-height:1.35;
+  padding:7px 9px;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:5px 8px;
+}
+#livePreview .pt-photo-crop-tools span {flex:1;min-width:140px}
+#livePreview .pt-photo-crop-tools button {
+  border:1px solid #a8cbc6;
+  background:#fff;
+  color:#176a66;
+  border-radius:6px;
+  cursor:pointer;
+  padding:4px 8px;
+  font-size:11px;
+}
+#livePreview .pt-photo-crop-tools small {
+  display:block;
+  width:100%;
+  color:#697e7a;
+}
+#livePreview .pt-photo-crop-tools input[type=range] {
+  width:85px;
+  vertical-align:middle;
+  accent-color:#187977;
+}
+#livePreview .pt-photo-height-handle:focus-visible,
+#livePreview .pt-photo-crop-tools button:focus-visible {outline:2px solid #167f7a;outline-offset:2px}
+
 </style></head>
 <body>
 <div class="layout">
@@ -1022,6 +1095,161 @@ async function start(){
   textarea.focus();textarea.setSelectionRange(textarea.value.length,textarea.value.length);
  }
  renderPreview=decorate;
+})();
+
+/* PT_PHOTO_VERTICAL_PREVIEW_20261116
+   Adjust the vertical photo composition in preview. The original uploaded
+   asset is never changed, and the control explicitly says so. */
+(function(){
+ const baseRender=renderPreview;
+ const memory=new Map();
+ const MAX_HEIGHT={phone:405,instagram:390,article:470};
+ const MIN_HEIGHT={phone:145,instagram:155,article:145};
+ const DEFAULT_HEIGHT={phone:260,instagram:315,article:250};
+ const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+ const getMode=()=>['phone','instagram','article'].includes(previewMode)?previewMode:'phone';
+ const canEditPhoto=()=>!!(current?.article&&me?.user?.edit&&$('headline')&&!$('headline').disabled);
+ function keyOf(articleId,mediaId,mode){
+  return 'pt_ryadom_photo_frame_v1:'+articleId+':'+mediaId+':'+mode;
+ }
+ function getState(key,mode){
+  let stored=memory.get(key);
+  if(!stored){
+   try{stored=JSON.parse(localStorage.getItem(key)||'null')}catch(_){}
+  }
+  const y=Number(stored?.y),h=Number(stored?.h);
+  const state={
+   y:Number.isFinite(y)?clamp(y,0,100):50,
+   h:Number.isFinite(h)?clamp(h,MIN_HEIGHT[mode],MAX_HEIGHT[mode]):DEFAULT_HEIGHT[mode]
+  };
+  memory.set(key,state);
+  return state;
+ }
+ function saveState(key,state){
+  memory.set(key,{y:state.y,h:state.h});
+  try{localStorage.setItem(key,JSON.stringify({y:state.y,h:state.h}))}catch(_){}
+ }
+ function decoratePhoto(){
+  const root=$('livePreview');
+  if(!root||!current)return;
+  root.classList.toggle('pt-photo-adjust-enabled',canEditPhoto());
+  if(!canEditPhoto())return;
+  const media=choosePreviewPhoto();
+  if(!media?.public_url)return;
+  const mode=getMode();
+  const img=root.querySelector(mode==='instagram'?'.ig-cover':mode==='article'?'.pt-article-view > img':'.pt-chat-cover');
+  if(!img)return;
+  const key=keyOf(current.article.id,media.id||media.public_url,mode);
+  const state=getState(key,mode);
+  img.classList.add('pt-photo-adjustable');
+  img.setAttribute('draggable','false');
+  img.setAttribute('title','Перетащите фотографию вверх или вниз');
+  img.style.setProperty('height',state.h+'px','important');
+  img.style.setProperty('max-height','none','important');
+  img.style.setProperty('aspect-ratio','auto','important');
+  img.style.setProperty('object-fit','cover','important');
+  img.style.setProperty('object-position','50% '+state.y+'%','important');
+  const handle=document.createElement('div');
+  handle.className='pt-photo-height-handle';
+  handle.title='Перетаскивайте вверх или вниз, чтобы изменить высоту кадра';
+  handle.tabIndex=0;
+  handle.setAttribute('role','slider');
+  handle.setAttribute('aria-label','Высота кадра фотографии');
+  handle.setAttribute('aria-valuemin',String(MIN_HEIGHT[mode]));
+  handle.setAttribute('aria-valuemax',String(MAX_HEIGHT[mode]));
+  const tools=document.createElement('div');
+  tools.className='pt-photo-crop-tools';
+  const title=document.createElement('span');
+  title.textContent='↕ Тяните фото для сдвига; нижнюю полоску — для изменения высоты.';
+  const reset=document.createElement('button');
+  reset.type='button';
+  reset.textContent='Сбросить кадр';
+  const hint=document.createElement('small');
+  hint.textContent='Положение сохранится в этом браузере только для предпросмотра. Исходник Telegram/Instagram не обрезается.';
+  const posLabel=document.createElement('label');
+  posLabel.textContent='Сдвиг: ';
+  const slider=document.createElement('input');
+  slider.type='range';
+  slider.min='0';slider.max='100';slider.step='1';
+  slider.value=String(state.y);
+  slider.setAttribute('aria-label','Вертикальное положение фотографии');
+  posLabel.append(slider);
+  tools.append(title,posLabel,reset,hint);
+  img.insertAdjacentElement('afterend',handle);
+  handle.insertAdjacentElement('afterend',tools);
+  function update(){
+   img.style.setProperty('height',state.h+'px','important');
+   img.style.setProperty('object-position','50% '+state.y+'%','important');
+   slider.value=String(Math.round(state.y));
+   handle.setAttribute('aria-valuenow',String(Math.round(state.h)));
+  }
+  function persist(){saveState(key,state)}
+  function imgOverflow(){
+   const w=img.clientWidth,h=img.clientHeight;
+   if(!w||!h||!img.naturalWidth||!img.naturalHeight)return 0;
+   const factor=Math.max(w/img.naturalWidth,h/img.naturalHeight);
+   return Math.max(0,img.naturalHeight*factor-h);
+  }
+  let drag=null;
+  img.addEventListener('pointerdown',ev=>{
+   if(ev.button!==0||!canEditPhoto())return;
+   drag={id:ev.pointerId,sy:ev.clientY,start:state.y};
+   img.classList.add('pt-photo-dragging');
+   img.setPointerCapture(ev.pointerId);
+   ev.preventDefault();
+  });
+  img.addEventListener('pointermove',ev=>{
+   if(!drag||ev.pointerId!==drag.id)return;
+   const overflow=imgOverflow();
+   if(overflow>0.5)state.y=clamp(drag.start-(ev.clientY-drag.sy)/overflow*100,0,100);
+   update();
+  });
+  function stopPhoto(ev){
+   if(!drag||ev.pointerId!==drag.id)return;
+   drag=null;img.classList.remove('pt-photo-dragging');
+   persist();
+  }
+  img.addEventListener('pointerup',stopPhoto);
+  img.addEventListener('pointercancel',stopPhoto);
+  img.addEventListener('lostpointercapture',()=>{if(drag){drag=null;img.classList.remove('pt-photo-dragging');persist();}});
+  let heightDrag=null;
+  handle.addEventListener('pointerdown',ev=>{
+   if(ev.button!==0||!canEditPhoto())return;
+   heightDrag={id:ev.pointerId,start:state.h,y:ev.clientY};
+   handle.setPointerCapture(ev.pointerId);
+   ev.preventDefault();
+  });
+  handle.addEventListener('pointermove',ev=>{
+   if(!heightDrag||ev.pointerId!==heightDrag.id)return;
+   state.h=clamp(Math.round(heightDrag.start+ev.clientY-heightDrag.y),MIN_HEIGHT[mode],MAX_HEIGHT[mode]);
+   update();
+  });
+  function stopHeight(ev){
+   if(!heightDrag||ev.pointerId!==heightDrag.id)return;
+   heightDrag=null;persist();
+  }
+  handle.addEventListener('pointerup',stopHeight);
+  handle.addEventListener('pointercancel',stopHeight);
+  handle.addEventListener('lostpointercapture',()=>{if(heightDrag){heightDrag=null;persist()}});
+  handle.addEventListener('keydown',ev=>{
+   if(ev.key==='ArrowUp'||ev.key==='ArrowDown'){
+    ev.preventDefault();
+    state.h=clamp(state.h+(ev.key==='ArrowDown'?10:-10),MIN_HEIGHT[mode],MAX_HEIGHT[mode]);
+    update();persist();
+   }
+  });
+  slider.addEventListener('input',()=>{
+   state.y=Number(slider.value);update();persist();
+  });
+  reset.addEventListener('click',()=>{
+   state.y=50;state.h=DEFAULT_HEIGHT[mode];update();persist();
+  });
+  update();
+ }
+ renderPreview=function(){
+  baseRender();
+  decoratePhoto();
+ };
 })();
 start();
 </script>
