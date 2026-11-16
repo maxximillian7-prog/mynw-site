@@ -29,7 +29,7 @@ function access(user,chief=false){if(chief?!user.approve:!user.edit)throw err("�
 async function input(req){const raw=await req.text();if(raw.length>28000)throw err("Слишком большой запрос",413);try{return JSON.parse(raw||"{}")}catch{throw err("Неверный JSON")}}
 async function audit(id,u,action,note="",before={},after={}){await sql("INSERT INTO pr_editorial_revisions(item_id,actor_user_id,action,note,before_state,after_state) VALUES($1::uuid,$2::uuid,$3,$4,$5::jsonb,$6::jsonb)",[id,u.id,action,cut(note,1000),JSON.stringify(before),JSON.stringify(after)])}
 async function detail(id){
- const rows=await sql("SELECT i.*,s.name AS source_name,s.code AS source_code,s.verification_status,s.rights_policy,d.id AS draft_id,d.status AS editorial_status,d.style,d.headline_ru,d.hook_ru,d.lead_ru,d.story_ru,d.why_matters_ru,d.context_verified,d.needs_more_facts,d.image_needed,d.image_choice,d.image_exception_reason,d.target_subcategory,d.editorial_note,d.updated_at AS draft_updated_at,d.source_context_used,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score AS editorial_value_score,pr_telegram_hashtag(i.primary_category) AS category_hashtag,(SELECT row_to_json(ev) FROM public.pr_trailyo_event_details ev WHERE ev.item_id=i.id) AS trailyo_event,pr_build_telegram_post(i.id) AS telegram_text,pr_build_telegram_caption(i.id) AS telegram_caption,g.allowed AS publication_allowed,g.reason AS publication_block_reason, (SELECT EXISTS(SELECT 1 FROM pr_media_assets m WHERE m.item_id=i.id AND m.public_url=i.photo_url AND m.status IN ('approved','candidate') AND m.media_type IN ('licensed_original','owned_original','generated_illustration','brand_generic') AND (m.rights_verified OR public.pr_editor_accepted_unverified_photo(i.id,m.public_url) OR (m.media_type='brand_generic' AND m.generation_model='trailyo_existing_image_reference' AND m.approved_by IS NOT NULL AND s.code='trailyo_events')) AND (m.media_type<>'generated_illustration' OR (m.illustration_label_required AND m.storage_bucket='pr-editorial-media' AND m.storage_key IS NOT NULL)) )) AS photo_delivery_ready FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id CROSS JOIN LATERAL pr_intake_check(i.id) q LEFT JOIN LATERAL pr_item_publication_check(i.id) g ON true WHERE i.id=$1::uuid",[id]);
+ const rows=await sql("SELECT i.*,s.name AS source_name,s.code AS source_code,s.verification_status,s.rights_policy,d.id AS draft_id,d.status AS editorial_status,d.style,d.headline_ru,d.hook_ru,d.lead_ru,d.story_ru,d.why_matters_ru,d.context_verified,d.needs_more_facts,d.image_needed,d.image_choice,d.image_exception_reason,d.target_subcategory,d.editorial_note,d.updated_at AS draft_updated_at,d.source_context_used,q.ready AS intake_ready,q.issues AS intake_issues,q.value_score AS editorial_value_score,pr_telegram_hashtag(i.primary_category) AS category_hashtag,(SELECT row_to_json(ev) FROM public.pr_trailyo_event_details ev WHERE ev.item_id=i.id) AS trailyo_event,pr_build_telegram_post(i.id) AS telegram_text,pr_build_telegram_caption(i.id) AS telegram_caption,public.pr_prepare_instagram_caption(i.id) AS instagram_caption,g.allowed AS publication_allowed,g.reason AS publication_block_reason, (SELECT EXISTS(SELECT 1 FROM pr_media_assets m WHERE m.item_id=i.id AND m.public_url=i.photo_url AND m.status IN ('approved','candidate') AND m.media_type IN ('licensed_original','owned_original','generated_illustration','brand_generic') AND (m.rights_verified OR public.pr_editor_accepted_unverified_photo(i.id,m.public_url) OR (m.media_type='brand_generic' AND m.generation_model='trailyo_existing_image_reference' AND m.approved_by IS NOT NULL AND s.code='trailyo_events')) AND (m.media_type<>'generated_illustration' OR (m.illustration_label_required AND m.storage_bucket='pr-editorial-media' AND m.storage_key IS NOT NULL)) )) AS photo_delivery_ready FROM pr_items i JOIN pr_sources s ON s.id=i.source_id LEFT JOIN pr_story_drafts d ON d.item_id=i.id CROSS JOIN LATERAL pr_intake_check(i.id) q LEFT JOIN LATERAL pr_item_publication_check(i.id) g ON true WHERE i.id=$1::uuid",[id]);
  if(!rows.length)throw err("Статья не найдена",404);
  const [media,evidence,comments,revisions,publications]=await Promise.all([
   sql("SELECT id,media_type,status,public_url,rights_verified,illustration_label_required,attribution,license_details,storage_bucket,storage_key,generation_model,created_at FROM pr_media_assets WHERE item_id=$1::uuid ORDER BY CASE WHEN media_type='brand_generic' THEN 1 ELSE 0 END,created_at DESC",[id]),
@@ -69,6 +69,15 @@ async function dispatchTelegramNow(postId){
   ...(r.status==="failed"?{warning:"Telegram: "+String(r.last_error||"отправка завершилась ошибкой").slice(0,160)}:{})};
 }
 
+// Shared validation for manual Lisbon date/time converted to an ISO timestamp by the editor.
+function parseRequestedPublishTime(value, nowMs=Date.now()){
+ if(typeof value!=="string"||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,3})?(?:Z|[+-][0-9]{2}:[0-9]{2})$/.test(value))
+  throw err("Укажите корректные дату и время публикации",400);
+ const when=new Date(value);
+ if(!Number.isFinite(when.getTime())||when.getTime()<nowMs+60000)
+  throw err("Выберите будущее время (не меньше минуты)",400);
+ return when.toISOString();
+}
 async function action(u,p){
  const id=p.item_id,a=p.action,note=cut(p.note,1500);
  if(!uuid(id))throw err("Неверный ID");
@@ -116,18 +125,11 @@ async function action(u,p){
   if(!["default","delay","manual","now"].includes(mode))throw err("Неверный режим времени",400);
   let delay=null,publishAt=null;
   if(mode==="now")delay=0;
-  if(mode==="now")delay=0;
   if(mode==="delay"){
    delay=Number(p.delay_minutes??p.schedule_delay_minutes);
    if(!Number.isInteger(delay)||delay<1||delay>525600)throw err("Неверная задержка",400);
   }
-  if(mode==="manual"){
-   const requested=p.publish_at??p.scheduled_for;
-   if(typeof requested!=="string"||!/^\\d{4}-\\d{2}-\\d{2}T/.test(requested))throw err("Укажите дату и время публикации",400);
-   const d=new Date(requested);
-   if(!Number.isFinite(d.getTime())||d.getTime()<Date.now()+60000)throw err("Укажите будущее время (не меньше минуты)",400);
-   publishAt=d.toISOString();
-  }
+  if(mode==="manual")publishAt=parseRequestedPublishTime(p.publish_at??p.scheduled_for);
   const rows=await sql("SELECT * FROM public.pr_owner_approve_and_queue($1::uuid,$2::uuid,$3::text,$4::integer,$5::timestamptz)",[id,u.id,note,delay,publishAt]);
   if(!rows.length)throw err("Не удалось выполнить утверждение",500);
   if(mode==="now"&&rows[0].post_id&&rows[0].queued){
@@ -181,12 +183,7 @@ async function action(u,p){
    delay=Number(p.delay_minutes??p.schedule_delay_minutes);
    if(!Number.isInteger(delay)||delay<1||delay>525600)throw err("Неверная задержка публикации",400);
   }
-  if(mode==="manual"){
-   const requested=p.publish_at??p.scheduled_for;
-   const requestedDate=new Date(requested);
-   if(typeof requested!=="string"||!/^\d{4}-\d{2}-\d{2}T/.test(requested)||!Number.isFinite(requestedDate.getTime()))throw err("Укажите корректные дату и время",400);
-   publishAt=requestedDate.toISOString();
-  }
+  if(mode==="manual")publishAt=parseRequestedPublishTime(p.publish_at??p.scheduled_for);
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_schedule_publication($1::uuid,$2::text,$3::integer,$4::timestamptz)",[id,destination,delay,publishAt]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
   await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for,schedule_mode:mode,requested_at:publishAt,delay_minutes:delay});
@@ -276,3 +273,4 @@ ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,
   return json({error:"Маршрут не найден"},404,origin);
  }catch(e){return json({error:cut(e.message,250)},e.status||500,origin)}
 }};
+export { parseRequestedPublishTime };

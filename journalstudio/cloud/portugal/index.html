@@ -574,14 +574,15 @@ function activeTags(i){
 }
 function isEventPreview(i){return i?.primary_category==="events";}
 function instagramCaption(f,i,img){
- // Approved/scheduled posts display the stored version, matching what Buffer received.
- if(!dirty&&current?.instagram?.caption&&!previewPhotoId)return current.instagram.caption;
+ // A post already handed to Buffer must preview the exact caption sent there.
+ if(!dirty&&current?.instagram?.buffer_post_id&&current?.instagram?.caption)
+  return current.instagram.caption;
+ // Server is the single source of truth for short editorial copy and curated briefs.
+ if(!dirty&&!previewPhotoId&&i.instagram_caption)return i.instagram_caption;
  const ev=i.trailyo_event||{},isEvent=i.primary_category==="events";
  const dateOnly=v=>{const d=String(v||"").slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d.slice(8,10)+"."+d.slice(5,7)+"."+d.slice(0,4):""};
  const localDate=v=>{try{return new Intl.DateTimeFormat("ru-RU",{timeZone:"Europe/Lisbon",day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(v))}catch{return ""}};
  const title=String(f.headline_ru||"").trim();
- const lead=String(f.lead_ru||"").trim().slice(0,900);
- const why=String(f.why_matters_ru||"").trim().slice(0,560);
  const hashtags=["#ПортугалияРядом",activeTags(i)].filter(Boolean).join(" ").trim();
  const details=[];
  if(isEvent){
@@ -597,13 +598,19 @@ function instagramCaption(f,i,img){
    /^https:\/\/mynw\.app\/trailyo\/event\/\?id=[a-f0-9-]{36}$/i.test(i.canonical_url||"")?i.canonical_url:"";
   if(link)details.push("🔗 Событие в Trailyo: "+link);
  }
- // Full Telegram URL is required in every Instagram caption, including event posts.
- details.push("Полные материалы и источники — в Telegram: https://t.me/pt_ryadom");
+ details.push("Больше подробностей и источники — в Telegram: https://t.me/pt_ryadom");
  if(hashtags)details.push(hashtags);
  const footer=details.join("\n\n");
- const raw=[title,lead,why].filter(Boolean).join("\n\n");
- const allowed=Math.max(0,2150-footer.length-2);
- return [raw.slice(0,allowed),footer].filter(Boolean).join("\n\n").slice(0,2150);
+ // While the editor has unsaved changes, derive meaningful facts from the
+ // article body. For saved articles, the authoritative SQL digest is used above.
+ const paras=String(f.story_ru||"").split(/\n\s*\n/).filter(Boolean);
+ let essence=paras.slice(0,3).map(s=>s.replace(/\s+/g," ").trim()).join(" ").trim();
+ if(!essence)essence=String(f.lead_ru||"").replace(/\s+/g," ").trim();
+ const room=Math.max(0,980-title.length-footer.length-6);
+ if(essence.length>Math.min(room,650)){
+  essence=essence.slice(0,Math.min(room,650)).replace(/\s+\S*$/,"").trim()+"…";
+ }
+ return [title,essence,footer].filter(Boolean).join("\n\n");
 }
 async function bufferCall(path,options={}){
  if(!session?.access_token)throw Error("Войдите в Journal Studio");
