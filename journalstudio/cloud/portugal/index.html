@@ -929,6 +929,39 @@ async function approveAndQueue(target="telegram"){
  }
 }
 
+/* PT_REJECT_INSTANT_NO_NOTE_20261116:
+   One click rejects the selected item without prompting for a reason,
+   reading the comments form, or notifying an author from the frontend.
+   Backend preserves an archived status so the same intake source isn't reimported. */
+async function rejectWithoutNote(){
+ if(!current||approvalPending)return;
+ const itemId=current.article?.id;
+ if(!itemId)return;
+ const button=$("rejectBtn");
+ if(button.disabled)return;
+ button.disabled=true;
+ try{
+  // Intentional: there is no 'note' field in the request.
+  // Do not forward the existing note textarea or request_changes workflow.
+  await call("/api/action",{method:"POST",body:{item_id:itemId,action:"reject"}});
+  if(current?.article?.id===itemId){
+   current=null;dirty=false;previewPhotoId=null;lastArticleDestinationChoice=null;
+   $("editorPanel").classList.add("hidden");
+   $("emptyPanel").classList.remove("hidden");
+   $("pageTitle").textContent="Выберите материал";
+   $("pageSubtitle").textContent=activeChannel==="afisha"?"Приёмка канала «Афиша»":"Приёмка основного канала";
+   $("items").querySelectorAll(".articleRow").forEach(row=>{
+    if(row.dataset.id===itemId)row.remove();
+   });
+  }
+  activeStatus="incoming";
+  document.querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="incoming"));
+  await Promise.all([counts(),list()]);
+  toast("Материал отклонён и сразу убран из приёмки.");
+ }catch(e){toast("Не удалось отклонить: "+e.message,true)}
+ finally{button.disabled=false}
+}
+
 async function sendAction(action,other={}){
  if(!current)return;const note=other.note??$("note").value;
  if(dirty&&action!=="comment"&&!confirm("Есть несохранённые правки. Выполнить действие без них?"))return;
@@ -1055,7 +1088,7 @@ function bind(){
 
 
  $("changesBtn").onclick=()=>sendAction("request_changes");
- $("rejectBtn").onclick=()=>{if(confirm("Отклонить материал?"))sendAction("reject")};
+ $("rejectBtn").onclick=rejectWithoutNote;
  $("reopenBtn").onclick=()=>sendAction("reopen");
  $("publicationMode").onchange=updatePublicationMode;updatePublicationMode();
  
