@@ -69,6 +69,15 @@ async function dispatchTelegramNow(postId){
   ...(r.status==="failed"?{warning:"Telegram: "+String(r.last_error||"отправка завершилась ошибкой").slice(0,160)}:{})};
 }
 
+// Shared validation for manual Lisbon date/time converted to an ISO timestamp by the editor.
+function parseRequestedPublishTime(value, nowMs=Date.now()){
+ if(typeof value!=="string"||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,3})?(?:Z|[+-][0-9]{2}:[0-9]{2})$/.test(value))
+  throw err("Укажите корректные дату и время публикации",400);
+ const when=new Date(value);
+ if(!Number.isFinite(when.getTime())||when.getTime()<nowMs+60000)
+  throw err("Выберите будущее время (не меньше минуты)",400);
+ return when.toISOString();
+}
 async function action(u,p){
  const id=p.item_id,a=p.action,note=cut(p.note,1500);
  if(!uuid(id))throw err("Неверный ID");
@@ -116,18 +125,11 @@ async function action(u,p){
   if(!["default","delay","manual","now"].includes(mode))throw err("Неверный режим времени",400);
   let delay=null,publishAt=null;
   if(mode==="now")delay=0;
-  if(mode==="now")delay=0;
   if(mode==="delay"){
    delay=Number(p.delay_minutes??p.schedule_delay_minutes);
    if(!Number.isInteger(delay)||delay<1||delay>525600)throw err("Неверная задержка",400);
   }
-  if(mode==="manual"){
-   const requested=p.publish_at??p.scheduled_for;
-   if(typeof requested!=="string"||!/^\\d{4}-\\d{2}-\\d{2}T/.test(requested))throw err("Укажите дату и время публикации",400);
-   const d=new Date(requested);
-   if(!Number.isFinite(d.getTime())||d.getTime()<Date.now()+60000)throw err("Укажите будущее время (не меньше минуты)",400);
-   publishAt=d.toISOString();
-  }
+  if(mode==="manual")publishAt=parseRequestedPublishTime(p.publish_at??p.scheduled_for);
   const rows=await sql("SELECT * FROM public.pr_owner_approve_and_queue($1::uuid,$2::uuid,$3::text,$4::integer,$5::timestamptz)",[id,u.id,note,delay,publishAt]);
   if(!rows.length)throw err("Не удалось выполнить утверждение",500);
   if(mode==="now"&&rows[0].post_id&&rows[0].queued){
@@ -181,12 +183,7 @@ async function action(u,p){
    delay=Number(p.delay_minutes??p.schedule_delay_minutes);
    if(!Number.isInteger(delay)||delay<1||delay>525600)throw err("Неверная задержка публикации",400);
   }
-  if(mode==="manual"){
-   const requested=p.publish_at??p.scheduled_for;
-   const requestedDate=new Date(requested);
-   if(typeof requested!=="string"||!/^\d{4}-\d{2}-\d{2}T/.test(requested)||!Number.isFinite(requestedDate.getTime()))throw err("Укажите корректные дату и время",400);
-   publishAt=requestedDate.toISOString();
-  }
+  if(mode==="manual")publishAt=parseRequestedPublishTime(p.publish_at??p.scheduled_for);
   const [reservation]=await sql("SELECT post_id,scheduled_for FROM public.pr_schedule_publication($1::uuid,$2::text,$3::integer,$4::timestamptz)",[id,destination,delay,publishAt]);
   if(!reservation?.scheduled_for)throw err("Не удалось зарезервировать время публикации",503);
   await audit(id,u,a,note,{}, {destination,scheduled_for:reservation.scheduled_for,schedule_mode:mode,requested_at:publishAt,delay_minutes:delay});
@@ -276,3 +273,4 @@ ORDER BY CASE WHEN intake_ready THEN 0 ELSE 1 END,
   return json({error:"Маршрут не найден"},404,origin);
  }catch(e){return json({error:cut(e.message,250)},e.status||500,origin)}
 }};
+export { parseRequestedPublishTime };
