@@ -176,6 +176,18 @@ input[type=search]{width:100%} .filters select{width:100%}
 .contactActions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 @media(max-width:1000px){.contactDesk{grid-column:2;grid-row:auto}.contactGrid{grid-template-columns:minmax(0,1fr)}.contactListPane{max-height:380px}}
 @media(max-width:650px){.contactDesk{padding:15px}.contactHeader{display:block}.contactGrid{display:block}.contactListPane{margin-bottom:12px}}
+
+/* PT_INLINE_PREVIEW_20261116 */
+#livePreview.pt-inline-ready [data-inline-edit]{cursor:text;outline:1px dashed transparent;outline-offset:2px;border-radius:5px}
+#livePreview.pt-inline-ready [data-inline-edit]:hover{outline-color:#53aba3;background:#e4f4f16b}
+#livePreview .pt-inline-block{margin:0 0 7px;min-height:24px}
+#livePreview .pt-inline-placeholder{color:#61847f;font-style:italic}
+#livePreview .pt-inline-form{padding:8px;background:#ecf7f5;border:1px solid #46a49b;border-radius:9px}
+#livePreview .pt-inline-label{font-size:12px;font-weight:700;margin-bottom:7px;color:#126b65}
+#livePreview .pt-inline-textarea{width:100%;max-width:100%;min-height:90px;resize:vertical;border:1px solid #9ecfca;border-radius:7px;background:white;padding:8px;font:13px/1.5 system-ui;color:#173c3b;white-space:pre-wrap}
+#livePreview .pt-inline-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+#livePreview .pt-inline-actions button{padding:5px 9px;border:1px solid #acc9c5;border-radius:6px;background:white;color:#145d57;font:700 12px system-ui;cursor:pointer}
+#livePreview .pt-inline-actions .pt-inline-save{color:white;background:#187977;border-color:#187977}
 </style></head>
 <body>
 <div class="layout">
@@ -912,7 +924,7 @@ function bind(){
   $("editorPanel").classList.add("hidden");$("emptyPanel").classList.remove("hidden");
   $("pageTitle").textContent="Выберите материал";$("pageSubtitle").textContent=next==="afisha"?"Приёмка канала «Афиша»":"Приёмка основного канала";
   $("listHeading").textContent=next==="afisha"?"🎭 Приёмка афиши":"📰 Приёмка основного канала";
-  $("listIntro").textContent=next==="afisha"?"Опубликованные события Trailyo: новые мероприятия минимум за 7 дней, а уже начавшиеся многодневные — пока они продолжаются. Изображения и текст утверждаются редактором.":"Новости, статьи и полезная информация. Только полностью подготовленные материалы с проверенным изображением и источником.";
+  $("listIntro").textContent=next==="afisha"?"Опубликованные события Trailyo: новые и ближайшие мероприятия, а также продолжающиеся многодневные события. Изображения и текст утверждаются редактором.":"Новости, статьи и полезная информация. Только полностью подготовленные материалы с проверенным изображением и источником.";
   document.querySelectorAll("[data-channel]").forEach(b=>b.classList.toggle("active",b.dataset.channel===next));
   document.querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="incoming"));
   await Promise.all([counts(),list()]);
@@ -957,6 +969,60 @@ async function start(){
  $("loginOverlay").hidden=true;
  }catch(e){login("Не удалось подтвердить доступ: "+e.message)}
 }
+/* PT_INLINE_PREVIEW_20261116: edit draft text directly from previews */
+(function(){
+ if(typeof renderPreview!=='function'||typeof gather!=='function'||typeof saveArticle!=='function'||typeof renderRichArticleText!=='function')return;
+ const base=renderPreview,names={headline:'Заголовок',story:'Основной текст',why:'Почему это важно',hook:'Подводка',lead:'Вступление'}, $e=id=>document.getElementById(id);
+ let active=null;
+ const enabled=()=>!!(current&&me?.user?.edit&&$e('headline')&&!$e('headline').disabled);
+ function tag(node,key){if(!node||!names[key])return;node.dataset.inlineEdit=key;node.tabIndex=0;node.setAttribute('role','button');node.title='Нажмите для редактирования: '+names[key];}
+ function decorate(){
+  if(active&&active.articleId!==current?.article?.id)active=null;
+  base();const root=$e('livePreview');if(!root)return;
+  root.classList.toggle('pt-inline-ready',enabled());if(!enabled())return;
+  const article=root.querySelector('.pt-article-view');
+  if(article){
+   const h=article.querySelector('[data-edit-field="headline"]');let anchor=h;
+   for(const key of ['hook','lead']){const value=$e(key)?.value||'';if(!anchor||!value.trim())continue;const block=document.createElement('div');block.className='pt-editor-section';block.innerHTML=renderRichArticleText(value);tag(block,key);anchor.after(block);anchor=block;}
+   article.querySelectorAll('[data-edit-field]').forEach(n=>tag(n,n.dataset.editField));
+  }else{
+   const body=root.querySelector('.pt-chat-body');
+   if(body){
+    const h=body.querySelector('.pt-message-title');if(h){h.textContent=$e('headline').value||'Заголовок';tag(h,'headline');}
+    for(const para of [...body.children])if(para.classList.contains('richParagraph'))para.remove();
+    const footer=body.querySelector('.pt-source');
+    for(const key of ['story','why']){
+     const block=document.createElement('div');block.className='pt-inline-block';
+     const value=$e(key)?.value||'';block.innerHTML=value.trim()?renderRichArticleText(value):'<span class="pt-inline-placeholder">✎ Нажмите, чтобы добавить текст</span>';
+     tag(block,key);body.insertBefore(block,footer);
+    }
+   }
+   const ig=root.querySelector('.ig-caption');if(ig)tag(ig,'story');
+  }
+  const hint=$e('previewHint');if(hint&&!hint.textContent.includes('Нажмите на текст'))hint.textContent+=' Нажмите на текст, чтобы исправить его прямо здесь.';
+  if(!root.dataset.ptInlineBound){root.dataset.ptInlineBound='yes';root.addEventListener('click',click,true);root.addEventListener('keydown',keys,true);}
+ }
+ function click(ev){if(!enabled()||ev.target.closest('button,textarea,input,a,[contenteditable]'))return;const target=ev.target.closest('[data-inline-edit]');if(!target)return;ev.preventDefault();ev.stopImmediatePropagation();edit(target,target.dataset.inlineEdit);}
+ function keys(ev){if(!enabled()||!['Enter',' '].includes(ev.key)||ev.target.closest('button,textarea,input'))return;const target=ev.target.closest('[data-inline-edit]');if(!target)return;ev.preventDefault();ev.stopImmediatePropagation();edit(target,target.dataset.inlineEdit);}
+ function edit(target,key){const field=$e(key);if(!names[key]||!field||field.disabled)return;
+  if(active){if(active.key===key){active.textarea.focus();return;}active.apply();target=$e('livePreview')?.querySelector('[data-inline-edit="'+key+'"]');if(!target)return;}
+  const box=document.createElement('div');box.className='pt-inline-form';
+  const label=document.createElement('div');label.className='pt-inline-label';label.textContent='✎ '+names[key]+' — прямо в предпросмотре';
+  const textarea=document.createElement('textarea');textarea.className='pt-inline-textarea';textarea.value=field.value;textarea.rows=key==='headline'?2:Math.min(14,Math.max(4,textarea.value.split('\n').length+2));if(field.maxLength>0)textarea.maxLength=field.maxLength;
+  const actions=document.createElement('div');actions.className='pt-inline-actions';
+  const make=(text,fn,cls='')=>{const b=document.createElement('button');b.type='button';b.textContent=text;b.className=cls;b.onclick=fn;actions.append(b);return b;};
+  const old=target.innerHTML;let closed=false;
+  function apply(){if(closed)return;closed=true;active=null;const changed=textarea.value!==field.value;if(changed){field.value=textarea.value;field.dispatchEvent(new Event('input',{bubbles:true}));}else decorate();}
+  function cancel(){if(closed)return;closed=true;active=null;target.innerHTML=old;decorate();}
+  make('Применить',apply);make('Сохранить статью',async()=>{apply();await saveArticle();},'pt-inline-save');make('Отмена',cancel);
+  box.append(label,textarea,actions);target.replaceChildren(box);
+  active={key,textarea,apply,articleId:current.article.id};
+  textarea.onkeydown=e=>{if(e.key==='Escape'){e.preventDefault();cancel();}else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();apply();}};
+  textarea.onblur=e=>{if(!closed&&!(e.relatedTarget&&actions.contains(e.relatedTarget)))apply();};
+  textarea.focus();textarea.setSelectionRange(textarea.value.length,textarea.value.length);
+ }
+ renderPreview=decorate;
+})();
 start();
 </script>
 </body></html>
