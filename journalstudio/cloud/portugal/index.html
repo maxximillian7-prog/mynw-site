@@ -723,12 +723,29 @@ function instagramCaption(f,i,img){
  const footer=details.join("\n\n");
  // While the editor has unsaved changes, derive meaningful facts from the
  // article body. For saved articles, the authoritative SQL digest is used above.
- const paras=String(f.story_ru||"").split(/\n\s*\n/).filter(Boolean);
- let essence=paras.slice(0,3).map(s=>s.replace(/\s+/g," ").trim()).join(" ").trim();
- if(!essence)essence=String(f.lead_ru||"").replace(/\s+/g," ").trim();
- const room=Math.max(0,980-title.length-footer.length-6);
- if(essence.length>Math.min(room,650)){
-  essence=essence.slice(0,Math.min(room,650)).replace(/\s+\S*$/,"").trim()+"…";
+ // PT_INSTAGRAM_COMPLETE_SENTENCES_20261117:
+ // Summaries must contain complete sentences. Do not cut fixed-length
+ // story slices or break Portuguese words and Russian endings.
+ const compact=value=>String(value||"").replace(/\s+/g," ").trim();
+ const room=Math.min(650,Math.max(0,980-title.length-footer.length-6));
+ const lead=compact(f.lead_ru);
+ let essence=lead;
+ let story=String(f.story_ru||"");
+ const firstLineEnd=story.indexOf("\n");
+ if(firstLineEnd>=0)story=story.slice(firstLineEnd+1);
+ story=compact(story);
+ const firstSentence=story.match(/^([^.!?…]+[.!?…])(?=\s|$)/u)?.[1]||"";
+ if(firstSentence.length>45&&essence.length<310&&
+    !essence.toLowerCase().includes(firstSentence.slice(0,40).toLowerCase())&&
+    essence.length+2+firstSentence.length<=room){
+  essence=[essence,firstSentence].filter(Boolean).join("\n\n");
+ }
+ if(!essence&&firstSentence.length<=room)essence=firstSentence;
+ if(essence.length>room){
+  // Prefer the last finished sentence within the budget; never use an
+  // ellipsis to disguise an unfinished word or sentence.
+  const finished=essence.slice(0,room).match(/^([\s\S]*[.!?…])(?:\s|$)/u)?.[1]||"";
+  essence=finished.trim()||(lead.length<=room?lead:"");
  }
  return [title,essence,footer].filter(Boolean).join("\n\n");
 }
