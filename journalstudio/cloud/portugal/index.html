@@ -813,6 +813,18 @@ function renderPreview(){
    '<div class="ig-bottom">⌂　　　 ⌕　　　 ⊞　　　 ♡　　　 ◉</div></div></div>';
   $("previewHint").textContent=img&&!approvedMedia?"⚠️ Фото видно для предпросмотра, но не подтверждено для Instagram":
    img?(isEventPreview(i)?"Афиша: дата без времени, место и ссылка на Trailyo в подписи. Кликабельная геометка Instagram потребует подключения через Facebook-страницу.":"Предпросмотр Instagram. Публикация через Buffer, текст редактируется вместе со статьёй."):"⚠️ Для Instagram требуется изображение. Для Telegram фото необязательно.";
+  // PT_INSTAGRAM_BUFFER_MISMATCH_20261117
+  // An existing Buffer post is a separate, immutable remote copy until
+  // edited there. Never imply that the regenerated local draft was sent.
+  const bufferExists=!!current?.instagram?.buffer_post_id;
+  const bufferCopy=String(current?.instagram?.caption||"");
+  const freshCopy=String(i.instagram_caption||"");
+  if(bufferExists&&bufferCopy&&freshCopy&&bufferCopy!==freshCopy){
+    const suffix=current?.instagram?.status==="published"?
+      "Пост уже опубликован: изменение редакционного текста не исправляет Instagram автоматически.":
+      "Пост уже создан в Buffer со старой подписью. Перед отправкой исправьте его в Buffer — изменения в Journal Studio не синхронизируют этот пост автоматически.";
+    $("previewHint").textContent="⚠️ "+suffix;
+  }
   $("tgLength").textContent=caption.length+" / 2200 символов · "+(approvedMedia?"фото утверждено":"фото не подтверждено");
  }else if(previewMode==="phone"){
   root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone">'+
