@@ -370,7 +370,7 @@ input[type=search]{width:100%} .filters select{width:100%}
   <div class="preview pt-live-preview" id="livePreview"></div>
   <div class="pt-screen-notice" id="previewHint">Мобильный макет Telegram на основе подготовленных текста и фотографии.</div>
   <div class="sourcebox" style="margin:12px 0"><strong>Рубрика: </strong><strong id="categoryTagPreview">—</strong><div class="faint">Навигационный хештег всегда добавляется в конец публикации.</div></div>
-  <div class="btns"><button class="btn" id="copyTelegramBtn">Копировать текст Telegram</button><button class="btn hidden" id="copyInstagramBtn">Копировать подпись Instagram</button><span class="secondary" id="tgLength">—</span></div>
+  <div class="btns"><button class="btn" id="copyTelegramBtn">Копировать текст Telegram</button><button class="btn hidden" id="copyInstagramBtn">Копировать подпись Instagram</button><button class="btn hidden" id="copyCorrectedInstagramBtn">Копировать исправленную подпись</button><span class="secondary" id="tgLength">—</span></div>
   <p class="secondary" style="margin-top:9px">Предпросмотр обновляется при каждом изменении. Для копирования публикация должна быть утверждена.</p>
  </div>
  <div class="card" id="photoPanel"><h3>④ Фотографии — быстро выбрать и заменить</h3>
@@ -798,6 +798,7 @@ function renderPreview(){
   $(id).classList.toggle("selected",previewMode===mode);
   $(id).setAttribute("aria-pressed",previewMode===mode?"true":"false");
  }
+ $("copyCorrectedInstagramBtn").classList.add("hidden");
  $("copyTelegramBtn").classList.toggle("hidden",previewMode==="instagram");
  $("copyInstagramBtn").classList.toggle("hidden",previewMode!=="instagram");
  if(previewMode==="instagram"){
@@ -825,6 +826,8 @@ function renderPreview(){
       "Пост уже создан в Buffer со старой подписью. Перед отправкой исправьте его в Buffer — изменения в Journal Studio не синхронизируют этот пост автоматически.";
     $("previewHint").textContent="⚠️ "+suffix;
   }
+  // PT_CORRECTED_BUFFER_COPY_BUTTON_20261117
+  $("copyCorrectedInstagramBtn").classList.toggle("hidden",!(bufferExists&&freshCopy&&freshCopy!==bufferCopy));
   $("tgLength").textContent=caption.length+" / 2200 символов · "+(approvedMedia?"фото утверждено":"фото не подтверждено");
  }else if(previewMode==="phone"){
   root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone">'+
@@ -1122,6 +1125,7 @@ function bind(){
  $("publicationMode").onchange=updatePublicationMode;updatePublicationMode();
  
  $("copyInstagramBtn").onclick=async()=>{if(!instagramCaptionCached){toast("Нет подписи Instagram",true);return}try{await navigator.clipboard.writeText(instagramCaptionCached);toast("Подпись Instagram скопирована")}catch{toast("Не удалось скопировать текст",true)}};
+ $("copyCorrectedInstagramBtn").onclick=async()=>{const fresh=String(current?.article?.instagram_caption||"");if(!fresh){toast("Исправленная подпись пока недоступна",true);return}try{await navigator.clipboard.writeText(fresh);toast("Исправленная подпись Instagram скопирована")}catch{toast("Не удалось скопировать подпись",true)}};
  updateApprovalButtons();
  $("approveBtn").onclick=()=>approveAndQueue("telegram");
  $("approveInstagramBtn").onclick=()=>{previewMode="instagram";renderPreview();approveAndQueue("instagram")};
