@@ -2,16 +2,33 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>DarkFactory · Journal Studio</title>
 <style>
 :root{color-scheme:dark;--bg:#101113;--panel:#1b1d20;--line:#36393e;--muted:#adb1b7;--accent:#e15847;--text:#f6f1e9}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:1px solid #484b50;background:#2a2d30;color:#f6f1e9;border-radius:10px;padding:9px 12px}button:hover{border-color:#df7c68}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:#bb3c30;color:#fff;border-color:#c6554a;font-weight:750}.good{background:#244739;border-color:#388364}.danger{background:#4a292a;border-color:#7a3539}.small{font-size:12px}.muted{color:var(--muted)}.pill{background:#292c30;border:1px solid #48494e;padding:5px 9px;border-radius:99px;font-size:12px}h1,h2,h3,p{margin:0}h1{font-size:23px}h2{font-size:17px}h3{font-size:14px}small{color:#bec0c4}.lock{max-width:420px;margin:8vh auto;padding:30px;background:#1c1d20;border:1px solid #4e3837;border-radius:20px;box-shadow:0 30px 70px #0008}.lock h1{margin-bottom:11px}.lock p{margin-bottom:18px}.lock input{width:100%;margin:8px 0 12px;padding:15px;background:#0e1012;border:1px solid #646067;border-radius:10px;color:white;letter-spacing:3px;font-size:20px}.layout{padding:15px 18px 34px;max-width:1650px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.top .brand{letter-spacing:.8px;color:#ffc6b2;font-weight:850}.top .subtitle{color:#bababe;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:13px 0 17px}.metric{background:#1b1c20;border:1px solid var(--line);padding:13px 16px;border-radius:12px}.metric b{display:block;font-size:22px}.metric span{font-size:12px;color:#b8b8bc}.workspace{display:grid;grid-template-columns:minmax(240px,310px) minmax(330px,1fr) minmax(275px,330px);align-items:start;gap:13px}.panel{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:13px;min-width:0}.queue{max-height:calc(100vh - 235px);overflow-y:auto}.queue-item{width:100%;text-align:left;display:block;border:1px solid #34373c;background:#202125;padding:12px;margin:7px 0}.queue-item.active{border:1px solid #d1664f;background:#302321}.queue-item .name{font-weight:750;margin:4px 0}.queue-item .detail{display:flex;gap:4px;flex-wrap:wrap}.queue-item .detail small{font-size:11px}.filters{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.filters button{padding:5px 9px;font-size:12px}.filters button.active{background:#e15847;color:#fff}.preview-head,.preview-foot,.form-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.preview-head{margin-bottom:8px}.preview-modes{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.preview-modes button{font-size:11px;padding:7px 8px}.preview-modes button.active{background:#d04e3c}.stage-wrap{margin:0 auto;background:#09090a;border:1px solid #4b4b4b;border-radius:10px;overflow:hidden;max-width:460px}.stage-wrap svg{display:block;width:100%;height:auto}.stage-wrap.theme-acid{border-color:#bdc942}.stage-wrap.animate svg .art-motion{transform-origin:540px 360px;animation:zoom 7s ease-in-out infinite alternate}@keyframes zoom{0%{transform:scale(1)}100%{transform:scale(1.055)}}.preview-foot{margin-top:12px}.approve{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}.approve button{flex:1;white-space:nowrap;font-size:12px}.control-label{font-size:11px;color:#c7c7c8;margin:6px 0}.form label{display:block;color:#bfc0c5;font-size:12px;margin:10px 0 4px}.form textarea,.form input,.form select{display:block;width:100%;min-width:0;padding:9px 10px;border-radius:9px;border:1px solid #4a4a4e;background:#111316;color:#f1f1f1;resize:vertical}.form textarea{min-height:56px}.form textarea#fPunch{min-height:75px}.form .two{display:grid;grid-template-columns:1fr 1fr;gap:7px}.swatches{display:grid;grid-template-columns:1fr 1fr;gap:8px}.swatches button{height:38px}.swatches .active{outline:2px solid #eaaa83;outline-offset:2px}.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.notice{margin-top:12px;background:#272a2c;padding:12px;border-radius:10px;color:#d0d0cf;font-size:12px}.error{color:#ff9385}.status{font-size:12px;margin-top:7px;min-height:18px;white-space:pre-wrap}.divider{border-top:1px solid #404147;margin:12px 0}.spacer{flex:1}#itemsCount{color:#c7c7c7;font-size:11px}.tag{display:inline-block;background:#30353a;border-radius:6px;padding:2px 5px;font-size:10px;color:#d6d6d6}.tag.ok{background:#22513d;color:#baf7ca}.tag.no{background:#603339;color:#ffcbcb}[hidden]{display:none!important}#appPane[hidden]{display:none}.slide-nav{display:flex;gap:4px;align-items:center}.slide-nav button{padding:5px 9px}.note{background:#262321;border-left:3px solid #c55f4b;padding:10px;font-size:12px;color:#d9cfca;border-radius:0 8px 8px 0;margin:10px 0}@media(max-width:1150px){.workspace{grid-template-columns:260px minmax(320px,1fr)}.form{grid-column:1/-1}.queue{max-height:none}}@media(max-width:680px){.layout{padding:10px}.workspace{grid-template-columns:1fr}.queue{max-height:320px}.metrics{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}.stage-wrap{max-width:380px}}
+
+/* DarkFactory v2 gritty editorial */
+body{background:radial-gradient(circle at 0 0,#291513 0,#0d0d0e 47%,#100c0d 100%)}
+.panel,.metric,.lock{background:#171314;border-color:#4f312c;box-shadow:0 10px 35px #0007}
+.brand{font-family:Impact,"Arial Narrow",Arial,sans-serif;font-size:19px;letter-spacing:1.7px}
+h1,h2,h3{font-family:Impact,"Arial Narrow",Arial,sans-serif;letter-spacing:.5px}
+.queue-item{background:linear-gradient(135deg,#211b1a,#130f10);border-left:4px solid #7e3027}
+.queue-item.active{border-color:#e65342;background:#30201c}
+.stage-wrap{background:#0a0709;border:5px solid #3e2b26;box-shadow:0 20px 50px #000a}
+.preview-modes button.active,.filters button.active{background:#8c2d25}
+button.primary{background:#a82c22;border-color:#d45142}
+.swatches button[data-theme="black_press"]{background:linear-gradient(145deg,#09090b,#a02b20)!important}
+.swatches button[data-theme="acid_brutal"]{background:linear-gradient(125deg,#24201a,#b4a25a)!important;color:#fff!important}
+#rewriteActions button{background:#30201f;border-color:#5b342d;color:#f2d1b3;font-weight:750}
+#rewriteActions button:hover{background:#74312c;color:#fff}
+.note{background:#2b1c19;border-color:#b64736}
+
 </style></head><body>
 <div id="lockPane" class="lock">
  <div class="brand" style="color:#e58d77">MYNOW / JOURNAL STUDIO · 18+</div>
- <h1>☠ DarkFactory</h1><p class="muted">Закрытая редакция чёрного юмора. Для входа сначала авторизуйтесь в Journal Studio, затем введите дополнительный PIN.</p>
+ <h1>☠ DarkFactory · V2</h1><p class="muted">Закрытая редакция чёрного юмора. Для входа сначала авторизуйтесь в Journal Studio, затем введите дополнительный PIN.</p>
  <form id="pinForm"><label for="pin">Дополнительный PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" maxlength="12" required><button class="primary" type="submit" style="width:100%">Открыть редакцию</button></form>
  <p id="lockStatus" class="status" aria-live="polite"></p>
 </div>
 <div id="appPane" class="layout" hidden>
  <header class="top">
-  <div><div class="brand">☠ DARKFACTORY <span class="muted">/ BLACK HUMOR LAB · 18+</span></div><h1>Приёмка и предпросмотр</h1><div class="subtitle">Instagram · Telegram · без звука · ручное утверждение</div></div>
+  <div><div class="brand">☠ DARKFACTORY <span class="muted">/ BLACK HUMOR LAB · 18+</span></div><h1>Чёрная пресса · приёмка</h1><div class="subtitle">Жёсткие панчи · автоформат · коллажи · Instagram / Telegram · без звука</div></div>
   <div class="actions"><button id="newItem">+ Создать вручную</button><button id="aiGenerate" class="primary">✦ Создать 5 через AI</button><button id="refresh">Обновить</button><button id="lock">Закрыть доступ</button></div>
  </header>
  <div class="metrics"><div class="metric"><b id="statAll">0</b><span>Всего материалов</span></div><div class="metric"><b id="statIG">0</b><span>Ожидают Instagram</span></div><div class="metric"><b id="statTG">0</b><span>Ожидают Telegram</span></div><div class="metric"><b id="statBoth">0</b><span>Утверждены в обеих сетях</span></div></div>
@@ -23,15 +40,15 @@
    <div class="preview-head" style="margin:10px 0"><div id="formatNote" class="muted small">Без звука · Иллюстрация и текст раздельно</div><div id="slideControls" class="slide-nav" hidden><button id="slideBack">←</button><small id="slideLabel">1/3</small><button id="slideNext">→</button></div></div>
    <div id="stageWrap" class="stage-wrap"><div id="stage"></div></div>
    <div class="preview-foot"><span class="muted small">Предпросмотр адаптируется под площадку</span><div class="row"><button id="exportPNG">Скачать PNG</button><button id="exportVideo">Видео без звука</button></div></div>
-   <div class="divider"></div><div class="control-label">Утверждение конкретных площадок</div>
+   <div class="divider"></div><div class="control-label">Редакторские команды · новые версии через AI</div><div class="approve" id="rewriteActions"><button data-rewrite="stronger">⚡ Жёстче</button><button data-rewrite="darker">☠ Темнее</button><button data-rewrite="shorter">✂ Короче</button><button data-rewrite="twist">↯ Новый панч</button><button data-rewrite="image">▣ Другой образ</button></div><div class="divider"></div><div class="control-label">Утверждение конкретных площадок · публикация выключена</div>
    <div class="approve"><button class="good" id="approveIG">✓ Instagram</button><button class="good" id="approveTG">✓ Telegram</button><button class="primary" id="approveBoth">✓ В обе сети</button></div>
    <div class="approve"><button id="needsChanges">Переделать</button><button id="reject" class="danger">Отклонить</button></div>
    <p id="status" class="status" aria-live="polite"></p>
   </main>
   <aside class="panel form">
    <div class="form-head"><h2>Редактор материала</h2><button id="saveItem" class="primary">Сохранить</button></div>
-   <label>Цветовая серия</label><div class="swatches"><button data-theme="black_press" class="active" style="background:#211b19;color:#f0dfc6">A · Black Press</button><button data-theme="acid_brutal" style="background:#d7ef57;color:#14181b">B · Acid Brutal</button></div>
-   <div class="two"><div><label>Формат</label><select id="fFormat"><option value="card">Карточка-панч</option><option value="chat">Переписка</option><option value="animated_story">Анимированная история</option><option value="fake_ad">Фальшивая реклама</option><option value="dark_news">Газета абсурда</option><option value="carousel">Карусель из 3 кадров</option></select></div><div><label>Тема</label><select id="fTopic"><option value="office">Работа / начальство</option><option value="romance">Отношения</option><option value="money">Банки / деньги</option><option value="bureaucracy">Бюрократия</option><option value="social">Соцсети</option><option value="luxury">Богатство и пафос</option><option value="service">Сервис</option><option value="psychology">Психология</option><option value="life">Жизнь</option></select></div></div>
+   <label>Визуальная серия · две палитры подпольной прессы</label><div class="swatches"><button data-theme="black_press" class="active" style="background:#211b19;color:#f0dfc6">A · Black Press</button><button data-theme="acid_brutal" style="background:#d7ef57;color:#14181b">B · Acid Brutal</button></div>
+   <div class="two"><div><label>Выбор подачи</label><select id="fFormatMode"><option value="auto">✦ Автоматически по шутке</option><option value="manual">Ручной выбор</option></select><label>Формат</label><select id="fFormat"><option value="card">Карточка-панч</option><option value="chat">Переписка</option><option value="animated_story">Анимированная история</option><option value="fake_ad">Фальшивая реклама</option><option value="dark_news">Газета абсурда</option><option value="carousel">Карусель из 3 кадров</option></select></div><div><label>Тема</label><select id="fTopic"><option value="office">Работа / начальство</option><option value="romance">Отношения</option><option value="money">Банки / деньги</option><option value="bureaucracy">Бюрократия</option><option value="social">Соцсети</option><option value="luxury">Богатство и пафос</option><option value="service">Сервис</option><option value="psychology">Психология</option><option value="life">Жизнь</option></select></div></div>
    <label>Заголовок</label><input id="fTitle" maxlength="180">
    <label>Завязка / первая реплика</label><textarea id="fHook" rows="3"></textarea>
    <label>Развитие (необязательно)</label><textarea id="fBody" rows="2"></textarea>
@@ -40,7 +57,7 @@
    <label>Подпись Instagram</label><textarea id="fIGCaption" rows="2"></textarea>
    <label>Подпись Telegram</label><textarea id="fTGCaption" rows="2"></textarea>
    <button id="previewChanges" style="width:100%;margin-top:10px">Обновить предпросмотр</button>
-   <div class="note">Тексты и изображения не публикуются автоматически. Сначала предпросмотр и отдельное одобрение для каждой площадки. AI-генерация использует существующий ключ проекта при его наличии и может расходовать API-кредиты.</div>
+   <div class="note">18+ · вымышленные истории и сатира. Материалы отправляются на приёмку, автопубликация выключена. Кнопки усиления шутки используют OpenAI API проекта и могут расходовать токены. Фото — Unsplash, обработка — коллаж.</div>
   </aside>
  </div>
 </div>
@@ -111,11 +128,11 @@ function fill(x){
  $("fFormat").value=x.format_type;$("fTopic").value=Array.from($("fTopic").options).some(function(o){return o.value===x.topic})?x.topic:"life";
  $("fDialogue").value=(x.dialogue||[]).map(function(p){return p.speaker+": "+p.text}).join("\n");
  $("fIGCaption").value=x.caption_instagram||"";$("fTGCaption").value=x.caption_telegram||"";
- document.querySelectorAll("[data-theme]").forEach(function(el){el.classList.toggle("active",el.dataset.theme===x.theme_variant)});
+ document.querySelectorAll("[data-theme]").forEach(function(el){el.classList.toggle("active",el.dataset.theme===x.theme_variant)});$("fFormatMode").value=x.format_mode==="manual"?"manual":"auto";$("fFormat").disabled=$("fFormatMode").value==="auto";
 }
 function readForm(x){
  var d=$("fDialogue").value.split("\n").filter(function(s){return s.trim()}).map(function(line){var p=line.indexOf(":");return {speaker:p>=0?line.slice(0,p).trim():"Собеседник",text:p>=0?line.slice(p+1).trim():line.trim()}});
- return {title:$("fTitle").value,hook:$("fHook").value,body:$("fBody").value,punch:$("fPunch").value,format_type:$("fFormat").value,topic:$("fTopic").value,dialogue:d,theme_variant:x.theme_variant,scene_variant:x.scene_variant,caption_instagram:$("fIGCaption").value,caption_telegram:$("fTGCaption").value};
+ return {title:$("fTitle").value,hook:$("fHook").value,body:$("fBody").value,punch:$("fPunch").value,format_type:$("fFormat").value,format_mode:$("fFormatMode").value,topic:$("fTopic").value,dialogue:d,theme_variant:x.theme_variant,scene_variant:x.scene_variant,art_variant:x.art_variant||0,caption_instagram:$("fIGCaption").value,caption_telegram:$("fTGCaption").value};
 }
 function choose(){
  var x=item();
@@ -340,9 +357,25 @@ $("queue").addEventListener("click",function(e){var b=e.target.closest("[data-id
 document.querySelectorAll("[data-filter]").forEach(function(b){b.onclick=function(){state.filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(function(x){x.classList.toggle("active",x===b)});renderQueue()}});
 document.querySelectorAll("[data-mode]").forEach(function(b){b.onclick=function(){state.mode=b.dataset.mode;paint()}});
 document.querySelectorAll("[data-theme]").forEach(function(b){b.onclick=function(){var x=item();if(!x)return;x.theme_variant=b.dataset.theme;fill(x);paint();inform("Тема изменена в предпросмотре. Нажми «Сохранить», чтобы закрепить.")}});
-$("fFormat").addEventListener("change",function(){var x=item();if(x){x.format_type=$("fFormat").value;paint()}});
+
+function suggestFormat(x){
+ const t=[x.hook,x.body,x.punch].join(" ").toLowerCase();
+ if((x.dialogue||[]).length>=2)return "chat";
+ if(/скидк|акци|тариф|подписк|vip|услуг|предложени|пакет|страховк|курс/i.test(t))return "fake_ad";
+ if(/сообщил|объявил|введен|внедрил|новост|ведомств|в аду|министерств/i.test(t))return "dark_news";
+ if((x.body||"").length>85&&(t.match(/[.!?…]/g)||[]).length>=4)return "carousel";
+ if((x.body||"").length>26||t.length>220)return "animated_story";
+ return "card";
+}
+$("fFormatMode").addEventListener("change",function(){
+ const x=item();if(!x)return;x.format_mode=$("fFormatMode").value;
+ if(x.format_mode==="auto"){x.format_type=suggestFormat({...x,...readForm(x)});$("fFormat").value=x.format_type}
+ $("fFormat").disabled=x.format_mode==="auto";paint()
+});
+
+$("fFormat").addEventListener("change",function(){var x=item();if(x){x.format_type=$("fFormat").value;x.format_mode="manual";$("fFormatMode").value="manual";paint()}});
 $("fTopic").addEventListener("change",function(){var x=item();if(x){x.topic=$("fTopic").value;paint()}});
-$("previewChanges").onclick=function(){var x=item();if(!x)return;Object.assign(x,readForm(x));paint();inform("Это предпросмотр. Для записи в базу нажми «Сохранить».")};
+$("previewChanges").onclick=function(){var x=item();if(!x)return;Object.assign(x,readForm(x));if(x.format_mode==="auto"){x.format_type=suggestFormat(x);$("fFormat").value=x.format_type}paint();inform("Это предпросмотр. Для записи в базу нажми «Сохранить».")};
 $("saveItem").onclick=function(){run(async function(){var x=item();if(!x)return;await patch(readForm(x));inform("Материал сохранён.")})};
 $("swapScene").onclick=function(){run(async function(){var x=item();if(!x)return;await patch({scene_variant:(x.scene_variant+1+Math.floor(Math.random()*4))%12});inform("Другой визуальный сюжет готов.")})};
 $("swapFormat").onclick=function(){run(async function(){var x=item();if(!x)return;var all=["card","chat","animated_story","fake_ad","dark_news","carousel"],i=all.indexOf(x.format_type);await patch({format_type:all[(i+1)%all.length]});inform("Формат изменён.")})};
@@ -351,6 +384,23 @@ $("approveTG").onclick=function(){run(function(){return approve("telegram","appr
 $("approveBoth").onclick=function(){run(function(){return approve("both","approved")})};
 $("reject").onclick=function(){run(function(){return approve("both","rejected")})};
 $("needsChanges").onclick=function(){run(function(){return approve("both","needs_changes")})};
+
+document.getElementById("rewriteActions").addEventListener("click",function(e){
+ const b=e.target.closest("[data-rewrite]");if(!b)return;
+ run(async function(){
+  const x=item();if(!x)return;
+  if(!state.ai)throw Error("OpenAI API недоступен. Можно редактировать текст вручную или сменить композицию.");
+  if(!confirm("Переработать материал через OpenAI API? Запрос может быть платным."))return;
+  inform("Создаётся новая версия…");b.disabled=true;
+  try{
+   const response=await req("/items/"+x.id+"/rewrite","POST",{mode:b.dataset.rewrite});
+   const index=state.items.findIndex(v=>v.id===x.id);
+   state.items[index]=response.item;updateStats();renderQueue();choose();
+   inform("Новая версия готова и возвращена на согласование.");
+  }finally{b.disabled=false}
+ });
+});
+
 $("exportPNG").onclick=function(){run(exportPNG)};
 $("exportVideo").onclick=function(){run(exportVideo)};
 $("slideBack").onclick=function(){state.slide=(state.slide+2)%3;paint()};
