@@ -10,7 +10,7 @@ window.StudioBrandHub=(function(){
   metrics:{green:null,portugal:null,seriously:null},bound:false};
  const $=id=>document.getElementById(id);
  const safeNum=x=>typeof x==="number"&&Number.isFinite(x)&&x>=0&&x<=1000000?Math.round(x):null;
- const canAccess=()=>!["author","reviewer"].includes(document.body.dataset.studioRole||"");
+ const canAccess=()=>typeof project==="undefined"||!project?true:!["author","reviewer"].includes(project.role||"");
  function activeTabFromBrand(brand){return brandTabs[brand]||"studios";}
  function preferredTab(){
   if(!canAccess())return "home";
@@ -145,8 +145,106 @@ window.StudioBrandHub=(function(){
   for(const k of ["review","queued","published"]){metrics[k]=safeNum(event.data[k])}
   updateCard(brand,metrics);
  }
+
+ function logo(brand){return "./brand-"+(brand==="green"?"nowgreen":brand==="seriously"?"seriously":"portugal")+".svg"}
+ function brandButton(brand,label,sub){
+  return '<button type="button" class="studio-editor-link" data-hub-go="'+brand+'" data-hub-brand="'+brand+'" aria-label="Редакция '+label+'">'+
+   '<img src="'+logo(brand)+'" alt=""><span class="meta"><b>'+label+'</b><small>'+sub+'</small></span><span class="mini-arrow">›</span></button>';
+ }
+ function summaryCard(brand,index,title,subtitle,badge,metrics){
+  const headings=brand==="green"?["На приёмке","Черновики","Опубликовано"]:["На приёмке","В очереди","Опубликовано"];
+  const keys=["review","queued","published"];
+  return '<article class="studio-hub-card '+brand+'"><div class="cover"><img src="'+logo(brand)+'" alt="Эмблема '+title+'">'+
+   '<span class="brand-index">'+index+' / '+badge+'</span></div>'+
+   '<div class="content"><h3>'+title+'</h3><p>'+subtitle+'</p>'+
+   '<div class="hub-metrics">'+keys.map((key,i)=>'<div><b data-hub-metric="'+brand+":"+key+'">—</b><span>'+headings[i]+'</span></div>').join("")+'</div>'+
+   '<div class="hub-actions"><button type="button" class="primary" data-hub-go="'+brand+'">Открыть журнал</button>'+
+   '<button type="button" data-hub-go="'+brand+'" data-hub-intent="'+(brand==="seriously"?"queue":"review")+'">'+
+   (brand==="seriously"?"Расписание":"Приёмка")+'</button></div>'+
+   '<div class="hub-subline" data-hub-status="'+brand+'">Откройте редакцию для загрузки показателей</div></div></article>';
+ }
+ function mount(){
+  const main=document.querySelector("#workspace .main"),sidebar=document.querySelector("#workspace .sidebar");
+  if(!main||!sidebar||document.getElementById("studioBrandSwitchbar"))return;
+  const nav=sidebar.querySelector("nav[data-admin-nav]");
+  if(nav){
+   nav.innerHTML='<button type="button" data-tab="studios"><b>◈</b> Все редакции</button>'+
+    '<button type="button" data-tab="settings"><b>⚙</b> Настройки</button>';
+  }
+  const firstHeading=sidebar.querySelector(".navhead");
+  if(firstHeading)firstHeading.textContent="NOWGREEN · РЕДАКЦИЯ";
+  const management=nav?.previousElementSibling;
+  if(management?.classList?.contains("navhead"))management.textContent="ПАНЕЛЬ УПРАВЛЕНИЯ";
+  const mainBrand=sidebar.querySelector(".brand");
+  if(mainBrand){
+   mainBrand.insertAdjacentHTML("afterend",
+    '<div class="navhead" data-admin-nav>ЖУРНАЛЫ · ВЫБЕРИ РЕДАКЦИЮ</div>'+
+    '<div class="studio-editor-nav" data-admin-nav>'+
+     brandButton("green","NowGreen Journal","Растения · уход · зелёный дом")+
+     brandButton("portugal","Португалия рядом","Новости · документы · афиша")+
+     brandButton("seriously","НЕТ! СЕРЬЁЗНО?!","Необычные проверенные факты")+
+    '</div>');
+  }
+  const bar='<div class="studio-brand-switchbar" id="studioBrandSwitchbar" data-admin-nav role="navigation" aria-label="Выбор редакционного журнала">'+
+   '<strong>Journal Studio</strong>'+
+   '<button type="button" class="studio-switch-tab hub-overview-button" data-hub-go="overview" data-hub-brand="overview">◈ Все редакции</button>'+
+   ['green','portugal','seriously'].map(brand=>'<button type="button" class="studio-switch-tab" data-hub-go="'+brand+'" data-hub-brand="'+brand+'">'+
+    '<img class="brand-bubble" src="'+logo(brand)+'" alt="">'+
+    ({green:"NowGreen",portugal:"Португалия рядом",seriously:"НЕТ! СЕРЬЁЗНО?!"}[brand])+'</button>').join("")+
+   '<div class="hub-right"><button type="button" data-hub-go="overview">Сводка редакций</button></div></div>';
+  const header=main.querySelector(".topbar");
+  if(header)header.insertAdjacentHTML("beforebegin",bar);
+  const home=main.querySelector('[data-view="home"]');
+  if(home){
+   home.insertAdjacentHTML("beforebegin",'<section class="view" data-view="studios" data-admin-nav>'+
+    '<div class="studio-hub-heading"><div><div class="eyebrow">MYNOW · ОБЩИЙ РЕДАКЦИОННЫЙ ЦЕНТР</div>'+
+    '<h2>Три журнала. Одна редакционная панель.</h2>'+
+    '<p>Собственные названия, эмблемы, аудитории и стиль публикаций. Общая навигация и единый понятный путь от идеи к публикации.</p></div>'+
+    '<span class="pill">Редакции и каналы независимы</span></div>'+
+    '<div class="studio-hub-grid">'+
+     summaryCard("green","01","NowGreen Journal","Растения, домашняя зелень, сад и устойчивый образ жизни.","NATURE JOURNAL")+
+     summaryCard("portugal","02","Португалия рядом","Новости, документы, семейная жизнь, советы и афиша.","PORTUGAL DESK")+
+     summaryCard("seriously","03","НЕТ! СЕРЬЁЗНО?!","Научные, природные и жизненные факты: Telegram RU/EN, Instagram RU/EN.","WOW FACTORY")+
+    '</div>'+
+    '<div class="studio-hub-workflow">'+
+     '<section class="card"><div class="eyebrow">ОБЩИЙ РЕДАКЦИОННЫЙ ПРОЦЕСС</div><h3>От идеи до выхода в канал</h3>'+
+     '<p>Все журналы используют понятные этапы, но сохраняют свои проверки, права, хранилища медиа и собственные расписания.</p>'+
+     '<div class="studio-hub-steps"><span>Идея</span><i>›</i><span>Черновик</span><i>›</i><span>Проверка</span><i>›</i><span>Приёмка</span><i>›</i><span>Очередь</span><i>›</i><span>Опубликовано</span></div></section>'+
+     '<section class="card"><div class="eyebrow">КОНТРОЛЬ КАЧЕСТВА</div><h3>Правила каждого журнала</h3>'+
+     '<div class="studio-hub-notes">'+
+      '<div><span class="note-symbol">✓</span>Приёмка материала внутри своего журнала</div>'+
+      '<div><span class="note-symbol">▣</span>Медиа хранятся независимо от текста и макетов</div>'+
+      '<div><span class="note-symbol">◷</span>Тихие часы и интервал настраиваются для канала</div>'+
+      '<div><span class="note-symbol">↗</span>Нет риска отправить публикацию в чужой канал</div>'+
+     '</div></section></div></section>');
+  }
+  const old=document.querySelector('[data-view="darkfactory"]');
+  if(old){
+   const frame=old.querySelector("#darkfactoryFrame");
+   if(frame){
+    frame.classList.add("studio-embedded-frame");
+    frame.removeAttribute("style");
+    frame.setAttribute("loading","lazy");
+    frame.dataset.src=(frame.dataset.src||"./darkfactory.html")+"&embedded=1";
+   }
+   old.insertAdjacentHTML("afterbegin",'<div class="studio-brand-workspace-header seriously">'+
+    '<div class="title-cluster"><img src="'+logo("seriously")+'" alt=""><div><h2>НЕТ! СЕРЬЁЗНО?! / NO, SERIOUSLY?!</h2>'+
+    '<p>Факты, визуалы и публикации · Instagram RU/EN · Telegram RU/EN</p></div></div>'+
+    '<a class="open-external" href="./darkfactory.html" target="_blank" rel="noopener">Открыть отдельно ↗</a></div>');
+   old.insertAdjacentHTML("beforebegin",
+    '<section class="view" data-view="portugal" data-admin-nav>'+
+    '<div class="studio-brand-workspace-header portugal">'+
+     '<div class="title-cluster"><img src="'+logo("portugal")+'" alt=""><div><h2>Португалия рядом</h2>'+
+     '<p>Новости, полезные статьи, афиша, сообщения и календарь публикаций</p></div></div>'+
+     '<a class="open-external" href="./portugal/" target="_blank" rel="noopener">Открыть отдельно ↗</a></div>'+
+    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1" src="about:blank"></iframe>'+
+    '</section>');
+  }
+ }
+
  function bind(){
   if(state.bound)return;state.bound=true;
+  mount();
   document.addEventListener("click",e=>{
    const t=e.target.closest("[data-hub-go],[data-hub-action]");
    if(!t)return;
