@@ -105,10 +105,10 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 <div id="app" class="shell layout-hidden">
  <header class="top"><div class="brand"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><div><div class="eyebrow">NO, SERIOUSLY? / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
  <div class="top-actions"><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
- <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
+ <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
- <div class="switches"><button class="active" data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button data-mode="telegram">Telegram · RU</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
+ <div class="switches"><button class="active" data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button data-mode="telegram">Telegram · RU</button><button data-mode="telegram_en">Telegram · EN</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
  <div class="proof-status"><span><span class="proof-led"></span>Предпросмотр публикации в приложении</span><span id="proofHint">Прокрутите карусель стрелками или пальцем</span></div>
  <div id="instagramFrame" class="social-proof">
   <div class="mock-ig-appbar"><span class="mock-ig-wordmark">Instagram</span><span class="mock-icons">
@@ -127,9 +127,9 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
   <div class="ig-comment">Добавить комментарий… <span style="float:right">♡</span></div>
  </div>
  <div id="telegramFrame" class="tg-proof" hidden>
-  <div class="tg-top"><span class="tg-back">‹</span><div class="tg-avatar">Н?</div><div><strong>НЕТ! СЕРЬЁЗНО? · макет</strong><small>Канал · демонстрация сообщения</small></div><span class="tg-search">⌕</span></div>
+  <div class="tg-top"><span class="tg-back">‹</span><div class="tg-avatar">!?</div><div><strong id="tgChannelTitle">НЕТ! СЕРЬЁЗНО? · макет</strong><small id="tgChannelSubtitle">Канал · демонстрация сообщения</small></div><span class="tg-search">⌕</span></div>
   <div class="tg-chat"><div class="tg-date">Предпросмотр</div><div class="tg-bubble">
-   <div class="tg-from">НЕТ! СЕРЬЁЗНО?</div>
+   <div class="tg-from" id="tgFrom">НЕТ! СЕРЬЁЗНО?</div>
    <div id="tgSingle" class="tg-single" hidden></div>
    <div id="tgAlbum" class="tg-album" hidden></div>
    <div id="tgCaption" class="tg-message"></div><div class="tg-meta">Время публикации не назначено · ◉</div>
@@ -145,14 +145,14 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
  <canvas id="canvas" width="1080" height="1350" hidden></canvas>
  <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
  <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт текущего слайда PNG</button></div>
- <div class="actions"><button class="ok" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" id="approveTG">Одобрить Telegram RU</button><button id="changes">На доработку</button></div>
+ <div class="actions"><button class="ok" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" id="approveTG">Одобрить Telegram RU</button><button class="ok" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
  <div id="status" class="status" aria-live="polite"></div>
  <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Внешняя автопубликация не запускается этим экраном.</div>
  </div></main>
  <section class="panel editor-panel"><div class="panel-head"><h2>Факты · источники · тексты</h2><button class="primary" id="save">Сохранить</button></div><div class="edit" id="editor">
  <div class="full"><div class="eyebrow" id="verification"></div><div id="evidence" class="block"></div></div>
  <div><h3>Русский · Instagram / Telegram</h3><label>Заголовок RU</label><input id="fTitle"><label>Вступление RU</label><textarea id="fHook"></textarea><label>История RU</label><textarea id="fBody" rows="8"></textarea><label>Instagram RU · подпись</label><textarea id="fIGRU" rows="5"></textarea><label>Telegram RU · публикация</label><textarea id="fTG" rows="6"></textarea></div>
- <div><h3>English · Instagram</h3><label>Headline EN</label><input id="fTitleEN"><label>Hook EN</label><textarea id="fHookEN"></textarea><label>Full Story EN</label><textarea id="fBodyEN" rows="8"></textarea><label>Instagram EN · Caption</label><textarea id="fIGEN" rows="6"></textarea><label>Формат</label><select id="fFormat"><option value="card">Одна карточка</option><option value="photo_story">Фотоистория</option><option value="carousel">Карусель</option><option value="timeline">Хронология</option><option value="comparison">Сравнение</option><option value="reel_story">Reels / Story</option></select></div>
+ <div><h3>English · Instagram</h3><label>Headline EN</label><input id="fTitleEN"><label>Hook EN</label><textarea id="fHookEN"></textarea><label>Full Story EN</label><textarea id="fBodyEN" rows="8"></textarea><label>Instagram EN · Caption</label><textarea id="fIGEN" rows="6"></textarea><label>Telegram EN · публикация</label><textarea id="fTGEN" rows="6"></textarea><label>Формат</label><select id="fFormat"><option value="card">Одна карточка</option><option value="photo_story">Фотоистория</option><option value="carousel">Карусель</option><option value="timeline">Хронология</option><option value="comparison">Сравнение</option><option value="reel_story">Reels / Story</option></select></div>
  <div class="full block"><label>Внутренний фактчекинг · источники видны только редактору (по одному URL в строке)</label><textarea id="fSources" rows="3"></textarea><label>Промпт визуала · английский</label><textarea id="fVisual" rows="3"></textarea><p class="note">Для нового иллюстративного кадра используется существующий OPENAI_API_KEY Journal Studio. Дубликаты и непроверенные факты не отправляются в генерацию.</p></div>
  </div></section></div></div>
 <script>
@@ -184,19 +184,20 @@ async function reload(){
  const visible=filtered();if(!visible.some(x=>x.id===selected))selected=visible[0]?.id||null;
  drawQueue();select();
 }
-function filtered(){let f=$("filter").value;return items.filter(x=>f==="all"||f==="pilot"&&x.source===pilot||f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot)||f==="review"&&(x.status_instagram==="review"||x.status_telegram==="review"))}
-function drawQueue(){$("queue").innerHTML=filtered().map((x,i)=>'<button data-id="'+safe(x.id)+'" class="'+(x.id===selected?"active":"")+'"><div class="tag '+(x.fact_verification==="verified"?"verified":"pending")+'">'+safe(fmt[x.format_type]||x.format_type)+" · "+safe(x.fact_verification)+"</div><div class=\"queue-title\">"+safe(x.title)+"</div><div class=\"tag\">IG: "+safe(x.status_instagram)+" · TG: "+safe(x.status_telegram)+" · "+(x.visual_status==="ready"?"🖼 готово":"◌ ожидает изображения")+"</div></button>").join("")||'<p class="muted">Материалов нет</p>'}
+function filtered(){let f=$("filter").value;return items.filter(x=>f==="all"||f==="pilot"&&x.source===pilot||f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot)||f==="review"&&(x.status_instagram==="review"||x.status_telegram==="review"||x.status_telegram_en==="review"))}
+function drawQueue(){$("queue").innerHTML=filtered().map((x,i)=>'<button data-id="'+safe(x.id)+'" class="'+(x.id===selected?"active":"")+'"><div class="tag '+(x.fact_verification==="verified"?"verified":"pending")+'">'+safe(fmt[x.format_type]||x.format_type)+" · "+safe(x.fact_verification)+"</div><div class=\"queue-title\">"+safe(x.title)+"</div><div class=\"tag\">IG: "+safe(x.status_instagram)+" · TG RU: "+safe(x.status_telegram)+" · TG EN: "+safe(x.status_telegram_en||"review")+" · "+(x.visual_status==="ready"?"🖼 готово":"◌ ожидает изображения")+"</div></button>").join("")||'<p class="muted">Материалов нет</p>'}
 function setField(id,val){$(id).value=val||""}
 function select(){
  const x=current();if(!x){$("chosenTitle").textContent="Нет материала";return}
  $("chosenTitle").textContent=x.title;$("formatName").textContent=fmt[x.format_type]||x.format_type;
- [["fTitle",x.title],["fTitleEN",x.title_en],["fHook",x.hook],["fHookEN",x.hook_en],["fBody",x.body],["fBodyEN",x.body_en],["fIGRU",x.caption_instagram],["fIGEN",x.caption_instagram_en],["fTG",x.caption_telegram],["fVisual",x.visual_prompt_en||x.visual_prompt],["fSources",(x.source_urls||[]).join("\n")],["fFormat",x.format_type]].forEach(([id,v])=>setField(id,v));
+ [["fTitle",x.title],["fTitleEN",x.title_en],["fHook",x.hook],["fHookEN",x.hook_en],["fBody",x.body],["fBodyEN",x.body_en],["fIGRU",x.caption_instagram],["fIGEN",x.caption_instagram_en],["fTG",x.caption_telegram],["fTGEN",x.caption_telegram_en],["fVisual",x.visual_prompt_en||x.visual_prompt],["fSources",(x.source_urls||[]).join("\n")],["fFormat",x.format_type]].forEach(([id,v])=>setField(id,v));
  $("verification").textContent="Проверка: "+x.fact_verification+" · Иллюстрация: "+x.visual_status;
  const sources=x.source_urls||[];$("evidence").innerHTML='<strong>Проверка фактов · только для редактора, в публикацию не выводится</strong>'+(sources.length?sources.map((url,i)=>'<div class="source">'+(i+1)+'. <a href="'+safe(url)+'" target="_blank" rel="noopener noreferrer">'+safe(url)+'</a></div>').join(""):'<p class="note">Источники отсутствуют — одобрение недоступно.</p>');
  $("illustrate").disabled=x.fact_verification!=="verified"||x.visual_status==="ready";
  $("illustrate").textContent=x.visual_status==="ready"?"✓ Изображение сохранено":"✦ Сгенерировать изображение";
  $("approveIG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
+ $("approveTGEN").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready"||!x.caption_telegram_en;
  drawQueue();loadImage(x.image_url);
 }
 function loadImage(url){image=null;imageSource=url||"";if(!url){render();return}const img=new Image();img.crossOrigin="anonymous";img.onload=()=>{if(url!==imageSource)return;image=img;render()};img.onerror=()=>{image=null;render()};img.src=url;render()}
@@ -205,9 +206,9 @@ function draft(){
  const x=current();if(!x)return null;
  return {...x,title:$("fTitle").value,title_en:$("fTitleEN").value,hook:$("fHook").value,hook_en:$("fHookEN").value,
  body:$("fBody").value,body_en:$("fBodyEN").value,caption_instagram:$("fIGRU").value,caption_instagram_en:$("fIGEN").value,
- caption_telegram:$("fTG").value,format_type:$("fFormat").value,source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))};
+ caption_telegram:$("fTG").value,caption_telegram_en:$("fTGEN").value,format_type:$("fFormat").value,source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))};
 }
-function languageEN(){return mode==="ig_en"||mode==="reel_en"}
+function languageEN(){return mode==="ig_en"||mode==="reel_en"||mode==="telegram_en"}
 function isReel(){return mode==="reel_ru"||mode==="reel_en"}
 function sentenceParts(text){
  const paragraphs=String(text||"").split(/\n+/).map(s=>s.trim()).filter(Boolean);
@@ -414,8 +415,11 @@ function updateCaption(x,en){
  $("igCaption").textContent=captionExpanded||!more?txt:txt.slice(0,194).trimEnd()+"…";
  $("igMore").hidden=!more;$("igMore").textContent=captionExpanded?(en?"less":"свернуть"):(en?"more":"ещё");
 }
-function updateTG(x,slides){
- const message=x.caption_telegram||x.title+"\n\n"+x.body;
+function updateTG(x,slides,en){
+ const message=en?(x.caption_telegram_en||x.title_en+"\n\n"+x.body_en):(x.caption_telegram||x.title+"\n\n"+x.body);
+ $("tgChannelTitle").textContent=en?"NO, SERIOUSLY?! · preview":"НЕТ! СЕРЬЁЗНО?! · макет";
+ $("tgChannelSubtitle").textContent=en?"Channel · editorial preview":"Канал · демонстрация сообщения";
+ $("tgFrom").textContent=en?"NO, SERIOUSLY?!":"НЕТ! СЕРЬЁЗНО?!";
  const max=950;let cut=max;
  if(message.length>max){let natural=message.lastIndexOf("\n",max);if(natural>500)cut=natural}
  const first=message.length>max?message.slice(0,cut):message,other=message.length>max?message.slice(cut).trimStart():"";
@@ -429,7 +433,7 @@ function updateTG(x,slides){
   single.hidden=true;album.hidden=false;
   album.innerHTML=slides.slice(0,4).map((slide,i)=>'<button class="tg-tile" data-album="'+i+'" aria-label="Открыть фото '+(i+1)+'"><canvas width="166" height="208"></canvas>'+(i===3&&slides.length>4?'<span class="tg-plus">+'+(slides.length-4)+'</span>':"")+'</button>').join("");
   album.querySelectorAll("[data-album]").forEach((b,i)=>{
-   drawCard(b.querySelector("canvas"),x,slides[i],false,false,true,i,slides.length);
+   drawCard(b.querySelector("canvas"),x,slides[i],en,false,true,i,slides.length);
    b.onclick=()=>openViewer(i);
   });
   $("canvas").hidden=true;
@@ -447,7 +451,7 @@ function render(){
  const x=draft();if(!x)return;
  const en=languageEN(),reel=isReel(),slides=slidesFor(x,en);
  slideIndex=Math.max(0,Math.min(slides.length-1,slideIndex));
- const ig=mode==="ig_ru"||mode==="ig_en",tg=mode==="telegram";
+ const ig=mode==="ig_ru"||mode==="ig_en",tg=mode==="telegram"||mode==="telegram_en";
  $("instagramFrame").hidden=!ig;$("telegramFrame").hidden=!tg;$("reelsFrame").hidden=!reel;
  $("proofHint").textContent=slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
  $("slideTools").hidden=slides.length<=1;$("slideRail").hidden=slides.length<=1;
@@ -463,7 +467,7 @@ function render(){
   $("igDots").innerHTML=slides.length>1?slides.map((slide,i)=>'<button class="'+(i===slideIndex?"active":"")+'" data-dot="'+i+'" aria-label="Перейти к слайду '+(i+1)+'"></button>').join(""):"";
   $("igDots").querySelectorAll("[data-dot]").forEach(b=>b.onclick=()=>{slideIndex=+b.dataset.dot;render()});
  }
- if(tg)updateTG(x,slides);
+ if(tg)updateTG(x,slides,en);
  if(reel){
   $("reelMedia").insertBefore(canvas,$("reelMedia").firstChild);canvas.hidden=false;
   $("reelSnippet").textContent=(en?x.hook_en:x.hook)||"История";
@@ -479,13 +483,13 @@ function moveSlide(delta){
  slideIndex=Math.max(0,Math.min(total-1,slideIndex+delta));render();
 }
 function openViewer(index){
- const x=draft();if(!x)return;const slides=slidesFor(x,false);viewerIndex=Math.max(0,Math.min(slides.length-1,index));
+ const x=draft();if(!x)return;const slides=slidesFor(x,languageEN());viewerIndex=Math.max(0,Math.min(slides.length-1,index));
  $("tgViewer").hidden=false;document.body.style.overflow="hidden";renderViewer();
 }
 function renderViewer(){
- const x=draft();if(!x)return;const slides=slidesFor(x,false);
+ const x=draft();if(!x)return;const slides=slidesFor(x,languageEN());
  viewerIndex=Math.max(0,Math.min(slides.length-1,viewerIndex));
- drawCard($("viewerCanvas"),x,slides[viewerIndex],false,false,false,viewerIndex,slides.length);
+ drawCard($("viewerCanvas"),x,slides[viewerIndex],languageEN(),false,false,viewerIndex,slides.length);
  $("viewerLabel").textContent=(viewerIndex+1)+" / "+slides.length;
  $("viewerPrev").disabled=viewerIndex===0;$("viewerNext").disabled=viewerIndex===slides.length-1;
 }
@@ -516,12 +520,13 @@ let previewPending=false;$("editor").addEventListener("input",e=>{if(!current()|
 $("editor").addEventListener("change",()=>{if(current())render()});
 $("refresh").onclick=()=>task(reload);
 $("close").onclick=()=>{unlocked="";sessionStorage.removeItem("darkfactory_access");$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden")};
-$("save").onclick=()=>task(async()=>{await patch({title:$("fTitle").value,title_en:$("fTitleEN").value,hook:$("fHook").value,hook_en:$("fHookEN").value,body:$("fBody").value,body_en:$("fBodyEN").value,punch:current().punch,format_type:$("fFormat").value,format_mode:"manual",caption_instagram:$("fIGRU").value,caption_instagram_en:$("fIGEN").value,caption_telegram:$("fTG").value,visual_prompt_en:$("fVisual").value,source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))});info("Сохранено; изменения отправлены на повторную проверку фактов.")});
+$("save").onclick=()=>task(async()=>{await patch({title:$("fTitle").value,title_en:$("fTitleEN").value,hook:$("fHook").value,hook_en:$("fHookEN").value,body:$("fBody").value,body_en:$("fBodyEN").value,punch:current().punch,format_type:$("fFormat").value,format_mode:"manual",caption_instagram:$("fIGRU").value,caption_instagram_en:$("fIGEN").value,caption_telegram:$("fTG").value,caption_telegram_en:$("fTGEN").value,visual_prompt_en:$("fVisual").value,source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))});info("Сохранено; изменения отправлены на повторную проверку фактов.")});
 $("illustrate").onclick=()=>task(async()=>{const x=current();if(!x)return;if(!confirm("Создать платную AI-иллюстрацию для «"+x.title+"»?"))return;info("Запрос к генератору изображений…");const d=await api("/items/"+x.id+"/generate-image","POST",{});await reload();info(d.image_url?"Иллюстрация сохранена в Journal Studio.":"Иллюстрация готова; обновите просмотр.")});
 $("download").onclick=()=>task(async()=>{const x=current();if(!x)return;const c=$("canvas");try{const link=document.createElement("a");link.href=c.toDataURL("image/png");link.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_"+mode+"_slide_"+(slideIndex+1)+".png";link.click();info("PNG сохранён.")}catch{throw Error("Браузер запретил экспорт изображения; обновите страницу.")}});
 $("approveIG").onclick=()=>task(async()=>{await patch({status_instagram:"approved"});info("Instagram RU/EN одобрено. Автопубликация пока не привязана к новому аккаунту.")});
 $("approveTG").onclick=()=>task(async()=>{await patch({status_telegram:"approved"});info("Telegram RU одобрено. Публикация требует назначения отдельного канала.")});
-$("changes").onclick=()=>task(async()=>{await patch({status_instagram:"needs_changes",status_telegram:"needs_changes"});info("Отправлено на доработку.")});
+$("approveTGEN").onclick=()=>task(async()=>{await patch({status_telegram_en:"approved"});info("Telegram EN одобрено. Публикация требует подключения отдельного английского канала.")});
+$("changes").onclick=()=>task(async()=>{await patch({status_instagram:"needs_changes",status_telegram:"needs_changes",status_telegram_en:"needs_changes"});info("Отправлено на доработку.")});
 $("automation").onclick=()=>task(async()=>{if(!confirm(settings.auto_enabled?"Остановить автопоиск новых фактов?":"Включить автопоиск до 10 новых фактов в день?"))return;await api("/settings","PATCH",{auto_enabled:!settings.auto_enabled});await loadSettings()});
 $("generate").onclick=()=>task(async()=>{if(!confirm("Запустить поиск новых проверяемых фактов через AI? Это расходует API-токены и не публикует контент."))return;info("Генерация фактов…");const r=await api("/generate","POST",{});await reload();info("Добавлено "+(r.items||[]).length+" фактов.")});
 $("new").onclick=()=>task(async()=>{const result=await api("/items","POST",{title:"Новый факт",hook:"Короткое вступление",body:"Текст факта",punch:"Почему это удивительно",topic:"history",format_type:"card",theme_variant:"black_press",scene_variant:0,dialogue:[],caption_instagram:"",caption_telegram:""});$("filter").value="all";await reload();selected=result.item.id;select();info("Создан черновик, необходимо добавить источники и проверить факт.")});
