@@ -150,3 +150,13 @@ body[data-studio-brand="overview"] .main{max-width:1620px}
 body[data-studio-brand="overview"] .topTitle h1{font-size:25px}
 #workspace .studio-brand-switchbar .studio-switch-tab:not(.hub-overview-button){font-size:10px}
 #workspace .studio-brand-switchbar .brand-bubble{display:none}}
+
+.studio-brand-quickactions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.studio-brand-quickactions button{background:#ffffff13;color:inherit;border:1px solid #ffffff48;
+ padding:8px 11px;font-size:12px;border-radius:10px;white-space:nowrap}
+.studio-brand-quickactions button:hover{background:#ffffff2a}
+.studio-brand-workspace-header.seriously .studio-brand-quickactions button{color:#ddff7e;border-color:#c0e14c7a}
+.studio-brand-workspace-header.seriously .open-external{color:#daff7e}
+@media(max-width:790px){.studio-brand-quickactions{width:100%;justify-content:flex-start}
+.studio-brand-workspace-header{flex-wrap:wrap;gap:7px}
+.studio-brand-quickactions button{padding:7px 9px;font-size:11px}}
