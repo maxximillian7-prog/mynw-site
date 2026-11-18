@@ -227,12 +227,12 @@ function slidesFor(x,en){
  const title=en?(x.title_en||x.title):x.title,hook=en?(x.hook_en||x.hook):x.hook;
  const body=en?(x.body_en||x.body):x.body;
  const n=x.format_type==="carousel"?5:x.format_type==="timeline"?4:x.format_type==="comparison"?3:1;
- const slides=[{type:"cover",heading:title,body:hook,tag:en?"TRUE STORY":"РЕАЛЬНАЯ ИСТОРИЯ"}];
+ const slides=[{type:"cover",heading:title,body:hook,tag:en?"UNBELIEVABLE FACT":"НЕВЕРОЯТНО, НО ФАКТ"}];
  if(n===1)return slides;
  const story=chunksOf(sentenceParts(body),n-2);
- const headers=n===5?(en?["WHAT HAPPENED?","THE UNBELIEVABLE DETAIL","WHY IT MATTERS"]:["ЧТО ПРОИЗОШЛО?","САМОЕ НЕВЕРОЯТНОЕ","ПОЧЕМУ ЭТО ВАЖНО"]):
- n===4?(en?["THE STORY","WHAT MADE IT STRANGE"]:["ЧТО СЛУЧИЛОСЬ","ПОЧЕМУ ЭТО УДИВЛЯЕТ"]):
- (en?["THE FACTS"]:["КАК ЭТО БЫЛО"]);
+ const headers=n===5?(en?["HOW IS IT POSSIBLE?","THE WILDEST PART","ONE IMPORTANT DETAIL"]:["КАК ЭТО ВОЗМОЖНО?","ВОТ ЧТО САМОЕ СТРАННОЕ","НО ЕСТЬ НЮАНС"]):
+ n===4?(en?["HOW IT WORKS","THE BIG SURPRISE"]:["КАК ЭТО РАБОТАЕТ","ВОТ В ЧЁМ ФОКУС"]):
+ (en?["HOW IT WORKS"]:["КАК ЭТО РАБОТАЕТ"]);
  story.forEach((t,i)=>slides.push({type:i%2?"detail":"story",heading:headers[i]||headers[0],body:t,tag:en?"DOCUMENTED FACT":"ПРОВЕРЕННЫЙ ФАКТ"}));
  slides.push({type:"outro",heading:en?"NO WAY. IT’S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:en?"Would your friends believe this? Send it to someone who needs a surprise.":String(x.punch||"").trim()+"\nА кому отправишь этот факт?",tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
  return slides;
