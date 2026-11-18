@@ -296,11 +296,33 @@ input[type=search]{width:100%} .filters select{width:100%}
 #ptAfishaNightWindow .pt-night-detail{display:block;margin-top:5px;color:#566d69;font-weight:600}
 #ptAfishaNightWindow .pt-night-shift{display:block;color:#8f4a16;background:#fff1df;border:1px solid #e6cba7;border-radius:6px;padding:7px 9px;margin:8px 0 2px;font-weight:700}
 
+
+/* Portuguese editorial identity and embedded-workspace ergonomics */
+.pt-magazine-brand{display:flex;align-items:center;gap:10px;font-family:Georgia,serif;font-size:17px}
+.pt-magazine-brand img{border-radius:12px;box-shadow:0 5px 14px #092f3838;flex:none}
+.pt-magazine-brand span{min-width:0}
+.pt-magazine-brand small{font-family:system-ui,-apple-system,Segoe UI,sans-serif;letter-spacing:.11em}
+body.studio-embedded .layout{max-width:none;grid-template-columns:196px minmax(270px,355px) minmax(460px,1fr)}
+body.studio-embedded nav.side{padding:17px 9px}
+body.studio-embedded .back{display:none}
+body.studio-embedded .sectionlist{padding:19px 11px}
+body.studio-embedded .workspace{padding:18px 22px 58px}
+body.studio-embedded .workspaceHeader{margin-bottom:13px}
+body.studio-embedded .brand small{font-size:9px}
+body.studio-embedded .brand{margin:3px 6px 14px}
+@media(max-width:1150px){body.studio-embedded .layout{grid-template-columns:160px minmax(250px,340px) minmax(380px,1fr)}}
+@media(max-width:860px){body.studio-embedded .layout{grid-template-columns:1fr}body.studio-embedded nav.side{position:relative;height:auto;display:block;min-height:0;padding:10px}
+body.studio-embedded .navStatuses{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:4px}
+body.studio-embedded .statusNav{width:auto;flex:none;padding:7px;font-size:11px}
+body.studio-embedded .sectionlist{min-height:260px;max-height:420px}
+body.studio-embedded .items{max-height:270px}
+body.studio-embedded .workspace{padding:13px}}
+
 </style></head>
 <body>
 <div class="layout">
 <nav class="side">
- <div class="brand">🇵🇹 Португалия рядом<small>MYNOW · EDITORIAL STATION</small></div>
+ <div class="brand pt-magazine-brand"><img src="../brand-portugal.svg" alt="Эмблема Португалия рядом" width="46" height="46"><span>Португалия рядом<small>MYNOW · PORTUGAL EDITORIAL</small></span></div>
  <a class="back" href="../">← Journal Studio</a>
  <div class="navtitle">Канал</div>
  <div class="navStatuses" id="channelTabs">
@@ -1595,6 +1617,39 @@ async function start(){
   }
   renderNight();
  };
+})();
+
+
+/* Unified Journal Studio shell: only same-origin, read-only editorial metrics. */
+(function(){
+ if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("studio-embedded");
+ const count=id=>{
+  const text=document.getElementById(id)?.textContent?.trim()||"";
+  if(!/^\d+$/.test(text))return null;
+  return Math.min(1000000,Math.max(0,Number(text)));
+ };
+ let latest="";
+ function sendSummary(){
+  if(window.parent===window)return;
+  const data={type:"studio-editor-summary",brand:"portugal",review:count("countIncoming"),
+   queued:count("countQueued"),published:null};
+  const token=JSON.stringify(data);
+  if(token===latest)return;latest=token;
+  window.parent.postMessage(data,location.origin);
+ }
+ window.addEventListener("message",event=>{
+  if(event.origin!==location.origin||event.source!==window.parent)return;
+  if(event.data?.type!=="studio-editor-navigate")return;
+  const target=event.data.action==="queue"?"queued":event.data.action==="review"?"incoming":null;
+  if(target){
+   const node=document.querySelector('[data-status="'+target+'"]');
+   if(node)node.click();
+  }
+ });
+ const watch=["countIncoming","countQueued","countApproved"];
+ const observer=new MutationObserver(()=>queueMicrotask(sendSummary));
+ for(const id of watch){const node=document.getElementById(id);if(node)observer.observe(node,{childList:true,characterData:true,subtree:true})}
+ window.addEventListener("load",sendSummary,{once:true});
 })();
 
 start();
