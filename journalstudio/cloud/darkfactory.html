@@ -14,7 +14,7 @@ h1,h2,h3{font-family:Impact,"Arial Narrow",Arial,sans-serif;letter-spacing:.5px}
 .preview-modes button.active,.filters button.active{background:#8c2d25}
 button.primary{background:#a82c22;border-color:#d45142}
 .swatches button[data-theme="black_press"]{background:linear-gradient(145deg,#09090b,#a02b20)!important}
-.swatches button[data-theme="acid_brutal"]{background:linear-gradient(125deg,#24201a,#b4a25a)!important;color:#fff!important}
+.swatches button[data-theme="acid_brutal"]{background:linear-gradient(125deg,#1a1411,#a27c35)!important;color:#fff!important}
 #rewriteActions button{background:#30201f;border-color:#5b342d;color:#f2d1b3;font-weight:750}
 #rewriteActions button:hover{background:#74312c;color:#fff}
 .note{background:#2b1c19;border-color:#b64736}
@@ -47,7 +47,7 @@ button.primary{background:#a82c22;border-color:#d45142}
   </main>
   <aside class="panel form">
    <div class="form-head"><h2>Редактор материала</h2><button id="saveItem" class="primary">Сохранить</button></div>
-   <label>Визуальная серия · две палитры подпольной прессы</label><div class="swatches"><button data-theme="black_press" class="active" style="background:#211b19;color:#f0dfc6">A · Black Press</button><button data-theme="acid_brutal" style="background:#d7ef57;color:#14181b">B · Acid Brutal</button></div>
+   <label>Визуальная серия · две палитры подпольной прессы</label><div class="swatches"><button data-theme="black_press" class="active" style="background:#211b19;color:#f0dfc6">A · Black Press</button><button data-theme="acid_brutal" style="background:#b9944a;color:#14181b">B · Acid Brutal</button></div>
    <div class="two"><div><label>Выбор подачи</label><select id="fFormatMode"><option value="auto">✦ Автоматически по шутке</option><option value="manual">Ручной выбор</option></select><label>Формат</label><select id="fFormat"><option value="card">Карточка-панч</option><option value="chat">Переписка</option><option value="animated_story">Анимированная история</option><option value="fake_ad">Фальшивая реклама</option><option value="dark_news">Газета абсурда</option><option value="carousel">Карусель из 3 кадров</option></select></div><div><label>Тема</label><select id="fTopic"><option value="office">Работа / начальство</option><option value="romance">Отношения</option><option value="money">Банки / деньги</option><option value="bureaucracy">Бюрократия</option><option value="social">Соцсети</option><option value="luxury">Богатство и пафос</option><option value="service">Сервис</option><option value="psychology">Психология</option><option value="life">Жизнь</option></select></div></div>
    <label>Заголовок</label><input id="fTitle" maxlength="180">
    <label>Завязка / первая реплика</label><textarea id="fHook" rows="3"></textarea>
@@ -57,10 +57,11 @@ button.primary{background:#a82c22;border-color:#d45142}
    <label>Подпись Instagram</label><textarea id="fIGCaption" rows="2"></textarea>
    <label>Подпись Telegram</label><textarea id="fTGCaption" rows="2"></textarea>
    <button id="previewChanges" style="width:100%;margin-top:10px">Обновить предпросмотр</button>
-   <div class="note">18+ · вымышленные истории и сатира. Материалы отправляются на приёмку, автопубликация выключена. Кнопки усиления шутки используют OpenAI API проекта и могут расходовать токены. Фото — Unsplash, обработка — коллаж.</div>
+   <div class="note">18+ · вымышленные истории и сатира. Материалы отправляются на приёмку, автопубликация выключена. Кнопки усиления шутки используют OpenAI API проекта и могут расходовать токены. Иллюстрации — оригинальный нуарный арт-пакет из 16 сцен; фотобанки и внешняя загрузка не используются.</div>
   </aside>
  </div>
 </div>
+<script src="./darkfactory-noir-assets.js?v=20261118-16scenes"></script>
 <script>
 (function(){
 "use strict";
@@ -69,7 +70,7 @@ var $=function(x){return document.getElementById(x)};
 var state={items:[],selected:null,mode:"ig_post",filter:"all",slide:0,unlock:sessionStorage.getItem("darkfactory_access")||"",ai:false,playing:null};
 var dims={ig_post:[1080,1350],ig_reel:[1080,1920],ig_square:[1080,1080],telegram:[1080,1080]};
 var labels={card:"Панч-карточка",chat:"Переписка",animated_story:"Анимированная история",fake_ad:"Фальшивая реклама",dark_news:"Газета абсурда",carousel:"Карусель"};
-var themes={black_press:{bg:"#191614",paper:"#F2E5D3",ink:"#171515",accent:"#C94D3D",other:"#CEB8A0",shade:"#47352D"},acid_brutal:{bg:"#151A1D",paper:"#ECF6D0",ink:"#141719",accent:"#DBF342",other:"#C8D4D9",shade:"#2C3E47"}};
+var themes={black_press:{bg:"#191614",paper:"#F2E5D3",ink:"#171515",accent:"#C94D3D",other:"#CEB8A0",shade:"#47352D"},acid_brutal:{bg:"#151315",paper:"#DFCFAC",ink:"#201815",accent:"#C99D4F",other:"#BEA787",shade:"#44332D"}};
 var escape=function(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
 var attr=function(s){return escape(s)};
 function session(){try{return JSON.parse(sessionStorage.getItem("journal_session")||"null")}catch(e){return null}}
@@ -153,37 +154,64 @@ function textEl(s,x,y,size,color,bold,anchor){return '<text x="'+x+'" y="'+y+'" 
 function wrap(s,n){var words=String(s||"").split(/\s+/).filter(Boolean),out=[],cur="";words.forEach(function(w){if(cur&&(cur+" "+w).length>n){out.push(cur);cur=w}else cur+=(cur?" ":"")+w;if(w.length>n&&cur.length>n){out.push(cur);cur=""}});if(cur)out.push(cur);return out}
 function lines(s,x,y,sz,c,limit,gap,max){var a=wrap(s,limit).slice(0,max||12);return {svg:a.map(function(v,i){return textEl(v,x,y+i*gap,sz,c,false)}).join(""),bottom:y+a.length*gap,count:a.length}}
 
-const PHOTO_BANK=[{"topic":"office","url":"https://images.unsplash.com/photo-1734336009361-f8d43327430f?auto=format&fit=crop&w=1150&q=80"},{"topic":"office","url":"https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1150&q=80"},{"topic":"office","url":"https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1150&q=80"},{"topic":"office","url":"https://images.unsplash.com/photo-1730586908083-8fa35f2fdf70?auto=format&fit=crop&w=1150&q=80"},{"topic":"romance","url":"https://images.unsplash.com/photo-1697551337733-f067865c906c?auto=format&fit=crop&w=1150&q=80"},{"topic":"romance","url":"https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1150&q=80"},{"topic":"romance","url":"https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1150&q=80"},{"topic":"money","url":"https://images.unsplash.com/photo-1726003906867-081fc895ce5d?auto=format&fit=crop&w=1150&q=80"},{"topic":"money","url":"https://images.unsplash.com/photo-1714865212999-a9817814b080?auto=format&fit=crop&w=1150&q=80"},{"topic":"money","url":"https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1150&q=80"},{"topic":"bureaucracy","url":"https://images.unsplash.com/photo-1773271042152-6a6c180f538f?auto=format&fit=crop&w=1150&q=80"},{"topic":"bureaucracy","url":"https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1150&q=80"},{"topic":"social","url":"https://images.unsplash.com/photo-1694537664637-45b5d278dccc?auto=format&fit=crop&w=1150&q=80"},{"topic":"social","url":"https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1150&q=80"},{"topic":"luxury","url":"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1150&q=80"},{"topic":"luxury","url":"https://images.unsplash.com/photo-1726003906867-081fc895ce5d?auto=format&fit=crop&w=1150&q=80"},{"topic":"service","url":"https://images.unsplash.com/photo-1694537664637-45b5d278dccc?auto=format&fit=crop&w=1150&q=80"},{"topic":"service","url":"https://images.unsplash.com/photo-1734336009361-f8d43327430f?auto=format&fit=crop&w=1150&q=80"},{"topic":"psychology","url":"https://images.unsplash.com/photo-1773897693681-4276735c0725?auto=format&fit=crop&w=1150&q=80"},{"topic":"psychology","url":"https://images.unsplash.com/photo-1697551337733-f067865c906c?auto=format&fit=crop&w=1150&q=80"},{"topic":"life","url":"https://images.unsplash.com/photo-1697551337733-f067865c906c?auto=format&fit=crop&w=1150&q=80"},{"topic":"life","url":"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1150&q=80"},{"topic":"luxury","url":"https://images.unsplash.com/photo-1773802571855-966b45523373?auto=format&fit=crop&w=1150&q=80"},{"topic":"life","url":"https://images.unsplash.com/photo-1730586908083-8fa35f2fdf70?auto=format&fit=crop&w=1150&q=80"},{"topic":"romance","url":"https://images.unsplash.com/photo-1730586908083-8fa35f2fdf70?auto=format&fit=crop&w=1150&q=80"}];
-const PHOTO_CACHE={};
-function photoFor(x){
- const arr=PHOTO_BANK.filter(p=>p.topic===x.topic);
- const group=arr.length?arr:PHOTO_BANK;
- const index=((Number(x.scene_variant||0)+Math.floor(Number(x.art_variant||0)/3))%group.length+group.length)%group.length;
- return PHOTO_BANK.indexOf(group[index]);
+
+/* 16 licensed original generated noir panels, embedded locally.
+   Semantic scene groups plus deterministic per-item variations avoid
+   unreliable network image sources and keep PNG/recording origin-clean. */
+const NOIR_SCENES={
+ office:[0,3,8,12,13],
+ romance:[1,4,6,9,15],
+ money:[2,0,14,15],
+ bureaucracy:[3,8,12,13],
+ social:[4,9,11,13],
+ luxury:[5,7,14,0],
+ service:[7,11,3,5],
+ psychology:[8,11,1,6],
+ life:[12,13,14,15,10],
+};
+function sceneFor(x){
+ const text=[x.title,x.hook,x.body,x.punch,x.visual_prompt].join(" ").toLowerCase();
+ let choices=NOIR_SCENES[x.topic]||NOIR_SCENES.life;
+ if(/свадьб|жених|невест|развод|бракосочетан|торт/.test(text))choices=[6,9,1,15];
+ else if(/ипотек|банк|кредит|долг|миллион|налог|бирж/.test(text))choices=[2,14,15,0];
+ else if(/переписк|сообщен|знакомств|лайк|телефон|приложени/.test(text))choices=[4,9,11,13];
+ else if(/суд|адвокат|закон|юрист|судья/.test(text))choices=[11,3,8,12];
+ else if(/казино|ставк|покер|азарт|лотере/.test(text))choices=[15,5,2,14];
+ else if(/очеред|справк|чиновник|бумаж|заявлен/.test(text))choices=[3,12,13,8];
+ else if(/рестора|ужин|чек|шампанск|гостей/.test(text))choices=[5,14,7,15];
+ else if(/работ|начальник|офис|корпоратив|карьер|hr/.test(text))choices=[0,3,13,12];
+ const v=(Number(x.scene_variant)||0), a=(Number(x.art_variant)||0);
+ let hash=0;for(const ch of String(x.id||x.title||""))hash=(hash*31+ch.charCodeAt(0))>>>0;
+ return choices[(hash+v+a)%choices.length];
 }
-function needPhoto(i){
- if(PHOTO_CACHE[i]!==undefined)return;
- PHOTO_CACHE[i]=null;
- fetch(PHOTO_BANK[i].url,{mode:"cors",referrerPolicy:"no-referrer"}).then(r=>{if(!r.ok)throw Error("Image fetch "+r.status);return r.blob()}).then(blob=>new Promise((resolve,reject)=>{
-  const f=new FileReader();f.onload=()=>resolve(String(f.result));f.onerror=reject;f.readAsDataURL(blob)
- })).then(value=>{PHOTO_CACHE[i]=value;const x=item();if(x&&photoFor(x)===i)paint()}).catch(()=>{PHOTO_CACHE[i]=false;const x=item();if(x&&photoFor(x)===i)paint()});
-}
+function photoFor(x){return sceneFor(x)}
+function needPhoto(){return Boolean(window.DarkFactoryNoirSheet)}
 function noisyDefs(){
  return '<defs><filter id="photonoir" x="-20%" y="-20%" width="140%" height="140%"><feColorMatrix type="saturate" values=".25"/><feComponentTransfer><feFuncR type="linear" slope=".79" intercept=".10"/><feFuncG type="linear" slope=".62" intercept=".015"/><feFuncB type="linear" slope=".57" intercept=".012"/></feComponentTransfer></filter><filter id="grunge"><feTurbulence baseFrequency=".52" numOctaves="3" seed="27" stitchTiles="stitch" type="fractalNoise"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".18"/></feComponentTransfer></filter><linearGradient id="redvignette" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#050506" stop-opacity=".70"/><stop offset=".48" stop-color="#230705" stop-opacity=".04"/><stop offset="1" stop-color="#0a0204" stop-opacity=".84"/></linearGradient><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".013" numOctaves="2" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="B"/></filter><clipPath id="photoClip"><path d="M28 91 L1067 83 L1057 310 L1072 438 L1053 1270 L28 1280 L37 567 L19 351 Z"/></clipPath></defs>';
 }
 function art(x,t,top){
- var i=photoFor(x);needPhoto(i);
- var data=PHOTO_CACHE[i],url=data||PHOTO_BANK[i].url;
- var layout=((x.scene_variant||0)+(x.art_variant||0))%7;
- var size=top+20,dy=[-35,-80,-110,-65,-140,-100,-35][layout];
- var image='<g clip-path="url(#photoClip)"><g class="art-motion"><image href="'+url+'" x="'+(-50-(layout%3)*70)+'" y="'+dy+'" width="'+(1230+(layout%3)*140)+'" height="'+(size+360)+'" preserveAspectRatio="xMidYMid slice" filter="url(#photonoir)"/></g>';
- image+='<rect x="0" y="80" width="1080" height="'+size+'" fill="url(#redvignette)"/><rect x="0" y="0" width="1080" height="'+size+'" filter="url(#grunge)" opacity=".45"/></g>';
- if(layout%2===0)image+='<path d="M120 140 L245 110 M875 156 L975 148 M40 592 L180 557" stroke="#ded1b8" stroke-width="6" opacity=".34"/>';
- if(layout%3===0)image+='<path d="M847 112 L987 747" stroke="#c42b26" stroke-width="36" opacity=".4" filter="url(#rough)"/>';
- if(layout%4===0)image+='<g transform="rotate(-11 854 178)"><rect x="742" y="136" width="248" height="67" fill="#9b2219" opacity=".96"/>'+textEl("АРХИВ 18+",865,177,32,"#f3e6ce",true,"middle")+'</g>';
+ const scene=sceneFor(x),column=scene%4,row=Math.floor(scene/4);
+ const variation=(Number(x.art_variant)||0)%8;
+ const tile=1180+(variation%3)*60;
+ const panX=[0,-38,48,-19,35,-45,22,-28][variation];
+ const panY=[0,32,-30,-20,22,8,-38,17][variation];
+ const sceneHeight=Math.max(260,top-100);
+ const left=540-(column+.5)*tile+panX;
+ const upper=100+sceneHeight/2-(row+.5)*tile+panY;
+ const asset=window.DarkFactoryNoirSheet||"";
+ let image='<defs><clipPath id="noirPhotoFrame"><path d="M20 99 L1063 92 L1056 '+(top-22)+' L25 '+(top-10)+' Z"/></clipPath></defs>';
+ image+='<g clip-path="url(#noirPhotoFrame)">';
+ if(asset)image+='<g class="art-motion"><image href="'+asset+'" x="'+left+'" y="'+upper+'" width="'+(tile*4)+'" height="'+(tile*4)+'" preserveAspectRatio="none"/></g>';
+ else image+=rect(20,100,1040,sceneHeight,"#34241f");
+ image+=rect(19,91,1047,sceneHeight+28,"url(#redvignette)");
+ image+='<rect x="20" y="96" width="1044" height="'+sceneHeight+'" filter="url(#grunge)" opacity=".5"/>';
+ image+='</g>';
+ image+='<path d="M24 100 L1058 94 M31 '+(top-11)+' L1061 '+(top-23)+'" stroke="#cbb69b" opacity=".64" stroke-width="5"/>';
+ image+='<path d="M43 226 L57 238 M1006 174 L985 207 M44 '+(top-78)+' L123 '+(top-88)+'" stroke="#e7d4be" opacity=".51" stroke-width="8"/>';
+ if(variation%2===0)image+='<g transform="rotate(-8 800 190)">'+rect(696,152,293,68,t.accent,1)+brutalText("НЕ ДЛЯ ВСЕХ",714,201,30,"#f7ecdf",900)+'</g>';
+ if(variation%3===0)image+='<path d="M80 150 L190 590" stroke="#aa2820" opacity=".36" stroke-width="28" filter="url(#rough)"/>';
  return image;
 }
-
 function palette(x){return themes[x.theme_variant]||themes.black_press}
 
 function brutalText(v,x,y,size,color,weight,anchor){
@@ -320,12 +348,10 @@ async function canvasFromSvg(str,width,height){
  var blob=new Blob([str],{type:"image/svg+xml;charset=utf-8"}),url=URL.createObjectURL(blob);
  try{var img=new Image();await new Promise(function(resolve,reject){img.onload=resolve;img.onerror=reject;img.src=url});var c=document.createElement("canvas");c.width=width;c.height=height;c.getContext("2d").drawImage(img,0,0,width,height);return c}finally{URL.revokeObjectURL(url)}
 }
-async function waitArt(x){
- if(x.format_type==="card" && String(x.hook||"").length<70 && String(x.punch||"").length<100 && ((x.scene_variant||0)%3===1))return;
- const i=photoFor(x);needPhoto(i);
- for(let t=0;t<35&&PHOTO_CACHE[i]===null;t++)await new Promise(resolve=>setTimeout(resolve,100));
- if(!PHOTO_CACHE[i])throw Error("Не удалось загрузить фото для экспорта. Попробуй другой визуал.");
+async function waitArt(){
+ if(!window.DarkFactoryNoirSheet)throw Error("Не загрузился пакет иллюстраций. Обновите страницу Ctrl+F5.");
 }
+
 async function exportPNG(){
  var x=item();if(!x)return;await waitArt(x);var dim=dims[state.mode];
  var c=await canvasFromSvg(renderSvg(x,state.mode,1,state.slide),dim[0],dim[1]);
@@ -405,7 +431,7 @@ $("fFormat").addEventListener("change",function(){var x=item();if(x){x.format_ty
 $("fTopic").addEventListener("change",function(){var x=item();if(x){x.topic=$("fTopic").value;paint()}});
 $("previewChanges").onclick=function(){var x=item();if(!x)return;Object.assign(x,readForm(x));if(x.format_mode==="auto"){x.format_type=suggestFormat(x);$("fFormat").value=x.format_type}paint();inform("Это предпросмотр. Для записи в базу нажми «Сохранить».")};
 $("saveItem").onclick=function(){run(async function(){var x=item();if(!x)return;await patch(readForm(x));inform("Материал сохранён.")})};
-$("swapScene").onclick=function(){run(async function(){var x=item();if(!x)return;await patch({scene_variant:(x.scene_variant+1+Math.floor(Math.random()*4))%12});inform("Другой визуальный сюжет готов.")})};
+$("swapScene").onclick=function(){run(async function(){var x=item();if(!x)return;await patch({scene_variant:(x.scene_variant+1+Math.floor(Math.random()*7))%64,art_variant:((x.art_variant||0)+1+Math.floor(Math.random()*9))%64});inform("Другая композиция и сцена готовы.")})};
 $("swapFormat").onclick=function(){run(async function(){var x=item();if(!x)return;var all=["card","chat","animated_story","fake_ad","dark_news","carousel"],i=all.indexOf(x.format_type);await patch({format_type:all[(i+1)%all.length]});inform("Формат изменён.")})};
 $("approveIG").onclick=function(){run(function(){return approve("instagram","approved")})};
 $("approveTG").onclick=function(){run(function(){return approve("telegram","approved")})};
