@@ -510,28 +510,27 @@ function updateCaption(x,en){
  $("igMore").hidden=!more;$("igMore").textContent=captionExpanded?(en?"less":"свернуть"):(en?"more":"ещё");
 }
 function updateTG(x,slides,en){
+ // Telegram has ONE original text-free photo, regardless of Instagram slide count.
  const message=en?(x.caption_telegram_en||x.title_en+"\n\n"+x.body_en):(x.caption_telegram||x.title+"\n\n"+x.body);
+ const plain=String(message||"").replace(/<\/?b>/gi,"").replace(/<[^>]*>/g,"").replace(/https?:\/\/[^\s]+/g,"").trim();
  $("tgChannelTitle").textContent=en?"NO, SERIOUSLY?! · preview":"НЕТ! СЕРЬЁЗНО?! · макет";
- $("tgChannelSubtitle").textContent=en?"Channel · editorial preview":"Канал · демонстрация сообщения";
+ $("tgChannelSubtitle").textContent=en?"Channel · editorial preview":"Канал · предпросмотр сообщения";
  $("tgFrom").textContent=en?"NO, SERIOUSLY?!":"НЕТ! СЕРЬЁЗНО?!";
- const max=950;let cut=max;
- if(message.length>max){let natural=message.lastIndexOf("\n",max);if(natural>500)cut=natural}
- const first=message.length>max?message.slice(0,cut):message,other=message.length>max?message.slice(cut).trimStart():"";
- setRich($("tgCaption"),first);$("tgOverflow").hidden=!other;
- if(other)setRich($("tgOverflowText"),other);
- const single=$("tgSingle"),album=$("tgAlbum");
- if(slides.length===1){
-  album.hidden=true;album.innerHTML="";single.hidden=false;
-  single.appendChild($("canvas"));$("canvas").hidden=false;
- }else{
-  single.hidden=true;album.hidden=false;
-  album.innerHTML=slides.slice(0,4).map((slide,i)=>'<button class="tg-tile" data-album="'+i+'" aria-label="Открыть фото '+(i+1)+'"><canvas width="166" height="208"></canvas>'+(i===3&&slides.length>4?'<span class="tg-plus">+'+(slides.length-4)+'</span>':"")+'</button>').join("");
-  album.querySelectorAll("[data-album]").forEach((b,i)=>{
-   drawCard(b.querySelector("canvas"),x,slides[i],en,false,true,i,slides.length);
-   b.onclick=()=>openViewer(i);
-  });
-  $("canvas").hidden=true;
+ const needsTextReply=plain.length>1000;
+ setRich($("tgCaption"),needsTextReply?"":plain);
+ $("tgCaption").hidden=needsTextReply;
+ $("tgOverflow").hidden=!needsTextReply;
+ if(needsTextReply)setRich($("tgOverflowText"),plain);
+ $("tgAlbum").hidden=true;$("tgAlbum").replaceChildren();
+ const single=$("tgSingle");single.hidden=false;
+ const photo=$("tgPhoto"),fallback=$("tgPhotoMissing");
+ const url=imageSource||"";
+ photo.hidden=!url;fallback.hidden=Boolean(url);
+ if(url&&photo.dataset.currentUrl!==url){
+  photo.dataset.currentUrl=url;photo.src=url;
  }
+ if(!url)fallback.textContent="Чистое фото ещё не создано — выбери загрузку или генерацию";
+ $("canvas").hidden=true;
 }
 function renderRail(x,slides,en){
  const rail=$("slideRail");rail.hidden=slides.length<2;
@@ -548,13 +547,13 @@ function render(){
  const ig=mode==="ig_ru"||mode==="ig_en",tg=mode==="telegram"||mode==="telegram_en";
  $("instagramFrame").hidden=!ig;$("telegramFrame").hidden=!tg;$("reelsFrame").hidden=!reel;
  $("proofHint").textContent=slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
- $("slideTools").hidden=slides.length<=1;$("slideRail").hidden=slides.length<=1;
+ $("slideTools").hidden=tg||slides.length<=1;$("slideRail").hidden=tg||slides.length<=1;
  $("slidePrev").disabled=slideIndex===0;$("slideNext").disabled=slideIndex===slides.length-1;
  $("slideLabel").textContent=(slideIndex+1)+" / "+slides.length+" · "+(fmt[x.format_type]||x.format_type);
  $("igCount").textContent=(slideIndex+1)+" / "+slides.length;
  document.querySelectorAll("[data-slide-dir]").forEach(b=>{b.hidden=slides.length<=1||Number(b.dataset.slideDir)<0&&slideIndex===0||Number(b.dataset.slideDir)>0&&slideIndex===slides.length-1});
  const canvas=$("canvas");
- drawCard(canvas,x,slides[slideIndex],en,reel,false,slideIndex,slides.length);
+ if(!tg)drawCard(canvas,x,slides[slideIndex],en,reel,false,slideIndex,slides.length);
  if(ig){
   $("igMedia").insertBefore(canvas,$("igMedia").firstChild);canvas.hidden=false;
   updateCaption(x,en);
@@ -566,9 +565,9 @@ function render(){
   $("reelMedia").insertBefore(canvas,$("reelMedia").firstChild);canvas.hidden=false;
   $("reelSnippet").textContent=(en?x.hook_en:x.hook)||"История";
  }
- renderRail(x,slides,en);
+ if(!tg)renderRail(x,slides,en);
  $("proofDescription").textContent=tg?
-  (slides.length>1?"Telegram показывает фотоальбом сеткой. Нажмите на любую фотографию и листайте в полноэкранном просмотре.":"Telegram: фото и полный текст сообщения канала — без ссылок и списка источников."):
+  "Telegram: ровно одно оригинальное фото без надписей и полный текст под ним. При тексте длиннее 1024 символов Telegram отправляет продолжение отдельным ответом.":
   reel?"Это предпросмотр обложки Reels в интерфейсе Instagram, НЕ готовое видео. Обложка экспортируется в PNG 9:16.":
   (slides.length>1?"Листайте как настоящую Instagram-карусель: кнопками, свайпом или миниатюрами ниже.":"Лента Instagram: изображение, профиль, панель реакций и настоящая подпись.");
 }
