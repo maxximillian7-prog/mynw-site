@@ -76,6 +76,7 @@ async function initialize(){
  $("gate").hidden=true;$("workspace").hidden=false;$("setupZone").hidden=true;
  const currentProject=project?.slug, savedProject=sessionStorage.getItem('journal_active_project');
  project=projects.find(p=>p.slug===currentProject)||projects.find(p=>p.slug===savedProject)||projects[0];
+ document.body.dataset.studioRole=project.role||"editor";
  window.StudioTheme?.apply(project.slug);
  $("project").innerHTML=projects.map(p=>'<option value="'+esc(p.slug)+'">'+esc(p.name)+" · "+esc(roles[p.role]||p.role)+"</option>").join("");
  $("project").value=project.slug;
@@ -83,7 +84,7 @@ async function initialize(){
  $("userDisplay").textContent=session.user?.email||roles[project.role]||"Редактор";
  $("invite").hidden=!editorRole();
  $("authorsInvite").hidden=!chiefRole();
- await loadData();showTab("home",true);
+ await loadData();await showTab(window.StudioBrandHub?.preferredTab?.()||"home",true);
 }
 async function claimOwner(){
  const key=$("setup").value;if(!key)throw Error("Введите ключ активации");
@@ -271,14 +272,15 @@ async function viewDelivery(id){
  $("deliveryDetails").innerHTML='<h3 style="margin-top:20px">Результаты отправки</h3>'+(data.deliveries||[]).map(x=>'<div class="channelCard"><div><b>'+esc(channels[x.channel]||x.channel)+'</b><div class="small muted">'+esc(x.error||"")+'</div></div>'+statusTag(x.status)+'</div>').join("")||'<div class="tip">Каналы публикации пока не выбраны.</div>';
 }
 async function showTab(target,force=false){
+ if(["studios","portugal","darkfactory"].includes(target)&&["author","reviewer"].includes(project?.role||""))return;
  if(!force&&target!==tab&&dirty&&!confirm("Есть несохранённые изменения. Покинуть конструктор?"))return;
  if(target!==tab){dirty=false}
  tab=target;
  document.querySelectorAll("[data-view]").forEach(el=>el.classList.toggle("active",el.dataset.view===target));
  document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("selected",el.dataset.tab===target));
- const labels={home:["Обзор редакции","Сегодня в Journal Studio"],library:["Материалы","Черновики, проверка и опубликованные статьи"],editor:["Конструктор статей","Подготовка и предпросмотр"],authors:["Авторы","ИИ-персонажи и приглашённые блогеры"],publish:["Публикации","Каналы и результаты отправки"],settings:["Настройки","Аккаунт и подключение редакции"],"ai-studio":["ИИ-редакция","Генерация статей, изображений и управление ИИ-авторами"],"review-queue":["Согласование","Очередь материалов и редакционные комментарии"],darkfactory:["НЕТ! СЕРЬЁЗНО?","Вирусные проверенные факты · Instagram RU/EN · Telegram RU"]};
+ const labels={home:["Обзор редакции","Сегодня в Journal Studio"],library:["Материалы","Черновики, проверка и опубликованные статьи"],editor:["Конструктор статей","Подготовка и предпросмотр"],authors:["Авторы","ИИ-персонажи и приглашённые блогеры"],publish:["Публикации","Каналы и результаты отправки"],settings:["Настройки","Аккаунт и подключение редакции"],"ai-studio":["ИИ-редакция","Генерация статей, изображений и управление ИИ-авторами"],"review-queue":["Согласование","Очередь материалов и редакционные комментарии"],darkfactory:["НЕТ! СЕРЬЁЗНО?!","Проверенные факты · Instagram RU/EN · Telegram RU/EN"],portugal:["Португалия рядом","Редакция новостей, документов и афиши · Telegram и Instagram"],studios:["Все редакции","Три журнала в одном редакционном центре"]};
  const viewInfo=labels[target]||[target.replace(/-/g," "),"Редакционное рабочее пространство"];
- $("headline").textContent=viewInfo[0];$("subtitle").textContent=project.name+" · "+viewInfo[1];
+ $("headline").textContent=viewInfo[0];$("subtitle").textContent=["studios","portugal","darkfactory"].includes(target)?viewInfo[1]:project.name+" · "+viewInfo[1];
  $("crumb").textContent="Journal Studio / "+viewInfo[0];
  if(target==="home")renderDashboard();
  if(target==="library")renderLibrary();
@@ -286,6 +288,7 @@ async function showTab(target,force=false){
  if(target==="publish")paintPublication();
  if(target==="editor")renderEditor();
  if(target==="settings"){$("settingsProject").textContent=project.name;$("settingsRole").textContent=roles[project.role]||project.role}
+ window.StudioBrandHub?.sync(target);
  window.scrollTo({top:0,behavior:"instant"});
 }
 function resetDraft(){
@@ -839,7 +842,7 @@ async function approveAuthor(id){
 async function changeProject(slug){
  if(dirty&&!confirm("Несохранённые изменения будут потеряны. Продолжить?")){$("project").value=project.slug;return}
  const target=projects.find(p=>p.slug===slug);if(!target)return;
- project=target;window.StudioTheme?.apply(project.slug);sessionStorage.setItem('journal_active_project',project.slug);
+ project=target;document.body.dataset.studioRole=project.role||"editor";window.StudioTheme?.apply(project.slug);sessionStorage.setItem('journal_active_project',project.slug);
  current=null;draft=null;placements=[];assets={};dirty=false;libraryTopicId=null;
  $("invite").hidden=!editorRole();$("authorsInvite").hidden=!chiefRole();
  await loadData();await showTab("home",true);
