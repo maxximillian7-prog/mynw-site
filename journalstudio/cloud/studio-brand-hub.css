@@ -1,0 +1,133 @@
+/* Journal Studio / Editorial Portfolios v1
+   One workspace and a consistent publication pathway, while each editorial
+   product keeps its own typography, identity, permissions and delivery APIs. */
+:root{
+ --hub-ink:#20382f;--hub-green:#2f7257;--hub-portugal:#187779;
+ --hub-lime:#cbfc37;--hub-cream:#f7f7f3;
+}
+.studio-brand-switchbar{
+ position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:7px;
+ padding:10px 12px;margin:-17px 0 23px;background:rgba(250,251,248,.96);
+ border:1px solid #e5eae4;border-radius:18px;box-shadow:0 7px 26px #182c2110;
+ backdrop-filter:blur(12px);
+}
+.studio-brand-switchbar strong{font-size:11px;color:#809087;letter-spacing:.11em;text-transform:uppercase;margin-right:10px;white-space:nowrap}
+.studio-brand-switchbar button{border:1px solid transparent;background:transparent;color:#66776e;
+ font-size:12px;font-weight:760;padding:8px 11px;border-radius:11px;display:flex;align-items:center;
+ gap:8px;white-space:nowrap;transition:all .16s}
+.studio-brand-switchbar button:hover{background:#eef3ec;color:#263e35}
+.studio-brand-switchbar button.is-active{background:#183e32;color:#fff;border-color:#2b6c4f}
+.studio-brand-switchbar button[data-hub-brand="portugal"].is-active{background:#106c6e;border-color:#15948f}
+.studio-brand-switchbar button[data-hub-brand="seriously"].is-active{background:#141819;border-color:#a1c52d;color:#d9ff5c}
+.studio-brand-switchbar .brand-bubble{width:27px;height:27px;border-radius:8px;display:block;object-fit:cover;box-shadow:0 1px 4px #172e251c}
+.studio-brand-switchbar .hub-right{margin-left:auto;display:flex;gap:6px}
+.studio-brand-switchbar .hub-right button{font-size:11px;letter-spacing:.02em}
+.studio-brand-switchbar .hub-overview-button{border-color:#dfe7e0}
+.studio-editor-nav{margin:4px 0 12px;display:grid;gap:8px}
+.studio-editor-nav .studio-editor-link{display:flex;gap:12px;align-items:center;
+ width:100%;min-height:68px;padding:10px 11px;text-align:left;
+ border:1px solid transparent;border-radius:14px;background:#234e3e;color:#f2fbf4;box-shadow:none}
+.studio-editor-nav .studio-editor-link:hover{background:#315f4d}
+.studio-editor-nav .studio-editor-link[aria-current="page"]{background:#eff6ee;color:#204938;border-color:#b6cdb9;box-shadow:inset 3px 0 0 #76aa7d}
+.studio-editor-nav .studio-editor-link[data-hub-brand="portugal"]{background:#145359}
+.studio-editor-nav .studio-editor-link[data-hub-brand="portugal"][aria-current="page"]{background:#e9f5f3;color:#14595c;border-color:#9ac7c1;box-shadow:inset 3px 0 0 #187c79}
+.studio-editor-nav .studio-editor-link[data-hub-brand="seriously"]{background:#20262a}
+.studio-editor-nav .studio-editor-link[data-hub-brand="seriously"][aria-current="page"]{background:#26302b;border-color:#b5e72e;color:#edffb4;box-shadow:inset 3px 0 0 #c3f52c}
+.studio-editor-link img{width:43px;height:43px;border-radius:12px;flex:none;object-fit:cover}
+.studio-editor-link .meta{display:flex;flex-direction:column;gap:3px;min-width:0}
+.studio-editor-link .meta b{font-size:13px;line-height:1.22}
+.studio-editor-link .meta small{font-size:10px;font-weight:550;color:inherit;opacity:.72;line-height:1.25}
+.studio-editor-link .mini-arrow{margin-left:auto;font-size:16px;opacity:.55}
+.studio-hub-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:22px;margin:3px 0 22px}
+.studio-hub-heading .eyebrow{color:#568b75}
+.studio-hub-heading h2{font-family:Georgia,serif;font-size:clamp(28px,3.3vw,42px);line-height:1.12;letter-spacing:-.9px;margin:5px 0 8px}
+.studio-hub-heading p{max-width:640px;color:#6a8074;font-size:13px;margin:0}
+.studio-hub-heading .pill{color:#37654f;background:#ecf4ea;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:750;white-space:nowrap}
+.studio-hub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px;margin-bottom:24px}
+.studio-hub-card{min-width:0;overflow:hidden;position:relative;border:1px solid #dce5dc;border-radius:23px;
+ background:#fff;box-shadow:0 17px 42px #1f443314;transition:transform .18s,box-shadow .18s}
+.studio-hub-card:hover{transform:translateY(-3px);box-shadow:0 22px 46px #143b2a22}
+.studio-hub-card .cover{position:relative;min-height:155px;padding:21px 21px 16px;overflow:hidden;
+ color:#fff;display:flex;align-items:flex-start;justify-content:space-between}
+.studio-hub-card .cover:after{content:"";position:absolute;width:205px;height:205px;border-radius:50%;
+ right:-48px;bottom:-140px;border:34px solid #ffffff12;pointer-events:none}
+.studio-hub-card.green .cover{background:linear-gradient(125deg,#1f664d,#164333)}
+.studio-hub-card.portugal .cover{background:linear-gradient(125deg,#136e73,#103a49)}
+.studio-hub-card.seriously .cover{background:radial-gradient(circle at 100% 40%,#384321,#101215 64%)}
+.studio-hub-card .cover img{width:84px;height:84px;border-radius:21px;box-shadow:0 12px 22px #06180e39}
+.studio-hub-card .cover .brand-index{position:relative;z-index:1;font-size:11px;letter-spacing:.1em;color:#e0eee3af;font-weight:750}
+.studio-hub-card.seriously .cover .brand-index{color:#e3fd8d}
+.studio-hub-card .content{padding:18px 20px 20px}
+.studio-hub-card .content h3{font-size:23px;letter-spacing:-.6px;margin:1px 0 4px;line-height:1.1}
+.studio-hub-card.green .content h3{font-family:Georgia,serif;color:#285b46}
+.studio-hub-card.portugal .content h3{font-family:Georgia,serif;color:#17666a}
+.studio-hub-card.seriously .content h3{font-family:Arial,sans-serif;font-weight:1000;font-style:italic;color:#20251d}
+.studio-hub-card .content p{font-size:12px;line-height:1.5;min-height:38px;color:#718077;margin:0 0 13px}
+.studio-hub-card .hub-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid #e9eeea;padding:14px 0 15px}
+.studio-hub-card .hub-metrics div{min-width:0}
+.studio-hub-card .hub-metrics b{display:block;font-size:22px;line-height:1.2;color:#263d34;font-variant-numeric:tabular-nums}
+.studio-hub-card .hub-metrics span{display:block;font-size:10px;color:#809085;margin-top:3px}
+.studio-hub-card .hub-actions{display:flex;gap:9px}
+.studio-hub-card .hub-actions button{flex:1;background:#f4f7f3;padding:10px 6px;font-size:12px;border:1px solid #e0e9e0}
+.studio-hub-card .hub-actions button.primary{background:#275d47;color:#fff;border-color:#275d47}
+.studio-hub-card.portugal .hub-actions button.primary{background:#126f71;border-color:#126f71}
+.studio-hub-card.seriously .hub-actions button.primary{background:#171b1c;border-color:#171b1c;color:#d6ff54}
+.studio-hub-card .hub-subline{font-size:11px;color:#819187;margin-top:10px;min-height:30px}
+.studio-hub-workflow{display:grid;grid-template-columns:1.2fr 1fr;gap:17px;margin-bottom:18px}
+.studio-hub-workflow .card{padding:20px 22px}
+.studio-hub-workflow h3{font-family:Georgia,serif;font-size:19px;color:#253e33;margin-bottom:10px}
+.studio-hub-workflow p{color:#718379;font-size:12px}
+.studio-hub-steps{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px;align-items:center}
+.studio-hub-steps span{border-radius:8px;background:#edf4ed;padding:8px 9px;color:#35654c;font-size:11px;font-weight:700}
+.studio-hub-steps i{font-style:normal;color:#a8b8ac;font-size:13px}
+.studio-hub-notes{display:grid;gap:8px}
+.studio-hub-notes div{display:flex;align-items:center;gap:10px;font-size:12px;color:#425c4f}
+.studio-hub-notes b{font-size:12px}
+.studio-hub-notes .note-symbol{background:#e5f2e8;border-radius:9px;width:27px;height:27px;display:grid;place-items:center;color:#236647;flex:none}
+.studio-brand-workspace-header{display:flex;align-items:center;justify-content:space-between;gap:15px;
+ padding:15px 20px;border-radius:20px;margin-bottom:13px;color:white}
+.studio-brand-workspace-header.portugal{background:#125c62}
+.studio-brand-workspace-header.seriously{background:#141919;border:1px solid #aace2c}
+.studio-brand-workspace-header img{height:46px;width:46px;border-radius:12px}
+.studio-brand-workspace-header h2{margin:0 0 3px;font-size:22px;color:#fff}
+.studio-brand-workspace-header p{margin:0;font-size:12px;opacity:.78}
+.studio-brand-workspace-header .title-cluster{display:flex;align-items:center;gap:13px}
+.studio-brand-workspace-header .open-external{display:inline-flex;align-items:center;gap:6px;
+ padding:8px 12px;border:1px solid #ffffff4a;border-radius:10px;color:inherit;font-size:12px;text-decoration:none}
+.studio-brand-workspace-header.seriously h2{color:#cefc4d;font-style:italic;font-family:Arial,sans-serif;font-weight:900}
+.studio-embedded-frame{width:100%;display:block;height:calc(100vh - 210px);min-height:780px;border:1px solid #d9e2da;border-radius:17px;background:#fff;overflow:hidden}
+body[data-studio-brand="seriously"] .studio-embedded-frame{background:#0c0e11;border-color:#39433a}
+body[data-studio-brand="portugal"] .studio-embedded-frame{border-color:#a9d1cb}
+body[data-studio-brand="portugal"] .sidebar,body[data-studio-brand="seriously"] .sidebar{display:none}
+body[data-studio-brand="portugal"] .main,body[data-studio-brand="seriously"] .main{max-width:none;width:100%;padding:20px 22px}
+body[data-studio-brand="portugal"] .topControls,body[data-studio-brand="seriously"] .topControls{display:none}
+body[data-studio-brand="portugal"] .topbar,body[data-studio-brand="seriously"] .topbar{margin-bottom:15px}
+body[data-studio-brand="seriously"] .topTitle h1{font-style:italic;font-weight:850}
+body[data-studio-brand="portugal"] .topTitle h1{color:#0d5b62}
+body[data-studio-brand="portugal"] .studio-brand-switchbar,body[data-studio-brand="seriously"] .studio-brand-switchbar{margin:0 0 12px}
+body[data-studio-role="author"] .studio-brand-switchbar,body[data-studio-role="reviewer"] .studio-brand-switchbar,
+body[data-studio-role="author"] .studio-editor-nav,body[data-studio-role="reviewer"] .studio-editor-nav,
+body[data-studio-role="author"] [data-view="studios"],body[data-studio-role="reviewer"] [data-view="studios"]{display:none!important}
+@media(max-width:1250px){
+ .studio-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .studio-hub-workflow{grid-template-columns:1fr}
+ .studio-brand-switchbar{overflow-x:auto}
+}
+@media(max-width:790px){
+ .studio-hub-grid{grid-template-columns:1fr}
+ .studio-brand-switchbar{border-radius:12px;gap:3px;padding:7px;margin:0 0 12px}
+ .studio-brand-switchbar strong{display:none}
+ .studio-brand-switchbar button{font-size:11px;padding:7px 8px}
+ .studio-brand-switchbar .brand-bubble{width:22px;height:22px}
+ .studio-brand-switchbar .hub-right{display:none}
+ .studio-hub-heading{display:block}
+ .studio-hub-heading .pill{display:inline-block;margin-top:10px}
+ .studio-brand-workspace-header{padding:11px;border-radius:13px}
+ .studio-brand-workspace-header p{display:none}
+ .studio-brand-workspace-header h2{font-size:17px}
+ .studio-brand-workspace-header .open-external{font-size:10px;padding:6px}
+ .studio-brand-workspace-header img{height:38px;width:38px}
+ body[data-studio-brand="portugal"] .main,body[data-studio-brand="seriously"] .main{padding:9px}
+ .studio-embedded-frame{height:calc(100vh - 195px);min-height:650px}
+ .studio-editor-nav{display:none}
+}
