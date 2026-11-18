@@ -419,7 +419,7 @@ async function loadSettings(){const x=await api("/settings");settings=x.settings
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
-document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;slideIndex=0;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));render()});
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));render()});
 $("igMore").onclick=()=>{captionExpanded=!captionExpanded;render()};
 $("slidePrev").onclick=()=>moveSlide(-1);$("slideNext").onclick=()=>moveSlide(1);
 document.querySelectorAll("[data-slide-dir]").forEach(b=>b.onclick=e=>{e.stopPropagation();moveSlide(Number(b.dataset.slideDir))});
