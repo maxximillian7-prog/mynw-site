@@ -132,9 +132,14 @@ window.StudioBrandHub=(function(){
  }
  function refreshGreen(){
   if(typeof project==="undefined"||!project||project.slug!=="nowgreen")return;
-  const get=id=>{const raw=$(id)?.textContent?.trim();if(!raw||!/^[0-9]+$/.test(raw))return null;const v=Number(raw);return Number.isFinite(v)?v:null};
-  const review=get("statReview"),published=get("statPublished");
-  const drafts=get("statDraft");
+  if(typeof posts!=="undefined"&&Array.isArray(posts)){
+   const count=status=>posts.filter(x=>x.status===status).length;
+   updateCard("green",{review:count("in_review"),queued:count("draft")+count("changes_requested"),published:count("published")});
+   return;
+  }
+  const get=id=>{const raw=$(id)?.textContent?.trim();if(!raw||!/^[0-9]+$/.test(raw))return null;
+   const n=Number(raw);return Number.isFinite(n)?n:null};
+  const review=get("statReview"),published=get("statPublished"),drafts=get("statDraft");
   if(review!==null||published!==null||drafts!==null)updateCard("green",{review,queued:drafts,published});
  }
  function receive(event){
