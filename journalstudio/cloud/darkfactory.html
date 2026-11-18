@@ -46,7 +46,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .mock-media{position:relative;background:#13191b;overflow:hidden;touch-action:pan-y;outline:none}
 .mock-media:focus-visible{outline:3px solid #69a3fa;outline-offset:-3px}
 .mock-media canvas{display:block;width:100%;height:auto}
-.mock-media .navbtn{position:absolute;top:47%;transform:translateY(-50%);z-index:3;border:none;border-radius:50%;width:35px;height:35px;background:#ffffffd6;color:#13161a;font-size:26px;line-height:20px;display:grid;place-items:center;padding:0;box-shadow:0 2px 10px #0004}
+.mock-media .navbtn{position:absolute;top:26%;transform:translateY(-50%);z-index:3;border:none;border-radius:50%;width:35px;height:35px;background:#ffffffd6;color:#13161a;font-size:26px;line-height:20px;display:grid;place-items:center;padding:0;box-shadow:0 2px 10px #0004}
 .mock-media .navbtn.prev{left:9px}.mock-media .navbtn.next{right:9px}.mock-media .navbtn[hidden]{display:none}
 .mock-count{position:absolute;right:11px;top:11px;z-index:2;color:#fff;background:#151618aa;border-radius:16px;padding:4px 10px;font-size:11px;font-weight:700}
 .ig-actions{display:flex;align-items:center;gap:16px;padding:10px 13px 4px}
@@ -215,10 +215,32 @@ function sentenceParts(text){
  return sentences.length?sentences:[String(text||"").trim()];
 }
 function chunksOf(parts,n){
- if(!parts.length)return ["",""];
- const groups=Array.from({length:n},()=>[]);
- parts.forEach((p,i)=>groups[Math.min(n-1,Math.floor(i*n/parts.length))].push(p));
- return groups.map((a,i)=>a.join(" ")||parts[Math.min(i,parts.length-1)]||"");
+ if(n<=0)return [];
+ const input=(parts||[]).map(p=>String(p||"").trim()).filter(Boolean);
+ if(!input.length)return Array.from({length:n},()=>"");
+ // Partition at complete-sentence boundaries, balancing WORDS instead of the number of sentences.
+ // This prevents a 4-word final slide while other slides are overcrowded.
+ const segments=input.flatMap(p=>{
+  const words=p.split(/\s+/);
+  if(words.length<=48)return [p];
+  const output=[];
+  for(let i=0;i<words.length;i+=32)output.push(words.slice(i,i+32).join(" "));
+  return output;
+ });
+ const weights=segments.map(p=>p.split(/\s+/).length);
+ const count=segments.length,groups=Math.min(n,count);
+ const pref=[0];weights.forEach(w=>pref.push(pref[pref.length-1]+w));
+ const target=pref[count]/groups;
+ const dp=Array.from({length:groups+1},()=>Array(count+1).fill(Infinity));
+ const trace=Array.from({length:groups+1},()=>Array(count+1).fill(0));dp[0][0]=0;
+ for(let g=1;g<=groups;g++)for(let j=g;j<=count;j++)for(let k=g-1;k<j;k++){
+  const wordCount=pref[j]-pref[k],cost=dp[g-1][k]+Math.pow(wordCount-target,2);
+  if(cost<dp[g][j]){dp[g][j]=cost;trace[g][j]=k}
+ }
+ const chunks=Array(groups);let j=count;
+ for(let g=groups;g>0;g--){const k=trace[g][j];chunks[g-1]=segments.slice(k,j).join(" ");j=k}
+ // If there are fewer sentences than storytelling panels, fewer is better than duplicate filler.
+ return chunks;
 }
 function domains(x){
  return (x.source_urls||[]).slice(0,3).map(s=>{try{return new URL(s).hostname.replace(/^www\./,"")}catch{return ""}}).filter(Boolean);
@@ -226,15 +248,21 @@ function domains(x){
 function slidesFor(x,en){
  const title=en?(x.title_en||x.title):x.title,hook=en?(x.hook_en||x.hook):x.hook;
  const body=en?(x.body_en||x.body):x.body;
- const n=x.format_type==="carousel"?5:x.format_type==="timeline"?4:x.format_type==="comparison"?3:1;
- const slides=[{type:"cover",heading:title,body:hook,tag:en?"UNBELIEVABLE FACT":"НЕВЕРОЯТНО, НО ФАКТ"}];
- if(n===1)return slides;
- const story=chunksOf(sentenceParts(body),n-2);
- const headers=n===5?(en?["HOW IS IT POSSIBLE?","THE WILDEST PART","ONE IMPORTANT DETAIL"]:["КАК ЭТО ВОЗМОЖНО?","ВОТ ЧТО САМОЕ СТРАННОЕ","НО ЕСТЬ НЮАНС"]):
- n===4?(en?["HOW IT WORKS","THE BIG SURPRISE"]:["КАК ЭТО РАБОТАЕТ","ВОТ В ЧЁМ ФОКУС"]):
- (en?["HOW IT WORKS"]:["КАК ЭТО РАБОТАЕТ"]);
- story.forEach((t,i)=>slides.push({type:i%2?"detail":"story",heading:headers[i]||headers[0],body:t,tag:en?"DOCUMENTED FACT":"ПРОВЕРЕННЫЙ ФАКТ"}));
- slides.push({type:"outro",heading:en?"NO WAY. IT’S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:en?"Would your friends believe this? Send it to someone who needs a surprise.":String(x.punch||"").trim()+"\nА кому отправишь этот факт?",tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
+ const words=String(body||"").trim().split(/\s+/).filter(Boolean).length;
+ const storyCount=x.format_type==="carousel"?3:x.format_type==="timeline"?2:x.format_type==="comparison"?(words>83?2:1):0;
+ const n=storyCount+2;
+ const scenes=storyCount?chunksOf(sentenceParts(body),storyCount):[];
+ const teaser=storyCount===0&&x.format_type!=="reel_story"?sentenceParts(body).slice(0,2).join(" "):"";
+ const slides=[{type:"cover",heading:title,body:hook,teaser,tag:en?"UNBELIEVABLE FACT":"НЕВЕРОЯТНО, НО ФАКТ"}];
+ if(!storyCount)return slides;
+ const headers=storyCount===3?(en?["HOW IS IT POSSIBLE?","THE WILDEST PART","ONE IMPORTANT DETAIL"]:["КАК ЭТО ВОЗМОЖНО?","ВОТ ЧТО САМОЕ СТРАННОЕ","НО ЕСТЬ НЮАНС"]):
+ storyCount===2?(en?["HERE’S HOW IT WORKS","WHAT'S THE CATCH?"]:["КАК ЭТО РАБОТАЕТ","А В ЧЁМ НЮАНС?"]):
+ (en?["HOW IT REALLY WORKS"]:["КАК ЭТО РАБОТАЕТ"]);
+ scenes.forEach((text,i)=>slides.push({type:i%2?"detail":"story",heading:headers[i]||headers[0],body:text,tag:en?"THE REAL EXPLANATION":"ВОТ КАК ЭТО РАБОТАЕТ"}));
+ const punch=String(x.punch||"").trim(),last=sentenceParts(body).slice(-1)[0]||"";
+ const outroText=en?[last,punch,"Would your friends believe this? Share this fact with someone curious."].filter(Boolean).join(" "):
+ [last,punch,"Отправь человеку, который тоже скажет: «Не может быть!»"].filter(Boolean).join(" ");
+ slides.push({type:"outro",heading:en?"NO WAY. IT’S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:outroText,tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
  return slides;
 }
 function wrapCanvas(ctx,text,maxW){
@@ -267,48 +295,95 @@ function drawCard(canvas,x,slide,en,reel,thumbnail=false,number=0,total=1){
  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
  if(image){
   const scale=Math.max(W/image.width,H/image.height),iw=image.width*scale,ih=image.height*scale;
-  ctx.save();if(slide.type!=="cover"){ctx.filter="blur(7px) brightness(.57)"}ctx.drawImage(image,(W-iw)/2,(H-ih)/2,iw,ih);ctx.restore();
+  ctx.save();if(slide.type!=="cover")ctx.filter="blur(7px) brightness(.57)";
+  ctx.drawImage(image,(W-iw)/2,(H-ih)/2,iw,ih);ctx.restore();
  }else{
-  ctx.strokeStyle="#bbd84a";ctx.globalAlpha=.2;ctx.lineWidth=7;
+  ctx.strokeStyle="#bbd84a";ctx.globalAlpha=.16;ctx.lineWidth=7;
   for(let i=0;i<12;i++){ctx.beginPath();ctx.arc(850,H*.46,80+i*38,0,Math.PI*2);ctx.stroke()}
   ctx.globalAlpha=1;
-  ctx.fillStyle="#ffffff99";ctx.font="600 20px Arial";ctx.fillText(en?"IMAGE PENDING":"ИЛЛЮСТРАЦИЯ НЕ СОЗДАНА",50,H*.48);
+  ctx.fillStyle="#ffffff99";ctx.font="600 20px Arial";
+  ctx.fillText(en?"IMAGE PENDING":"ИЛЛЮСТРАЦИЯ НЕ СОЗДАНА",72,H*.43);
  }
  const fade=ctx.createLinearGradient(0,0,0,H);
- fade.addColorStop(0,"#050708d9");fade.addColorStop(.24,slide.type==="cover"?"#06060625":"#0608099c");
- fade.addColorStop(.59,slide.type==="cover"?"#03040550":"#05080ac4");
- fade.addColorStop(1,"#040608fa");ctx.fillStyle=fade;ctx.fillRect(0,0,W,H);
+ fade.addColorStop(0,"#050708e8");fade.addColorStop(.21,slide.type==="cover"?"#06060630":"#06080983");
+ fade.addColorStop(.55,slide.type==="cover"?"#03040552":"#05080abd");
+ fade.addColorStop(1,"#040608fa");
+ ctx.fillStyle=fade;ctx.fillRect(0,0,W,H);
+ // Unobstructed signature area.
  ctx.fillStyle=accent;ctx.fillRect(52,53,15,110);
  ctx.font="italic 900 51px Arial";ctx.fillStyle="#fff";ctx.fillText(en?"NO,":"НЕТ!",84,105);
  ctx.font="italic 900 49px Arial";ctx.fillStyle=accent;ctx.fillText(en?"SERIOUSLY?":"СЕРЬЁЗНО?",84,161);
- ctx.fillStyle="#f5f8f0bb";ctx.font="700 22px Arial";ctx.textAlign="right";
- ctx.fillText(slide.tag||"FACT",W-54,104);ctx.textAlign="left";
- const bottomSafe=reel?340:158,baseY=slide.type==="cover"?(reel?H-1030:H-630):(reel?520:360);
+ ctx.fillStyle="#f5f8f0bb";ctx.font="700 21px Arial";ctx.textAlign="right";
+ ctx.fillText(slide.tag||"FACT",W-54,105);ctx.textAlign="left";
+ ctx.textBaseline="top";
+ const bottomSafe=reel?290:110,contentBottom=H-bottomSafe-38;
+ const left=120,contentWidth=W-left*2;
+ const drawText=(model,y,color,lineFactor=1.25)=>{
+  ctx.font="600 "+model.size+"px Arial, sans-serif";ctx.fillStyle=color;
+  model.lines.forEach((line,i)=>ctx.fillText(line,left,y+i*model.size*lineFactor));
+  return y+model.lines.length*model.size*lineFactor;
+ };
+ const layoutText=(text,maxW,maxH,size,min,weight)=>{
+  let found={size:min,lines:[]};
+  for(let n=size;n>=min;n-=2){
+   ctx.font=weight+" "+n+"px Arial, sans-serif";
+   const lines=wrapCanvas(ctx,text,maxW),height=lines.length*n*1.3;
+   if(height<=maxH){found={size:n,lines};break}
+  }
+  if(!found.lines.length){ctx.font=weight+" "+min+"px Arial, sans-serif";found={size:min,lines:wrapCanvas(ctx,text,maxW)}}
+  return found;
+ };
  if(slide.type==="cover"){
-  const title=fitCanvas(ctx,slide.heading,W-112,4,reel?94:89,55,"900");
-  const lineHeight=title.size*1.13;
-  let y=baseY+Math.max(0,4-title.lines.length)*18;
-  ctx.fillStyle="#fffdf7";ctx.textBaseline="top";title.lines.forEach((t,i)=>ctx.fillText(t,55,y+i*lineHeight));
-  y+=title.lines.length*lineHeight+26;
-  ctx.fillStyle=accent;ctx.fillRect(55,y,W-110,10);y+=35;
-  const body=fitCanvas(ctx,slide.body,W-122,4,39,28,"600");ctx.fillStyle="#f2f5ef";
-  body.lines.forEach((t,i)=>ctx.fillText(t,57,y+i*body.size*1.3));
+  const text=String(slide.body||"").trim();
+  const teaser=String(slide.teaser||"").trim();
+  const bodyText=teaser&&total===1?text+"\n\n"+teaser:text;
+  const title=fitCanvas(ctx,slide.heading,contentWidth,4,reel?92:84,52,"900");
+  const titleH=title.lines.length*title.size*1.13;
+  const body=layoutText(bodyText,contentWidth-12,reel?520:350,reel?39:38,27,"600");
+  const bodyH=body.lines.length*body.size*1.3;
+  const entire=titleH+31+7+28+bodyH;
+  const minTop=reel?470:335;
+  let top=Math.max(minTop,contentBottom-entire-30);
+  if(top+entire>contentBottom)top=Math.max(minTop,contentBottom-entire);
+  const boxTop=top-28,boxH=Math.max(100,Math.min(contentBottom-boxTop+22,entire+70));
+  ctx.fillStyle="rgba(4,7,8,.68)";
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(74,boxTop,W-148,boxH,20);ctx.fill()}
+  else ctx.fillRect(74,boxTop,W-148,boxH);
+  ctx.font="900 "+title.size+"px Arial";ctx.fillStyle="#fffdf6";
+  title.lines.forEach((t,i)=>ctx.fillText(t,left,top+i*title.size*1.13));
+  let y=top+titleH+22;
+  ctx.fillStyle=accent;ctx.fillRect(left,y,contentWidth,7);y+=35;
+  drawText(body,y,"#f1f4ec",1.3);
  }else{
-  ctx.fillStyle=accent;ctx.font="900 36px Arial";ctx.fillText(String(number+1).padStart(2,"0")+" / "+String(total).padStart(2,"0"),57,baseY);
-  let y=baseY+84;const header=fitCanvas(ctx,slide.heading,W-120,3,85,54,"900");
-  ctx.fillStyle="#fff";header.lines.forEach((t,i)=>ctx.fillText(t,57,y+i*header.size*1.12));
-  y+=header.lines.length*header.size*1.14+45;
-  ctx.fillStyle=accent;ctx.fillRect(58,y,W-115,8);y+=35;
-  const paragraph=fitCanvas(ctx,slide.body,W-126,reel?9:8,slide.type==="outro"?42:49,29,"600");
-  ctx.fillStyle="#f1f3e9";paragraph.lines.forEach((t,i)=>ctx.fillText(t,61,y+i*paragraph.size*1.3));
+  const top=reel?390:300;
+  ctx.fillStyle=accent;ctx.font="800 30px Arial";
+  ctx.fillText(String(number+1).padStart(2,"0")+"  /  "+String(total).padStart(2,"0"),left,top);
+  const titleY=top+60;
+  const heading=fitCanvas(ctx,slide.heading,contentWidth,2,reel?78:70,51,"900");
+  const headingH=heading.lines.length*heading.size*1.1;
+  ctx.font="900 "+heading.size+"px Arial";ctx.fillStyle="#fff";
+  heading.lines.forEach((t,i)=>ctx.fillText(t,left,titleY+i*heading.size*1.1));
+  const ruleY=titleY+headingH+22;
+  ctx.fillStyle=accent;ctx.fillRect(left,ruleY,contentWidth,7);
+  const bodyY=ruleY+36;
+  const available=Math.max(240,contentBottom-bodyY-28);
+  const paragraph=layoutText(slide.body,contentWidth-34,available,slide.type==="outro"?43:44,30,"600");
+  const paragraphH=paragraph.lines.length*paragraph.size*1.3;
+  const pad=24,boxH=paragraphH+pad*2;
+  ctx.fillStyle="rgba(2,5,7,.76)";
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(left-16,bodyY-13,contentWidth+32,Math.min(boxH,contentBottom-bodyY+30),18);ctx.fill()}
+  else ctx.fillRect(left-16,bodyY-13,contentWidth+32,Math.min(boxH,contentBottom-bodyY+30));
+  drawText(paragraph,bodyY+6,"#f4f7f0",1.3);
  }
- ctx.fillStyle="#070a0c";ctx.fillRect(0,H-bottomSafe,W,bottomSafe);
- ctx.fillStyle=accent;ctx.fillRect(53,H-bottomSafe+28,84,6);
- ctx.fillStyle="#eaf1de";ctx.font="750 26px Arial";
- ctx.fillText(en?"AI ILLUSTRATION · EDITORIAL PREVIEW":"ИИ-ИЛЛЮСТРАЦИЯ · РЕДАКЦИОННЫЙ МАКЕТ",55,H-bottomSafe+80);
- ctx.font="700 23px Arial";ctx.fillStyle="#abbdad";
- ctx.fillText(total>1?(en?"SWIPE FOR MORE →":"ЛИСТАЙТЕ ДАЛЬШЕ →"):(en?"MORE IMPOSSIBLE FACTS →":"ЕЩЁ БОЛЬШЕ НЕВЕРОЯТНЫХ ФАКТОВ →"),56,H-31);
- ctx.textAlign="right";ctx.fillStyle=accent;ctx.font="900 27px Arial";ctx.fillText((number+1)+" / "+total,W-55,H-35);ctx.textAlign="left";
+ // Footer has fixed height, no text is drawn underneath it.
+ ctx.fillStyle="rgba(5,8,10,.95)";ctx.fillRect(0,H-bottomSafe,W,bottomSafe);
+ ctx.fillStyle=accent;ctx.fillRect(56,H-bottomSafe+24,86,5);
+ ctx.fillStyle="#e9f0e4";ctx.font="700 21px Arial";
+ ctx.fillText(en?"AI ILLUSTRATION · PREVIEW":"ИИ-ИЛЛЮСТРАЦИЯ · МАКЕТ",56,H-bottomSafe+44);
+ ctx.font="700 20px Arial";ctx.fillStyle="#aab9ad";
+ ctx.fillText(total>1?(en?"SWIPE →":"ЛИСТАЙ →"):(en?"MORE FACTS":"БОЛЬШЕ ФАКТОВ"),56,H-bottomSafe+79);
+ ctx.textAlign="right";ctx.fillStyle=accent;ctx.font="900 22px Arial";
+ ctx.fillText((number+1)+" / "+total,W-55,H-bottomSafe+44);ctx.textAlign="left";
 }
 function setRich(el,text){
  el.replaceChildren();let bold=false;const parts=String(text||"").split(/(<\/?b>|https:\/\/[^\s<>]+)/ig);
