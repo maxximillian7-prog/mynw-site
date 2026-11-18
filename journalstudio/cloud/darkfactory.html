@@ -33,7 +33,7 @@ button.primary{background:#a82c22;border-color:#d45142}
  </header>
  <div class="metrics"><div class="metric"><b id="statAll">0</b><span>Всего материалов</span></div><div class="metric"><b id="statIG">0</b><span>Ожидают Instagram</span></div><div class="metric"><b id="statTG">0</b><span>Ожидают Telegram</span></div><div class="metric"><b id="statBoth">0</b><span>Утверждены в обеих сетях</span></div></div>
  <div class="workspace">
-  <aside class="panel"><div class="preview-head"><h2>Очередь материалов</h2><span id="itemsCount"></span></div><div class="filters"><button data-filter="all" class="active">Все</button><button data-filter="review">На проверке</button><button data-filter="approved">Одобрено</button></div><div id="queue" class="queue"></div></aside>
+  <aside class="panel"><div class="preview-head"><h2>Очередь материалов</h2><span id="itemsCount"></span></div><div class="filters"><button data-filter="current" class="active">Новая серия</button><button data-filter="all">Все</button><button data-filter="review">На проверке</button><button data-filter="approved">Одобрено</button></div><div id="queue" class="queue"></div></aside>
   <main class="panel">
    <div class="preview-head"><div><h2 id="selectedTitle">Материал</h2><div id="selectedMeta" class="muted small"></div></div><div class="row"><button id="swapScene" title="Новая композиция">⟳ Другой визуал</button><button id="swapFormat">⇄ Формат</button></div></div>
    <div class="preview-modes" id="previewModes"><button data-mode="ig_post" class="active">Instagram 4:5</button><button data-mode="ig_reel">Reels 9:16</button><button data-mode="ig_square">IG 1:1</button><button data-mode="telegram">Telegram 1:1</button></div>
@@ -67,7 +67,7 @@ button.primary{background:#a82c22;border-color:#d45142}
 "use strict";
 var ROOT="https://npsfaymjckcqhtyiafms.supabase.co", PUB="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 var $=function(x){return document.getElementById(x)};
-var state={items:[],selected:null,mode:"ig_post",filter:"all",slide:0,unlock:sessionStorage.getItem("darkfactory_access")||"",ai:false,playing:null};
+var state={items:[],selected:null,mode:"ig_post",filter:"current",slide:0,unlock:sessionStorage.getItem("darkfactory_access")||"",ai:false,playing:null};
 var dims={ig_post:[1080,1350],ig_reel:[1080,1920],ig_square:[1080,1080],telegram:[1080,1080]};
 var labels={card:"Панч-карточка",chat:"Переписка",animated_story:"Анимированная история",fake_ad:"Фальшивая реклама",dark_news:"Газета абсурда",carousel:"Карусель"};
 var themes={black_press:{bg:"#191614",paper:"#F2E5D3",ink:"#171515",accent:"#C94D3D",other:"#CEB8A0",shade:"#47352D"},acid_brutal:{bg:"#151315",paper:"#DFCFAC",ink:"#201815",accent:"#C99D4F",other:"#BEA787",shade:"#44332D"}};
@@ -114,7 +114,7 @@ function updateStats(){
  $("statTG").textContent=items.filter(function(x){return x.status_telegram==="review"||x.status_telegram==="needs_changes"}).length;
  $("statBoth").textContent=items.filter(function(x){return x.status_telegram==="approved"&&x.status_instagram==="approved"}).length;
 }
-function filtered(x){return state.filter==="all"||state.filter==="review"&&(x.status_instagram!=="approved"||x.status_telegram!=="approved")||state.filter==="approved"&&(x.status_instagram==="approved"||x.status_telegram==="approved")}
+function filtered(x){return state.filter==="current"&&!["editorial","ai"].includes(x.source)||state.filter==="all"||state.filter==="review"&&(x.status_instagram!=="approved"||x.status_telegram!=="approved")||state.filter==="approved"&&(x.status_instagram==="approved"||x.status_telegram==="approved")}
 function tag(s){return '<span class="tag '+(s==="approved"?"ok":s==="rejected"?"no":"")+'">'+(s==="approved"?"✓":s==="rejected"?"✕":"…")+"</span>"}
 function renderQueue(){
  var list=state.items.filter(filtered);
