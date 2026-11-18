@@ -276,7 +276,7 @@ async function showTab(target,force=false){
  tab=target;
  document.querySelectorAll("[data-view]").forEach(el=>el.classList.toggle("active",el.dataset.view===target));
  document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("selected",el.dataset.tab===target));
- const labels={home:["Обзор редакции","Сегодня в Journal Studio"],library:["Материалы","Черновики, проверка и опубликованные статьи"],editor:["Конструктор статей","Подготовка и предпросмотр"],authors:["Авторы","ИИ-персонажи и приглашённые блогеры"],publish:["Публикации","Каналы и результаты отправки"],settings:["Настройки","Аккаунт и подключение редакции"],"ai-studio":["ИИ-редакция","Генерация статей, изображений и управление ИИ-авторами"],"review-queue":["Согласование","Очередь материалов и редакционные комментарии"]};
+ const labels={home:["Обзор редакции","Сегодня в Journal Studio"],library:["Материалы","Черновики, проверка и опубликованные статьи"],editor:["Конструктор статей","Подготовка и предпросмотр"],authors:["Авторы","ИИ-персонажи и приглашённые блогеры"],publish:["Публикации","Каналы и результаты отправки"],settings:["Настройки","Аккаунт и подключение редакции"],"ai-studio":["ИИ-редакция","Генерация статей, изображений и управление ИИ-авторами"],"review-queue":["Согласование","Очередь материалов и редакционные комментарии"],darkfactory:["НЕТ! СЕРЬЁЗНО?","Вирусные проверенные факты · Instagram RU/EN · Telegram RU"]};
  const viewInfo=labels[target]||[target.replace(/-/g," "),"Редакционное рабочее пространство"];
  $("headline").textContent=viewInfo[0];$("subtitle").textContent=project.name+" · "+viewInfo[1];
  $("crumb").textContent="Journal Studio / "+viewInfo[0];
