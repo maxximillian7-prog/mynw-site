@@ -248,21 +248,19 @@ function domains(x){
 function slidesFor(x,en){
  const title=en?(x.title_en||x.title):x.title,hook=en?(x.hook_en||x.hook):x.hook;
  const body=en?(x.body_en||x.body):x.body;
- const words=String(body||"").trim().split(/\s+/).filter(Boolean).length;
- const storyCount=x.format_type==="carousel"?3:x.format_type==="timeline"?2:x.format_type==="comparison"?(words>83?2:1):0;
- const n=storyCount+2;
- const scenes=storyCount?chunksOf(sentenceParts(body),storyCount):[];
- const teaser=storyCount===0&&x.format_type!=="reel_story"?sentenceParts(body).slice(0,2).join(" "):"";
- const slides=[{type:"cover",heading:title,body:hook,teaser,tag:en?"UNBELIEVABLE FACT":"НЕВЕРОЯТНО, НО ФАКТ"}];
+ const longer=Math.max(String(x.body||"").length,String(x.body_en||"").length);
+ const isCarousel=["carousel","timeline","comparison"].includes(x.format_type);
+ // The amount of real story content determines the number of slides.
+ // Around 200-240 characters per interior slide is readable at 1080x1350.
+ const storyCount=isCarousel?Math.max(2,Math.min(7,Math.ceil(longer/(x.format_type==="carousel"?215:240)))):0;
+ const panels=storyCount?chunksOf(sentenceParts(body),storyCount):[];
+ const slides=[{type:"cover",heading:title,body:hook,teaser:!storyCount&&x.format_type!=="reel_story"?sentenceParts(body).slice(0,2).join(" "):"",tag:en?"UNBELIEVABLE FACT":"НЕВЕРОЯТНО, НО ФАКТ"}];
  if(!storyCount)return slides;
- const headers=storyCount===3?(en?["HOW IS IT POSSIBLE?","THE WILDEST PART","ONE IMPORTANT DETAIL"]:["КАК ЭТО ВОЗМОЖНО?","ВОТ ЧТО САМОЕ СТРАННОЕ","НО ЕСТЬ НЮАНС"]):
- storyCount===2?(en?["HERE’S HOW IT WORKS","WHAT'S THE CATCH?"]:["КАК ЭТО РАБОТАЕТ","А В ЧЁМ НЮАНС?"]):
- (en?["HOW IT REALLY WORKS"]:["КАК ЭТО РАБОТАЕТ"]);
- scenes.forEach((text,i)=>slides.push({type:i%2?"detail":"story",heading:headers[i]||headers[0],body:text,tag:en?"THE REAL EXPLANATION":"ВОТ КАК ЭТО РАБОТАЕТ"}));
- const punch=String(x.punch||"").trim(),last=sentenceParts(body).slice(-1)[0]||"";
- const outroText=en?[last,punch,"Would your friends believe this? Share this fact with someone curious."].filter(Boolean).join(" "):
- [last,punch,"Отправь человеку, который тоже скажет: «Не может быть!»"].filter(Boolean).join(" ");
- slides.push({type:"outro",heading:en?"NO WAY. IT’S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:outroText,tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
+ const headers=en?["HOW IS THIS POSSIBLE?","HERE'S THE STRANGE PART","WHAT SCIENCE FOUND","THE SURPRISING DETAIL","BUT THERE'S A CATCH","ONE LAST TWIST","WHAT DOES IT MEAN?"]:
+ ["КАК ЭТО ВОЗМОЖНО?","ВОТ ЧТО УДИВЛЯЕТ","ЧТО УЗНАЛИ УЧЁНЫЕ","САМАЯ СТРАННАЯ ДЕТАЛЬ","НО ЕСТЬ НЮАНС","И ЭТО ЕЩЁ НЕ ВСЁ","ЧТО ЭТО ЗНАЧИТ?"];
+ panels.forEach((t,i)=>slides.push({type:i%2?"detail":"story",heading:headers[i]||headers[headers.length-1],body:t,tag:en?"THE REAL EXPLANATION":"ВОТ КАК ЭТО РАБОТАЕТ"}));
+ const punch=en?(sentenceParts(body).slice(-2).join(" ")):[sentenceParts(body).slice(-2).join(" "),String(x.punch||"").trim()].filter(Boolean).join(" ");
+ slides.push({type:"outro",heading:en?"NO WAY. IT'S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:punch+"\n"+(en?"Would your friends believe this? Send it to someone who loves surprising facts.":"Отправь человеку, который тоже скажет: «Не может быть!»"),tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
  return slides;
 }
 function wrapCanvas(ctx,text,maxW){
@@ -324,14 +322,26 @@ function drawCard(canvas,x,slide,en,reel,thumbnail=false,number=0,total=1){
   return y+model.lines.length*model.size*lineFactor;
  };
  const layoutText=(text,maxW,maxH,size,min,weight)=>{
-  let found={size:min,lines:[]};
-  for(let n=size;n>=min;n-=2){
-   ctx.font=weight+" "+n+"px Arial, sans-serif";
-   const lines=wrapCanvas(ctx,text,maxW),height=lines.length*n*1.3;
-   if(height<=maxH){found={size:n,lines};break}
+  let candidate=null;
+  for(let font=size;font>=min;font-=2){
+   ctx.font=weight+" "+font+"px Arial, sans-serif";
+   const lines=wrapCanvas(ctx,text,maxW);
+   if(lines.length*font*1.3<=maxH){candidate={size:font,lines};break}
   }
-  if(!found.lines.length){ctx.font=weight+" "+min+"px Arial, sans-serif";found={size:min,lines:wrapCanvas(ctx,text,maxW)}}
-  return found;
+  if(!candidate){
+   // This only activates for unexpected editor text. Never draw beneath the footer.
+   ctx.font=weight+" "+min+"px Arial, sans-serif";
+   const lines=wrapCanvas(ctx,text,maxW);
+   const allowed=Math.max(1,Math.floor(maxH/(min*1.3)));
+   const visible=lines.slice(0,allowed);
+   if(lines.length>allowed){
+    let last=visible[visible.length-1];
+    while(last.length>1&&ctx.measureText(last+"…").width>maxW)last=last.slice(0,-1);
+    visible[visible.length-1]=last+"…";
+   }
+   candidate={size:min,lines:visible,overflow:lines.length>allowed};
+  }
+  return candidate;
  };
  if(slide.type==="cover"){
   const text=String(slide.body||"").trim();
@@ -366,10 +376,10 @@ function drawCard(canvas,x,slide,en,reel,thumbnail=false,number=0,total=1){
   const ruleY=titleY+headingH+22;
   ctx.fillStyle=accent;ctx.fillRect(left,ruleY,contentWidth,7);
   const bodyY=ruleY+36;
-  const available=Math.max(240,contentBottom-bodyY-28);
+  const available=Math.max(150,contentBottom-bodyY-55);
   const paragraph=layoutText(slide.body,contentWidth-34,available,slide.type==="outro"?43:44,30,"600");
   const paragraphH=paragraph.lines.length*paragraph.size*1.3;
-  const pad=24,boxH=paragraphH+pad*2;
+  const pad=20,boxH=paragraphH+pad*2;
   ctx.fillStyle="rgba(2,5,7,.76)";
   if(ctx.roundRect){ctx.beginPath();ctx.roundRect(left-16,bodyY-13,contentWidth+32,Math.min(boxH,contentBottom-bodyY+30),18);ctx.fill()}
   else ctx.fillRect(left-16,bodyY-13,contentWidth+32,Math.min(boxH,contentBottom-bodyY+30));
