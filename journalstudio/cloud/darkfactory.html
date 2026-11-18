@@ -695,10 +695,67 @@ for(const locale of ["ru","en"]){
 }
 $("showTGSetup").onclick=()=>{$("tgSetup").scrollIntoView({behavior:"smooth",block:"start"})};
 
+
+function quickModeFields(){
+ const en=languageEN(),tg=mode==="telegram"||mode==="telegram_en";
+ return {title:en?"fTitleEN":"fTitle",hook:en?"fHookEN":"fHook",
+ story:en?"fBodyEN":"fBody",caption:tg?(en?"fTGEN":"fTG"):(en?"fIGEN":"fIGRU"),tg,en};
+}
+function updateQuickEditor(){
+ if(!quickEditOpen)return;
+ const fields=quickModeFields();
+ for(const [target,source] of [["quickTitle",fields.title],["quickHook",fields.hook],["quickStory",fields.story],["quickCaption",fields.caption]]){
+  $(target).value=$(source).value;
+ }
+ for(const part of ["Title","Hook","Story"]){
+  $("quick"+part).hidden=fields.tg;$("quick"+part+"Label").hidden=fields.tg;
+ }
+ $("quickCaptionLabel").textContent=fields.tg?(fields.en?"Telegram EN · full text":"Telegram RU · полный текст"):
+  (fields.en?"Instagram EN · post caption":"Instagram RU · подпись");
+}
+function toggleQuick(open){
+ quickEditOpen=open;$("quickEditor").hidden=!open;
+ if(open)updateQuickEditor();
+}
+for(const [target,key] of [["quickTitle","title"],["quickHook","hook"],["quickStory","story"],["quickCaption","caption"]]){
+ $(target).oninput=()=>{const fields=quickModeFields();$(fields[key]).value=$(target).value;render()};
+}
+$("quickEditOpen").onclick=()=>toggleQuick(!quickEditOpen);
+$("quickClose").onclick=()=>toggleQuick(false);
+$("igCaption").onclick=()=>toggleQuick(true);
+$("tgCaption").onclick=()=>toggleQuick(true);
+$("tgOverflowText").onclick=()=>toggleQuick(true);
+$("igMedia").addEventListener("click",e=>{if(e.target.closest("button"))return;toggleQuick(true)});
+async function persistCurrent(){
+ const x=current();if(!x)throw Error("Выберите материал");
+ return await patch({
+  title:$("fTitle").value,title_en:$("fTitleEN").value,hook:$("fHook").value,hook_en:$("fHookEN").value,
+  body:$("fBody").value,body_en:$("fBodyEN").value,punch:x.punch,
+  format_type:$("fFormat").value,format_mode:"manual",
+  caption_instagram:$("fIGRU").value,caption_instagram_en:$("fIGEN").value,
+  caption_telegram:$("fTG").value,caption_telegram_en:$("fTGEN").value,
+  visual_prompt_en:$("fVisual").value,
+  source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))
+ });
+}
+$("quickSave").onclick=()=>task(async()=>{await persistCurrent();info("Правки сохранены, медиа не удалены.")});
+$("approveAll").onclick=()=>task(async()=>{
+ const x=current();if(!x)return;
+ info("Сохраняю правки, проверяю факт и утверждаю 4 версии…");
+ await persistCurrent();
+ if(current().fact_verification!=="verified"){
+  const check=await api("/items/"+x.id+"/recheck","POST",{});
+  if(!check.verified){info("Проверка факта не пройдена: "+check.reason,true);await reload();return}
+ }
+ const result=await api("/items/"+x.id+"/approve-all","POST",{});
+ await reload();await loadSchedule();
+ info("✓ Утверждено. Создано записей в очереди: "+(result.queue||[]).length+(result.errors?.length?". Есть ошибки очереди: "+JSON.stringify(result.errors):""));
+});
+
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
-document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));render()});
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));updateQuickEditor();render()});
 $("igMore").onclick=()=>{captionExpanded=!captionExpanded;render()};
 $("slidePrev").onclick=()=>moveSlide(-1);$("slideNext").onclick=()=>moveSlide(1);
 document.querySelectorAll("[data-slide-dir]").forEach(b=>b.onclick=e=>{e.stopPropagation();moveSlide(Number(b.dataset.slideDir))});
@@ -711,7 +768,7 @@ let previewPending=false;$("editor").addEventListener("input",e=>{if(!current()|
 $("editor").addEventListener("change",()=>{if(current())render()});
 $("refresh").onclick=()=>task(reload);
 $("close").onclick=()=>{unlocked="";sessionStorage.removeItem("darkfactory_access");$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden")};
-$("save").onclick=()=>task(async()=>{await patch({title:$("fTitle").value,title_en:$("fTitleEN").value,hook:$("fHook").value,hook_en:$("fHookEN").value,body:$("fBody").value,body_en:$("fBodyEN").value,punch:current().punch,format_type:$("fFormat").value,format_mode:"manual",caption_instagram:$("fIGRU").value,caption_instagram_en:$("fIGEN").value,caption_telegram:$("fTG").value,caption_telegram_en:$("fTGEN").value,visual_prompt_en:$("fVisual").value,source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))});info("Сохранено; изменения отправлены на повторную проверку фактов.")});
+$("save").onclick=()=>task(async()=>{await persistCurrent();info("Правки сохранены, медиа остаются в хранилище.")});
 $("illustrate").onclick=()=>task(async()=>{const x=current();if(!x)return;if(!confirm("Создать платную AI-иллюстрацию для «"+x.title+"»?"))return;info("Запрос к генератору изображений…");const d=await api("/items/"+x.id+"/generate-image","POST",{});await reload();info(d.image_url?"Иллюстрация сохранена в Journal Studio.":"Иллюстрация готова; обновите просмотр.")});
 $("download").onclick=()=>task(async()=>{const x=current();if(!x)return;const c=$("canvas");try{const link=document.createElement("a");link.href=c.toDataURL("image/png");link.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_"+mode+"_slide_"+(slideIndex+1)+".png";link.click();info("PNG сохранён.")}catch{throw Error("Браузер запретил экспорт изображения; обновите страницу.")}});
 $("approveIG").onclick=()=>task(async()=>{await patch({status_instagram:"approved"});info("Instagram RU/EN одобрено. Автопубликация пока не привязана к новому аккаунту.")});
