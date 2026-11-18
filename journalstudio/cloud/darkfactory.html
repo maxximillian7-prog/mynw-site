@@ -159,7 +159,7 @@ function renderSvg(x,mode,progress,slide){
  mode=mode||state.mode;progress=progress==null?1:progress;slide=slide||0;
  var dim=dims[mode]||dims.ig_post,H=dim[1],t=palette(x);
  var chat=x.format_type==="chat",carousel=x.format_type==="carousel";
- var top=chat?Math.floor(H*.32):Math.floor(H*(mode==="ig_reel"?.52:.54));top=Math.max(330,top);
+ var top=chat?Math.floor(H*.32):Math.floor(H*(mode==="ig_reel"?.47:.54));top=Math.max(330,top);var safeBottom=mode==="ig_reel"?220:0;
  var s='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="'+H+'" viewBox="0 0 1080 '+H+'">';
  s+=rect(0,0,1080,H,t.bg)+art(x,t,top);
  s+=rect(0,0,1080,85,t.bg)+textEl("НАШИ ВАШИМ · 18+",75,56,27,t.paper,true)+textEl("BLACK HUMOR LAB",1005,56,23,t.accent,true,"end");
@@ -187,16 +187,16 @@ function renderSvg(x,mode,progress,slide){
   var maxLines=Math.max(3,Math.floor((H-fy-190)/62));var first=lines(h,78,fy+33,48,t.ink,32,62,maxLines);
   if(showHook)s+=first.svg;
   var by=first.bottom+20;
-  if(body&&showBody){var mid=lines(body,78,by+15,41,t.ink,38,56,Math.max(2,Math.floor((H-by-180)/55)));s+=mid.svg;by=mid.bottom+12}
+  if(body&&showBody){var mid=lines(body,78,by+15,41,t.ink,38,56,Math.max(2,Math.floor((H-by-180-safeBottom)/55)));s+=mid.svg;by=mid.bottom+12}
   if(showPunch){
-   var punchLines=wrap(p,30).slice(0,Math.max(2,Math.floor((H-by-85)/65)));
+   var punchLines=wrap(p,30).slice(0,Math.max(2,Math.floor((H-by-85-safeBottom)/65)));
    var ph=35+punchLines.length*62;
-   var py=Math.min(Math.max(by+14,top+230),H-ph-74);
+   var py=Math.min(Math.max(by+14,top+230),H-ph-74-safeBottom);
    s+=rect(68,py,945,ph,t.accent,9);
    punchLines.forEach(function(z,i){s+=textEl(z,94,py+67+i*60,49,t.bg,true)});
   }
  }
- s+=rect(0,H-58,1080,58,t.bg)+textEl("НАШИ ВАШИМ · САТИРА",75,H-20,23,t.paper,true)+textEl("18+",995,H-20,24,t.accent,true,"end");
+ if(safeBottom)s+=rect(0,H-safeBottom,1080,safeBottom,t.bg);s+=rect(0,H-58-safeBottom,1080,58,t.bg)+textEl("НАШИ ВАШИМ · САТИРА",75,H-20-safeBottom,23,t.paper,true)+textEl("18+",995,H-20-safeBottom,24,t.accent,true,"end");
  return s+"</svg>";
 }
 function paint(progress){
