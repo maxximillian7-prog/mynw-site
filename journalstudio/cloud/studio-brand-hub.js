@@ -231,19 +231,19 @@ window.StudioBrandHub=(function(){
     frame.classList.add("studio-embedded-frame");
     frame.removeAttribute("style");
     frame.setAttribute("loading","lazy");
-    frame.dataset.src=(frame.dataset.src||"./darkfactory.html")+"&embedded=1";
+    frame.dataset.src="./darkfactory.html?v=20261118-unified-5&embedded=1";
    }
    old.insertAdjacentHTML("afterbegin",'<div class="studio-brand-workspace-header seriously">'+
     '<div class="title-cluster"><img src="'+logo("seriously")+'" alt=""><div><h2>НЕТ! СЕРЬЁЗНО?! / NO, SERIOUSLY?!</h2>'+
     '<p>Факты, визуалы и публикации · Instagram RU/EN · Telegram RU/EN</p></div></div>'+
-    '<div class="studio-brand-quickactions"><button type="button" data-hub-go="seriously" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="seriously" data-hub-intent="queue">◷ Расписание</button><a class="open-external" href="./darkfactory.html" target="_blank" rel="noopener">↗ Отдельно</a></div></div>');
+    '<div class="studio-brand-quickactions"><button type="button" data-hub-go="seriously" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="seriously" data-hub-intent="queue">◷ Расписание</button><a class="open-external" href="./darkfactory.html?v=20261118-unified-5" target="_blank" rel="noopener">↗ Отдельно</a></div></div>');
    old.insertAdjacentHTML("beforebegin",
     '<section class="view" data-view="portugal" data-admin-nav>'+
     '<div class="studio-brand-workspace-header portugal">'+
      '<div class="title-cluster"><img src="'+logo("portugal")+'" alt=""><div><h2>Португалия рядом</h2>'+
      '<p>Новости, полезные статьи, афиша, сообщения и календарь публикаций</p></div></div>'+
-     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><a class="open-external" href="./portugal/" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
-    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1" src="about:blank"></iframe>'+
+     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><a class="open-external" href="./portugal/?v=20261118-unified-5" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
+    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1&v=20261118-unified-5" src="about:blank"></iframe>'+
     '</section>');
   }
  }
