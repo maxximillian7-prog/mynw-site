@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>DarkFactory asset technical test</title><h1 id="result">WORKING</h1><script>
+(async function(){
+ try{
+  const u="https://images.unsplash.com/photo-1734336009361-f8d43327430f?auto=format&fit=crop&w=500&q=70";
+  const r=await fetch(u,{mode:"cors",referrerPolicy:"no-referrer"});if(!r.ok)throw Error("PHOTO_HTTP_"+r.status);
+  const blob=await r.blob();
+  const data=await new Promise((ok,fail)=>{const f=new FileReader;f.onload=()=>ok(f.result);f.onerror=fail;f.readAsDataURL(blob)});
+  const sv='<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><image href="'+data+'" width="150" height="150"/></svg>';
+  const addr=URL.createObjectURL(new Blob([sv],{type:"image/svg+xml;charset=utf-8"}));
+  const im=new Image;
+  await new Promise((ok,fail)=>{im.onload=ok;im.onerror=fail;im.src=addr});
+  const c=document.createElement("canvas");c.width=150;c.height=150;c.getContext("2d").drawImage(im,0,0);
+  const result=c.toDataURL("image/png");
+  document.getElementById("result").textContent="SUCCESS: crossorigin photo fetched, SVG embedded, PNG exported ("+blob.size+" bytes, png "+result.length+" chars)";
+ }catch(e){document.getElementById("result").textContent="FAIL: "+e.message}
+})();
+</script>
