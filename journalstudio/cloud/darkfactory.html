@@ -29,6 +29,75 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .toast{margin-top:8px;color:#d6e7b4}.layout-hidden{display:none!important}
 @media(max-width:1200px){.board{grid-template-columns:260px 1fr}.panel.editor-panel{grid-column:1/-1}.edit{max-height:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}.edit>.full{grid-column:1/-1}}
 @media(max-width:740px){.shell{padding:13px}.board{display:block}.panel{margin-bottom:14px}.queue{max-height:280px}.edit{display:block}.logo{font-size:22px}}
+
+/* Social platform proofing — platform chrome is a visual simulation, not a real connected account. */
+.proof-status{max-width:480px;margin:0 auto 10px;color:#b2b7c0;font-size:11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.proof-status .proof-led{width:7px;height:7px;display:inline-block;background:var(--lime);border-radius:50%;margin-right:6px}
+.social-proof{max-width:480px;margin:0 auto;background:#fff;color:#18191e;border:1px solid #35393e;border-radius:17px;overflow:hidden;box-shadow:0 18px 48px #0005}
+.mock-ig-appbar{height:45px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;border-bottom:1px solid #e8e9ed}
+.mock-ig-wordmark{font-family:Georgia,serif;font-size:24px;font-style:italic;font-weight:750;letter-spacing:-1.1px}
+.mock-icon{width:23px;height:23px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.mock-icons{display:flex;align-items:center;gap:17px}
+.ig-author-row{display:flex;align-items:center;gap:10px;padding:11px 13px}
+.mock-avatar{border-radius:50%;width:39px;height:39px;padding:2px;background:linear-gradient(135deg,#f9a243,#ee2a7b,#6228b5);display:grid;place-items:center;flex:none}
+.mock-avatar>span{width:100%;height:100%;display:grid;place-items:center;border:2px solid #fff;border-radius:50%;background:#0f1311;color:#d5f34e;font-size:13px;font-weight:950}
+.author-handle{font-size:12px;font-weight:780;line-height:1.2}.author-sub{font-size:10px;color:#767a82}.mock-ellipsis{margin-left:auto;font-size:24px;line-height:1}
+.mock-media{position:relative;background:#13191b;overflow:hidden;touch-action:pan-y;outline:none}
+.mock-media:focus-visible{outline:3px solid #69a3fa;outline-offset:-3px}
+.mock-media canvas{display:block;width:100%;height:auto}
+.mock-media .navbtn{position:absolute;top:47%;transform:translateY(-50%);z-index:3;border:none;border-radius:50%;width:35px;height:35px;background:#ffffffd6;color:#13161a;font-size:26px;line-height:20px;display:grid;place-items:center;padding:0;box-shadow:0 2px 10px #0004}
+.mock-media .navbtn.prev{left:9px}.mock-media .navbtn.next{right:9px}.mock-media .navbtn[hidden]{display:none}
+.mock-count{position:absolute;right:11px;top:11px;z-index:2;color:#fff;background:#151618aa;border-radius:16px;padding:4px 10px;font-size:11px;font-weight:700}
+.ig-actions{display:flex;align-items:center;gap:16px;padding:10px 13px 4px}
+.ig-actions .bookmark{margin-left:auto}
+.ig-dots{min-height:17px;display:flex;justify-content:center;align-items:center;gap:5px;margin:0 0 4px}
+.ig-dots button{width:6px;height:6px;border:0;border-radius:50%;background:#c8cbd0;padding:0}
+.ig-dots button.active{background:#0097ec;width:7px;height:7px}
+.ig-feedback{padding:0 13px 5px;font-size:11px;color:#878a90}
+.ig-caption{white-space:pre-wrap;overflow-wrap:anywhere;padding:0 13px 6px;font-size:12px;line-height:1.55;max-height:250px;overflow:auto}
+.ig-caption strong{font-size:12px}.ig-more{border:0;background:none;color:#8a8b92;padding:0 0 0 5px;font-size:12px}
+.ig-comment{color:#a1a4aa;padding:8px 13px 13px;font-size:11px}
+.tg-proof{max-width:480px;margin:0 auto;background:#cddbd9;color:#15232c;border:1px solid #364549;border-radius:16px;overflow:hidden;box-shadow:0 18px 48px #0005}
+.tg-top{display:flex;gap:10px;align-items:center;padding:13px 14px;background:#fff;color:#142029}
+.tg-back{font-size:23px;color:#338bc4;margin-right:3px}
+.tg-avatar{width:39px;height:39px;background:#151b19;border-radius:50%;color:#ceff37;font-weight:950;display:grid;place-items:center}
+.tg-top strong{font-size:14px}.tg-top small{display:block;color:#77858a;font-size:11px}
+.tg-search{margin-left:auto;font-size:22px;color:#7f8b8e}
+.tg-chat{background-color:#cfdfd8;background-image:radial-gradient(#afc6bc66 1px,transparent 1px),linear-gradient(30deg,#cae0db,#dee5db);background-size:23px 23px,100% 100%;padding:14px 14px 35px;max-height:680px;overflow-y:auto}
+.tg-date{text-align:center;margin:0 auto 12px;padding:5px 13px;background:#6284787d;color:#fff;border-radius:20px;width:max-content;font-size:11px}
+.tg-bubble{background:#fff;box-shadow:0 1px 3px #42534c30;border-radius:10px 10px 10px 3px;overflow:hidden;max-width:410px;margin:0 auto 10px}
+.tg-from{color:#359bc9;font-size:12px;font-weight:780;padding:10px 12px 7px}
+.tg-single canvas{display:block;width:100%;height:auto}
+.tg-album{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;background:#fff}
+.tg-album button{padding:0;border:0;background:#16201d;position:relative;border-radius:0;overflow:hidden}
+.tg-album canvas{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
+.tg-album .tg-plus{position:absolute;inset:0;background:#0009;color:#fff;font-size:28px;font-weight:800;display:grid;place-items:center}
+.tg-message{white-space:pre-wrap;overflow-wrap:anywhere;padding:8px 12px 8px;font-size:13px;line-height:1.55}
+.tg-message a{color:#2787c0;text-decoration:none}
+.tg-meta{display:flex;justify-content:flex-end;gap:8px;padding:0 12px 9px;color:#8c9a9f;font-size:10px}
+.tg-bottom{background:#fff;color:#95a0a5;border-top:1px solid #dfe6e8;padding:12px 18px;font-size:12px}
+.reel-proof{max-width:405px;margin:0 auto;position:relative;border-radius:16px;overflow:hidden;background:#030506;border:1px solid #343b42;color:#fff}
+.reel-proof .mock-media canvas{width:100%}
+.reel-head{position:absolute;z-index:4;top:20px;left:18px;font-size:20px;font-weight:750;text-shadow:0 1px 4px #000}
+.reel-right{position:absolute;right:12px;bottom:105px;display:grid;gap:25px;z-index:4;text-align:center;font-size:12px;text-shadow:0 1px 5px #000}
+.reel-caption{position:absolute;bottom:30px;left:15px;right:66px;z-index:4;font-size:13px;text-shadow:0 1px 6px #000}
+.reel-caption small{display:block;color:#ebeeee;margin-top:6px}
+.reel-marker{position:absolute;right:16px;top:23px;background:#000b;border-radius:20px;padding:5px 10px;font-size:10px;z-index:4}
+.slide-tools{max-width:480px;margin:13px auto 0;display:flex;align-items:center;justify-content:center;gap:12px}
+.slide-tools button{min-width:43px}.slide-tools #slideLabel{min-width:105px;text-align:center;color:#dce7be;font-size:12px;font-weight:700}
+.slide-rail{max-width:480px;margin:12px auto 0;display:flex;gap:9px;overflow-x:auto;padding:0 2px 8px;scrollbar-width:thin}
+.slide-rail button{flex:0 0 94px;text-align:left;padding:5px;background:#24282f;border:1px solid #414951;border-radius:9px}
+.slide-rail button.active{border-color:#d3fc58;background:#334025}
+.slide-rail canvas{display:block;width:100%;height:auto;border-radius:5px;background:#12161d}
+.slide-rail span{font-size:10px;display:block;margin-top:4px;line-height:1.2;color:#d3d9cc}
+.proof-note{font-size:11px;color:#a8b1b0;max-width:480px;margin:9px auto 0;text-align:center}
+#tgViewer[hidden]{display:none}
+#tgViewer{position:fixed;inset:0;background:#101a22f7;z-index:3000;display:flex;align-items:center;justify-content:center;padding:58px 14px 70px}
+.viewer-inner{max-width:min(95vw,470px);max-height:78vh;display:flex;flex-direction:column;align-items:center;gap:12px}
+.viewer-inner canvas{max-height:68vh;max-width:90vw;width:auto;height:auto;object-fit:contain;border:1px solid #405057;box-shadow:0 15px 45px #0008;touch-action:pan-y}
+.viewer-controls{display:flex;align-items:center;gap:15px}.viewer-controls button{min-width:48px}
+.viewer-close{position:fixed;top:14px;right:22px;font-size:24px;background:transparent;border:none;color:#fff}
+@media(max-width:740px){.social-proof,.tg-proof{border-radius:10px}.slide-rail button{flex-basis:80px}.work{padding:11px}}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
@@ -38,9 +107,43 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
- <div class="switches"><button class="active" data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button data-mode="telegram">Telegram · RU</button><button data-mode="reel">Reels · 9:16</button></div>
- <div class="preview"><canvas id="canvas" width="1080" height="1350"></canvas></div>
- <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт PNG</button></div>
+ <div class="switches"><button class="active" data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button data-mode="telegram">Telegram · RU</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
+ <div class="proof-status"><span><span class="proof-led"></span>Предпросмотр публикации в приложении</span><span id="proofHint">Прокрутите карусель стрелками или пальцем</span></div>
+ <div id="instagramFrame" class="social-proof">
+  <div class="mock-ig-appbar"><span class="mock-ig-wordmark">Instagram</span><span class="mock-icons">
+   <svg class="mock-icon" viewBox="0 0 24 24"><path d="M12 21s-9-5.3-9-12a5 5 0 0 1 9-2 5 5 0 0 1 9 2c0 6.7-9 12-9 12z"/></svg>
+   <svg class="mock-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="m6 7 6 5 6-5"/></svg></span></div>
+  <div class="ig-author-row"><div class="mock-avatar"><span>N?</span></div><div><div class="author-handle">no.seriously · <span style="color:#697078;font-weight:500">макет</span></div><div class="author-sub">Пример профиля · не подключён</div></div><span class="mock-ellipsis">⋯</span></div>
+  <div id="igMedia" class="mock-media" tabindex="0" aria-label="Слайды Instagram — листайте стрелками или свайпом">
+   <span class="mock-count" id="igCount">1 / 1</span>
+   <button class="navbtn prev" data-slide-dir="-1" title="Предыдущий слайд" aria-label="Предыдущий слайд">‹</button>
+   <button class="navbtn next" data-slide-dir="1" title="Следующий слайд" aria-label="Следующий слайд">›</button>
+  </div>
+  <div class="ig-actions"><svg class="mock-icon" viewBox="0 0 24 24"><path d="M20.8 4.6c-2.1-2.2-5.5-2.2-7.6 0L12 5.8l-1.2-1.2c-2.1-2.2-5.5-2.2-7.6 0s-2.1 5.8 0 8L12 21l8.8-8.4c2.1-2.2 2.1-5.8 0-8Z"/></svg><svg class="mock-icon" viewBox="0 0 24 24"><path d="M21 11.2c0 4.8-4 8.8-9 8.8-1.4 0-2.9-.3-4.1-1L3 21l1.4-4C3.5 15.4 3 13.4 3 11.2 3 6.6 7 3 12 3s9 3.6 9 8.2Z"/></svg><svg class="mock-icon" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4L22 2Z"/></svg><svg class="mock-icon bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></div>
+  <div class="ig-dots" id="igDots"></div>
+  <div class="ig-feedback">Предпросмотр · реакции и просмотры не показаны</div>
+  <div class="ig-caption"><strong>no.seriously</strong> <span id="igCaption"></span><button class="ig-more" id="igMore">ещё</button></div>
+  <div class="ig-comment">Добавить комментарий… <span style="float:right">♡</span></div>
+ </div>
+ <div id="telegramFrame" class="tg-proof" hidden>
+  <div class="tg-top"><span class="tg-back">‹</span><div class="tg-avatar">Н?</div><div><strong>НЕТ! СЕРЬЁЗНО? · макет</strong><small>Канал · демонстрация сообщения</small></div><span class="tg-search">⌕</span></div>
+  <div class="tg-chat"><div class="tg-date">Предпросмотр</div><div class="tg-bubble">
+   <div class="tg-from">НЕТ! СЕРЬЁЗНО?</div>
+   <div id="tgSingle" class="tg-single" hidden></div>
+   <div id="tgAlbum" class="tg-album" hidden></div>
+   <div id="tgCaption" class="tg-message"></div><div class="tg-meta">Время публикации не назначено · ◉</div>
+  </div><div id="tgOverflow" class="tg-bubble" hidden><div id="tgOverflowText" class="tg-message"></div><div class="tg-meta">Продолжение публикации · ◉</div></div></div>
+  <div class="tg-bottom">Канал · только просмотр публикации</div>
+ </div>
+ <div id="reelsFrame" class="reel-proof" hidden>
+  <div id="reelMedia" class="mock-media" tabindex="0"><div class="reel-head">Reels</div><span class="reel-marker">МАКЕТ ОБЛОЖКИ · БЕЗ ВИДЕО</span><div class="reel-right"><div style="font-size:27px">♡</div><div style="font-size:26px">♧</div><div style="font-size:27px">➤</div><div style="font-size:26px">⋯</div></div><div class="reel-caption"><strong>◉ no.seriously · макет</strong><small id="reelSnippet">Короткая история</small></div></div>
+ </div>
+ <div id="slideTools" class="slide-tools"><button id="slidePrev" aria-label="Предыдущий слайд">←</button><span id="slideLabel">1 / 1</span><button id="slideNext" aria-label="Следующий слайд">→</button></div>
+ <div id="slideRail" class="slide-rail" aria-label="Миниатюры слайдов карусели"></div>
+ <div class="proof-note" id="proofDescription">Изображения и подписи показаны в примерном интерфейсе платформы. Аккаунт и реакции условные.</div>
+ <canvas id="canvas" width="1080" height="1350" hidden></canvas>
+ <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
+ <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт текущего слайда PNG</button></div>
  <div class="actions"><button class="ok" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" id="approveTG">Одобрить Telegram RU</button><button id="changes">На доработку</button></div>
  <div id="status" class="status" aria-live="polite"></div>
  <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Внешняя автопубликация не запускается этим экраном.</div>
