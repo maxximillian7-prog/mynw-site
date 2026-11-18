@@ -752,6 +752,40 @@ $("approveAll").onclick=()=>task(async()=>{
  info("✓ Утверждено. Создано записей в очереди: "+(result.queue||[]).length+(result.errors?.length?". Есть ошибки очереди: "+JSON.stringify(result.errors):""));
 });
 
+
+$("mediaUploadOpen").onclick=()=>{$("mediaFile").click()};
+$("mediaFile").onchange=()=>task(async()=>{
+ const file=$("mediaFile").files?.[0];if(!file)return;
+ const item=current();if(!item)throw Error("Выберите материал");
+ if(file.size>8*1024*1024||!["image/png","image/jpeg","image/webp"].includes(file.type))throw Error("Нужен PNG/JPEG/WebP до 8 МБ");
+ const active=session();if(!active?.access_token||!unlocked)throw Error("Нужна авторизация в Journal Studio");
+ info("Сохраняю исходное изображение в постоянный архив…");
+ const response=await fetch(ROOT+"/functions/v1/darkfactory/items/"+item.id+"/media",{
+  method:"PUT",headers:{
+   apikey:PUB,Authorization:"Bearer "+active.access_token,
+   "x-darkfactory-session":unlocked,"Content-Type":file.type
+  },body:file,cache:"no-store"
+ });
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok)throw Error(result.error||"Ошибка сохранения медиа "+response.status);
+ $("mediaFile").value="";await reload();
+ info("✓ Новое фото сохранено. Старые версии остались в архиве.");
+});
+$("mediaHistoryOpen").onclick=()=>task(async()=>{
+ const item=current();if(!item)return;
+ const history=$("mediaHistory");history.hidden=!history.hidden;if(history.hidden)return;
+ const data=await api("/items/"+item.id+"/media-history");
+ const list=(data.versions||[]).map(v=>'<div class="source"><span>'+
+  safe(v.kind)+" · "+safe(new Date(v.created_at).toLocaleString())+
+  '</span> <button data-media-version="'+safe(v.id)+'" style="padding:4px 8px;font-size:11px">Восстановить</button></div>').join("");
+ $("mediaHistoryEntries").innerHTML=list||'<p class="muted">История медиа пока пустая</p>';
+ $("mediaHistoryEntries").querySelectorAll("[data-media-version]").forEach(btn=>btn.onclick=()=>task(async()=>{
+  if(!confirm("Восстановить предыдущую версию фото без удаления остальных?"))return;
+  await api("/items/"+item.id+"/media-restore","POST",{version_id:btn.dataset.mediaVersion});
+  await reload();info("Предыдущая версия фото восстановлена.");
+ }));
+});
+
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
