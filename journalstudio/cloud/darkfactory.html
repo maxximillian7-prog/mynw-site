@@ -145,11 +145,22 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .queue-schedule .status-unknown{color:#ff9e8c}
 .queue-schedule .status-blocked{color:#e2d087}
 @media(max-width:800px){.calendar-grid{grid-template-columns:1fr}.queue-schedule-scroll{max-height:320px}.queue-schedule table{min-width:810px}}
+
+.wow-emblem{width:59px;height:59px;border-radius:13px;object-fit:contain;box-shadow:0 6px 24px #0008;flex:none}
+body.studio-embedded .shell{max-width:none;margin:0;padding:15px 19px 27px}
+body.studio-embedded .top{padding:13px 16px;margin-bottom:12px}
+body.studio-embedded .brand .logo{font-size:22px}
+body.studio-embedded .top-actions{gap:6px}
+body.studio-embedded .top-actions button{padding:7px 10px;font-size:12px}
+body.studio-embedded .board{grid-template-columns:minmax(230px,300px) minmax(430px,1fr) minmax(290px,380px)}
+body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:13px}
+@media(max-width:1250px){body.studio-embedded .board{grid-template-columns:minmax(230px,300px) minmax(400px,1fr)}body.studio-embedded .editor-panel{grid-column:1/-1}}
+@media(max-width:830px){body.studio-embedded .board{display:block}body.studio-embedded .shell{padding:9px}body.studio-embedded .wow-emblem{width:44px;height:44px}body.studio-embedded .brand .logo{font-size:19px}}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
 <div id="app" class="shell layout-hidden">
- <header class="top"><div class="brand"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><div><div class="eyebrow">NO, SERIOUSLY? / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
+ <header class="top"><div class="brand"><img class="wow-emblem" src="./brand-seriously.svg" alt="Эмблема НЕЕЕТ, серьёзно" width="64" height="64"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?!</span></div><div><div class="eyebrow">NO, SERIOUSLY?! / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
  <div class="top-actions"><button id="showSchedule">◷ Расписание</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
@@ -253,6 +264,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 const ROOT="https://npsfaymjckcqhtyiafms.supabase.co", PUB="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 const $=id=>document.getElementById(id);
 let items=[],selected=null,mode="ig_ru",unlocked=sessionStorage.getItem("darkfactory_access")||"",settings={},image=null,imageSource="",busy=false,slideIndex=0,viewerIndex=0,captionExpanded=false;
+if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("studio-embedded");
 let tgChannels={ru:null,en:null};
 let quickEditOpen=false,mediaRefreshPending=false,scheduleData={settings:[],queue:[]};
 const pilot="fact_pilot_20261118";
@@ -276,8 +288,28 @@ async function reload(){
  $("verifiedCount").textContent=items.filter(x=>x.fact_verification==="verified").length;
  $("imageCount").textContent=items.filter(x=>x.visual_status==="ready").length;
  const visible=filtered();if(!visible.some(x=>x.id===selected))selected=visible[0]?.id||null;
- drawQueue();select();
+ drawQueue();select();emitSummary();
 }
+
+let lastSummary="";
+function emitSummary(){
+ if(window.parent===window||!unlocked)return;
+ const rows=Array.isArray(items)?items:[],queue=scheduleData?.queue||[];
+ const review=rows.filter(x=>[x.status_instagram,x.status_telegram,x.status_telegram_en].some(y=>y==="review"||y==="needs_changes")).length;
+ const queued=queue.filter(x=>["scheduled","sending","blocked"].includes(x.status)).length;
+ const published=queue.filter(x=>x.status==="sent").length;
+ const summary={type:"studio-editor-summary",brand:"seriously",review,queued,published};
+ const serialized=JSON.stringify(summary);if(serialized===lastSummary)return;lastSummary=serialized;
+ window.parent.postMessage(summary,location.origin);
+}
+window.addEventListener("message",event=>{
+ if(event.origin!==location.origin||event.source!==window.parent)return;
+ if(event.data?.type!=="studio-editor-navigate")return;
+ if(event.data.action==="review"){
+  $("filter").value="review";selected=null;reload().catch(err=>info(err.message,true));
+ }else if(event.data.action==="queue")$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
 function filtered(){let f=$("filter").value;return items.filter(x=>f==="all"||f==="pilot"&&x.source===pilot||f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot)||f==="review"&&(x.status_instagram==="review"||x.status_telegram==="review"||x.status_telegram_en==="review"))}
 function drawQueue(){$("queue").innerHTML=filtered().map((x,i)=>'<button data-id="'+safe(x.id)+'" class="'+(x.id===selected?"active":"")+'"><div class="tag '+(x.fact_verification==="verified"?"verified":"pending")+'">'+safe(fmt[x.format_type]||x.format_type)+" · "+safe(x.fact_verification)+"</div><div class=\"queue-title\">"+safe(x.title)+"</div><div class=\"tag\">IG: "+safe(x.status_instagram)+" · TG RU: "+safe(x.status_telegram)+" · TG EN: "+safe(x.status_telegram_en||"review")+" · "+(x.visual_status==="ready"?"🖼 готово":"◌ ожидает изображения")+"</div></button>").join("")||'<p class="muted">Материалов нет</p>'}
 function setField(id,val){$(id).value=val||""}
@@ -885,7 +917,7 @@ function renderScheduleQueue(){
 async function loadSchedule(){
  const response=await api("/schedule");
  scheduleData={settings:response.settings||[],queue:response.queue||[]};
- renderScheduleSettings();renderScheduleQueue();
+ renderScheduleSettings();renderScheduleQueue();emitSummary();
 }
 $("showSchedule").onclick=()=>{$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"})};
 $("refreshSchedule").onclick=()=>task(async()=>{await loadSchedule();info("Очередь обновлена")});
