@@ -56,14 +56,14 @@ window.StudioBrandHub=(function(){
    }
   };
   if(!frame.dataset.loaded){
-   frame.addEventListener("load",()=>{apply();deliverIntent(brand)}, {once:true});
+   frame.addEventListener("load",()=>{frame.dataset.ready="1";apply();deliverIntent(brand)}, {once:true});
    frame.dataset.loaded="1";frame.src=frame.dataset.src;
-  }else{apply();deliverIntent(brand)}
+  }else if(frame.dataset.ready==="1"){apply();deliverIntent(brand)}
  }
  function deliverIntent(brand){
   const action=state.pendingIntent[brand];if(!action)return;
   const frame=$(brand==="portugal"?"portugalFrame":"darkfactoryFrame");
-  if(!frame?.contentWindow)return;
+  if(!frame?.contentWindow||frame.dataset.ready!=="1")return;
   try{
    frame.contentWindow.postMessage({type:"studio-editor-navigate",action},location.origin);
    // A same-origin DOM fallback handles older cached child implementations.
