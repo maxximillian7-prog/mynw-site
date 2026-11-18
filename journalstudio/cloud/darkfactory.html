@@ -150,11 +150,22 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
 <div id="app" class="shell layout-hidden">
  <header class="top"><div class="brand"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><div><div class="eyebrow">NO, SERIOUSLY? / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
- <div class="top-actions"><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
+ <div class="top-actions"><button id="showSchedule">◷ Расписание</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
  <div class="switches"><button class="active" data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button data-mode="telegram">Telegram · RU</button><button data-mode="telegram_en">Telegram · EN</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
+ <div class="preview-toolbar"><button id="quickEditOpen">✎ Редактор прямо в превью</button><button id="mediaUploadOpen">↑ Загрузить / заменить фото</button><button id="mediaHistoryOpen">▤ Архив медиа</button><input type="file" id="mediaFile" accept="image/jpeg,image/png,image/webp" hidden></div>
+ 
+ <div class="editor-inline" id="quickEditor" hidden>
+ <h3>✎ Быстрая правка в предпросмотре</h3>
+ <p class="note">Правки сразу отражаются на карточке. Сохранение не публикует материал.</p>
+ <label id="quickTitleLabel">Заголовок</label><textarea id="quickTitle" rows="2"></textarea>
+ <label id="quickHookLabel">Первая фраза</label><textarea id="quickHook" rows="2"></textarea>
+ <label id="quickStoryLabel">Полный текст факта</label><textarea id="quickStory" rows="5"></textarea>
+ <label id="quickCaptionLabel">Подпись публикации</label><textarea id="quickCaption" rows="6"></textarea>
+ <div class="inline-actions"><button id="quickSave" class="primary">Сохранить</button><button id="quickClose">Закрыть</button></div>
+ </div>
  <div class="proof-status"><span><span class="proof-led"></span>Предпросмотр публикации в приложении</span><span id="proofHint">Прокрутите карусель стрелками или пальцем</span></div>
  <div id="instagramFrame" class="social-proof">
   <div class="mock-ig-appbar"><span class="mock-ig-wordmark">Instagram</span><span class="mock-icons">
@@ -176,7 +187,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
   <div class="tg-top"><span class="tg-back">‹</span><div class="tg-avatar">!?</div><div><strong id="tgChannelTitle">НЕТ! СЕРЬЁЗНО? · макет</strong><small id="tgChannelSubtitle">Канал · демонстрация сообщения</small></div><span class="tg-search">⌕</span></div>
   <div class="tg-chat"><div class="tg-date">Предпросмотр</div><div class="tg-bubble">
    <div class="tg-from" id="tgFrom">НЕТ! СЕРЬЁЗНО?</div>
-   <div id="tgSingle" class="tg-single" hidden></div>
+   <div id="tgSingle" class="tg-single" hidden><img id="tgPhoto" alt="Оригинальная иллюстрация без наложенного текста" hidden><div id="tgPhotoMissing" class="tg-no-image">Ожидает постоянное фото</div></div>
    <div id="tgAlbum" class="tg-album" hidden></div>
    <div id="tgCaption" class="tg-message"></div><div class="tg-meta">Время публикации не назначено · ◉</div>
   </div><div id="tgOverflow" class="tg-bubble" hidden><div id="tgOverflowText" class="tg-message"></div><div class="tg-meta">Продолжение публикации · ◉</div></div></div>
@@ -191,7 +202,8 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
  <canvas id="canvas" width="1080" height="1350" hidden></canvas>
  <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
  <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт текущего слайда PNG</button></div>
- <div class="actions"><button class="ok" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" id="approveTG">Одобрить Telegram RU</button><button class="ok" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
+ <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
+ <div class="actions"><button class="primary" id="approveAll">✓ Утвердить 4 версии и поставить в очередь</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
  <div id="status" class="status" aria-live="polite"></div>
  <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Внешняя автопубликация не запускается этим экраном.</div>
  </div></main>
@@ -201,6 +213,17 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
  <div><h3>English · Instagram</h3><label>Headline EN</label><input id="fTitleEN"><label>Hook EN</label><textarea id="fHookEN"></textarea><label>Full Story EN</label><textarea id="fBodyEN" rows="8"></textarea><label>Instagram EN · Caption</label><textarea id="fIGEN" rows="6"></textarea><label>Telegram EN · публикация</label><textarea id="fTGEN" rows="6"></textarea><label>Формат</label><select id="fFormat"><option value="card">Одна карточка</option><option value="photo_story">Фотоистория</option><option value="carousel">Карусель</option><option value="timeline">Хронология</option><option value="comparison">Сравнение</option><option value="reel_story">Reels / Story</option></select></div>
  <div class="full block"><label>Внутренний фактчекинг · источники видны только редактору (по одному URL в строке)</label><textarea id="fSources" rows="3"></textarea><label>Промпт визуала · английский</label><textarea id="fVisual" rows="3"></textarea><p class="note">Для нового иллюстративного кадра используется существующий OPENAI_API_KEY Journal Studio. Дубликаты и непроверенные факты не отправляются в генерацию.</p></div>
  </div></section></div>
+ 
+ <section class="panel calendar-panel" id="schedulePanel">
+  <div class="panel-head"><h2>◷ Редакционный календарь и очередь публикаций</h2><button id="refreshSchedule">↻ Обновить</button></div>
+  <div class="calendar-note">Europe/Lisbon · тихие часы 00:00–08:00 · интервал не менее 60 минут между постами одного канала. Утверждение создаёт очередь, но отправка начнётся только после включения автопубликации.</div>
+  <div id="scheduleSettings" class="calendar-grid"></div>
+  <div class="queue-schedule">
+   <div class="queue-schedule-header"><strong>Запланировано · опубликовано · ошибки</strong><span id="scheduledCount" class="tag">0</span></div>
+   <div class="queue-schedule-scroll" id="scheduleQueue"><p style="padding:15px" class="muted">Загрузка очереди…</p></div>
+  </div>
+ </section>
+
  <section class="panel tg-setup" id="tgSetup">
  <div class="panel-head"><h2>Telegram Bot API · подключение каналов</h2><span class="tag">Токены хранятся только на сервере · автопубликация выключена</span></div>
  <div class="tg-grid">
