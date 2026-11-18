@@ -539,7 +539,7 @@ function swipe(element,onDelta){
  element.addEventListener("pointercancel",()=>{start=null});
 }
 async function patch(data){const x=current();if(!x)return;const result=await api("/items/"+x.id,"PATCH",data);items[items.findIndex(v=>v.id===x.id)]=result.item;select();return result.item}
-async function open(){try{await api("/health");if(!unlocked)throw Error("Locked");await api("/settings");$("login").classList.add("layout-hidden");$("app").classList.remove("layout-hidden");await reload();await loadSettings();await loadTGChannels()}catch(e){$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden");$("loginInfo").textContent=e.message}}
+async function open(){try{await api("/health");if(!unlocked)throw Error("Locked");await api("/settings");$("login").classList.add("layout-hidden");$("app").classList.remove("layout-hidden");await reload();await loadSettings();try{await loadTGChannels()}catch(e){info('Telegram API: '+String(e.message||e),true)}}catch(e){$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden");$("loginInfo").textContent=e.message}}
 async function loadSettings(){const x=await api("/settings");settings=x.settings||{};$("automation").textContent=settings.auto_enabled?"⏱ Автопополнение: ВКЛ":"⏸ Автопополнение: ВЫКЛ"}
 
 function suffixTG(locale){return locale==="ru"?"RU":"EN"}
