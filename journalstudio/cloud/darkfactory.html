@@ -153,7 +153,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
  <div class="full"><div class="eyebrow" id="verification"></div><div id="evidence" class="block"></div></div>
  <div><h3>Русский · Instagram / Telegram</h3><label>Заголовок RU</label><input id="fTitle"><label>Вступление RU</label><textarea id="fHook"></textarea><label>История RU</label><textarea id="fBody" rows="8"></textarea><label>Instagram RU · подпись</label><textarea id="fIGRU" rows="5"></textarea><label>Telegram RU · публикация</label><textarea id="fTG" rows="6"></textarea></div>
  <div><h3>English · Instagram</h3><label>Headline EN</label><input id="fTitleEN"><label>Hook EN</label><textarea id="fHookEN"></textarea><label>Full Story EN</label><textarea id="fBodyEN" rows="8"></textarea><label>Instagram EN · Caption</label><textarea id="fIGEN" rows="6"></textarea><label>Формат</label><select id="fFormat"><option value="card">Одна карточка</option><option value="photo_story">Фотоистория</option><option value="carousel">Карусель</option><option value="timeline">Хронология</option><option value="comparison">Сравнение</option><option value="reel_story">Reels / Story</option></select></div>
- <div class="full block"><label>Источники — по одному HTTPS-адресу в строке</label><textarea id="fSources" rows="3"></textarea><label>Промпт визуала · английский</label><textarea id="fVisual" rows="3"></textarea><p class="note">Для нового иллюстративного кадра используется существующий OPENAI_API_KEY Journal Studio. Дубликаты и непроверенные факты не отправляются в генерацию.</p></div>
+ <div class="full block"><label>Внутренний фактчекинг · источники видны только редактору (по одному URL в строке)</label><textarea id="fSources" rows="3"></textarea><label>Промпт визуала · английский</label><textarea id="fVisual" rows="3"></textarea><p class="note">Для нового иллюстративного кадра используется существующий OPENAI_API_KEY Journal Studio. Дубликаты и непроверенные факты не отправляются в генерацию.</p></div>
  </div></section></div></div>
 <script>
 (function(){
@@ -192,7 +192,7 @@ function select(){
  $("chosenTitle").textContent=x.title;$("formatName").textContent=fmt[x.format_type]||x.format_type;
  [["fTitle",x.title],["fTitleEN",x.title_en],["fHook",x.hook],["fHookEN",x.hook_en],["fBody",x.body],["fBodyEN",x.body_en],["fIGRU",x.caption_instagram],["fIGEN",x.caption_instagram_en],["fTG",x.caption_telegram],["fVisual",x.visual_prompt_en||x.visual_prompt],["fSources",(x.source_urls||[]).join("\n")],["fFormat",x.format_type]].forEach(([id,v])=>setField(id,v));
  $("verification").textContent="Проверка: "+x.fact_verification+" · Иллюстрация: "+x.visual_status;
- const sources=x.source_urls||[];$("evidence").innerHTML='<strong>Первичные ссылки / доказательства</strong>'+(sources.length?sources.map((url,i)=>'<div class="source">'+(i+1)+'. <a href="'+safe(url)+'" target="_blank" rel="noopener noreferrer">'+safe(url)+'</a></div>').join(""):'<p class="note">Источники отсутствуют — одобрение недоступно.</p>');
+ const sources=x.source_urls||[];$("evidence").innerHTML='<strong>Проверка фактов · только для редактора, в публикацию не выводится</strong>'+(sources.length?sources.map((url,i)=>'<div class="source">'+(i+1)+'. <a href="'+safe(url)+'" target="_blank" rel="noopener noreferrer">'+safe(url)+'</a></div>').join(""):'<p class="note">Источники отсутствуют — одобрение недоступно.</p>');
  $("illustrate").disabled=x.fact_verification!=="verified"||x.visual_status==="ready";
  $("illustrate").textContent=x.visual_status==="ready"?"✓ Изображение сохранено":"✦ Сгенерировать изображение";
  $("approveIG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
@@ -234,7 +234,7 @@ function slidesFor(x,en){
  n===4?(en?["THE STORY","WHAT MADE IT STRANGE"]:["ЧТО СЛУЧИЛОСЬ","ПОЧЕМУ ЭТО УДИВЛЯЕТ"]):
  (en?["THE FACTS"]:["КАК ЭТО БЫЛО"]);
  story.forEach((t,i)=>slides.push({type:i%2?"detail":"story",heading:headers[i]||headers[0],body:t,tag:en?"DOCUMENTED FACT":"ПРОВЕРЕННЫЙ ФАКТ"}));
- slides.push({type:"sources",heading:en?"NOT MADE UP.":"ЭТО НЕ ВЫДУМКА.",body:en?"Verified sources in the caption.":"Ссылки на проверяемые источники — в подписи.",sources:domains(x),tag:en?"CHECK THE SOURCES":"ПРОВЕРЬ ИСТОЧНИКИ"});
+ slides.push({type:"outro",heading:en?"NO WAY. IT’S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:en?"Would your friends believe this? Send it to someone who needs a surprise.":String(x.punch||"").trim()+"\nА кому отправишь этот факт?",tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
  return slides;
 }
 function wrapCanvas(ctx,text,maxW){
@@ -299,9 +299,7 @@ function drawCard(canvas,x,slide,en,reel,thumbnail=false,number=0,total=1){
   ctx.fillStyle="#fff";header.lines.forEach((t,i)=>ctx.fillText(t,57,y+i*header.size*1.12));
   y+=header.lines.length*header.size*1.14+45;
   ctx.fillStyle=accent;ctx.fillRect(58,y,W-115,8);y+=35;
-  const bodyText=slide.type==="sources"&&slide.sources?.length?
-   slide.body+"\n"+slide.sources.map((s,i)=>(i+1)+". "+s).join("   "):slide.body;
-  const paragraph=fitCanvas(ctx,bodyText,W-126,reel?9:8,slide.type==="sources"?42:49,29,"600");
+  const paragraph=fitCanvas(ctx,slide.body,W-126,reel?9:8,slide.type==="outro"?42:49,29,"600");
   ctx.fillStyle="#f1f3e9";paragraph.lines.forEach((t,i)=>ctx.fillText(t,61,y+i*paragraph.size*1.3));
  }
  ctx.fillStyle="#070a0c";ctx.fillRect(0,H-bottomSafe,W,bottomSafe);
@@ -309,7 +307,7 @@ function drawCard(canvas,x,slide,en,reel,thumbnail=false,number=0,total=1){
  ctx.fillStyle="#eaf1de";ctx.font="750 26px Arial";
  ctx.fillText(en?"AI ILLUSTRATION · EDITORIAL PREVIEW":"ИИ-ИЛЛЮСТРАЦИЯ · РЕДАКЦИОННЫЙ МАКЕТ",55,H-bottomSafe+80);
  ctx.font="700 23px Arial";ctx.fillStyle="#abbdad";
- ctx.fillText(total>1?(en?"SWIPE FOR MORE →":"ЛИСТАЙТЕ ДАЛЬШЕ →"):(en?"SOURCES IN CAPTION":"ИСТОЧНИКИ В ПОДПИСИ"),56,H-31);
+ ctx.fillText(total>1?(en?"SWIPE FOR MORE →":"ЛИСТАЙТЕ ДАЛЬШЕ →"):(en?"MORE IMPOSSIBLE FACTS →":"ЕЩЁ БОЛЬШЕ НЕВЕРОЯТНЫХ ФАКТОВ →"),56,H-31);
  ctx.textAlign="right";ctx.fillStyle=accent;ctx.font="900 27px Arial";ctx.fillText((number+1)+" / "+total,W-55,H-35);ctx.textAlign="left";
 }
 function setRich(el,text){
@@ -387,7 +385,7 @@ function render(){
  }
  renderRail(x,slides,en);
  $("proofDescription").textContent=tg?
-  (slides.length>1?"Telegram показывает фотоальбом сеткой. Нажмите на любую фотографию и листайте в полноэкранном просмотре.":"Telegram: фото, полный текст и источники в виде сообщения канала."):
+  (slides.length>1?"Telegram показывает фотоальбом сеткой. Нажмите на любую фотографию и листайте в полноэкранном просмотре.":"Telegram: фото и полный текст сообщения канала — без ссылок и списка источников."):
   reel?"Это предпросмотр обложки Reels в интерфейсе Instagram, НЕ готовое видео. Обложка экспортируется в PNG 9:16.":
   (slides.length>1?"Листайте как настоящую Instagram-карусель: кнопками, свайпом или миниатюрами ниже.":"Лента Instagram: изображение, профиль, панель реакций и настоящая подпись.");
 }
