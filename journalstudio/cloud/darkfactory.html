@@ -29,7 +29,7 @@ button.primary{background:#a82c22;border-color:#d45142}
 <div id="appPane" class="layout" hidden>
  <header class="top">
   <div><div class="brand">☠ DARKFACTORY <span class="muted">/ BLACK HUMOR LAB · 18+</span></div><h1>Чёрная пресса · приёмка</h1><div class="subtitle">Жёсткие панчи · автоформат · коллажи · Instagram / Telegram · без звука</div></div>
-  <div class="actions"><button id="newItem">+ Создать вручную</button><button id="aiGenerate" class="primary">✦ Создать 5 через AI</button><button id="refresh">Обновить</button><button id="lock">Закрыть доступ</button></div>
+  <div class="actions"><button id="newItem">+ Создать вручную</button><button id="aiGenerate" class="primary">✦ Создать 5 через AI</button><button id="autoToggle" title="Автоматическое пополнение очереди по расписанию">⏱ Автоматизация: …</button><button id="refresh">Обновить</button><button id="lock">Закрыть доступ</button></div>
  </header>
  <div class="metrics"><div class="metric"><b id="statAll">0</b><span>Всего материалов</span></div><div class="metric"><b id="statIG">0</b><span>Ожидают Instagram</span></div><div class="metric"><b id="statTG">0</b><span>Ожидают Telegram</span></div><div class="metric"><b id="statBoth">0</b><span>Утверждены в обеих сетях</span></div></div>
  <div class="workspace">
@@ -99,7 +99,7 @@ async function open(){
   $("lockPane").hidden=true;$("appPane").hidden=false;
   $("aiGenerate").disabled=!state.ai;
   $("aiGenerate").title=state.ai?"Создать 5 шуток, платный API-запрос":"OPENAI_API_KEY не найден в проекте";
-  await load();
+  await load();await loadSettings();
  }catch(e){locked();lockStatus(e.message,true)}
 }
 async function load(){
@@ -356,6 +356,28 @@ async function exportVideo(){
 function run(fn){Promise.resolve().then(fn).catch(message)}
 $("pinForm").addEventListener("submit",function(e){e.preventDefault();run(async function(){lockStatus("Проверка доступа…");var data=await req("/unlock","POST",{pin:$("pin").value},false);state.unlock=data.token;sessionStorage.setItem("darkfactory_access",state.unlock);$("pin").value="";await open()})});
 $("lock").onclick=function(){run(async function(){try{await req("/lock","POST",{})}catch(e){}locked()})};
+
+async function loadSettings(){
+ try{
+  const v=await req("/settings");
+  state.settings=v.settings||{};
+  const el=$("autoToggle"),enabled=!!state.settings.auto_enabled;
+  el.textContent=enabled?"⏱ Автоматизация: включена":"⏸ Автоматизация: выключена";
+  el.title=enabled?"Каждый день до 5 черновиков, пока очередь не переполнена. Нужен OpenAI API ключ.":"Включить ежедневное создание черновиков";
+  if(!v.ai_enabled){el.textContent="⚠ AI-ключ не найден";el.title="OpenAI API не подключён к серверному проекту; можно оставить автоматизацию выключенной."}
+ }catch(e){$("autoToggle").textContent="⏱ Автоматизация: недоступна"}
+}
+$("autoToggle").onclick=function(){
+ run(async function(){
+  const was=!!state.settings?.auto_enabled;
+  if(!was&&!confirm("Включить создание до 5 новых шуток ежедневно? Используются платные API-токены OpenAI проекта."))return;
+  if(was&&!confirm("Отключить автоматическое создание новых материалов? Уже сохранённые черновики останутся."))return;
+  const v=await req("/settings","PATCH",{auto_enabled:!was});
+  state.settings=v.settings;await loadSettings();
+  inform(was?"Автогенерация остановлена.":"Автогенерация включена.");
+ });
+};
+
 $("refresh").onclick=function(){run(load)};
 $("aiGenerate").onclick=function(){if(!confirm("Создать 5 новых шуток через существующий OpenAI API? Запрос может быть платным."))return;run(async function(){inform("AI создаёт пять новых шуток…");var data=await req("/generate","POST",{});await load();inform("Добавлено "+(data.items||[]).length+" новых материалов на приёмку.")})};
 $("newItem").onclick=function(){run(async function(){var data=await req("/items","POST",{title:"Новый панч",hook:"Здесь будет завязка.",body:"",punch:"Здесь будет неожиданная концовка.",topic:"office",format_type:"card",theme_variant:"black_press",scene_variant:Math.floor(Math.random()*12),dialogue:[],caption_instagram:"",caption_telegram:""});await load();state.selected=data.item.id;choose();inform("Новая карточка создана.")})};
