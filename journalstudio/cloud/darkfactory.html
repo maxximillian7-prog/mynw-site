@@ -413,12 +413,13 @@ document.querySelectorAll("[data-mode]").forEach(function(b){b.onclick=function(
 document.querySelectorAll("[data-theme]").forEach(function(b){b.onclick=function(){var x=item();if(!x)return;x.theme_variant=b.dataset.theme;fill(x);paint();inform("Тема изменена в предпросмотре. Нажми «Сохранить», чтобы закрепить.")}});
 
 function suggestFormat(x){
- const t=[x.hook,x.body,x.punch].join(" ").toLowerCase();
- if((x.dialogue||[]).length>=2)return "chat";
- if(/скидк|акци|тариф|подписк|vip|услуг|предложени|пакет|страховк|курс/i.test(t))return "fake_ad";
- if(/сообщил|объявил|введен|внедрил|новост|ведомств|в аду|министерств/i.test(t))return "dark_news";
- if((x.body||"").length>85&&(t.match(/[.!?…]/g)||[]).length>=4)return "carousel";
- if((x.body||"").length>26||t.length>220)return "animated_story";
+ const title=String(x.title||"").toLowerCase(),h=String(x.hook||"").toLowerCase(),b=String(x.body||"").toLowerCase(),p=String(x.punch||"").toLowerCase();
+ const t=[title,h,b,p].join(" ");
+ if((x.dialogue||[]).filter(z=>z&&String(z.text||"").trim()).length>=2||(/^[—–-]\s/.test(x.hook||"")&&/^[—–-]\s/.test(x.punch||"")))return "chat";
+ if(/(^|\s)(объявили|сообщили|новость|введён|открыли|запустили|постановили|запретили|газета|министерство|пресс-служба|скандал|официально)/.test(t)&&!/скидк|распродаж/.test(title))return "dark_news";
+ if(/(^|\s)(реклам|скидк|акци[яюи]|тариф|прайс|подписк|vip|спецпредложен|услуг|пакет\s|купите|закажите|в продаже|доставк|программа\s)/.test(h+" "+title))return "fake_ad";
+ if(b.length>95||(b.length>50&&(t.match(/[.!?…]/g)||[]).length>=4))return "carousel";
+ if(b.length>38||[h,b,p].join("").length>215)return "animated_story";
  return "card";
 }
 $("fFormatMode").addEventListener("change",function(){
