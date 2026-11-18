@@ -233,7 +233,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
    <label for="tgTokenRU">Токен бота из @BotFather</label><input id="tgTokenRU" type="password" autocomplete="new-password" placeholder="Вставить токен только здесь" spellcheck="false">
    <p class="password-info">Бот должен быть администратором именно этого канала с правом публиковать сообщения. Токен не сохраняется в браузере.</p>
    <div class="tg-buttons"><button class="primary" id="tgConnectRU">Подключить API</button><button id="tgVerifyRU">Проверить</button><button id="tgTestRU">Тестовое сообщение</button></div>
-   <div class="tg-buttons"><button class="ok" id="tgPublishRU">Опубликовать утверждённый факт</button><button id="tgDisableRU">Отключить</button></div>
+   <div class="tg-buttons"><button class="ok" id="tgPublishRU">Поставить утверждённый факт в очередь</button><button id="tgDisableRU">Отключить</button></div>
    <p class="tg-notice" id="tgNoticeRU"></p>
   </div>
   <div class="tg-connect-card" data-tg-locale="en"><h3>🇬🇧 NO, SERIOUSLY?! <span id="tgStateEN" class="status-pill">Not connected</span></h3>
@@ -242,7 +242,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
    <label for="tgTokenEN">BotFather API token</label><input id="tgTokenEN" type="password" autocomplete="new-password" placeholder="Paste token here only" spellcheck="false">
    <p class="password-info">The bot must be a channel administrator with permission to post. The token isn't stored in the browser.</p>
    <div class="tg-buttons"><button class="primary" id="tgConnectEN">Connect API</button><button id="tgVerifyEN">Verify permissions</button><button id="tgTestEN">Send test message</button></div>
-   <div class="tg-buttons"><button class="ok" id="tgPublishEN">Publish approved fact</button><button id="tgDisableEN">Disconnect</button></div>
+   <div class="tg-buttons"><button class="ok" id="tgPublishEN">Queue approved fact</button><button id="tgDisableEN">Disconnect</button></div>
    <p class="tg-notice" id="tgNoticeEN"></p>
   </div>
  </div>
@@ -577,7 +577,8 @@ function render(){
  slideIndex=Math.max(0,Math.min(slides.length-1,slideIndex));
  const ig=mode==="ig_ru"||mode==="ig_en",tg=mode==="telegram"||mode==="telegram_en";
  $("instagramFrame").hidden=!ig;$("telegramFrame").hidden=!tg;$("reelsFrame").hidden=!reel;
- $("proofHint").textContent=slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
+ $("proofHint").textContent=tg?"Одно исходное фото · полный текст внизу":slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
+ $("download").textContent=tg?"↓ Скачать исходное фото":"↓ Экспорт слайда PNG";
  $("slideTools").hidden=tg||slides.length<=1;$("slideRail").hidden=tg||slides.length<=1;
  $("slidePrev").disabled=slideIndex===0;$("slideNext").disabled=slideIndex===slides.length-1;
  $("slideLabel").textContent=(slideIndex+1)+" / "+slides.length+" · "+(fmt[x.format_type]||x.format_type);
@@ -681,10 +682,10 @@ for(const locale of ["ru","en"]){
  });
  $("tgPublish"+suf).onclick=()=>task(async()=>{
   const x=current(),channel=tgChannels[locale];if(!x||!channel?.enabled)return;
-  if(!confirm((locale==="ru"?"Опубликовать":"Publish")+" «"+x.title+"» "+(locale==="ru"?"в канал ":"to ")+channel.title+"?"))return;
+  if(!confirm((locale==="ru"?"Поставить в очередь ":"Queue ")+"«"+x.title+"» "+(locale==="ru"?"для канала ":"for ")+channel.title+" с соблюдением расписания?"))return;
   try{
    const result=await api("/telegram/items/"+x.id+"/"+locale+"/publish","POST",{});
-   noteTG(locale,"✓ Опубликовано, сообщение #"+result.message_id+". Повторная отправка заблокирована.");
+   await loadSchedule();noteTG(locale,"✓ Материал в очереди. Ожидает назначенного времени: "+new Date(result.entry.run_at).toLocaleString("ru-RU",{timeZone:"Europe/Lisbon"}));
   }catch(e){noteTG(locale,e.message||String(e),true);throw e}
  });
  $("tgDisable"+suf).onclick=()=>task(async()=>{
@@ -907,7 +908,21 @@ $("refresh").onclick=()=>task(reload);
 $("close").onclick=()=>{unlocked="";sessionStorage.removeItem("darkfactory_access");$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden")};
 $("save").onclick=()=>task(async()=>{await persistCurrent();info("Правки сохранены, медиа остаются в хранилище.")});
 $("illustrate").onclick=()=>task(async()=>{const x=current();if(!x)return;if(!confirm("Создать платную AI-иллюстрацию для «"+x.title+"»?"))return;info("Запрос к генератору изображений…");const d=await api("/items/"+x.id+"/generate-image","POST",{});await reload();info(d.image_url?"Иллюстрация сохранена в Journal Studio.":"Иллюстрация готова; обновите просмотр.")});
-$("download").onclick=()=>task(async()=>{const x=current();if(!x)return;const c=$("canvas");try{const link=document.createElement("a");link.href=c.toDataURL("image/png");link.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_"+mode+"_slide_"+(slideIndex+1)+".png";link.click();info("PNG сохранён.")}catch{throw Error("Браузер запретил экспорт изображения; обновите страницу.")}});
+$("download").onclick=()=>task(async()=>{
+ const x=current();if(!x)return;
+ if(mode==="telegram"||mode==="telegram_en"){
+  if(!imageSource)throw Error("У этого факта ещё нет оригинального фото");
+  const r=await fetch(imageSource);if(!r.ok)throw Error("Не удалось скачать исходное фото");
+  const b=await r.blob();const url=URL.createObjectURL(b);
+  try{const a=document.createElement("a");a.href=url;a.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_Telegram."+(b.type==="image/jpeg"?"jpg":b.type==="image/png"?"png":"webp");a.click()}
+  finally{setTimeout(()=>URL.revokeObjectURL(url),1000)}
+  info("Исходное фото без текста скачано.");
+ }else{
+  const c=$("canvas"),a=document.createElement("a");a.href=c.toDataURL("image/png");
+  a.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_"+mode+"_slide_"+(slideIndex+1)+".png";
+  a.click();info("PNG с текстом для Instagram сохранён.");
+ }
+});
 $("approveIG").onclick=()=>task(async()=>{await patch({status_instagram:"approved"});info("Instagram RU/EN одобрено. Автопубликация пока не привязана к новому аккаунту.")});
 $("approveTG").onclick=()=>task(async()=>{await patch({status_telegram:"approved"});info("Telegram RU одобрено. Публикация требует назначения отдельного канала.")});
 $("approveTGEN").onclick=()=>task(async()=>{await patch({status_telegram_en:"approved"});info("Telegram EN одобрено. Публикация требует подключения отдельного английского канала.")});
