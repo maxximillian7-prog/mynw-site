@@ -242,7 +242,12 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 <div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
  <div class="switches"><button data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button class="active" data-mode="telegram">Telegram · RU</button><button data-mode="telegram_en">Telegram · EN</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
- <div class="preview-toolbar"><button id="quickEditOpen">✎ Редактор прямо в превью</button><button id="mediaUploadOpen">↑ Загрузить / заменить фото</button><button id="mediaHistoryOpen">▤ Архив медиа</button><input type="file" id="mediaFile" accept="image/jpeg,image/png,image/webp" hidden></div>
+ <div class="preview-toolbar"><button id="quickEditOpen">✎ Редактор прямо в превью</button>
+<button class="primary" type="button" id="illustrate">✦ Сгенерировать фото</button>
+<button id="mediaUploadOpen">↑ Загрузить / заменить фото</button>
+<button id="mediaHistoryOpen">▤ Архив медиа</button>
+<input type="file" id="mediaFile" accept="image/jpeg,image/png,image/webp" hidden></div>
+<div class="note" id="photoGenStatus" aria-live="polite" style="margin:5px 4px 13px">Фото создаются в фирменном тёмном редакционном стиле. Генерация не публикует материал.</div>
  
  <div class="editor-inline" id="quickEditor" hidden>
  <h3>✎ Быстрая правка в предпросмотре</h3>
@@ -288,7 +293,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <div class="proof-note" id="proofDescription">Изображения и подписи показаны в примерном интерфейсе платформы. Аккаунт и реакции условные.</div>
  <canvas id="canvas" width="1080" height="1350" hidden></canvas>
  <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
- <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт текущего слайда PNG</button></div>
+ <div class="actions"><button id="download">↓ Экспорт текущего слайда PNG</button></div>
  <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
  <div class="fact-review-controls" id="factReviewControls">
   <div class="fact-review-heading">Проверка факта и публикация позже</div>
@@ -677,8 +682,17 @@ function select(){
  [["fTitle",x.title],["fTitleEN",x.title_en],["fHook",x.hook],["fHookEN",x.hook_en],["fBody",x.body],["fBodyEN",x.body_en],["fIGRU",x.caption_instagram],["fIGEN",x.caption_instagram_en],["fTG",x.caption_telegram],["fTGEN",x.caption_telegram_en],["fVisual",x.visual_prompt_en||x.visual_prompt],["fSources",(x.source_urls||[]).join("\n")],["fFormat",x.format_type]].forEach(([id,v])=>setField(id,v));
  $("verification").textContent="Проверка: "+x.fact_verification+" · Иллюстрация: "+x.visual_status;
  const sources=x.source_urls||[];$("evidence").innerHTML='<strong>Проверка фактов · только для редактора, в публикацию не выводится</strong>'+(sources.length?sources.map((url,i)=>'<div class="source">'+(i+1)+'. <a href="'+safe(url)+'" target="_blank" rel="noopener noreferrer">'+safe(url)+'</a></div>').join(""):'<p class="note">Источники отсутствуют — одобрение недоступно.</p>');
- $("illustrate").disabled=x.fact_verification!=="verified"||x.visual_status==="ready";
- $("illustrate").textContent=x.visual_status==="ready"?"✓ Изображение сохранено":"✦ Сгенерировать изображение";
+ const photoButton=$("illustrate"),genState=$("photoGenStatus");
+ photoButton.disabled=busy||x.visual_status==="generating"||x.fact_verification==="disputed";
+ photoButton.textContent=x.visual_status==="generating"?"⏳ Генерируется…":
+   x.image_storage_path&&x.visual_status==="ready"?"♻ Перегенерировать фото":
+   x.visual_status==="failed"?"↻ Повторить генерацию":"✦ Сгенерировать фото";
+ genState.textContent=x.visual_status==="ready"?"✓ Фото сохранено. Можно перегенерировать, предыдущая версия останется в архиве.":
+   x.visual_status==="generating"?"⏳ Создаю фото в едином стиле журнала. Повторный запуск заблокирован.":
+   x.visual_status==="failed"?"⚠ "+(x.image_generation_error||"Генерация не завершилась")+" · Можно попробовать ещё раз.":
+   x.fact_verification==="disputed"?"⚠ Спорный факт: исправьте утверждение до генерации фото.":
+   "✦ Премиальный тёмный редакционный стиль, без надписей. Фото можно создать до проверки факта; публикация отдельно.";
+ genState.style.color=x.visual_status==="failed"?"#ff9d91":x.visual_status==="ready"?"#c1f48e":"";
  $("approveIG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTGEN").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready"||!x.caption_telegram_en;
@@ -1760,7 +1774,34 @@ $("editor").addEventListener("change",()=>{if(current())render()});
 $("refresh").onclick=()=>task(reload);
 $("close").onclick=()=>{unlocked="";sessionStorage.removeItem("darkfactory_access");$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden")};
 $("save").onclick=()=>task(async()=>{await persistCurrent();if(isDraftDirty())throw Error("Сервер не подтвердил сохранение");info("✓ Правки сохранены, медиа остаются в хранилище.")});
-$("illustrate").onclick=()=>task(async()=>{const x=current();if(!x)return;if(!confirm("Создать платную AI-иллюстрацию для «"+x.title+"»?"))return;info("Запрос к генератору изображений…");const d=await api("/items/"+x.id+"/generate-image","POST",{});await reload();info(d.image_url?"Иллюстрация сохранена в Journal Studio.":"Иллюстрация готова; обновите просмотр.")});
+$("illustrate").onclick=()=>task(async()=>{
+ const initial=current();if(!initial)throw Error("Выберите статью");
+ if(initial.fact_verification==="disputed")throw Error("Спорный факт нужно уточнить перед генерацией");
+ if(initial.visual_status==="generating")throw Error("Генерация фото уже идёт");
+ const itemId=initial.id;
+ if(isDraftDirty()||$("fVisual").value.trim()!==String(initial.visual_prompt_en||initial.visual_prompt||"").trim())
+  await persistCurrent();
+ const x=current(),regenerate=Boolean(x.image_storage_path);
+ const confirmation=regenerate?
+  "Перегенерировать фото для «"+x.title+"»?\n\nНовая платная генерация. Предыдущее изображение сохранится в архиве; очередь выбранной статьи потребуется утвердить повторно.":
+  "Создать фото для «"+x.title+"»?\n\nПлатная генерация в едином стиле журнала. Статья НЕ публикуется автоматически.";
+ if(!confirm(confirmation))return;
+ info(regenerate?"Перегенерирую фото, старое остаётся в архиве…":"Создаю изображение в стиле «НЕТ! СЕРЬЁЗНО?!»…");
+ $("illustrate").disabled=true;$("illustrate").textContent="⏳ Генерация фото…";
+ $("photoGenStatus").textContent="⏳ Генерация началась. Готовое фото будет сохранено в архив и показано в предпросмотре.";
+ try{
+  const result=await api("/items/"+itemId+"/generate-image","POST",{replace_existing:regenerate});
+  if(!result.item||result.item.visual_status!=="ready"||!result.item.image_storage_path)
+   throw Error("Сервер не подтвердил сохранение готового изображения");
+  await reload();
+  if(filtered().some(row=>row.id===itemId)){selected=itemId;select()}
+  info("✓ Фото сохранено в архиве. "+(regenerate?"Предыдущая версия сохранена. ":"")+"Проверьте предпросмотр, затем отдельно утвердите публикацию.");
+ }catch(err){
+  await reload().catch(()=>{});
+  throw err;
+ }
+});
+
 $("download").onclick=()=>task(async()=>{
  const x=current();if(!x)return;
  if(mode==="telegram"||mode==="telegram_en"){
