@@ -230,7 +230,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
  <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт текущего слайда PNG</button></div>
  <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
- <div class="actions"><button class="primary" id="approveAll">✓ Утвердить 4 версии и поставить в очередь</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
+ <div class="actions"><button class="primary" id="approveAll">✓ Утвердить 4 версии и поставить в очередь</button><button type="button" class="primary" id="publishNowPreview">⚡ Опубликовать сейчас</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
  <div id="status" class="status" aria-live="polite"></div>
  <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Внешняя автопубликация не запускается этим экраном.</div>
  </div></main>
@@ -411,6 +411,16 @@ function draft(){
  return {...x,title:$("fTitle").value,title_en:$("fTitleEN").value,hook:$("fHook").value,hook_en:$("fHookEN").value,
  body:$("fBody").value,body_en:$("fBodyEN").value,caption_instagram:$("fIGRU").value,caption_instagram_en:$("fIGEN").value,
  caption_telegram:$("fTG").value,caption_telegram_en:$("fTGEN").value,format_type:$("fFormat").value,source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))};
+}
+
+function isDraftDirty(){
+ const original=current(),edited=draft();if(!original||!edited)return false;
+ for(const field of ["title","title_en","hook","hook_en","body","body_en",
+  "caption_instagram","caption_instagram_en","caption_telegram","caption_telegram_en","format_type"]){
+  if(String(original[field]??"")!==String(edited[field]??""))return true;
+ }
+ if(JSON.stringify(original.source_urls||[])!==JSON.stringify(edited.source_urls||[]))return true;
+ return false;
 }
 function languageEN(){return mode==="ig_en"||mode==="reel_en"||mode==="telegram_en"}
 function isReel(){return mode==="reel_ru"||mode==="reel_en"}
@@ -688,6 +698,14 @@ function render(){
   $("reelSnippet").textContent=(en?x.hook_en:x.hook)||"История";
  }
  if(!tg)renderRail(x,slides,en);
+ const manual=$("publishNowPreview");
+ manual.hidden=reel;
+ manual.textContent=en?"⚡ Publish now":"⚡ Опубликовать сейчас";
+ const approved=current()?.fact_verification==="verified"&&current()?.visual_status==="ready";
+ const connected=tg?tgChannels[en?"en":"ru"]?.enabled:
+  (bufferState.channels||[]).some(c=>c.destination==="instagram_"+(en?"en":"ru")&&c.enabled);
+ const statusOK=tg?(en?current()?.status_telegram_en:current()?.status_telegram)==="approved":current()?.status_instagram==="approved";
+ manual.disabled=!connected||!approved||!statusOK||isDraftDirty();
  $("proofDescription").textContent=tg?
   "Telegram: ровно одно оригинальное фото без надписей и полный текст под ним. При тексте длиннее 1024 символов Telegram отправляет продолжение отдельным ответом.":
   reel?"Это предпросмотр обложки Reels в интерфейсе Instagram, НЕ готовое видео. Обложка экспортируется в PNG 9:16.":
@@ -1129,6 +1147,17 @@ for(const locale of ["ru","en"]){
  $("bufferSchedule"+suf).onclick=()=>task(()=>sendBufferNowOrSchedule("schedule"));
 }
 
+$("publishNowPreview").onclick=()=>{
+ if(isDraftDirty()){info("Сначала сохраните и повторно утвердите несохранённые изменения",true);return;}
+ const target={
+  telegram:"tgPublishNowRU",telegram_en:"tgPublishNowEN",
+  ig_ru:"bufferNowRU",ig_en:"bufferNowEN"
+ }[mode];
+ if(!target){info("Публикация Reels требует готового видео. Пока доступен только экспорт обложки.",true);return}
+ const action=$(target);
+ if(!action||action.disabled){info("Для публикации сначала подтвердите факт, медиа и подключение канала",true);return}
+ action.click();
+};
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
