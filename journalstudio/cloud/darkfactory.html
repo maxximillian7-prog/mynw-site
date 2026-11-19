@@ -947,18 +947,34 @@ async function persistCurrent(){
 }
 $("quickSave").onclick=()=>task(async()=>{await persistCurrent();if(isDraftDirty())throw Error("Сервер не подтвердил сохранение");info("✓ Правки сохранены, медиа не удалены.")});
 $("approveAll").onclick=()=>task(async()=>{
- const x=current();if(!x)return;
- info("Сохраняю правки, проверяю факт и утверждаю 4 версии…");
+ const x=current();if(!x)throw Error("Выберите материал");
+ const id=x.id;
+ if(x.format_type==="reel_story")throw Error("Для Instagram Reels нужен настоящий видеоролик. Выберите фотоисторию/карточку перед постановкой во все четыре канала.");
+ if(!confirm("Утвердить подготовленный предпросмотр и поставить «"+x.title+"» в очередь всех подключённых каналов?\n\nЭто НЕ немедленная отправка. Фото и Instagram-слайды будут подготовлены автоматически."))return;
+ info("Сохраняю правки и проверяю факт…");
  await persistCurrent();
- if(current().fact_verification!=="verified"){
-  const check=await api("/items/"+x.id+"/recheck","POST",{});
-  if(!check.verified){info("Проверка факта не пройдена: "+check.reason,true);await reload();return}
+ let item=current();
+ if(item.fact_verification!=="verified"){
+  const checked=await api("/items/"+id+"/recheck","POST",{});
+  if(!checked.verified)throw Error("Проверка факта не пройдена: "+(checked.reason||"не подтверждено"));
+  item.fact_verification="verified";
  }
- const result=await api("/items/"+x.id+"/approve-all","POST",{});
- await reload();await loadSchedule();
- info("✓ Утверждено. Создано записей в очереди: "+(result.queue||[]).length+(result.errors?.length?". Есть ошибки очереди: "+JSON.stringify(result.errors):""));
+ if(!item.image_storage_path)throw Error("В предпросмотре отсутствует сохранённый оригинал изображения");
+ await loadSchedule();await loadBufferPosts();
+ for(const dest of ["instagram_ru","instagram_en"]){
+  if(hasPublicationRecord(id,dest))continue;
+  info("Автоматически готовлю слайды "+dest+"…");
+  await prepareInstagramForPublishing(item,dest.slice(-2));
+ }
+ info("Подтверждаю медиа и четыре версии в редакции…");
+ await api("/items/"+id+"/approve-preview","POST",{destinations:publishingDestinations});
+ const result=await api("/items/"+id+"/approve-all","POST",{});
+ await reload();selected=id;select();await loadSchedule();
+ info("✓ Утверждено. В очереди: "+(result.queue||[]).length+
+  (result.skipped?.length?" · Уже отправлены: "+result.skipped.join(", "):"")+
+  (result.errors?.length?" · Ошибки: "+JSON.stringify(result.errors):""),
+  Boolean(result.errors?.length));
 });
-
 
 $("mediaUploadOpen").onclick=()=>{$("mediaFile").click()};
 $("mediaFile").onchange=()=>task(async()=>{
