@@ -750,7 +750,7 @@ function updateTGButtons(){
   $("tgDisable"+suf).disabled=!configured;
   const currentItem=current();
   $("tgPublish"+suf).disabled=!configured||!currentItem||currentItem.fact_verification!=="verified"||currentItem.visual_status!=="ready"||(locale==="ru"?currentItem.status_telegram:currentItem.status_telegram_en)!=="approved";
-  $("tgPublishNow"+suf).disabled=$("tgPublish"+suf).disabled;
+  $("tgPublishNow"+suf).disabled=!configured||!currentItem;
   $("tgInfo"+suf).textContent=configured?(channel.title+" · "+channel.username+" · @"+channel.bot_username):
    (locale==="ru"?"Укажите канал и токен бота":"Enter channel and bot token");
   if(configured && !$("tgUsername"+suf).value)$("tgUsername"+suf).value=channel.username||channel.channel_id||"";
@@ -798,16 +798,8 @@ for(const locale of ["ru","en"]){
   }catch(e){noteTG(locale,e.message||String(e),true);throw e}
  });
  
- $("tgPublishNow"+suf).onclick=()=>task(async()=>{
-  const fact=current(),channel=tgChannels[locale];
-  if(!fact||!channel?.enabled)throw Error("Выбери утверждённый факт и подключённый канал");
-  const name=locale==="ru"?"русском":"английском";
-  if(!confirm("⚡ ОПУБЛИКОВАТЬ СЕЙЧАС "+fact.title+" в "+name+" Telegram? \n\nЭто реальная отправка. Остальная очередь не изменится; повторная публикация того же факта будет заблокирована."))return;
-  const result=await api("/telegram/items/"+fact.id+"/"+locale+"/publish-now","POST",{});
-  await loadSchedule();
-  noteTG(locale,"✓ Публикация отправлена сейчас. Telegram ID "+result.message_id+"; время других постов сохранено.");
- });
-$("tgDisable"+suf).onclick=()=>task(async()=>{
+ $("tgPublishNow"+suf).onclick=()=>{mode=locale==="ru"?"telegram":"telegram_en";$("publishNowPreview").click()};
+ $("tgDisable"+suf).onclick=()=>task(async()=>{
   if(!confirm(locale==="ru"?"Отключить Telegram RU от Журнала?":"Disconnect Telegram EN from Journal Studio?"))return;
   await api("/telegram/channels/"+locale+"/disconnect","POST",{});
   await loadTGChannels();noteTG(locale,"Отключено. Публикации заблокированы.");
@@ -1039,7 +1031,7 @@ function updateBufferButtons(){
   const already=Boolean(x&&(bufferState.posts||[]).some(p=>p.item_id===x.id&&p.destination==="instagram_"+locale));
   $("bufferMedia"+suf).disabled=!x||!x.image_storage_path||x.format_type==="reel_story"||already;
   $("bufferCheckMedia"+suf).disabled=!x;
-  $("bufferNow"+suf).disabled=!link||!approved||already;
+  $("bufferNow"+suf).disabled=!link||!x||already;
   $("bufferSchedule"+suf).disabled=!link||!approved||already;
  }
 }
@@ -1158,7 +1150,7 @@ for(const locale of ["ru","en"]){
   $("bufferMediaStatus"+suf).textContent="✓ Передано Buffer: "+result.buffer_post_id+" · "+(result.buffer_status||"pending");
   info("Отправлено в Buffer "+suf+". Статус "+(result.buffer_status||"ожидает публикации")+".");
  }
- $("bufferNow"+suf).onclick=()=>task(()=>sendBufferNowOrSchedule("now"));
+ $("bufferNow"+suf).onclick=()=>{mode="ig_"+locale;$("publishNowPreview").click()};
  $("bufferSchedule"+suf).onclick=()=>task(()=>sendBufferNowOrSchedule("schedule"));
 }
 
