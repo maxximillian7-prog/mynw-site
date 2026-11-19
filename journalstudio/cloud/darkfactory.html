@@ -1186,9 +1186,52 @@ async function persistCurrent(){
  });
 }
 $("quickSave").onclick=()=>task(async()=>{await persistCurrent();if(isDraftDirty())throw Error("Сервер не подтвердил сохранение");info("✓ Правки сохранены, медиа не удалены.")});
+
+$("verifyFact").onclick=()=>task(async()=>{
+ const x=current();if(!x)throw Error("Выберите материал");
+ if(x.fact_verification==="verified"){info("Факт уже подтверждён. Можно запланировать или опубликовать позднее.");return}
+ const id=x.id;
+ info("Сохраняю правки и проверяю источники факта…");
+ await persistCurrent();
+ const material=current();
+ if((material.source_urls||[]).length<2)throw Error("Для подтверждения нужны минимум две ссылки на независимые источники. Добавьте их ниже и сохраните.");
+ const check=await api("/items/"+id+"/recheck","POST",{});
+ const view=material.editorial_deferred?"deferred":check.verified?"review":"unconfirmed";
+ await afterFactAction(id,view,check.verified?
+  "✓ Факт подтверждён двумя независимыми источниками. Статья сохранена и не опубликована. Можете запланировать её позже.":
+  "⚠ Факт не подтверждён: "+(check.reason||"источники не подтвердили утверждение")+". Материал сохранён для доработки.");
+});
+$("markUnconfirmed").onclick=()=>task(async()=>{
+ const x=current();if(!x)return;
+ if(!confirm("Пометить факт как неподтверждённый?\n\nНезапущенные публикации выбранной статьи будут отменены. Уже опубликованные посты сохранятся в архиве."))return;
+ const why=prompt("Почему факт не подтверждён? (необязательно)","Нужна дополнительная проверка источников");
+ if(why===null)return;
+ const id=x.id;await persistCurrent();
+ await api("/items/"+id+"/unconfirmed","POST",{reason:why});
+ await afterFactAction(id,x.editorial_deferred?"deferred":"unconfirmed",
+  "⚠ Факт отмечен как неподтверждённый. Сохранён, но публикация заблокирована до повторной проверки.");
+});
+$("deferPublication").onclick=()=>task(async()=>{
+ const x=current();if(!x)return;
+ const id=x.id;
+ if(!confirm("Сохранить «"+x.title+"» для публикации позже?\n\nНезапущенные публикации этой статьи будут сняты с очереди, исходники и правки сохранятся."))return;
+ await persistCurrent();
+ await api("/items/"+id+"/defer","POST",{});
+ await afterFactAction(id,"deferred","◷ Статья сохранена в «Отложено». Её можно проверить, изменить и вернуть к публикации в любой момент.");
+});
+$("resumePublication").onclick=()=>task(async()=>{
+ const x=current();if(!x)return;
+ const id=x.id;
+ if(isDraftDirty())await persistCurrent();
+ await api("/items/"+id+"/resume","POST",{});
+ await afterFactAction(id,"review","↩ Статья возвращена к публикации. Если факт подтверждён, можно отправить сейчас или назначить время.");
+});
+
 $("approveAll").onclick=()=>task(async()=>{
  const x=current();if(!x)throw Error("Выберите материал");
  const id=x.id;
+ if(x.editorial_deferred)throw Error("Материал отложен. Нажмите «Вернуть к публикации», чтобы запланировать.");
+ if(x.fact_verification!=="verified")throw Error("Факт не подтверждён. Сначала нажмите «Проверить и подтвердить факт».");
  if(x.format_type==="reel_story")throw Error("Для Instagram Reels нужен настоящий видеоролик. Выберите фотоисторию/карточку перед постановкой во все четыре канала.");
  if(!confirm("Утвердить подготовленный предпросмотр и поставить «"+x.title+"» в очередь всех подключённых каналов?\n\nЭто НЕ немедленная отправка. Фото и Instagram-слайды будут подготовлены автоматически."))return;
  info("Сохраняю правки и проверяю факт…");
@@ -1592,6 +1635,8 @@ async function prepareInstagramForPublishing(item,locale){
 async function publishSelectedDestinations(requested){
  const item=current();if(!item)throw Error("Выберите статью");
  const id=item.id;
+ if(item.editorial_deferred)throw Error("Материал отложен. Сначала нажмите «Вернуть к публикации».");
+ if(item.fact_verification!=="verified")throw Error("Факт не подтверждён. Сначала выполните отдельную проверку.");
  const list=[...new Set(requested)];
  if(!list.length||list.some(d=>!publishingDestinations.includes(d)))throw Error("Некорректный выбор каналов");
  // Refresh delivery state before claiming a live post. Never resend a known successful post.
