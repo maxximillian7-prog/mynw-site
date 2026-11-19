@@ -895,7 +895,7 @@ for(const locale of ["ru","en"]){
   await loadTGChannels();noteTG(locale,"Отключено. Публикации заблокированы.");
  });
 }
-$("showTGSetup").onclick=()=>{$("tgSetup").scrollIntoView({behavior:"smooth",block:"start"})};
+$("showTGSetup").onclick=()=>{$("telegramDetails").open=true;$("telegramDetails").scrollIntoView({behavior:"smooth",block:"start"})};
 
 
 function quickModeFields(){
@@ -1089,6 +1089,7 @@ async function loadSchedule(){
  renderScheduleSettings();renderScheduleQueue();drawQueue();renderSelectedPlan();emitSummary();
 }
 $("showSchedule").onclick=()=>{$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"})};
+$("showConfig").onclick=()=>{$("calendarConfig").open=true;$("calendarConfig").scrollIntoView({behavior:"smooth",block:"start"})};
 $("refreshSchedule").onclick=()=>task(async()=>{await loadSchedule();info("Очередь обновлена")});
 
 
@@ -1177,7 +1178,7 @@ async function refreshBufferChannels(){
  }
  renderBufferState();
 }
-$("showBuffer").onclick=()=>$("bufferSetup").scrollIntoView({behavior:"smooth",block:"start"});
+$("showBuffer").onclick=()=>{$("bufferDetails").open=true;$("bufferDetails").scrollIntoView({behavior:"smooth",block:"start"})};
 $("bufferConnectKey").onclick=()=>task(async()=>{
  const key=$("bufferKey").value.trim();if(!key)throw Error("Вставь API-ключ Buffer");
  const data=await api("/buffer/key","POST",{api_key:key});
@@ -1244,37 +1245,127 @@ for(const locale of ["ru","en"]){
  $("bufferSchedule"+suf).onclick=()=>task(()=>sendBufferNowOrSchedule("schedule"));
 }
 
-$("publishNowPreview").onclick=()=>task(async()=>{
- const item=current(),chosenMode=mode;
- if(!item)throw Error("Выберите материал");
- const tg=chosenMode==="telegram"||chosenMode==="telegram_en";
- const locale=chosenMode==="telegram_en"||chosenMode==="ig_en"?"en":"ru";
- if(!["telegram","telegram_en","ig_ru","ig_en"].includes(chosenMode))throw Error("Для Reels необходимо готовое видео");
- const channel=tg?tgChannels[locale]:(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
- if(!channel?.enabled)throw Error("Подключите выбранный канал");
- if(tg){const msg=String(locale==="ru"?$("fTG").value:$("fTGEN").value).replace(/<[^>]*>/g,"").replace(/https?:\/\/[^\s]+/g,"").trim();if(msg.length<80||msg.length>4000)throw Error("Telegram: полный текст должен содержать 80–4000 символов. Сейчас: "+msg.length);}
- if(!confirm("ОПУБЛИКОВАТЬ СЕЙЧАС только "+locale.toUpperCase()+"-версию «"+item.title+"» в "+(tg?"Telegram":"Instagram")+"?\\n\\nПравки будут сохранены и выбранная версия утверждена. Остальная очередь не изменится."))return;
- info("Сохраняю и проверяю факт…");
+
+const publishingDestinations=["telegram_ru","telegram_en","instagram_ru","instagram_en"];
+function hasPublicationRecord(itemId,destination){
+ const jobs=(scheduleData.queue||[]).filter(j=>j.item_id===itemId&&j.destination===destination);
+ const posted=jobs.some(j=>["sent","submitted","sending","unknown"].includes(j.status));
+ const buffer=destination.startsWith("instagram_")&&(bufferState.posts||[]).some(p=>p.item_id===itemId&&p.destination===destination);
+ return posted||Boolean(buffer);
+}
+async function loadOriginalForPublishing(item){
+ if(!item?.image_storage_path)throw Error("Сначала сохраните исходное фото в медиатеке");
+ if(image&&image.width>100&&image.height>100)return image;
+ const media=await api("/items/"+item.id+"/media");
+ if(!media.image_url)throw Error("Не получено сохранённое изображение. Откройте архив медиа.");
+ const pic=await new Promise((resolve,reject)=>{
+  const img=new Image();img.crossOrigin="anonymous";
+  img.onload=()=>resolve(img);img.onerror=()=>reject(Error("Не удалось загрузить оригинал фото из архива"));
+  img.src=media.image_url;
+ });
+ image=pic;imageSource=media.image_url;
+ return pic;
+}
+async function prepareInstagramForPublishing(item,locale){
+ if(item.format_type==="reel_story")
+  throw Error("Instagram Reels требует настоящее видео. Сначала выберите формат карточки или фотоистории, если хотите обычный фотопост.");
+ const source=await loadOriginalForPublishing(item);
+ const x=draft(),slides=slidesFor(x,locale==="en");
+ if(!slides.length||slides.length>10)throw Error("Instagram допускает от 1 до 10 слайдов");
+ const active=session();if(!active?.access_token||!unlocked)throw Error("Войдите в Journal Studio");
+ for(let i=0;i<slides.length;i++){
+  image=source;
+  const canvas=document.createElement("canvas");
+  drawCard(canvas,x,slides[i],locale==="en",false,false,i,slides.length);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.89));
+  if(!blob||blob.size>8*1024*1024)throw Error("Не удалось подготовить Instagram-слайд "+(i+1));
+  const response=await fetch(ROOT+"/functions/v1/darkfactory/instagram/items/"+item.id+"/"+locale+"/slides/"+(i+1),{
+   method:"PUT",cache:"no-store",headers:{apikey:PUB,Authorization:"Bearer "+active.access_token,
+    "x-darkfactory-session":unlocked,"Content-Type":"image/jpeg"},body:blob
+  });
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok)throw Error(result.error||"Не удалось сохранить Instagram-слайд "+(i+1));
+  $("bufferMediaStatus"+locale.toUpperCase()).textContent="✓ Сохранён "+(i+1)+" / "+slides.length;
+ }
+ return slides.length;
+}
+async function publishSelectedDestinations(requested){
+ const item=current();if(!item)throw Error("Выберите статью");
+ const id=item.id;
+ const list=[...new Set(requested)];
+ if(!list.length||list.some(d=>!publishingDestinations.includes(d)))throw Error("Некорректный выбор каналов");
+ // Refresh delivery state before claiming a live post. Never resend a known successful post.
+ await loadSchedule();
+ await loadBufferPosts();
+ const pending=list.filter(d=>!hasPublicationRecord(id,d));
+ const already=list.filter(d=>hasPublicationRecord(id,d));
+ if(!pending.length){info("Уже отправлено или ожидает проверки: "+list.join(", ")+". Повторная отправка заблокирована.");return}
+ const unconnected=pending.filter(d=>d.startsWith("telegram_")?!tgChannels[d.slice(-2)]?.enabled:
+  !(bufferState.channels||[]).some(c=>c.destination===d&&c.enabled));
+ if(unconnected.length)throw Error("Сначала подключите каналы: "+unconnected.join(", ")+". Ничего не отправлено.");
+ if(pending.some(d=>d.startsWith("instagram_"))&&item.format_type==="reel_story")
+  throw Error("Для Instagram выбран Reels без видео. Выберите формат фотоистории/карусели, либо публикуйте только в Telegram.");
+ const destinationsList=pending.map(d=>({"telegram_ru":"Telegram RU","telegram_en":"Telegram EN",
+  "instagram_ru":"Instagram RU","instagram_en":"Instagram EN"})[d]).join(", ");
+ if(!confirm("ОПУБЛИКОВАТЬ СЕЙЧАС «"+item.title+"»\n\nКаналы: "+destinationsList+
+  "\n\nОдобренный предпросмотр будет сохранён, фото и Instagram-слайды подготовлены автоматически. Это реальные отправки; другие статьи в очереди не сдвигаются."))return;
+ info("Сохраняю статью и подтверждаю факт…");
  await persistCurrent();
- if(current()?.fact_verification!=="verified"){
-  const check=await api("/items/"+item.id+"/recheck","POST",{});
-  if(!check.verified){await reload();throw Error("Проверка не пройдена: "+(check.reason||"нет подтверждения"))}
-  await reload();
+ let saved=current();
+ if(saved?.fact_verification!=="verified"){
+  const check=await api("/items/"+id+"/recheck","POST",{});
+  if(!check.verified)throw Error("Факт не подтверждён: "+(check.reason||"нет независимых источников"));
+  if(saved)saved.fact_verification="verified";
  }
- if(current()?.visual_status!=="ready")throw Error("Изображение не готово. Сначала сохраните или создайте фото");
- const field=tg?(locale==="ru"?"status_telegram":"status_telegram_en"):"status_instagram";
- if(current()?.[field]!=="approved")await patch({[field]:"approved"});
- info("Отправляю публикацию…");
- if(tg){
-  const result=await api("/telegram/items/"+item.id+"/"+locale+"/publish-now","POST",{});
-  await loadSchedule();noteTG(locale,"✓ Telegram ID: "+result.message_id);
-  info("✓ Опубликована одна "+locale.toUpperCase()+"-версия в Telegram. Очередь не сдвинута.");
- }else{
-  const result=await api("/instagram/items/"+item.id+"/"+locale+"/buffer-publish","POST",{mode:"now"});
-  await loadBufferPosts();
-  info("✓ Передано Buffer. Статус: "+(result.buffer_status||"ожидает публикации")+".");
+ if(!saved?.image_storage_path)throw Error("В предпросмотре нет сохранённого изображения. Сначала загрузите оригинал.");
+ // Prepare all Instagram imagery BEFORE sending any live messages.
+ for(const dest of pending.filter(d=>d.startsWith("instagram_"))){
+  const locale=dest.slice(-2);
+  info("Готовлю Instagram "+locale.toUpperCase()+" · слайды по утверждённому предпросмотру…");
+  await prepareInstagramForPublishing(saved,locale);
  }
- await reload();
+ info("Проверяю сохранённое фото и утверждаю выбранные версии…");
+ const approval=await api("/items/"+id+"/approve-preview","POST",{destinations:pending});
+ if(!approval.verified_media)throw Error("Сервер не подтвердил сохранённое изображение");
+ const index=items.findIndex(v=>v.id===id);if(index>=0)items[index]=approval.item;
+ const telegramPending=pending.filter(d=>d.startsWith("telegram_"));
+ if(telegramPending.length){
+  info("Подготавливаю горизонтальное фото 16:9…");
+  await api("/telegram/items/"+id+"/preview-wide","POST",{});
+ }
+ const successes=[],failures=[];
+ for(const dest of pending){
+  const locale=dest.slice(-2);
+  info("Отправка: "+dest+" ("+(successes.length+failures.length+1)+" / "+pending.length+")…");
+  try{
+   if(dest.startsWith("telegram_")){
+    const result=await api("/telegram/items/"+id+"/"+locale+"/publish-now","POST",{});
+    successes.push(dest+" · Telegram #"+result.message_id);
+   }else{
+    const result=await api("/instagram/items/"+id+"/"+locale+"/buffer-publish","POST",{mode:"now"});
+    successes.push(dest+" · Buffer "+(result.buffer_status||"submitted"));
+   }
+  }catch(error){failures.push(dest+" · "+String(error.message||error));}
+ }
+ await loadSchedule();
+ await loadBufferPosts();
+ const output=(successes.length?"✓ "+successes.join("; "):"Нет подтверждённых отправок")+
+  (already.length?" · Ранее отправлены/ожидают: "+already.join(", "):"")+
+  (failures.length?" · Ошибки (без автоматического повтора): "+failures.join("; "):"");
+ info(output,failures.length>0);
+ // Keep selection stable even when selected item leaves the review filter.
+ await reload();selected=id;select();
+}
+$("publishTGNowRU").onclick=()=>task(()=>publishSelectedDestinations(["telegram_ru"]));
+$("publishTGNowEN").onclick=()=>task(()=>publishSelectedDestinations(["telegram_en"]));
+$("publishIGNowRU").onclick=()=>task(()=>publishSelectedDestinations(["instagram_ru"]));
+$("publishIGNowEN").onclick=()=>task(()=>publishSelectedDestinations(["instagram_en"]));
+$("publishAllNow").onclick=()=>task(()=>publishSelectedDestinations(publishingDestinations));
+$("publishNowPreview").onclick=()=>task(()=>{
+ const dest=mode==="telegram"?"telegram_ru":mode==="telegram_en"?"telegram_en":
+ mode==="ig_ru"?"instagram_ru":mode==="ig_en"?"instagram_en":null;
+ if(!dest)throw Error("Reels требует реального видео");
+ return publishSelectedDestinations([dest]);
 });
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
