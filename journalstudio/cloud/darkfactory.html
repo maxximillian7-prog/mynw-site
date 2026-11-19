@@ -721,6 +721,7 @@ function updateTGButtons(){
   $("tgDisable"+suf).disabled=!configured;
   const currentItem=current();
   $("tgPublish"+suf).disabled=!configured||!currentItem||currentItem.fact_verification!=="verified"||currentItem.visual_status!=="ready"||(locale==="ru"?currentItem.status_telegram:currentItem.status_telegram_en)!=="approved";
+  $("tgPublishNow"+suf).disabled=$("tgPublish"+suf).disabled;
   $("tgInfo"+suf).textContent=configured?(channel.title+" · "+channel.username+" · @"+channel.bot_username):
    (locale==="ru"?"Укажите канал и токен бота":"Enter channel and bot token");
   if(configured && !$("tgUsername"+suf).value)$("tgUsername"+suf).value=channel.username||channel.channel_id||"";
@@ -767,7 +768,17 @@ for(const locale of ["ru","en"]){
    await loadSchedule();noteTG(locale,"✓ Материал в очереди. Ожидает назначенного времени: "+new Date(result.entry.run_at).toLocaleString("ru-RU",{timeZone:"Europe/Lisbon"}));
   }catch(e){noteTG(locale,e.message||String(e),true);throw e}
  });
- $("tgDisable"+suf).onclick=()=>task(async()=>{
+ 
+ $("tgPublishNow"+suf).onclick=()=>task(async()=>{
+  const fact=current(),channel=tgChannels[locale];
+  if(!fact||!channel?.enabled)throw Error("Выбери утверждённый факт и подключённый канал");
+  const name=locale==="ru"?"русском":"английском";
+  if(!confirm("⚡ ОПУБЛИКОВАТЬ СЕЙЧАС "+fact.title+" в "+name+" Telegram? \n\nЭто реальная отправка. Остальная очередь не изменится; повторная публикация того же факта будет заблокирована."))return;
+  const result=await api("/telegram/items/"+fact.id+"/"+locale+"/publish-now","POST",{});
+  await loadSchedule();
+  noteTG(locale,"✓ Публикация отправлена сейчас. Telegram ID "+result.message_id+"; время других постов сохранено.");
+ });
+$("tgDisable"+suf).onclick=()=>task(async()=>{
   if(!confirm(locale==="ru"?"Отключить Telegram RU от Журнала?":"Disconnect Telegram EN from Journal Studio?"))return;
   await api("/telegram/channels/"+locale+"/disconnect","POST",{});
   await loadTGChannels();noteTG(locale,"Отключено. Публикации заблокированы.");
