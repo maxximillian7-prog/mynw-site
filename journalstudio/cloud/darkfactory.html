@@ -2,7 +2,7 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#101114">
 <title>НЕТ! СЕРЬЁЗНО?! — Journal Studio</title>
-<link rel="icon" type="image/svg+xml" href="./brand-seriously.svg">
+<link rel="icon" type="image/svg+xml" href="./brand-seriously.svg?v=20261119-approved">
 <style>
 :root{color-scheme:dark;--bg:#0c0d11;--panel:#181b20;--raised:#20242b;--line:#343940;--text:#f7f5ed;--muted:#aeb7b7;--lime:#c6f53a;--coral:#ff6455}*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
@@ -169,7 +169,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
 <div id="app" class="shell layout-hidden">
- <header class="top"><div class="brand"><img class="wow-emblem" src="./brand-seriously.svg" alt="Эмблема НЕЕЕТ, серьёзно" width="64" height="64"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?!</span></div><div><div class="eyebrow">NO, SERIOUSLY?! / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
+ <header class="top"><div class="brand"><img class="wow-emblem" src="./brand-seriously.svg?v=20261119-approved" alt="Эмблема НЕЕЕТ, серьёзно" width="64" height="64"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?!</span></div><div><div class="eyebrow">NO, SERIOUSLY?! / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
  <div class="top-actions"><button id="showSchedule">◷ Расписание</button><button id="showBuffer">◎ Instagram / Buffer</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
