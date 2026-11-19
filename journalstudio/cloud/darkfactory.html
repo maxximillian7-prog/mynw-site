@@ -1013,14 +1013,20 @@ $("refreshSchedule").onclick=()=>task(async()=>{await loadSchedule();info("Оч�
 let bufferState={key_configured:false,channels:[]},bufferAvailable=[];
 function renderBufferState(){
  const configured=Boolean(bufferState.key_configured);
- $("bufferSummary").textContent=configured?"Buffer API подключён · выберите отдельные Instagram-аккаунты":"Buffer API не подключён";
- $("bufferKeyStatus").textContent=configured?"✓ API-ключ сохранён на сервере":"Нужен API-ключ из Buffer → Settings → API";
+ const links=(bufferState.channels||[]).filter(c=>c.enabled&&["instagram_ru","instagram_en"].includes(c.destination));
+ $("bufferSummary").textContent=!configured?"Buffer API не подключён":
+  links.length===2?"✓ Instagram RU и EN подключены к Buffer":
+  links.length===1?"Buffer API подключён · 1 из 2 Instagram привязан":
+  "Buffer API подключён · подключите Instagram RU и EN";
+ $("bufferKeyStatus").textContent=configured?"✓ API-ключ хранится на сервере. Повторно вводить не нужно":"Нужен API-ключ из Buffer → Settings → API";
  for(const locale of ["ru","en"]){
-  const suf=locale.toUpperCase();
-  const link=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
-  $("bufferState"+suf).textContent=link?("✓ "+link.channel_name):(locale==="ru"?"Не подключён":"Not connected");
+  const suf=locale.toUpperCase(),expected=locale==="ru"?"net_seryozno":"no.seriously.facts";
+  const linked=links.find(c=>c.destination==="instagram_"+locale);
+  const available=bufferAvailable.some(c=>String(c.name||"").toLowerCase()===expected);
+  $("bufferState"+suf).textContent=linked?("✓ "+linked.channel_name):(locale==="ru"?"Не подключён":"Not connected");
   $("bufferChannel"+suf).disabled=!configured;
-  $("bufferBind"+suf).disabled=!configured||!bufferAvailable.length;
+  $("bufferBind"+suf).disabled=!configured||!available||Boolean(linked);
+  $("bufferBind"+suf).textContent=linked?(locale==="ru"?"✓ Привязан":"✓ Connected"):(locale==="ru"?"Привязать RU":"Connect EN");
  }
  updateBufferButtons();
 }
@@ -1069,14 +1075,23 @@ $("bufferCheckPosts").onclick=()=>task(async()=>{
 
 async function refreshBufferChannels(){
  const result=await api("/buffer/channels");
- bufferAvailable=result.channels||[];
+ const expectedNames=new Set(["net_seryozno","no.seriously.facts"]);
+ // Never show 'pt_ryadom': that Instagram belongs to a different magazine.
+ bufferAvailable=(result.channels||[]).filter(c=>expectedNames.has(String(c.name||"").toLowerCase()));
  for(const locale of ["ru","en"]){
   const suf=locale.toUpperCase(),select=$("bufferChannel"+suf);
-  select.innerHTML='<option value="">— Выберите аккаунт Instagram —</option>'+bufferAvailable.map((v,i)=>
-   '<option value="'+i+'">'+safe(v.display_name||v.name||"Instagram")+' · '+safe(v.organization_id)+'</option>'
-  ).join("");
-  const linked=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale);
-  if(linked){const i=bufferAvailable.findIndex(v=>v.id===linked.channel_id);if(i>=0)select.value=String(i)}
+  const expected=locale==="ru"?"net_seryozno":"no.seriously.facts";
+  const matchIndex=bufferAvailable.findIndex(c=>String(c.name||"").toLowerCase()===expected);
+  const linked=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
+  if(matchIndex>=0){
+   const found=bufferAvailable[matchIndex];
+   select.innerHTML='<option value="'+matchIndex+'">'+safe(found.display_name||found.name)+'</option>';
+   select.value=String(matchIndex);
+  }else if(linked){
+   select.innerHTML='<option value="">✓ '+safe(linked.channel_name)+' · уже привязан</option>';
+  }else{
+   select.innerHTML='<option value="">'+(locale==="ru"?"Аккаунт RU не найден в Buffer":"English Instagram not found in Buffer")+'</option>';
+  }
  }
  renderBufferState();
 }
