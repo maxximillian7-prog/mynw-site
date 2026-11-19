@@ -356,7 +356,7 @@ const $=id=>document.getElementById(id);
 let items=[],selected=null,mode="telegram",unlocked=sessionStorage.getItem("darkfactory_access")||"",settings={},image=null,imageSource="",busy=false,slideIndex=0,viewerIndex=0,captionExpanded=false;
 if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("studio-embedded");
 let tgChannels={ru:null,en:null};
-let quickEditOpen=false,mediaRefreshPending=false,scheduleData={settings:[],queue:[]};
+let quickEditOpen=false,mediaRefreshPending=false,scheduleData={settings:[],queue:[],instant_deliveries:[]};
 const pilot="fact_pilot_20261118";
 const fmt={card:"Карточка",photo_story:"Фотоистория",carousel:"Карусель",timeline:"Хронология",comparison:"Сравнение",reel_story:"Reels"};
 const safe=x=>String(x||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -418,10 +418,15 @@ function plannedTimeText(raw){
 }
 function statusForArticle(itemId,dest){
  const job=entryForDestination(itemId,dest);
+ const instant=(scheduleData.instant_deliveries||[]).find(d=>d.item_id===itemId&&d.destination===dest);
  const bp=dest.startsWith("instagram_")?(bufferState?.posts||[]).find(p=>p.item_id===itemId&&p.destination===dest):null;
  if(bp&&["published","submitted","creating","unknown","failed"].includes(bp.status)){
   const label=bp.status==="published"?"✓ Опубликовано":bp.status==="submitted"?"→ Передано Buffer":bp.status==="creating"?"Отправляется":bp.status==="unknown"?"⚠ Проверить": "⚠ Ошибка";
   return {label:label+(bp.due_at?" · "+plannedTimeText(bp.due_at):""),className:bp.status==="unknown"?"unknown":bp.status==="published"?"sent":"scheduled",terminal:bp.status!=="failed"};
+ }
+ if(instant){
+  const label=instant.status==="sent"?"✓ Опубликовано вручную":instant.status==="sending"?"Отправляется":instant.status==="unknown"?"⚠ Проверить в канале":instant.status;
+  return {label:label+(instant.sent_at?" · "+plannedTimeText(instant.sent_at):""),className:instant.status==="sent"?"sent":"unknown",terminal:true};
  }
  if(!job)return {label:"Время не назначено",className:"",terminal:false};
  const text=job.status==="sent"?"✓ Опубликовано":job.status==="submitted"?"→ Передано":job.status==="scheduled"?"◷ Запланировано":job.status==="blocked"?"⚠ Ожидает медиа":job.status==="sending"?"Отправляется":job.status==="unknown"?"⚠ Требует проверки":job.status;
@@ -1085,7 +1090,7 @@ function renderScheduleQueue(){
 }
 async function loadSchedule(){
  const response=await api("/schedule");
- scheduleData={settings:response.settings||[],queue:response.queue||[]};
+ scheduleData={settings:response.settings||[],queue:response.queue||[],instant_deliveries:response.instant_deliveries||[]};
  renderScheduleSettings();renderScheduleQueue();drawQueue();renderSelectedPlan();emitSummary();
 }
 $("showSchedule").onclick=()=>{$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"})};
@@ -1249,7 +1254,8 @@ for(const locale of ["ru","en"]){
 const publishingDestinations=["telegram_ru","telegram_en","instagram_ru","instagram_en"];
 function hasPublicationRecord(itemId,destination){
  const jobs=(scheduleData.queue||[]).filter(j=>j.item_id===itemId&&j.destination===destination);
- const posted=jobs.some(j=>["sent","submitted","sending","unknown"].includes(j.status));
+ const posted=jobs.some(j=>["sent","submitted","sending","unknown"].includes(j.status))||
+  (scheduleData.instant_deliveries||[]).some(d=>d.item_id===itemId&&d.destination===destination);
  const buffer=destination.startsWith("instagram_")&&(bufferState.posts||[]).some(p=>p.item_id===itemId&&p.destination===destination);
  return posted||Boolean(buffer);
 }
