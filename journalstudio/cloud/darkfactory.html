@@ -165,6 +165,13 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 #bufferSetup #bufferKey{max-width:100%}
 #tgPublishNowRU,#tgPublishNowEN,#bufferNowRU,#bufferNowEN{background:#c6f53a;color:#151a14;border-color:#c6f53a}
 #tgPublishNowRU:disabled,#tgPublishNowEN:disabled,#bufferNowRU:disabled,#bufferNowEN:disabled{opacity:.45}
+.buffer-deliveries{padding:18px;border-top:1px solid #3b433d}
+.buffer-deliveries .calendar-subtitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.buffer-deliveries .calendar-subtitle button{font-size:12px}
+.buffer-history-row{display:flex;justify-content:space-between;gap:14px;align-items:center;background:#1b2223;padding:9px 12px;border-radius:10px;margin:7px 0;font-size:12px}
+.buffer-history-row small{color:#c0c9bf}
+.buffer-history-row a{color:#d4ff65;text-decoration:underline}
+@media(max-width:640px){.buffer-history-row{flex-wrap:wrap}}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
@@ -279,6 +286,10 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
    <div class="tg-buttons"><button class="primary" id="bufferNowEN">⚡ Publish now</button><button id="bufferScheduleEN">◷ Schedule via Buffer</button></div>
    <p class="tg-notice" id="bufferMediaStatusEN">No media prepared</p>
   </div>
+ </div>
+ <div class="buffer-deliveries">
+  <div class="calendar-subtitle"><strong>Instagram — история отправок через Buffer</strong><button type="button" id="bufferCheckPosts">Обновить статусы</button></div>
+  <div id="bufferDeliveries" aria-live="polite" class="muted">Публикаций через Buffer пока нет.</div>
  </div>
 </section>
 
@@ -1001,16 +1012,43 @@ function updateBufferButtons(){
   const suf=locale.toUpperCase();
   const link=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
   const approved=Boolean(x&&x.fact_verification==="verified"&&x.visual_status==="ready"&&x.status_instagram==="approved");
-  $("bufferMedia"+suf).disabled=!x||!x.image_storage_path;
+  const already=Boolean(x&&(bufferState.posts||[]).some(p=>p.item_id===x.id&&p.destination==="instagram_"+locale));
+  $("bufferMedia"+suf).disabled=!x||!x.image_storage_path||already;
   $("bufferCheckMedia"+suf).disabled=!x;
-  $("bufferNow"+suf).disabled=!link||!approved;
-  $("bufferSchedule"+suf).disabled=!link||!approved;
+  $("bufferNow"+suf).disabled=!link||!approved||already;
+  $("bufferSchedule"+suf).disabled=!link||!approved||already;
  }
 }
 async function loadBuffer(){
  bufferState=await api("/buffer/status");renderBufferState();
  if(bufferState.key_configured)try{await refreshBufferChannels()}catch(e){$("bufferKeyStatus").textContent="Ключ есть, но получить список каналов не удалось: "+e.message}
+ await loadBufferPosts();
 }
+
+async function loadBufferPosts(){
+ const response=await api("/buffer/posts");
+ bufferState.posts=response.posts||[];
+ const statusLabel={creating:"Подготовка",submitted:"Передано в Buffer",published:"Опубликовано в Instagram",failed:"Ошибка публикации",unknown:"Исход требует проверки"};
+ const rows=bufferState.posts.slice(0,30);
+ $("bufferDeliveries").innerHTML=rows.length?
+ rows.map(p=>{
+  const fact=items.find(x=>x.id===p.item_id);
+  const locale=p.destination==="instagram_ru"?"🇷🇺":"🇬🇧";
+  const date=p.published_at||p.due_at||p.created_at;
+  const time=date?new Date(date).toLocaleString("ru-RU",{timeZone:"Europe/Lisbon",dateStyle:"short",timeStyle:"short"}):"";
+  const link=typeof p.public_url==="string"&&/^https:\/\/(www\.)?instagram\.com\//i.test(p.public_url)?
+   '<a rel="noopener noreferrer" target="_blank" href="'+safe(p.public_url)+'">Открыть в Instagram</a>':"";
+  return '<div class="buffer-history-row"><span>'+locale+' <strong>'+safe(fact?.title||p.item_id.slice(0,8))+'</strong></span>'+
+   '<span>'+safe(statusLabel[p.status]||p.status)+' · '+safe(time)+'</span>'+link+
+   (p.error?'<small>'+safe(p.error)+'</small>':"")+'</div>';
+ }).join(""):'<p class="muted">Пока нет публикаций через Buffer</p>';
+ updateBufferButtons();
+}
+$("bufferCheckPosts").onclick=()=>task(async()=>{
+ await loadBufferPosts();
+ info("Статусы Buffer обновлены по данным сервера. Фактическая публикация подтверждается ответом Buffer.");
+});
+
 async function refreshBufferChannels(){
  const result=await api("/buffer/channels");
  bufferAvailable=result.channels||[];
@@ -1083,7 +1121,7 @@ for(const locale of ["ru","en"]){
   if(!confirm((type==="now"?"ОПУБЛИКОВАТЬ СЕЙЧАС":"ПЕРЕДАТЬ В BUFFER ПО РАСПИСАНИЮ")+" «"+x.title+"» для "+destination.channel_name+
    "?\n\nБудет использован согласованный текст "+suf+" и ранее сохранённые изображения. Другие публикации не сдвигаются."))return;
   const result=await api("/instagram/items/"+x.id+"/"+locale+"/buffer-publish","POST",{mode:type});
-  await loadSchedule();
+  await loadSchedule();await loadBufferPosts();
   $("bufferMediaStatus"+suf).textContent="✓ Передано Buffer: "+result.buffer_post_id+" · "+(result.buffer_status||"pending");
   info("Отправлено в Buffer "+suf+". Статус "+(result.buffer_status||"ожидает публикации")+".");
  }
