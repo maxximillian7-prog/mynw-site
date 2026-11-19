@@ -181,7 +181,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
- <div class="switches"><button class="active" data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button data-mode="telegram">Telegram · RU</button><button data-mode="telegram_en">Telegram · EN</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
+ <div class="switches"><button data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button class="active" data-mode="telegram">Telegram · RU</button><button data-mode="telegram_en">Telegram · EN</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
  <div class="preview-toolbar"><button id="quickEditOpen">✎ Редактор прямо в превью</button><button id="mediaUploadOpen">↑ Загрузить / заменить фото</button><button id="mediaHistoryOpen">▤ Архив медиа</button><input type="file" id="mediaFile" accept="image/jpeg,image/png,image/webp" hidden></div>
  
  <div class="editor-inline" id="quickEditor" hidden>
@@ -321,7 +321,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 "use strict";
 const ROOT="https://npsfaymjckcqhtyiafms.supabase.co", PUB="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 const $=id=>document.getElementById(id);
-let items=[],selected=null,mode="ig_ru",unlocked=sessionStorage.getItem("darkfactory_access")||"",settings={},image=null,imageSource="",busy=false,slideIndex=0,viewerIndex=0,captionExpanded=false;
+let items=[],selected=null,mode="telegram",unlocked=sessionStorage.getItem("darkfactory_access")||"",settings={},image=null,imageSource="",busy=false,slideIndex=0,viewerIndex=0,captionExpanded=false;
 if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("studio-embedded");
 let tgChannels={ru:null,en:null};
 let quickEditOpen=false,mediaRefreshPending=false,scheduleData={settings:[],queue:[]};
@@ -1201,7 +1201,7 @@ $("publishNowPreview").onclick=()=>task(async()=>{
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
-document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));updateQuickEditor();render()});
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;$("status").textContent="";document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));updateQuickEditor();render()});
 $("igMore").onclick=()=>{captionExpanded=!captionExpanded;render()};
 $("slidePrev").onclick=()=>moveSlide(-1);$("slideNext").onclick=()=>moveSlide(1);
 document.querySelectorAll("[data-slide-dir]").forEach(b=>b.onclick=e=>{e.stopPropagation();moveSlide(Number(b.dataset.slideDir))});
