@@ -1405,7 +1405,8 @@ function renderMediaArchive(){
     '<span>⚠ Файл недоступен. Обновите архив.</span>')+'</button>'+
    '<h4>'+safe(v.title)+'</h4>'+
    '<small>'+safe(kind)+' · '+safe(archiveDate(v.created_at))+'</small>'+
-   (v.current?'<span class="archive-current">✓ Выбрано для этой статьи</span>':'')+
+   (v.approved?'<span class="archive-current">✓ Фото утверждено редактором</span>':
+    v.current?'<span class="archive-current">◷ Фото выбрано · ожидает утверждения</span>':'')+
    '<div class="media-archive-actions"><button type="button" data-media-preview="'+safe(v.id)+'" '+
    (!canOpen?"disabled":"")+'>'+(canOpen?"Просмотреть":"Недоступно")+'</button></div>'+
    '</article>';
@@ -1443,7 +1444,7 @@ function openArchivedPhoto(v){
  $("mediaArchiveViewerMeta").textContent=
   (v.kind==="generated"?"AI-иллюстрация":v.kind==="uploaded"?"Загруженное фото":"Архивная версия")+
   " · "+archiveDate(v.created_at)+
-  (v.current?" · ✓ Текущая выбранная версия":"");
+  (v.approved?" · ✓ Утверждено редактором":v.current?" · Текущая выбранная версия":"");
  $("mediaArchiveViewerError").textContent="";
  const img=$("mediaArchiveViewerImage");
  img.onerror=()=>{$("mediaArchiveViewerError").textContent="Не удалось открыть оригинал. Закройте просмотр и обновите архив для новой защищённой ссылки."};
@@ -1451,26 +1452,30 @@ function openArchivedPhoto(v){
  const isSelectedArticle=current()?.id===v.item_id;
  const button=$("mediaArchiveApprove"),go=$("mediaArchiveGoToArticle");
  button.hidden=!isSelectedArticle;
- button.disabled=!isSelectedArticle||v.current;
- button.textContent=v.current?"✓ Уже выбрано для статьи":"✓ Утвердить это фото для статьи";
+ button.disabled=!isSelectedArticle||v.approved;
+ button.textContent=v.approved?"✓ Фото уже утверждено":v.current?
+  "✓ Утвердить текущее фото":"✓ Утвердить это фото для статьи";
  go.hidden=isSelectedArticle;
  $("mediaArchiveViewer").hidden=false;
 }
 async function approveArchivedPhoto(){
  const v=archivePreview;
  if(!v||!current()||current().id!==v.item_id)throw Error("Выберите исходную статью фотографии");
- if(v.current){closeArchiveViewer();info("✓ Это фото уже выбрано для статьи.");return}
- if(!confirm("Утвердить это изображение для статьи «"+v.title+"»?\n\nОно станет основным фото в Telegram и Instagram. История фотографий сохранится; ранее утверждённые посты потребуют повторной приёмки. Публикации не отправятся автоматически."))return;
+ if(v.approved){closeArchiveViewer();info("✓ Это фото уже утверждено редактором.");return}
+ if(!confirm("Утвердить фото для статьи «"+v.title+"»?\n\n"+
+  (v.current?"Это уже выбранная версия. Отметка подтверждения сохранится в истории редакции.":
+   "Выбранное фото станет основным. Старое останется в архиве, а каналы потребуют повторной приёмки.")+
+  "\nНи одна публикация не отправится автоматически."))return;
  const itemId=v.item_id;
- const out=await api("/items/"+itemId+"/media-restore","POST",{version_id:v.id});
- if(!out?.restored||out?.item?.image_storage_path===undefined)
-  throw Error("Сервер не подтвердил выбор фотографии");
+ const out=await api("/items/"+itemId+"/media-approve","POST",{version_id:v.id,confirmed:true});
+ if(!out?.approved||!out?.selected||out?.item?.image_storage_path===undefined)
+  throw Error("Сервер не подтвердил утверждение фотографии");
  closeArchiveViewer();
  await reload();
  if(!filtered().some(row=>row.id===itemId))$("filter").value="all";
  selected=itemId;select();
  if(!$("mediaHistory").hidden)await fetchMediaHistory(archiveScope);
- info("✓ Фото утверждено для статьи. Можно посмотреть предпросмотр и отдельно утвердить публикации.");
+ info("✓ Фото утверждено редактором и сохранено в архиве. Публикация остаётся отдельным действием.");
 }
 $("mediaHistoryOpen").onclick=()=>task(async()=>{
  const item=current();if(!item)throw Error("Выберите статью");
