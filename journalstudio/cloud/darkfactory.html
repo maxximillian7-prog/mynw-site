@@ -204,6 +204,21 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 .pin-renew-actions{display:flex;gap:9px;margin-top:13px}
 .pin-renew-actions button{flex:1}
 .pin-renew-error{font-size:12px;color:#ff958a;min-height:18px;margin:8px 0 0}
+
+/* Clean editorial tabs and immutable published archive snapshots */
+.editorial-tabs{display:flex;gap:6px;padding:10px 10px 3px;flex-wrap:wrap}
+.editorial-tabs button{font-size:11px;flex:1;min-width:94px;background:#1b2423;border:1px solid #3b4945;color:#d5e5d5;padding:9px 5px}
+.editorial-tabs button.active{background:#c6f53a;color:#151b13;border-color:#c6f53a}
+.archive-item-mark{color:#c6f53a;font-size:11px;font-weight:750;letter-spacing:0;text-transform:none;margin:7px 0 3px;display:block}
+.archive-history{margin-top:12px;border-top:1px solid #3d4b48;padding-top:10px}
+.archive-history h4{font-size:12px;color:#d4f99e;margin:0 0 8px}
+.archive-history article{background:#101a1b;border:1px solid #344744;border-radius:9px;padding:10px;margin:8px 0}
+.archive-history .archive-row{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px}
+.archive-history .archive-row strong{color:#e0f4c9}
+.archive-history a{font-size:11px}
+.archive-history details{margin-top:6px}
+.archive-history summary{font-size:11px;color:#bdcdb8;cursor:pointer;padding:4px 0}
+.archive-history pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 Arial,sans-serif;max-height:360px;overflow:auto;color:#dbe9df;background:#182124;padding:10px;border-radius:8px}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
@@ -211,7 +226,9 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <header class="top"><div class="brand"><img class="wow-emblem" src="./brand-seriously.svg?v=20261119-approved" alt="Эмблема НЕЕЕТ, серьёзно" width="64" height="64"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?!</span></div><div><div class="eyebrow">NO, SERIOUSLY?! / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
  <div class="top-actions"><button id="showSchedule">◷ Очередь</button><button id="showConfig">⚙ Расписание</button><button id="showBuffer">◎ Instagram API</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
- <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
+ <div class="board"><section class="panel"><div class="panel-head"><h2>Материалы</h2><select id="filter" style="max-width:144px"><option value="review" selected>На приёмке</option><option value="published">Опубликовано</option><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="all">Всё</option></select></div>
+<div class="editorial-tabs"><button type="button" data-editorial-view="review" class="active">На приёмке <span id="reviewListCount">0</span></button><button type="button" data-editorial-view="published">Опубликовано <span id="publishedListCount">0</span></button></div>
+<div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
  <div class="switches"><button data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button class="active" data-mode="telegram">Telegram · RU</button><button data-mode="telegram_en">Telegram · EN</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
  <div class="preview-toolbar"><button id="quickEditOpen">✎ Редактор прямо в превью</button><button id="mediaUploadOpen">↑ Загрузить / заменить фото</button><button id="mediaHistoryOpen">▤ Архив медиа</button><input type="file" id="mediaFile" accept="image/jpeg,image/png,image/webp" hidden></div>
@@ -376,6 +393,7 @@ let items=[],selected=null,mode="telegram",unlocked=sessionStorage.getItem("dark
 if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("studio-embedded");
 let tgChannels={ru:null,en:null};
 let quickEditOpen=false,mediaRefreshPending=false,scheduleData={settings:[],queue:[],instant_deliveries:[]};
+let publishedArchive=[];
 const pilot="fact_pilot_20261118";
 const fmt={card:"Карточка",photo_story:"Фотоистория",carousel:"Карусель",timeline:"Хронология",comparison:"Сравнение",reel_story:"Reels"};
 const safe=x=>String(x||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -425,23 +443,47 @@ async function api(path,method="GET",body,gate=true,allowRenew=true){
 }
 async function task(fn){if(busy)return;busy=true;try{await fn()}catch(e){info(e.message||String(e),true)}finally{busy=false}}
 function current(){return items.find(x=>x.id===selected)}
+async function loadPublishedArchive(){
+ const response=await api("/published");
+ publishedArchive=Array.isArray(response.entries)?response.entries:[];
+ return publishedArchive;
+}
+function publishedEntries(itemId){
+ return publishedArchive.filter(e=>e.item_id===itemId).sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at));
+}
+function isAlreadyPublished(itemId){return publishedArchive.some(e=>e.item_id===itemId)}
+function publicationFor(itemId,dest){return publishedArchive.find(e=>e.item_id===itemId&&e.destination===dest)||null}
+function reviewNeeded(x){
+ return !isAlreadyPublished(x.id)&&[x.status_instagram,x.status_telegram,x.status_telegram_en].some(v=>v==="review"||v==="needs_changes");
+}
+function syncEditorialTabs(){
+ const reviewCount=items.filter(reviewNeeded).length;
+ const publishedCount=new Set(publishedArchive.map(e=>e.item_id)).size;
+ $("reviewListCount").textContent=String(reviewCount);
+ $("publishedListCount").textContent=String(publishedCount);
+ const view=$("filter").value;
+ document.querySelectorAll("[data-editorial-view]").forEach(btn=>{
+  btn.classList.toggle("active",btn.dataset.editorialView===view);
+ });
+}
 async function reload(){
  const a=await api("/items");items=a.items||[];
+ await loadPublishedArchive();
  $("allCount").textContent=items.filter(x=>x.source&&x.source!=="ai_v2").length;
  $("pilotCount").textContent=items.filter(x=>x.source===pilot).length;
  $("verifiedCount").textContent=items.filter(x=>x.fact_verification==="verified").length;
  $("imageCount").textContent=items.filter(x=>x.visual_status==="ready").length;
  const visible=filtered();if(!visible.some(x=>x.id===selected))selected=visible[0]?.id||null;
- drawQueue();select();emitSummary();updateBufferButtons();
+ syncEditorialTabs();drawQueue();select();emitSummary();updateBufferButtons();
 }
 
 let lastSummary="";
 function emitSummary(){
  if(window.parent===window||!unlocked)return;
- const rows=Array.isArray(items)?items:[],queue=scheduleData?.queue||[];
- const review=rows.filter(x=>[x.status_instagram,x.status_telegram,x.status_telegram_en].some(y=>y==="review"||y==="needs_changes")).length;
+ const queue=scheduleData?.queue||[];
+ const review=items.filter(reviewNeeded).length;
  const queued=queue.filter(x=>["scheduled","sending","blocked"].includes(x.status)).length;
- const published=queue.filter(x=>x.status==="sent").length;
+ const published=new Set(publishedArchive.map(e=>e.item_id)).size;
  const summary={type:"studio-editor-summary",brand:"seriously",review,queued,published};
  const serialized=JSON.stringify(summary);if(serialized===lastSummary)return;lastSummary=serialized;
  window.parent.postMessage(summary,location.origin);
@@ -449,12 +491,23 @@ function emitSummary(){
 window.addEventListener("message",event=>{
  if(event.origin!==location.origin||event.source!==window.parent)return;
  if(event.data?.type!=="studio-editor-navigate")return;
- if(event.data.action==="review"){
-  $("filter").value="review";selected=null;reload().catch(err=>info(err.message,true));
+ if(event.data.action==="review"||event.data.action==="published"){
+  $("filter").value=event.data.action;selected=null;reload().catch(err=>info(err.message,true));
  }else if(event.data.action==="queue")$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"});
 });
 
-function filtered(){let f=$("filter").value;return items.filter(x=>f==="all"||f==="pilot"&&x.source===pilot||f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot)||f==="review"&&(x.status_instagram==="review"||x.status_telegram==="review"||x.status_telegram_en==="review"))}
+function filtered(){
+ const f=$("filter").value;
+ const rows=items.filter(x=>f==="all"||f==="review"&&reviewNeeded(x)||
+ f==="published"&&isAlreadyPublished(x.id)||
+ f==="pilot"&&x.source===pilot||
+ f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot));
+ if(f==="published")rows.sort((a,b)=>{
+  const da=publishedEntries(a.id)[0]?.published_at||"",db=publishedEntries(b.id)[0]?.published_at||"";
+  return Date.parse(db||0)-Date.parse(da||0);
+ });
+ return rows;
+}
 const editorialDestinations=[
  ["telegram_ru","✈ TG RU"],["telegram_en","✈ TG EN"],
  ["instagram_ru","◎ IG RU"],["instagram_en","◎ IG EN"]
@@ -471,12 +524,14 @@ function plannedTimeText(raw){
  return parsed.toLocaleString("ru-RU",{timeZone:"Europe/Lisbon",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
 }
 function statusForArticle(itemId,dest){
+ const archived=publicationFor(itemId,dest);
+ if(archived)return {label:"✓ Опубликовано · "+plannedTimeText(archived.published_at),className:"sent",terminal:true};
  const job=entryForDestination(itemId,dest);
  const instant=(scheduleData.instant_deliveries||[]).find(d=>d.item_id===itemId&&d.destination===dest);
  const bp=dest.startsWith("instagram_")?(bufferState?.posts||[]).find(p=>p.item_id===itemId&&p.destination===dest):null;
  if(bp&&["published","submitted","creating","unknown","failed"].includes(bp.status)){
-  const label=bp.status==="published"?"✓ Опубликовано":bp.status==="submitted"?"→ Передано Buffer":bp.status==="creating"?"Отправляется":bp.status==="unknown"?"⚠ Проверить": "⚠ Ошибка";
-  return {label:label+(bp.due_at?" · "+plannedTimeText(bp.due_at):""),className:bp.status==="unknown"?"unknown":bp.status==="published"?"sent":"scheduled",terminal:bp.status!=="failed"};
+  const label=bp.status==="published"?"✓ Опубликовано":bp.status==="submitted"?"→ Передано Buffer":bp.status==="creating"?"Отправляется":bp.status==="unknown"?"⚠ Проверить":"⚠ Ошибка";
+  return {label:label+(bp.due_at?" · "+plannedTimeText(bp.due_at):""),className:bp.status==="published"?"sent":bp.status==="unknown"?"unknown":"scheduled",terminal:bp.status!=="failed"};
  }
  if(instant){
   const label=instant.status==="sent"?"✓ Опубликовано вручную":instant.status==="sending"?"Отправляется":instant.status==="unknown"?"⚠ Проверить в канале":instant.status;
@@ -493,19 +548,34 @@ function planMarkup(x){
   return '<span class="'+state.className+'"><b>'+safe(label)+'</b> · '+safe(state.label)+'</span>';
  }).join("")+'</div>';
 }
+function archiveDetailsMarkup(itemId){
+ const rows=publishedEntries(itemId);if(!rows.length)return "";
+ return '<div class="archive-history"><h4>✓ Сохранённые опубликованные версии · '+rows.length+'</h4>'+
+ rows.map(entry=>{
+  const channel=editorialDestinations.find(([dest])=>dest===entry.destination)?.[1]||entry.destination;
+  const url=typeof entry.public_url==="string"&&/^https:\/\/(t\.me|www\.instagram\.com|instagram\.com)\//.test(entry.public_url)?entry.public_url:null;
+  return '<article><div class="archive-row"><strong>'+safe(channel)+'</strong><span>'+safe(plannedTimeText(entry.published_at))+' · Лиссабон</span></div>'+
+   (url?'<a href="'+safe(url)+'" target="_blank" rel="noopener noreferrer">Открыть публикацию</a>':"")+
+   '<details><summary>Опубликованный текст и заголовок (архивная копия)</summary><strong>'+safe(entry.title_snapshot)+'</strong>'+
+   '<pre>'+safe(entry.text_snapshot||"Текст недоступен для старой публикации")+'</pre></details></article>';
+ }).join("")+'</div>';
+}
 function renderSelectedPlan(){
- const el=$("selectedPublicationPlan"),x=current();
- if(!el)return;
- el.innerHTML=x?'<h3>◷ План выбранной статьи · Europe/Lisbon</h3>'+planMarkup(x):
+ const el=$("selectedPublicationPlan"),x=current();if(!el)return;
+ el.innerHTML=x?'<h3>◷ План выбранной статьи · Europe/Lisbon</h3>'+planMarkup(x)+archiveDetailsMarkup(x.id):
  '<h3>◷ План публикаций</h3><span class="muted">Выберите материал</span>';
 }
 function drawQueue(){
- $("queue").innerHTML=filtered().map(x=>'<button data-id="'+safe(x.id)+'" class="'+(x.id===selected?"active":"")+'">'+
- '<div class="tag '+(x.fact_verification==="verified"?"verified":"pending")+'">'+safe(fmt[x.format_type]||x.format_type)+" · "+safe(x.fact_verification)+'</div>'+
- '<div class="queue-title">'+safe(x.title)+'</div>'+
- '<div class="tag">Фото: '+(x.visual_status==="ready"?"✓ сохранено":"ожидает")+" · IG "+safe(x.status_instagram)+
- ' · TG RU '+safe(x.status_telegram)+" · TG EN "+safe(x.status_telegram_en||"review")+'</div>'+
- planMarkup(x)+'</button>').join("")||'<p class="muted">Материалов нет</p>';
+ $("queue").innerHTML=filtered().map(x=>{
+  const published=publishedEntries(x.id),mostRecent=published[0];
+  return '<button data-id="'+safe(x.id)+'" class="'+(x.id===selected?"active":"")+'">'+
+   '<div class="tag '+(x.fact_verification==="verified"?"verified":"pending")+'">'+safe(fmt[x.format_type]||x.format_type)+" · "+safe(x.fact_verification)+'</div>'+
+   '<div class="queue-title">'+safe(x.title)+'</div>'+
+   (mostRecent?'<span class="archive-item-mark">✓ Опубликовано · '+safe(plannedTimeText(mostRecent.published_at))+' · '+published.length+' '+(published.length===1?"канал":"канала/каналов")+'</span>':"")+
+   '<div class="tag">Фото: '+(x.visual_status==="ready"?"✓ сохранено":"ожидает")+
+   ' · IG '+safe(x.status_instagram)+' · TG RU '+safe(x.status_telegram)+" · TG EN "+safe(x.status_telegram_en||"review")+'</div>'+
+   planMarkup(x)+'</button>';
+ }).join("")||'<p class="muted">'+($("filter").value==="published"?"Пока нет подтверждённых публикаций":$("filter").value==="review"?"Нет материалов на приёмке":"Материалов нет")+'</p>';
 }
 function setField(id,val){$(id).value=val||""}
 function select(){
