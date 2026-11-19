@@ -683,7 +683,7 @@ function select(){
  $("verification").textContent="Проверка: "+x.fact_verification+" · Иллюстрация: "+x.visual_status;
  const sources=x.source_urls||[];$("evidence").innerHTML='<strong>Проверка фактов · только для редактора, в публикацию не выводится</strong>'+(sources.length?sources.map((url,i)=>'<div class="source">'+(i+1)+'. <a href="'+safe(url)+'" target="_blank" rel="noopener noreferrer">'+safe(url)+'</a></div>').join(""):'<p class="note">Источники отсутствуют — одобрение недоступно.</p>');
  const photoButton=$("illustrate"),genState=$("photoGenStatus");
- photoButton.disabled=busy||x.visual_status==="generating"||x.fact_verification==="disputed";
+ photoButton.disabled=x.visual_status==="generating"||x.fact_verification==="disputed";
  photoButton.textContent=x.visual_status==="generating"?"⏳ Генерируется…":
    x.image_storage_path&&x.visual_status==="ready"?"♻ Перегенерировать фото":
    x.visual_status==="failed"?"↻ Повторить генерацию":"✦ Сгенерировать фото";
