@@ -372,7 +372,7 @@ function select(){
  $("approveIG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTGEN").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready"||!x.caption_telegram_en;
- updateTGButtons();
+ updateTGButtons();updateBufferButtons();
  drawQueue();loadImage(x.image_url);
 }
 function loadImage(url){
