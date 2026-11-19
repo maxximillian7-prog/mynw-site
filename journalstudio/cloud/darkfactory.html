@@ -195,6 +195,15 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 .selected-plan{padding:12px;background:#1b2425;border:1px solid #3c4c4d;border-radius:11px;margin:10px 0}
 .selected-plan h3{font-size:12px;color:#cafa91;margin:0 0 8px}.selected-plan .queue-plan span{font-size:11px}
 @media(max-width:700px){.platform-publish{grid-template-columns:1fr}.queue-plan{grid-template-columns:1fr 1fr}}
+
+/* Show protected session renewal inside editor without navigating away. */
+.pin-renew-shade{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.78);display:grid;place-items:center;padding:18px}
+.pin-renew-card{width:100%;max-width:415px;background:#181f21;border:1px solid #566543;border-radius:16px;padding:24px;box-shadow:0 25px 80px #000c}
+.pin-renew-card h2{font-size:18px;margin:0 0 8px;color:#dbff85}
+.pin-renew-card p{font-size:13px;color:#d2d9d2;line-height:1.6;margin:0 0 14px}
+.pin-renew-actions{display:flex;gap:9px;margin-top:13px}
+.pin-renew-actions button{flex:1}
+.pin-renew-error{font-size:12px;color:#ff958a;min-height:18px;margin:8px 0 0}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
@@ -348,6 +357,16 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
   </div>
  </div>
  </section></details></div>
+<div class="pin-renew-shade" id="pinRenewDialog" hidden role="dialog" aria-modal="true" aria-labelledby="pinRenewTitle">
+ <form class="pin-renew-card" id="pinRenewForm">
+  <h2 id="pinRenewTitle">🔒 Подтвердите доступ к редакции</h2>
+  <p>Дополнительная сессия «НЕТ! СЕРЬЁЗНО?!» истекла. Введите установленный PIN, чтобы продолжить публикацию. Черновик и выбранная статья останутся на месте.</p>
+  <label for="pinRenewValue">Редакторский PIN</label>
+  <input type="password" id="pinRenewValue" inputmode="numeric" minlength="4" maxlength="12" pattern="[0-9]{4,12}" autocomplete="off" required>
+  <div id="pinRenewError" class="pin-renew-error" aria-live="polite"></div>
+  <div class="pin-renew-actions"><button type="button" id="pinRenewCancel">Отмена</button><button type="submit" class="primary" id="pinRenewSubmit">Продолжить</button></div>
+ </form>
+</div>
 <script>
 (function(){
 "use strict";
@@ -362,12 +381,47 @@ const fmt={card:"Карточка",photo_story:"Фотоистория",carousel
 const safe=x=>String(x||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function session(){try{return JSON.parse(sessionStorage.getItem("journal_session")||"null")}catch{return null}}
 function info(t,error=false){$("status").textContent=t;$("status").style.color=error?"#ff9789":"#d7edb6"}
-async function api(path,method="GET",body,gate=true){
+let pinRenewPending=null;
+function promptPinRenewal(){
+ if(pinRenewPending)return pinRenewPending;
+ const dialog=$("pinRenewDialog"),input=$("pinRenewValue"),form=$("pinRenewForm");
+ const error=$("pinRenewError"),submit=$("pinRenewSubmit"),cancel=$("pinRenewCancel");
+ pinRenewPending=new Promise((resolve,reject)=>{
+  dialog.hidden=false;error.textContent="";input.value="";submit.disabled=false;input.focus();
+  function finish(){
+   dialog.hidden=true;input.value="";form.removeEventListener("submit",onSubmit);
+   cancel.removeEventListener("click",onCancel);
+  }
+  function onCancel(){
+   finish();reject(new Error("Сессия редакции истекла. Для защищённых действий снова введите PIN."));
+  }
+  async function onSubmit(e){
+   e.preventDefault();submit.disabled=true;error.textContent="Проверяю PIN…";
+   try{
+    const result=await api("/unlock","POST",{pin:input.value},false,false);
+    if(!result?.token)throw Error("Сервер не подтвердил редакторскую сессию");
+    unlocked=result.token;sessionStorage.setItem("darkfactory_access",unlocked);
+    finish();resolve();
+   }catch(e){error.textContent=e.message||"Неверный PIN";input.select();}
+   finally{submit.disabled=false}
+  }
+  cancel.addEventListener("click",onCancel);
+  form.addEventListener("submit",onSubmit);
+ }).finally(()=>{pinRenewPending=null});
+ return pinRenewPending;
+}
+async function api(path,method="GET",body,gate=true,allowRenew=true){
  const u=session();if(!u?.access_token)throw Error("Войдите в Journal Studio");
  const headers={apikey:PUB,Authorization:"Bearer "+u.access_token,"Content-Type":"application/json"};
  if(gate&&unlocked)headers["x-darkfactory-session"]=unlocked;
  const r=await fetch(ROOT+"/functions/v1/darkfactory"+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),cache:"no-store"});
- const data=await r.json().catch(()=>({}));if(!r.ok)throw Error(data.error||"Ошибка сервера "+r.status);return data;
+ const data=await r.json().catch(()=>({}));
+ if(r.status===423&&gate&&allowRenew){
+  await promptPinRenewal();
+  return api(path,method,body,gate,false);
+ }
+ if(!r.ok)throw Error(data.error||"Ошибка сервера "+r.status);
+ return data;
 }
 async function task(fn){if(busy)return;busy=true;try{await fn()}catch(e){info(e.message||String(e),true)}finally{busy=false}}
 function current(){return items.find(x=>x.id===selected)}
