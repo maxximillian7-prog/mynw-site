@@ -1470,11 +1470,13 @@ async function approveArchivedPhoto(){
  const out=await api("/items/"+itemId+"/media-approve","POST",{version_id:v.id,confirmed:true});
  if(!out?.approved||!out?.selected||out?.item?.image_storage_path===undefined)
   throw Error("Сервер не подтвердил утверждение фотографии");
+ const reopen=!$("mediaHistory").hidden,scope=archiveScope;
  closeArchiveViewer();
+ $("mediaHistory").hidden=true;
  await reload();
  if(!filtered().some(row=>row.id===itemId))$("filter").value="all";
  selected=itemId;select();
- if(!$("mediaHistory").hidden)await fetchMediaHistory(archiveScope);
+ if(reopen){$("mediaHistory").hidden=false;await fetchMediaHistory(scope)}
  info("✓ Фото утверждено редактором и сохранено в архиве. Публикация остаётся отдельным действием.");
 }
 $("mediaHistoryOpen").onclick=()=>task(async()=>{
