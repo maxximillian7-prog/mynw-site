@@ -378,10 +378,10 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  
  <section class="panel calendar-panel" id="schedulePanel">
   <div class="panel-head"><h2>◷ Редакционный календарь и очередь публикаций</h2><button id="refreshSchedule">↻ Обновить</button></div>
-  <div class="calendar-note">Europe/Lisbon · тихие часы 00:00–08:00 · интервал не менее 60 минут между постами одного канала. Утверждение создаёт очередь, но отправка начнётся только после включения автопубликации.</div>
+  <div class="calendar-note" id="calendarExplanation">Europe/Lisbon · тихие часы 00:00–08:00 · ожидается загрузка интервала. Четыре версии одного факта выходят вместе; следующие факты — с установленным промежутком.</div>
   <details class="tech-fold" id="calendarConfig"><summary>⚙ Настройки расписания · все четыре канала</summary><div id="scheduleSettings" class="calendar-grid"></div></details>
   <div class="queue-schedule">
-   <div class="queue-schedule-header"><strong>Запланировано · опубликовано · ошибки</strong><span id="scheduledCount" class="tag">0</span></div>
+   <div class="queue-schedule-header"><strong>Запланировано · опубликовано · ошибки</strong><span id="scheduledCount" class="tag">0</span></div><div id="scheduleGroupOverview" class="calendar-note" aria-live="polite"></div>
    <div class="queue-schedule-scroll" id="scheduleQueue"><p style="padding:15px" class="muted">Загрузка очереди…</p></div>
   </div>
  </section>
@@ -1609,6 +1609,27 @@ function renderScheduleSettings(){
 }
 function renderScheduleQueue(){
  const q=scheduleData.queue||[];
+ const cfg=scheduleData.settings||[];
+ const gap=cfg.filter(x=>x.enabled).reduce((m,x)=>Math.max(m,Number(x.min_gap_minutes)||0),0);
+ $("calendarExplanation").textContent="Europe/Lisbon · тихие часы 00:00–08:00 · интервал "+gap+
+  " минут между разными фактами. Все четыре версии одного факта имеют общий временной слот. Ручная публикация учитывается при проверке очереди.";
+ const groups=new Map();
+ for(const j of q.filter(x=>["scheduled","blocked"].includes(x.status)&&Date.parse(x.run_at)>Date.now())){
+  const existing=groups.get(j.item_id)||{at:j.run_at,channels:[],status:j.status};
+  if(Date.parse(j.run_at)<Date.parse(existing.at))existing.at=j.run_at;
+  existing.channels.push(j.destination);
+  if(j.status==="blocked")existing.status="blocked";
+  groups.set(j.item_id,existing);
+ }
+ const batch=[...groups.entries()].sort((a,b)=>Date.parse(a[1].at)-Date.parse(b[1].at));
+ $("scheduleGroupOverview").innerHTML=batch.length?
+  "<strong>Ближайшие пакеты публикаций</strong> · каждый факт одновременно в RU/EN Telegram и Instagram:"+
+  batch.map(([itemId,p])=>"<div style='padding:6px 0;border-bottom:1px solid #3c4844'>"+
+   "<strong>"+safe(new Date(p.at).toLocaleString("ru-RU",{timeZone:"Europe/Lisbon",dateStyle:"short",timeStyle:"short"}))+"</strong> · "+
+   safe(items.find(x=>x.id===itemId)?.title||"Факт "+itemId.slice(0,7))+
+   " · "+p.channels.length+" канала"+
+   (p.status==="blocked"?" · ⚠ Есть блокировки":"")+"</div>").join(""):"Очередь будущих публикаций пуста.";
+
  $("scheduledCount").textContent=String(q.length)+" записей";
  if(!q.length){$("scheduleQueue").innerHTML='<p class="muted" style="padding:15px">Очередь пуста. Утверди первый проверенный материал одной кнопкой.</p>';return}
  const list=q.map(j=>{
