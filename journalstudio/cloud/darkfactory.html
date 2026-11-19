@@ -157,12 +157,20 @@ body.studio-embedded .board{grid-template-columns:minmax(230px,300px) minmax(430
 body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:13px}
 @media(max-width:1250px){body.studio-embedded .board{grid-template-columns:minmax(230px,300px) minmax(400px,1fr)}body.studio-embedded .editor-panel{grid-column:1/-1}}
 @media(max-width:830px){body.studio-embedded .board{display:block}body.studio-embedded .shell{padding:9px}body.studio-embedded .wow-emblem{width:44px;height:44px}body.studio-embedded .brand .logo{font-size:19px}}
+
+#bufferSetup .tg-connect-card{min-width:0}
+#bufferSetup .tg-connect-card select{width:100%;background:#11191c;color:#f2f4ee;border-color:#49514c}
+#bufferSetup .tg-buttons{align-items:center;flex-wrap:wrap}
+#bufferSetup .tg-buttons button{flex:1;min-width:128px}
+#bufferSetup #bufferKey{max-width:100%}
+#tgPublishNowRU,#tgPublishNowEN,#bufferNowRU,#bufferNowEN{background:#c6f53a;color:#151a14;border-color:#c6f53a}
+#tgPublishNowRU:disabled,#tgPublishNowEN:disabled,#bufferNowRU:disabled,#bufferNowEN:disabled{opacity:.45}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
 <div id="app" class="shell layout-hidden">
  <header class="top"><div class="brand"><img class="wow-emblem" src="./brand-seriously.svg" alt="Эмблема НЕЕЕТ, серьёзно" width="64" height="64"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?!</span></div><div><div class="eyebrow">NO, SERIOUSLY?! / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
- <div class="top-actions"><button id="showSchedule">◷ Расписание</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
+ <div class="top-actions"><button id="showSchedule">◷ Расписание</button><button id="showBuffer">◎ Instagram / Buffer</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
@@ -236,7 +244,45 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
   </div>
  </section>
 
- <section class="panel tg-setup" id="tgSetup">
+ 
+<section class="panel tg-setup" id="bufferSetup">
+ <div class="panel-head"><h2>◎ Instagram · Buffer API</h2><span class="tag" id="bufferSummary">Подключение Instagram ещё не подтверждено</span></div>
+ <p class="note" style="padding:12px 18px 0">Подключаются исключительно Instagram-аккаунты проекта «НЕТ! СЕРЬЁЗНО?!». Аккаунты «Португалия рядом» не используются. Ключ хранится на сервере, публичные слайды создаются из готового Instagram-предпросмотра.</p>
+ <div class="tg-grid">
+  <div class="tg-connect-card">
+   <h3>1. Ключ Buffer API</h3>
+   <label for="bufferKey">API key из Buffer → Settings → API</label>
+   <input type="password" id="bufferKey" autocomplete="off" spellcheck="false" placeholder="Вставь API-ключ Buffer сюда">
+   <div class="tg-buttons"><button class="primary" id="bufferConnectKey">Сохранить и проверить ключ</button><button id="bufferRefresh">Обновить аккаунты</button></div>
+   <p class="tg-notice" id="bufferKeyStatus">Не подключено</p>
+  </div>
+  <div class="tg-connect-card">
+   <h3>2. Instagram RU / Instagram EN</h3>
+   <label for="bufferChannelRU">Русский Instagram</label><select id="bufferChannelRU"><option value="">Сначала подключите Buffer</option></select>
+   <div class="tg-buttons"><button id="bufferBindRU">Привязать RU</button><span id="bufferStateRU" class="tag">Не подключён</span></div>
+   <label for="bufferChannelEN">English Instagram</label><select id="bufferChannelEN"><option value="">Connect Buffer first</option></select>
+   <div class="tg-buttons"><button id="bufferBindEN">Connect EN</button><span id="bufferStateEN" class="tag">Not connected</span></div>
+  </div>
+ </div>
+ <div class="tg-grid">
+  <div class="tg-connect-card">
+   <h3>🇷🇺 Instagram RU</h3>
+   <p class="note">Слайды с текстом, текущий утверждённый материал, отдельный аккаунт.</p>
+   <div class="tg-buttons"><button id="bufferMediaRU">▣ Подготовить фото / карусель RU</button><button id="bufferCheckMediaRU">Проверить слайды</button></div>
+   <div class="tg-buttons"><button class="primary" id="bufferNowRU">⚡ Опубликовать сейчас</button><button id="bufferScheduleRU">◷ В Buffer по расписанию</button></div>
+   <p class="tg-notice" id="bufferMediaStatusRU">Медиа не подготовлены</p>
+  </div>
+  <div class="tg-connect-card">
+   <h3>🇬🇧 Instagram EN</h3>
+   <p class="note">Text-on-image slides with a separately approved English caption.</p>
+   <div class="tg-buttons"><button id="bufferMediaEN">▣ Prepare EN images / carousel</button><button id="bufferCheckMediaEN">Check slides</button></div>
+   <div class="tg-buttons"><button class="primary" id="bufferNowEN">⚡ Publish now</button><button id="bufferScheduleEN">◷ Schedule via Buffer</button></div>
+   <p class="tg-notice" id="bufferMediaStatusEN">No media prepared</p>
+  </div>
+ </div>
+</section>
+
+<section class="panel tg-setup" id="tgSetup">
  <div class="panel-head"><h2>Telegram Bot API · подключение каналов</h2><span class="tag">Токены хранятся только на сервере · автопубликация управляется календарём</span></div>
  <div class="tg-grid">
   <div class="tg-connect-card" data-tg-locale="ru"><h3>🇷🇺 НЕТ! СЕРЬЁЗНО?! <span id="tgStateRU" class="status-pill">Не подключён</span></h3>
@@ -245,7 +291,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
    <label for="tgTokenRU">Токен бота из @BotFather</label><input id="tgTokenRU" type="password" autocomplete="new-password" placeholder="Вставить токен только здесь" spellcheck="false">
    <p class="password-info">Бот должен быть администратором именно этого канала с правом публиковать сообщения. Токен не сохраняется в браузере.</p>
    <div class="tg-buttons"><button class="primary" id="tgConnectRU">Подключить API</button><button id="tgVerifyRU">Проверить</button><button id="tgTestRU">Тестовое сообщение</button></div>
-   <div class="tg-buttons"><button class="ok" id="tgPublishRU">Поставить утверждённый факт в очередь</button><button id="tgDisableRU">Отключить</button></div>
+   <div class="tg-buttons"><button class="ok" id="tgPublishRU">Поставить утверждённый факт в очередь</button><button class="primary" id="tgPublishNowRU">⚡ Опубликовать сейчас</button><button id="tgDisableRU">Отключить</button></div>
    <p class="tg-notice" id="tgNoticeRU"></p>
   </div>
   <div class="tg-connect-card" data-tg-locale="en"><h3>🇬🇧 NO, SERIOUSLY?! <span id="tgStateEN" class="status-pill">Not connected</span></h3>
@@ -254,7 +300,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
    <label for="tgTokenEN">BotFather API token</label><input id="tgTokenEN" type="password" autocomplete="new-password" placeholder="Paste token here only" spellcheck="false">
    <p class="password-info">The bot must be a channel administrator with permission to post. The token isn't stored in the browser.</p>
    <div class="tg-buttons"><button class="primary" id="tgConnectEN">Connect API</button><button id="tgVerifyEN">Verify permissions</button><button id="tgTestEN">Send test message</button></div>
-   <div class="tg-buttons"><button class="ok" id="tgPublishEN">Queue approved fact</button><button id="tgDisableEN">Disconnect</button></div>
+   <div class="tg-buttons"><button class="ok" id="tgPublishEN">Queue approved fact</button><button class="primary" id="tgPublishNowEN">⚡ Publish now</button><button id="tgDisableEN">Disconnect</button></div>
    <p class="tg-notice" id="tgNoticeEN"></p>
   </div>
  </div>
