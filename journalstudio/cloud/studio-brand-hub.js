@@ -89,7 +89,7 @@ window.StudioBrandHub=(function(){
   state.active=brand;document.body.dataset.studioBrand=brand;
   const identities={
    overview:{title:"Journal Studio · Все редакции | MyNow",favicon:"/assets/mynow-main-logo.webp",theme:"#173d31"},
-   green:{title:"NowGreen Journal | Journal Studio",favicon:"./brand-nowgreen.svg",theme:"#215a42"},
+   green:{title:"NowGreen Journal | Journal Studio",favicon:"/assets/brand/nowgreen-logo.webp",theme:"#215a42"},
    portugal:{title:"Португалия рядом | Journal Studio",favicon:"./brand-portugal.svg",theme:"#126a71"},
    seriously:{title:"НЕТ! СЕРЬЁЗНО?! | Journal Studio",favicon:"./brand-seriously.svg",theme:"#111614"}
   };
@@ -164,7 +164,7 @@ window.StudioBrandHub=(function(){
   updateCard(brand,metrics);
  }
 
- function logo(brand){return "./brand-"+(brand==="green"?"nowgreen":brand==="seriously"?"seriously":"portugal")+".svg"}
+ function logo(brand){return brand==="green"?"/assets/brand/nowgreen-logo.webp":"./brand-"+(brand==="seriously"?"seriously":"portugal")+".svg"}
  function brandButton(brand,label,sub){
   return '<button type="button" class="studio-editor-link" data-hub-go="'+brand+'" data-hub-brand="'+brand+'" aria-label="Редакция '+label+'">'+
    '<img src="'+logo(brand)+'" alt=""><span class="meta"><b>'+label+'</b><small>'+sub+'</small></span><span class="mini-arrow">›</span></button>';
