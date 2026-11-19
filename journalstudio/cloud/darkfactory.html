@@ -1055,7 +1055,9 @@ for(const locale of ["ru","en"]){
   if(!image||!x.image_storage_path||x.visual_status!=="ready")
    throw Error("Подождите, пока оригинальная иллюстрация загрузится, затем повторите");
   if(!confirm("Создать и сохранить в публичном Instagram-хранилище все "+suf+" слайды из текущего предпросмотра? \nИх сможет скачать Buffer для публикации."))return;
+  const sourceImage=image;
   await persistCurrent();
+  if(sourceImage)image=sourceImage; // select() reloads the preview, but originals must remain in carousel export
   const fact=current(),en=locale==="en",preview=draft(),slides=slidesFor(preview,en);
   if(!slides.length||slides.length>10)throw Error("Допускается 1–10 слайдов");
   const active=session();if(!active?.access_token||!unlocked)throw Error("Нет редакционной сессии");
