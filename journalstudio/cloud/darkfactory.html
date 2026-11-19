@@ -290,6 +290,17 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
  <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт текущего слайда PNG</button></div>
  <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
+ <div class="fact-review-controls" id="factReviewControls">
+  <div class="fact-review-heading">Проверка факта и публикация позже</div>
+  <div class="fact-review-state" id="factReviewState" aria-live="polite">Загрузка статуса проверки…</div>
+  <div class="fact-review-buttons">
+    <button type="button" class="verified" id="verifyFact">🔎 Проверить и подтвердить</button>
+    <button type="button" class="unconfirmed" id="markUnconfirmed">⚠ Не подтверждён</button>
+    <button type="button" class="deferred" id="deferPublication">◷ Сохранить на потом</button>
+    <button type="button" class="deferred" id="resumePublication" hidden>↩ Вернуть к публикации</button>
+  </div>
+  <div class="review-note">Подтверждение проверяет минимум два независимых источника. Ни одна из этих кнопок не публикует статью. После проверки можно отправить сейчас либо запланировать.</div>
+</div>
  <div class="selected-plan" id="selectedPublicationPlan" aria-live="polite"><h3>План публикаций · время Лиссабона</h3><span class="muted">Выберите материал в очереди</span></div>
   <div class="platform-publish" aria-label="Публикация в отдельные каналы">
    <div class="platform-card telegram"><strong>✈ Telegram</strong><small>Квадратная обложка 1:1 с заголовком + полный текст</small><div class="platform-buttons"><button type="button" class="primary" id="publishTGNowRU">⚡ RU · сейчас</button><button type="button" class="primary" id="publishTGNowEN">⚡ EN · сейчас</button></div></div>
@@ -302,17 +313,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  </div></main>
  <section class="panel editor-panel"><div class="panel-head"><h2>Факты · источники · тексты</h2><button class="primary" id="save">Сохранить</button></div><div class="edit" id="editor">
  <div class="full">
-<div class="fact-review-controls" id="factReviewControls">
-  <div class="fact-review-heading">Проверка факта и публикация позже</div>
-  <div class="fact-review-state" id="factReviewState" aria-live="polite">Загрузка статуса проверки…</div>
-  <div class="fact-review-buttons">
-    <button type="button" class="verified" id="verifyFact">🔎 Проверить и подтвердить</button>
-    <button type="button" class="unconfirmed" id="markUnconfirmed">⚠ Не подтверждён</button>
-    <button type="button" class="deferred" id="deferPublication">◷ Сохранить на потом</button>
-    <button type="button" class="deferred" id="resumePublication" hidden>↩ Вернуть к публикации</button>
-  </div>
-  <div class="review-note">Подтверждение проверяет минимум два независимых источника. Ни одна из этих кнопок не публикует статью. После проверки можно отправить сейчас либо запланировать.</div>
-</div>
+
 <div class="eyebrow" id="verification"></div><div id="evidence" class="block"></div></div>
  <div><h3>Русский · Instagram / Telegram</h3><label>Заголовок RU</label><input id="fTitle"><label>Вступление RU</label><textarea id="fHook"></textarea><label>История RU</label><textarea id="fBody" rows="8"></textarea><label>Instagram RU · подпись</label><textarea id="fIGRU" rows="5"></textarea><label>Telegram RU · публикация</label><textarea id="fTG" rows="6"></textarea></div>
  <div><h3>English · Instagram</h3><label>Headline EN</label><input id="fTitleEN"><label>Hook EN</label><textarea id="fHookEN"></textarea><label>Full Story EN</label><textarea id="fBodyEN" rows="8"></textarea><label>Instagram EN · Caption</label><textarea id="fIGEN" rows="6"></textarea><label>Telegram EN · публикация</label><textarea id="fTGEN" rows="6"></textarea><label>Формат</label><select id="fFormat"><option value="card">Одна карточка</option><option value="photo_story">Фотоистория</option><option value="carousel">Карусель</option><option value="timeline">Хронология</option><option value="comparison">Сравнение</option><option value="reel_story">Reels / Story</option></select></div>
