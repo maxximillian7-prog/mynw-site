@@ -119,7 +119,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .editor-inline .inline-actions{display:flex;gap:8px;margin-top:9px}
 .preview-toolbar{max-width:480px;margin:9px auto;display:flex;gap:7px;flex-wrap:wrap}
 .preview-toolbar button{font-size:11px;flex:1;min-width:100px}
-.tg-single img{width:100%;display:block;max-height:520px;object-fit:contain;background:#17211e}
+.tg-single img{width:100%;display:block;aspect-ratio:16/9;height:auto;object-fit:cover;object-position:center;background:#17211e}
 .tg-no-image{min-height:240px;display:grid;place-items:center;background:#1b282a;color:#e5e9e5;padding:20px;text-align:center}
 .calendar-panel{margin-top:18px}
 .calendar-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:15px}
@@ -216,7 +216,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
    <div class="tg-from" id="tgFrom">НЕТ! СЕРЬЁЗНО?</div>
    <div id="tgSingle" class="tg-single" hidden><img id="tgPhoto" alt="Оригинальная иллюстрация без наложенного текста" hidden><div id="tgPhotoMissing" class="tg-no-image">Ожидает постоянное фото</div></div>
    <div id="tgAlbum" class="tg-album" hidden></div>
-   <div id="tgCaption" class="tg-message"></div><div class="tg-meta">Время публикации не назначено · ◉</div>
+   <div id="tgCaption" class="tg-message"></div><div class="tg-meta">Один Telegram-пост · фото 16:9 + полный текст · ◉</div>
   </div><div id="tgOverflow" class="tg-bubble" hidden><div id="tgOverflowText" class="tg-message"></div><div class="tg-meta">Продолжение публикации · ◉</div></div></div>
   <div class="tg-bottom">Канал · только просмотр публикации</div>
  </div>
@@ -232,7 +232,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
  <div class="actions"><button class="primary" id="approveAll">✓ Утвердить 4 версии и поставить в очередь</button><button type="button" class="primary" id="publishNowPreview">⚡ Опубликовать сейчас</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
  <div id="status" class="status" aria-live="polite"></div>
- <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Внешняя автопубликация не запускается этим экраном.</div>
+ <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Кнопка «Опубликовать сейчас» отправляет один выбранный пост в подключённый канал после подтверждения; остальные записи не сдвигаются.</div>
  </div></main>
  <section class="panel editor-panel"><div class="panel-head"><h2>Факты · источники · тексты</h2><button class="primary" id="save">Сохранить</button></div><div class="edit" id="editor">
  <div class="full"><div class="eyebrow" id="verification"></div><div id="evidence" class="block"></div></div>
@@ -636,11 +636,10 @@ function updateTG(x,slides,en){
  $("tgChannelTitle").textContent=en?"NO, SERIOUSLY?! · preview":"НЕТ! СЕРЬЁЗНО?! · макет";
  $("tgChannelSubtitle").textContent=en?"Channel · editorial preview":"Канал · предпросмотр сообщения";
  $("tgFrom").textContent=en?"NO, SERIOUSLY?!":"НЕТ! СЕРЬЁЗНО?!";
- const needsTextReply=plain.length>1000;
- setRich($("tgCaption"),needsTextReply?"":plain);
- $("tgCaption").hidden=needsTextReply;
- $("tgOverflow").hidden=!needsTextReply;
- if(needsTextReply)setRich($("tgOverflowText"),plain);
+ // The backend sends one text message with a 16:9 image link preview above it.
+ setRich($("tgCaption"),plain);
+ $("tgCaption").hidden=false;
+ $("tgOverflow").hidden=true;
  $("tgAlbum").hidden=true;$("tgAlbum").replaceChildren();
  const single=$("tgSingle");single.hidden=false;
  const photo=$("tgPhoto"),fallback=$("tgPhotoMissing");
@@ -677,7 +676,7 @@ function render(){
  slideIndex=Math.max(0,Math.min(slides.length-1,slideIndex));
  const ig=mode==="ig_ru"||mode==="ig_en",tg=mode==="telegram"||mode==="telegram_en";
  $("instagramFrame").hidden=!ig;$("telegramFrame").hidden=!tg;$("reelsFrame").hidden=!reel;
- $("proofHint").textContent=tg?"Одно исходное фото · полный текст внизу":slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
+ $("proofHint").textContent=tg?"Один пост · фото 16:9 над полным текстом":slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
  $("download").textContent=tg?"↓ Скачать исходное фото":"↓ Экспорт слайда PNG";
  $("slideTools").hidden=tg||slides.length<=1;$("slideRail").hidden=tg||slides.length<=1;
  $("slidePrev").disabled=slideIndex===0;$("slideNext").disabled=slideIndex===slides.length-1;
@@ -707,7 +706,7 @@ function render(){
  const statusOK=tg?(en?current()?.status_telegram_en:current()?.status_telegram)==="approved":current()?.status_instagram==="approved";
  manual.disabled=!current()||!connected; // Save, verify and approve in the publish handler
  $("proofDescription").textContent=tg?
-  "Telegram: ровно одно оригинальное фото без надписей и полный текст под ним. При тексте длиннее 1024 символов Telegram отправляет продолжение отдельным ответом.":
+  "Telegram: одно сообщение с широким фото 16:9 над всем текстом (до 4000 символов). Изображение без надписей; ссылка на фото скрыта. Второго сообщения нет.":
   reel?"Это предпросмотр обложки Reels в интерфейсе Instagram, НЕ готовое видео. Обложка экспортируется в PNG 9:16.":
   (slides.length>1?"Листайте как настоящую Instagram-карусель: кнопками, свайпом или миниатюрами ниже.":"Лента Instagram: изображение, профиль, панель реакций и настоящая подпись.");
 }
@@ -1162,6 +1161,7 @@ $("publishNowPreview").onclick=()=>task(async()=>{
  if(!["telegram","telegram_en","ig_ru","ig_en"].includes(chosenMode))throw Error("Для Reels необходимо готовое видео");
  const channel=tg?tgChannels[locale]:(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
  if(!channel?.enabled)throw Error("Подключите выбранный канал");
+ if(tg){const msg=String(locale==="ru"?$("fTG").value:$("fTGEN").value).replace(/<[^>]*>/g,"").replace(/https?:\/\/[^\s]+/g,"").trim();if(msg.length<80||msg.length>4000)throw Error("Telegram: полный текст должен содержать 80–4000 символов. Сейчас: "+msg.length);}
  if(!confirm("ОПУБЛИКОВАТЬ СЕЙЧАС только "+locale.toUpperCase()+"-версию «"+item.title+"» в "+(tg?"Telegram":"Instagram")+"?\\n\\nПравки будут сохранены и выбранная версия утверждена. Остальная очередь не изменится."))return;
  info("Сохраняю и проверяю факт…");
  await persistCurrent();
