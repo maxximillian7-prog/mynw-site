@@ -219,6 +219,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 .archive-history details{margin-top:6px}
 .archive-history summary{font-size:11px;color:#bdcdb8;cursor:pointer;padding:4px 0}
 .archive-history pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 Arial,sans-serif;max-height:360px;overflow:auto;color:#dbe9df;background:#182124;padding:10px;border-radius:8px}
+.archive-history .archive-media{display:block;max-width:160px;max-height:160px;object-fit:cover;border:1px solid #50635a;border-radius:10px;margin:8px 0}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
@@ -443,8 +444,8 @@ async function api(path,method="GET",body,gate=true,allowRenew=true){
 }
 async function task(fn){if(busy)return;busy=true;try{await fn()}catch(e){info(e.message||String(e),true)}finally{busy=false}}
 function current(){return items.find(x=>x.id===selected)}
-async function loadPublishedArchive(){
- const response=await api("/published");
+async function loadPublishedArchive(silent=false){
+ const response=await api("/published","GET",undefined,true,!silent);
  publishedArchive=Array.isArray(response.entries)?response.entries:[];
  return publishedArchive;
 }
@@ -554,8 +555,10 @@ function archiveDetailsMarkup(itemId){
  rows.map(entry=>{
   const channel=editorialDestinations.find(([dest])=>dest===entry.destination)?.[1]||entry.destination;
   const url=typeof entry.public_url==="string"&&/^https:\/\/(t\.me|www\.instagram\.com|instagram\.com)\//.test(entry.public_url)?entry.public_url:null;
+  const media=typeof entry.media_url==="string"&&entry.media_url.startsWith(ROOT+"/storage/v1/object/public/darkfactory-social/")?entry.media_url:null;
   return '<article><div class="archive-row"><strong>'+safe(channel)+'</strong><span>'+safe(plannedTimeText(entry.published_at))+' · Лиссабон</span></div>'+
    (url?'<a href="'+safe(url)+'" target="_blank" rel="noopener noreferrer">Открыть публикацию</a>':"")+
+   (media?'<img class="archive-media" src="'+safe(media)+'" alt="Сохранённая обложка публикации" loading="lazy">':"")+
    '<details><summary>Опубликованный текст и заголовок (архивная копия)</summary><strong>'+safe(entry.title_snapshot)+'</strong>'+
    '<pre>'+safe(entry.text_snapshot||"Текст недоступен для старой публикации")+'</pre></details></article>';
  }).join("")+'</div>';
@@ -1658,6 +1661,19 @@ $("automation").onclick=()=>task(async()=>{if(!confirm(settings.auto_enabled?"О
 $("generate").onclick=()=>task(async()=>{if(!confirm("Запустить поиск новых проверяемых фактов через AI? Это расходует API-токены и не публикует контент."))return;info("Генерация фактов…");const r=await api("/generate","POST",{});await reload();info("Добавлено "+(r.items||[]).length+" фактов.")});
 $("new").onclick=()=>task(async()=>{const result=await api("/items","POST",{title:"Новый факт",hook:"Короткое вступление",body:"Текст факта",punch:"Почему это удивительно",topic:"history",format_type:"card",theme_variant:"black_press",scene_variant:0,dialogue:[],caption_instagram:"",caption_telegram:""});$("filter").value="all";await reload();selected=result.item.id;select();info("Создан черновик, необходимо добавить источники и проверить факт.")});
 updateTGButtons();
+// Detect asynchronous Telegram/Buffer confirmations without altering unsaved editor drafts.
+// A background refresh never requests the editorial PIN; protected user actions renew it.
+let archivePollActive=false;
+setInterval(async()=>{
+ if(archivePollActive||busy||!unlocked||document.hidden||$("app").classList.contains("layout-hidden"))return;
+ archivePollActive=true;
+ try{
+  const before=new Set(publishedArchive.map(x=>x.item_id+"|"+x.destination));
+  await loadPublishedArchive(true);
+  const newlyPublished=publishedArchive.some(x=>!before.has(x.item_id+"|"+x.destination));
+  if(newlyPublished||$("filter").value==="published")refreshPublishedViews();
+ }catch(_e){/* Next foreground action can renew an expired PIN */}finally{archivePollActive=false}
+},60000);
 if(unlocked)open();else $("loginInfo").textContent="Требуется подтверждённая сессия Journal Studio.";
 })();
 </script></body></html>
