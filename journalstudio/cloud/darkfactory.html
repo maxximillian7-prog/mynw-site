@@ -335,7 +335,7 @@ async function reload(){
  $("verifiedCount").textContent=items.filter(x=>x.fact_verification==="verified").length;
  $("imageCount").textContent=items.filter(x=>x.visual_status==="ready").length;
  const visible=filtered();if(!visible.some(x=>x.id===selected))selected=visible[0]?.id||null;
- drawQueue();select();emitSummary();
+ drawQueue();select();emitSummary();updateBufferButtons();
 }
 
 let lastSummary="";
@@ -706,7 +706,7 @@ function swipe(element,onDelta){
  element.addEventListener("pointercancel",()=>{start=null});
 }
 async function patch(data){const x=current();if(!x)return;const result=await api("/items/"+x.id,"PATCH",data);items[items.findIndex(v=>v.id===x.id)]=result.item;select();return result.item}
-async function open(){try{await api("/health");if(!unlocked)throw Error("Locked");await api("/settings");$("login").classList.add("layout-hidden");$("app").classList.remove("layout-hidden");await reload();await loadSettings();try{await loadTGChannels()}catch(e){info("Telegram API: "+String(e.message||e),true)}try{await loadSchedule()}catch(e){info("Календарь: "+String(e.message||e),true)}}catch(e){$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden");$("loginInfo").textContent=e.message}}
+async function open(){try{await api("/health");if(!unlocked)throw Error("Locked");await api("/settings");$("login").classList.add("layout-hidden");$("app").classList.remove("layout-hidden");await reload();await loadSettings();try{await loadTGChannels()}catch(e){info("Telegram API: "+String(e.message||e),true)}try{await loadSchedule()}catch(e){info("Календарь: "+String(e.message||e),true)}try{await loadBuffer()}catch(e){info("Instagram/Buffer: "+String(e.message||e),true)}}catch(e){$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden");$("loginInfo").textContent=e.message}}
 async function loadSettings(){const x=await api("/settings");settings=x.settings||{};$("automation").textContent=settings.auto_enabled?"⏱ Автопополнение: ВКЛ":"⏸ Автопополнение: ВЫКЛ"}
 
 function suffixTG(locale){return locale==="ru"?"RU":"EN"}
@@ -979,6 +979,115 @@ async function loadSchedule(){
 }
 $("showSchedule").onclick=()=>{$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"})};
 $("refreshSchedule").onclick=()=>task(async()=>{await loadSchedule();info("Очередь обновлена")});
+
+
+let bufferState={key_configured:false,channels:[]},bufferAvailable=[];
+function renderBufferState(){
+ const configured=Boolean(bufferState.key_configured);
+ $("bufferSummary").textContent=configured?"Buffer API подключён · выберите отдельные Instagram-аккаунты":"Buffer API не подключён";
+ $("bufferKeyStatus").textContent=configured?"✓ API-ключ сохранён на сервере":"Нужен API-ключ из Buffer → Settings → API";
+ for(const locale of ["ru","en"]){
+  const suf=locale.toUpperCase();
+  const link=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
+  $("bufferState"+suf).textContent=link?("✓ "+link.channel_name):(locale==="ru"?"Не подключён":"Not connected");
+  $("bufferChannel"+suf).disabled=!configured;
+  $("bufferBind"+suf).disabled=!configured||!bufferAvailable.length;
+ }
+ updateBufferButtons();
+}
+function updateBufferButtons(){
+ const x=current();
+ for(const locale of ["ru","en"]){
+  const suf=locale.toUpperCase();
+  const link=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
+  const approved=Boolean(x&&x.fact_verification==="verified"&&x.visual_status==="ready"&&x.status_instagram==="approved");
+  $("bufferMedia"+suf).disabled=!x||!x.image_storage_path;
+  $("bufferCheckMedia"+suf).disabled=!x;
+  $("bufferNow"+suf).disabled=!link||!approved;
+  $("bufferSchedule"+suf).disabled=!link||!approved;
+ }
+}
+async function loadBuffer(){
+ bufferState=await api("/buffer/status");renderBufferState();
+ if(bufferState.key_configured)try{await refreshBufferChannels()}catch(e){$("bufferKeyStatus").textContent="Ключ есть, но получить список каналов не удалось: "+e.message}
+}
+async function refreshBufferChannels(){
+ const result=await api("/buffer/channels");
+ bufferAvailable=result.channels||[];
+ for(const locale of ["ru","en"]){
+  const suf=locale.toUpperCase(),select=$("bufferChannel"+suf);
+  select.innerHTML='<option value="">— Выберите аккаунт Instagram —</option>'+bufferAvailable.map((v,i)=>
+   '<option value="'+i+'">'+safe(v.display_name||v.name||"Instagram")+' · '+safe(v.organization_id)+'</option>'
+  ).join("");
+  const linked=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale);
+  if(linked){const i=bufferAvailable.findIndex(v=>v.id===linked.channel_id);if(i>=0)select.value=String(i)}
+ }
+ renderBufferState();
+}
+$("showBuffer").onclick=()=>$("bufferSetup").scrollIntoView({behavior:"smooth",block:"start"});
+$("bufferConnectKey").onclick=()=>task(async()=>{
+ const key=$("bufferKey").value.trim();if(!key)throw Error("Вставь API-ключ Buffer");
+ const data=await api("/buffer/key","POST",{api_key:key});
+ $("bufferKey").value="";
+ $("bufferKeyStatus").textContent="✓ Ключ проверен и сохранён; доступных Instagram: "+(data.instagram_channels||[]).length;
+ await loadBuffer();
+});
+$("bufferRefresh").onclick=()=>task(async()=>{
+ await loadBuffer();info("Buffer: список подключённых Instagram обновлён");
+});
+for(const locale of ["ru","en"]){
+ const suf=locale.toUpperCase();
+ $("bufferBind"+suf).onclick=()=>task(async()=>{
+  const index=Number($("bufferChannel"+suf).value);
+  const chosen=bufferAvailable[index];
+  if(!$("bufferChannel"+suf).value||!chosen)throw Error("Выберите Instagram в Buffer");
+  if(!confirm("Привязать «"+(chosen.display_name||chosen.name)+"» к Instagram "+suf+" проекта НЕТ! СЕРЬЁЗНО?!?"))return;
+  await api("/buffer/connect","POST",{locale,organization_id:chosen.organization_id,channel_id:chosen.id});
+  await loadBuffer();info("Instagram "+suf+" подключён через Buffer. Автопубликация отдельно настраивается в календаре.");
+ });
+ $("bufferCheckMedia"+suf).onclick=()=>task(async()=>{
+  const x=current();if(!x)return;
+  const result=await api("/instagram/items/"+x.id+"/"+locale+"/slides");
+  $("bufferMediaStatus"+suf).textContent="Сохранено слайдов: "+(result.assets||[]).length;
+ });
+ $("bufferMedia"+suf).onclick=()=>task(async()=>{
+  const x=current();if(!x)throw Error("Выберите материал");
+  if(!image||!x.image_storage_path||x.visual_status!=="ready")
+   throw Error("Подождите, пока оригинальная иллюстрация загрузится, затем повторите");
+  if(!confirm("Создать и сохранить в публичном Instagram-хранилище все "+suf+" слайды из текущего предпросмотра? \nИх сможет скачать Buffer для публикации."))return;
+  await persistCurrent();
+  const fact=current(),en=locale==="en",preview=draft(),slides=slidesFor(preview,en);
+  if(!slides.length||slides.length>10)throw Error("Допускается 1–10 слайдов");
+  const active=session();if(!active?.access_token||!unlocked)throw Error("Нет редакционной сессии");
+  for(let i=0;i<slides.length;i++){
+   const canvas=document.createElement("canvas");
+   drawCard(canvas,preview,slides[i],en,false,false,i,slides.length);
+   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.89));
+   if(!blob||blob.size>8*1024*1024)throw Error("Не удалось экспортировать слайд "+(i+1));
+   const response=await fetch(ROOT+"/functions/v1/darkfactory/instagram/items/"+fact.id+
+     "/"+locale+"/slides/"+(i+1),{method:"PUT",cache:"no-store",
+    headers:{apikey:PUB,Authorization:"Bearer "+active.access_token,
+     "x-darkfactory-session":unlocked,"Content-Type":"image/jpeg"},body:blob});
+   const body=await response.json().catch(()=>({}));
+   if(!response.ok)throw Error(body.error||"Не сохранён слайд "+(i+1));
+   $("bufferMediaStatus"+suf).textContent="Сохранено "+(i+1)+" / "+slides.length+" слайдов";
+  }
+  info("✓ Instagram "+suf+": "+slides.length+" изображений сохранены. Проверьте и утвердите факт перед публикацией.");
+ });
+ async function sendBufferNowOrSchedule(type){
+  const x=current();if(!x)throw Error("Выберите материал");
+  const destination=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
+  if(!destination)throw Error("Сначала подключите отдельный Instagram "+suf+" через Buffer");
+  if(!confirm((type==="now"?"ОПУБЛИКОВАТЬ СЕЙЧАС":"ПЕРЕДАТЬ В BUFFER ПО РАСПИСАНИЮ")+" «"+x.title+"» для "+destination.channel_name+
+   "?\n\nБудет использован согласованный текст "+suf+" и ранее сохранённые изображения. Другие публикации не сдвигаются."))return;
+  const result=await api("/instagram/items/"+x.id+"/"+locale+"/buffer-publish","POST",{mode:type});
+  await loadSchedule();
+  $("bufferMediaStatus"+suf).textContent="✓ Передано Buffer: "+result.buffer_post_id+" · "+(result.buffer_status||"pending");
+  info("Отправлено в Buffer "+suf+". Статус "+(result.buffer_status||"ожидает публикации")+".");
+ }
+ $("bufferNow"+suf).onclick=()=>task(()=>sendBufferNowOrSchedule("now"));
+ $("bufferSchedule"+suf).onclick=()=>task(()=>sendBufferNowOrSchedule("schedule"));
+}
 
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
