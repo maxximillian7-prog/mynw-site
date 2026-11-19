@@ -220,6 +220,16 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 .archive-history summary{font-size:11px;color:#bdcdb8;cursor:pointer;padding:4px 0}
 .archive-history pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 Arial,sans-serif;max-height:360px;overflow:auto;color:#dbe9df;background:#182124;padding:10px;border-radius:8px}
 .archive-history .archive-media{display:block;max-width:160px;max-height:160px;object-fit:cover;border:1px solid #50635a;border-radius:10px;margin:8px 0}
+
+.fact-review-controls{padding:13px 14px;margin:0 0 13px;border-radius:12px;border:1px solid #536251;background:#171f20}
+.fact-review-controls .fact-review-heading{font-size:12px;font-weight:800;color:#e7f4dd;margin-bottom:8px}
+.fact-review-controls .fact-review-state{font-size:12px;color:#bed1c1;margin-bottom:10px;line-height:1.6}
+.fact-review-controls .fact-review-buttons{display:flex;flex-wrap:wrap;gap:8px}
+.fact-review-controls button{font-size:12px;padding:10px 12px;min-width:152px;flex:1}
+.fact-review-controls button.verified{border-color:#bdfa39;background:#c7f740;color:#171c14}
+.fact-review-controls button.unconfirmed{border-color:#866353;background:#352822;color:#f9b7a8}
+.fact-review-controls button.deferred{border-color:#708389;background:#243036;color:#deeee8}
+.fact-review-controls .review-note{font-size:11px;color:#95aaa5;margin-top:8px;line-height:1.6}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
@@ -227,8 +237,8 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <header class="top"><div class="brand"><img class="wow-emblem" src="./brand-seriously.svg?v=20261119-approved" alt="Эмблема НЕЕЕТ, серьёзно" width="64" height="64"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?!</span></div><div><div class="eyebrow">NO, SERIOUSLY?! / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
  <div class="top-actions"><button id="showSchedule">◷ Очередь</button><button id="showConfig">⚙ Расписание</button><button id="showBuffer">◎ Instagram API</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
- <div class="board"><section class="panel"><div class="panel-head"><h2>Материалы</h2><select id="filter" style="max-width:144px"><option value="review" selected>На приёмке</option><option value="published">Опубликовано</option><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="all">Всё</option></select></div>
-<div class="editorial-tabs"><button type="button" data-editorial-view="review" class="active">На приёмке <span id="reviewListCount">0</span></button><button type="button" data-editorial-view="published">Опубликовано <span id="publishedListCount">0</span></button></div>
+ <div class="board"><section class="panel"><div class="panel-head"><h2>Материалы</h2><select id="filter" style="max-width:144px"><option value="review" selected>На приёмке</option><option value="unconfirmed">Не подтверждено</option><option value="deferred">Отложено</option><option value="published">Опубликовано</option><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="all">Всё</option></select></div>
+<div class="editorial-tabs"><button type="button" data-editorial-view="review" class="active">На приёмке <span id="reviewListCount">0</span></button><button type="button" data-editorial-view="deferred">Отложено <span id="deferredListCount">0</span></button><button type="button" data-editorial-view="published">Опубликовано <span id="publishedListCount">0</span></button></div>
 <div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
  <div class="switches"><button data-mode="ig_ru">Instagram · RU</button><button data-mode="ig_en">Instagram · EN</button><button class="active" data-mode="telegram">Telegram · RU</button><button data-mode="telegram_en">Telegram · EN</button><button data-mode="reel_ru">Reels · RU</button><button data-mode="reel_en">Reels · EN</button></div>
@@ -286,12 +296,24 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
    <div class="platform-card instagram"><strong>◎ Instagram / Buffer</strong><small>Карточки из предпросмотра подготавливаются автоматически</small><div class="platform-buttons"><button type="button" class="primary" id="publishIGNowRU">⚡ RU · сейчас</button><button type="button" class="primary" id="publishIGNowEN">⚡ EN · сейчас</button></div></div>
   </div>
   <button type="button" class="primary" id="publishAllNow">⚡ Опубликовать во все 4 канала</button>
-  <div class="actions"><button class="primary" id="approveAll">✓ Утвердить 4 версии и поставить в очередь</button><button type="button" class="primary" id="publishNowPreview">⚡ Опубликовать сейчас</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
+  <div class="actions"><button class="primary" id="approveAll">◷ Запланировать на позже · 4 канала</button><button type="button" class="primary" id="publishNowPreview">⚡ Опубликовать сейчас</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
  <div id="status" class="status" aria-live="polite"></div>
  <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Кнопка «Опубликовать сейчас» отправляет один выбранный пост в подключённый канал после подтверждения; остальные записи не сдвигаются.</div>
  </div></main>
  <section class="panel editor-panel"><div class="panel-head"><h2>Факты · источники · тексты</h2><button class="primary" id="save">Сохранить</button></div><div class="edit" id="editor">
- <div class="full"><div class="eyebrow" id="verification"></div><div id="evidence" class="block"></div></div>
+ <div class="full">
+<div class="fact-review-controls" id="factReviewControls">
+  <div class="fact-review-heading">Проверка факта и публикация позже</div>
+  <div class="fact-review-state" id="factReviewState" aria-live="polite">Загрузка статуса проверки…</div>
+  <div class="fact-review-buttons">
+    <button type="button" class="verified" id="verifyFact">🔎 Проверить и подтвердить</button>
+    <button type="button" class="unconfirmed" id="markUnconfirmed">⚠ Не подтверждён</button>
+    <button type="button" class="deferred" id="deferPublication">◷ Сохранить на потом</button>
+    <button type="button" class="deferred" id="resumePublication" hidden>↩ Вернуть к публикации</button>
+  </div>
+  <div class="review-note">Подтверждение проверяет минимум два независимых источника. Ни одна из этих кнопок не публикует статью. После проверки можно отправить сейчас либо запланировать.</div>
+</div>
+<div class="eyebrow" id="verification"></div><div id="evidence" class="block"></div></div>
  <div><h3>Русский · Instagram / Telegram</h3><label>Заголовок RU</label><input id="fTitle"><label>Вступление RU</label><textarea id="fHook"></textarea><label>История RU</label><textarea id="fBody" rows="8"></textarea><label>Instagram RU · подпись</label><textarea id="fIGRU" rows="5"></textarea><label>Telegram RU · публикация</label><textarea id="fTG" rows="6"></textarea></div>
  <div><h3>English · Instagram</h3><label>Headline EN</label><input id="fTitleEN"><label>Hook EN</label><textarea id="fHookEN"></textarea><label>Full Story EN</label><textarea id="fBodyEN" rows="8"></textarea><label>Instagram EN · Caption</label><textarea id="fIGEN" rows="6"></textarea><label>Telegram EN · публикация</label><textarea id="fTGEN" rows="6"></textarea><label>Формат</label><select id="fFormat"><option value="card">Одна карточка</option><option value="photo_story">Фотоистория</option><option value="carousel">Карусель</option><option value="timeline">Хронология</option><option value="comparison">Сравнение</option><option value="reel_story">Reels / Story</option></select></div>
  <div class="full block"><label>Внутренний фактчекинг · источники видны только редактору (по одному URL в строке)</label><textarea id="fSources" rows="3"></textarea><label>Промпт визуала · английский</label><textarea id="fVisual" rows="3"></textarea><p class="note">Для нового иллюстративного кадра используется существующий OPENAI_API_KEY Journal Studio. Дубликаты и непроверенные факты не отправляются в генерацию.</p></div>
@@ -455,13 +477,15 @@ function publishedEntries(itemId){
 function isAlreadyPublished(itemId){return publishedArchive.some(e=>e.item_id===itemId)}
 function publicationFor(itemId,dest){return publishedArchive.find(e=>e.item_id===itemId&&e.destination===dest)||null}
 function reviewNeeded(x){
- return !isAlreadyPublished(x.id)&&[x.status_instagram,x.status_telegram,x.status_telegram_en].some(v=>v==="review"||v==="needs_changes");
+ return !isAlreadyPublished(x.id)&&!x.editorial_deferred&&(x.fact_verification!=="verified"||[x.status_instagram,x.status_telegram,x.status_telegram_en].some(v=>v==="review"||v==="needs_changes"));
 }
 function syncEditorialTabs(){
  const reviewCount=items.filter(reviewNeeded).length;
  const publishedCount=new Set(publishedArchive.map(e=>e.item_id)).size;
+ const deferredCount=items.filter(x=>x.editorial_deferred).length;
  $("reviewListCount").textContent=String(reviewCount);
  $("publishedListCount").textContent=String(publishedCount);
+ $("deferredListCount").textContent=String(deferredCount);
  const view=$("filter").value;
  document.querySelectorAll("[data-editorial-view]").forEach(btn=>{
   btn.classList.toggle("active",btn.dataset.editorialView===view);
@@ -501,6 +525,8 @@ function filtered(){
  const f=$("filter").value;
  const rows=items.filter(x=>f==="all"||f==="review"&&reviewNeeded(x)||
  f==="published"&&isAlreadyPublished(x.id)||
+ f==="unconfirmed"&&x.fact_verification!=="verified"||
+ f==="deferred"&&x.editorial_deferred||
  f==="pilot"&&x.source===pilot||
  f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot));
  if(f==="published")rows.sort((a,b)=>{
@@ -563,8 +589,38 @@ function archiveDetailsMarkup(itemId){
    '<pre>'+safe(entry.text_snapshot||"Текст недоступен для старой публикации")+'</pre></details></article>';
  }).join("")+'</div>';
 }
+function updateFactReviewButtons(){
+ const x=current(),verified=x?.fact_verification==="verified",held=Boolean(x?.editorial_deferred);
+ const verify=$("verifyFact"),unconfirmed=$("markUnconfirmed");
+ const defer=$("deferPublication"),resume=$("resumePublication"),state=$("factReviewState");
+ if(!verify||!state)return;
+ verify.disabled=!x||verified;
+ verify.textContent=verified?"✓ Факт подтверждён":"🔎 Проверить и подтвердить факт";
+ unconfirmed.disabled=!x||!verified;
+ unconfirmed.textContent=verified?"⚠ Отметить как неподтверждённый":"⚠ Факт не подтверждён";
+ defer.hidden=held;defer.disabled=!x;
+ resume.hidden=!held;resume.disabled=!x;
+ const label=verified?"✓ Подтверждён по источникам":"⚠ Не подтверждён";
+ const reason=String(x?.creative_notes||"").slice(0,300);
+ state.textContent=x?label+" · "+(held?"Публикация отложена · ":"")+
+  (Array.isArray(x.source_urls)?x.source_urls.length:0)+" источников"+
+  (reason?" · "+reason:""):
+  "Выберите материал для проверки.";
+ $("approveAll").disabled=!verified||held||!x?.image_storage_path;
+ updatePublishArchiveButtons();
+}
+async function afterFactAction(itemId,filterChoice,confirmation){
+ $("filter").value=filterChoice;selected=itemId;
+ await reload();
+ if(!filtered().some(x=>x.id===itemId)){
+  $("filter").value="all";selected=itemId;await reload();
+ }
+ selected=itemId;select();
+ if(confirmation)info(confirmation);
+}
 function updatePublishArchiveButtons(){
  const item=current();
+ const factReady=!!item&&item.fact_verification==="verified"&&!item.editorial_deferred;
  for(const [id,dest,label] of [
   ["publishTGNowRU","telegram_ru","RU"],["publishTGNowEN","telegram_en","EN"],
   ["publishIGNowRU","instagram_ru","RU"],["publishIGNowEN","instagram_en","EN"]
@@ -572,14 +628,14 @@ function updatePublishArchiveButtons(){
   const button=$(id);if(!button)continue;
   const done=item&&Boolean(publicationFor(item.id,dest));
   const pending=item&&!done&&hasPublicationRecord(item.id,dest);
-  button.disabled=!item||done||pending;
+  button.disabled=!factReady||done||pending;
   button.textContent=done?"✓ Опубликовано":pending?"◷ В обработке":"⚡ "+label+" · сейчас";
  }
  const all=$("publishAllNow");
  if(all){
   const remaining=item?editorialDestinations.filter(([dest])=>!hasPublicationRecord(item.id,dest)).length:0;
   const sent=item?publishedEntries(item.id).length:0;
-  all.disabled=!item||remaining===0;
+  all.disabled=!factReady||remaining===0;
   all.textContent=remaining===0?"✓ Все каналы обработаны":sent?"⚡ Опубликовать в остальные каналы ("+remaining+")":"⚡ Опубликовать во все 4 канала";
  }
 }
@@ -590,6 +646,7 @@ function refreshPublishedViews(){
  if(!visible.some(x=>x.id===selected))selected=visible[0]?.id||null;
  syncEditorialTabs();drawQueue();
  if(previous!==selected)select();else renderSelectedPlan();
+ updateFactReviewButtons();
  updatePublishArchiveButtons();emitSummary();
 }
 function renderSelectedPlan(){
@@ -623,7 +680,7 @@ function select(){
  $("approveTG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTGEN").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready"||!x.caption_telegram_en;
  updateTGButtons();updateBufferButtons();
- drawQueue();renderSelectedPlan();updatePublishArchiveButtons();loadImage(x.image_url);
+ drawQueue();renderSelectedPlan();updateFactReviewButtons();loadImage(x.image_url);
 }
 function loadImage(url){
  image=null;imageSource=url||"";
@@ -1616,7 +1673,7 @@ $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){sel
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
 document.querySelectorAll("[data-editorial-view]").forEach(button=>{
  button.onclick=()=>{const view=button.dataset.editorialView;
-  if(view!=="review"&&view!=="published")return;
+  if(view!=="review"&&view!=="published"&&view!=="deferred")return;
   $("filter").value=view;selected=null;reload().catch(e=>info(e.message,true));
  };
 });
