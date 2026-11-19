@@ -908,8 +908,8 @@ function scheduleCard(x){
   ((x.allowed_weekdays||[]).includes(i+1)?"checked":"")+">"+name+"</label>").join("");
  return '<div class="calendar-card" data-destination="'+safeDest+'"><h3>'+destinationLabels[dest]+'</h3>'+
  '<div class="settings-row"><label>Автопубликация включена</label><input data-field="enabled" type="checkbox" '+(x.enabled?"checked":"")+
- (instagram?" disabled":"")+'></div>'+
- (instagram?'<p class="note">Публикация ожидает подключения отдельных Instagram-аккаунтов. Подготовленная очередь не отправляется в «Португалия рядом».</p>':"")+
+ '></div>'+
+ (instagram?'<p class="note">Автопубликация работает только после привязки своего Instagram к Buffer; материалы «Португалия рядом» не затрагиваются.</p>':"")+
  '<div class="settings-row"><label>Автоматически ставить после приёмки</label><input type="checkbox" data-field="auto_queue" '+(x.auto_queue?"checked":"")+'></div>'+
  '<div class="row"><div><label>Интервал (мин.)</label><input type="number" data-field="min_gap_minutes" min="60" max="1440" step="5" value="'+Number(x.min_gap_minutes||60)+'"></div>'+
  '<div><label>Постов в сутки</label><input type="number" data-field="max_per_day" min="1" max="16" value="'+Number(x.max_per_day||10)+'"></div></div>'+
@@ -934,7 +934,7 @@ function renderScheduleSettings(){
   if(!days.length)throw Error("Нужен хотя бы один день недели");
   const dates=val("excluded_dates").split(/\s+/).map(x=>x.trim()).filter(Boolean);
   const result=await api("/schedule/settings/"+dest,"PATCH",{
-   enabled:dest.startsWith("instagram_")?false:checked("enabled"),auto_queue:checked("auto_queue"),
+   enabled:checked("enabled"),auto_queue:checked("auto_queue"),
    min_gap_minutes:min,max_per_day:max,active_start:start,active_end:end,
    allowed_weekdays:days,excluded_dates:dates
   });
@@ -955,7 +955,7 @@ function renderScheduleQueue(){
   const actions=editable?'<div class="s-actions"><button data-move-queue="'+safe(j.id)+'">Перенести</button><button data-cancel-queue="'+safe(j.id)+'">Отменить</button></div>':
    j.message_id?'<span class="muted">#'+Number(j.message_id)+'</span>':'';
   return '<tr><td>'+safe(name)+'</td><td>'+safe(destinationLabels[j.destination]||j.destination)+'</td>'+
-   '<td class="status-'+safe(j.status)+'">'+safe(j.status)+'</td><td>'+input+'</td><td>'+actions+
+   '<td class="status-'+safe(j.status)+'">'+safe(j.status==="submitted"?"Передано Buffer":j.status)+'</td><td>'+input+'</td><td>'+actions+
    (j.error?'<small style="color:#ff9b8c">'+safe(j.error)+'</small>':'')+'</td></tr>';
  }).join("");
  $("scheduleQueue").innerHTML='<table><thead><tr><th>Материал</th><th>Канал</th><th>Статус</th>'+
