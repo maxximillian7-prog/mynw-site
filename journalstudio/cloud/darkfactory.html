@@ -172,12 +172,35 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 .buffer-history-row small{color:#c0c9bf}
 .buffer-history-row a{color:#d4ff65;text-decoration:underline}
 @media(max-width:640px){.buffer-history-row{flex-wrap:wrap}}
+
+/* Compact technical drawers, clear per-platform actions and editorial times */
+.tech-fold{margin:12px 0;border:1px solid #3b4647;border-radius:13px;overflow:hidden;background:#13191d}
+.tech-fold>summary{cursor:pointer;padding:15px 17px;background:#222b2d;color:#e8f1e8;font-weight:800;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tech-fold>summary::-webkit-details-marker{display:none}
+.tech-fold>summary::after{content:"Открыть ↓";font-size:11px;color:var(--lime);white-space:nowrap}
+.tech-fold[open]>summary::after{content:"Свернуть ↑"}
+.tech-fold>.panel{margin:0;border:0;border-radius:0}
+.tech-fold .calendar-grid{padding:12px}.tech-fold .calendar-note{padding:12px 16px}
+.platform-publish{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.platform-publish .platform-card{padding:13px;border:1px solid #38484b;border-radius:12px;background:#131b20}
+.platform-card.instagram{border-color:#664765}.platform-card.telegram{border-color:#426377}
+.platform-card strong{font-size:14px;display:block;margin-bottom:3px}.platform-card small{display:block;color:#a7b9b4;font-size:11px;min-height:27px}
+.platform-buttons{display:flex;gap:6px;margin-top:10px}.platform-buttons button{flex:1;min-width:0;padding:9px 7px;font-size:11px}
+.platform-publish .platform-card .primary{background:var(--lime);color:#121613}
+#publishAllNow{background:#d1fa4c;color:#10160c;width:100%;padding:13px 12px;font-size:14px;border-color:#d1fa4c}
+#publishNowPreview{display:none!important}
+.queue-plan{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:8px}
+.queue-plan span{font-size:10px;color:#a6b7b2;letter-spacing:0;text-transform:none;line-height:1.45}
+.queue-plan b{font-weight:750;color:#e0eae5}.queue-plan .scheduled{color:#c7e993}.queue-plan .sent{color:#9ce6bc}.queue-plan .unknown{color:#ffba86}
+.selected-plan{padding:12px;background:#1b2425;border:1px solid #3c4c4d;border-radius:11px;margin:10px 0}
+.selected-plan h3{font-size:12px;color:#cafa91;margin:0 0 8px}.selected-plan .queue-plan span{font-size:11px}
+@media(max-width:700px){.platform-publish{grid-template-columns:1fr}.queue-plan{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
 <div id="app" class="shell layout-hidden">
  <header class="top"><div class="brand"><img class="wow-emblem" src="./brand-seriously.svg?v=20261119-approved" alt="Эмблема НЕЕЕТ, серьёзно" width="64" height="64"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?!</span></div><div><div class="eyebrow">NO, SERIOUSLY?! / JOURNAL STUDIO</div><div class="muted">Факты, которые звучат как выдумка. Но это правда.</div></div></div>
- <div class="top-actions"><button id="showSchedule">◷ Расписание</button><button id="showBuffer">◎ Instagram / Buffer</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
+ <div class="top-actions"><button id="showSchedule">◷ Очередь</button><button id="showConfig">⚙ Расписание</button><button id="showBuffer">◎ Instagram API</button><button id="showTGSetup">✈ Telegram API</button><button id="refresh">↻ Обновить</button><button id="new">+ Новый факт</button><button id="generate">✦ Найти факты через AI</button><button id="automation">Автопополнение</button><button id="close">Закрыть доступ</button></div></header>
  <div class="intro"><div><strong id="allCount">0</strong> <span class="muted">материалов</span></div><div><strong id="pilotCount">0</strong> <span class="muted">пилот</span></div><div><strong id="verifiedCount">0</strong> <span class="muted">проверены</span></div><div><strong id="imageCount">0</strong> <span class="muted">с иллюстрациями</span></div><div class="muted" style="max-width:350px">Instagram: RU + EN · Telegram: RU + EN. Автоодобрение фактов не означает публикацию в аккаунт.</div></div>
  <div class="board"><section class="panel"><div class="panel-head"><h2>Редакторская очередь</h2><select id="filter" style="max-width:130px"><option value="pilot">Пилот · 10</option><option value="facts">Все факты</option><option value="review">На приёмке</option><option value="all">Всё</option></select></div><div class="queue" id="queue"></div></section>
  <main class="panel"><div class="panel-head"><h2 id="chosenTitle">Предпросмотр</h2><span class="tag" id="formatName"></span></div><div class="work">
@@ -230,7 +253,13 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
  <div class="actions"><button class="primary" id="illustrate">✦ Сгенерировать изображение</button><button id="download">↓ Экспорт текущего слайда PNG</button></div>
  <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
- <div class="actions"><button class="primary" id="approveAll">✓ Утвердить 4 версии и поставить в очередь</button><button type="button" class="primary" id="publishNowPreview">⚡ Опубликовать сейчас</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
+ <div class="selected-plan" id="selectedPublicationPlan" aria-live="polite"><h3>План публикаций · время Лиссабона</h3><span class="muted">Выберите материал в очереди</span></div>
+  <div class="platform-publish" aria-label="Публикация в отдельные каналы">
+   <div class="platform-card telegram"><strong>✈ Telegram</strong><small>Одно фото 16:9 и полный текст в одном сообщении</small><div class="platform-buttons"><button type="button" class="primary" id="publishTGNowRU">⚡ RU · сейчас</button><button type="button" class="primary" id="publishTGNowEN">⚡ EN · сейчас</button></div></div>
+   <div class="platform-card instagram"><strong>◎ Instagram / Buffer</strong><small>Карточки из предпросмотра подготавливаются автоматически</small><div class="platform-buttons"><button type="button" class="primary" id="publishIGNowRU">⚡ RU · сейчас</button><button type="button" class="primary" id="publishIGNowEN">⚡ EN · сейчас</button></div></div>
+  </div>
+  <button type="button" class="primary" id="publishAllNow">⚡ Опубликовать во все 4 канала</button>
+  <div class="actions"><button class="primary" id="approveAll">✓ Утвердить 4 версии и поставить в очередь</button><button type="button" class="primary" id="publishNowPreview">⚡ Опубликовать сейчас</button><button class="ok" style="display:none" id="approveIG">Одобрить Instagram RU/EN</button><button class="ok" style="display:none" id="approveTG">Одобрить Telegram RU</button><button class="ok" style="display:none" id="approveTGEN">Одобрить Telegram EN</button><button id="changes">На доработку</button></div>
  <div id="status" class="status" aria-live="polite"></div>
  <div class="note">Иллюстрации AI отмечены как реконструкции. Экспорт PNG создаёт изображение в выбранном формате. Reels: только обложка, экспорт видео пока не реализован. Кнопка «Опубликовать сейчас» отправляет один выбранный пост в подключённый канал после подтверждения; остальные записи не сдвигаются.</div>
  </div></main>
@@ -244,7 +273,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <section class="panel calendar-panel" id="schedulePanel">
   <div class="panel-head"><h2>◷ Редакционный календарь и очередь публикаций</h2><button id="refreshSchedule">↻ Обновить</button></div>
   <div class="calendar-note">Europe/Lisbon · тихие часы 00:00–08:00 · интервал не менее 60 минут между постами одного канала. Утверждение создаёт очередь, но отправка начнётся только после включения автопубликации.</div>
-  <div id="scheduleSettings" class="calendar-grid"></div>
+  <details class="tech-fold" id="calendarConfig"><summary>⚙ Настройки расписания · все четыре канала</summary><div id="scheduleSettings" class="calendar-grid"></div></details>
   <div class="queue-schedule">
    <div class="queue-schedule-header"><strong>Запланировано · опубликовано · ошибки</strong><span id="scheduledCount" class="tag">0</span></div>
    <div class="queue-schedule-scroll" id="scheduleQueue"><p style="padding:15px" class="muted">Загрузка очереди…</p></div>
@@ -252,6 +281,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  </section>
 
  
+<details class="tech-fold" id="bufferDetails"><summary>◎ Instagram / Buffer · API, аккаунты, медиа и история</summary>
 <section class="panel tg-setup" id="bufferSetup">
  <div class="panel-head"><h2>◎ Instagram · Buffer API</h2><span class="tag" id="bufferSummary">Подключение Instagram ещё не подтверждено</span></div>
  <p class="note" style="padding:12px 18px 0">Подключаются исключительно Instagram-аккаунты проекта «НЕТ! СЕРЬЁЗНО?!». Аккаунты «Португалия рядом» не используются. Ключ хранится на сервере, публичные слайды создаются из готового Instagram-предпросмотра.</p>
@@ -292,7 +322,9 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
   <div id="bufferDeliveries" aria-live="polite" class="muted">Публикаций через Buffer пока нет.</div>
  </div>
 </section>
+</details>
 
+<details class="tech-fold" id="telegramDetails"><summary>✈ Telegram · API, проверки и подключение</summary>
 <section class="panel tg-setup" id="tgSetup">
  <div class="panel-head"><h2>Telegram Bot API · подключение каналов</h2><span class="tag">Токены хранятся только на сервере · автопубликация управляется календарём</span></div>
  <div class="tg-grid">
@@ -315,7 +347,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
    <p class="tg-notice" id="tgNoticeEN"></p>
   </div>
  </div>
- </section></div>
+ </section></details></div>
 <script>
 (function(){
 "use strict";
