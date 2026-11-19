@@ -243,7 +243,7 @@ window.StudioBrandHub=(function(){
     frame.classList.add("studio-embedded-frame");
     frame.removeAttribute("style");
     frame.setAttribute("loading","lazy");
-    frame.dataset.src="./darkfactory.html?v=20261118-unified-5&embedded=1";
+    frame.dataset.src="./darkfactory.html?v=20261119-buffer-manual-v1&embedded=1";
    }
    old.insertAdjacentHTML("afterbegin",'<div class="studio-brand-workspace-header seriously">'+
     '<div class="title-cluster"><img src="'+logo("seriously")+'" alt=""><div><h2>НЕТ! СЕРЬЁЗНО?! / NO, SERIOUSLY?!</h2>'+
