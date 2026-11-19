@@ -401,7 +401,53 @@ window.addEventListener("message",event=>{
 });
 
 function filtered(){let f=$("filter").value;return items.filter(x=>f==="all"||f==="pilot"&&x.source===pilot||f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot)||f==="review"&&(x.status_instagram==="review"||x.status_telegram==="review"||x.status_telegram_en==="review"))}
-function drawQueue(){$("queue").innerHTML=filtered().map((x,i)=>'<button data-id="'+safe(x.id)+'" class="'+(x.id===selected?"active":"")+'"><div class="tag '+(x.fact_verification==="verified"?"verified":"pending")+'">'+safe(fmt[x.format_type]||x.format_type)+" · "+safe(x.fact_verification)+"</div><div class=\"queue-title\">"+safe(x.title)+"</div><div class=\"tag\">IG: "+safe(x.status_instagram)+" · TG RU: "+safe(x.status_telegram)+" · TG EN: "+safe(x.status_telegram_en||"review")+" · "+(x.visual_status==="ready"?"🖼 готово":"◌ ожидает изображения")+"</div></button>").join("")||'<p class="muted">Материалов нет</p>'}
+const editorialDestinations=[
+ ["telegram_ru","✈ TG RU"],["telegram_en","✈ TG EN"],
+ ["instagram_ru","◎ IG RU"],["instagram_en","◎ IG EN"]
+];
+function entryForDestination(itemId,dest){
+ const active=(scheduleData?.queue||[]).filter(q=>q.item_id===itemId&&q.destination===dest&&q.status!=="cancelled");
+ const priority={scheduled:0,sending:1,blocked:2,submitted:3,unknown:4,sent:5,failed:6};
+ active.sort((a,b)=>(priority[a.status]??99)-(priority[b.status]??99));
+ return active[0]||null;
+}
+function plannedTimeText(raw){
+ if(!raw)return "";
+ const parsed=new Date(raw);if(!Number.isFinite(parsed.getTime()))return "";
+ return parsed.toLocaleString("ru-RU",{timeZone:"Europe/Lisbon",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+}
+function statusForArticle(itemId,dest){
+ const job=entryForDestination(itemId,dest);
+ const bp=dest.startsWith("instagram_")?(bufferState?.posts||[]).find(p=>p.item_id===itemId&&p.destination===dest):null;
+ if(bp&&["published","submitted","creating","unknown","failed"].includes(bp.status)){
+  const label=bp.status==="published"?"✓ Опубликовано":bp.status==="submitted"?"→ Передано Buffer":bp.status==="creating"?"Отправляется":bp.status==="unknown"?"⚠ Проверить": "⚠ Ошибка";
+  return {label:label+(bp.due_at?" · "+plannedTimeText(bp.due_at):""),className:bp.status==="unknown"?"unknown":bp.status==="published"?"sent":"scheduled",terminal:bp.status!=="failed"};
+ }
+ if(!job)return {label:"Время не назначено",className:"",terminal:false};
+ const text=job.status==="sent"?"✓ Опубликовано":job.status==="submitted"?"→ Передано":job.status==="scheduled"?"◷ Запланировано":job.status==="blocked"?"⚠ Ожидает медиа":job.status==="sending"?"Отправляется":job.status==="unknown"?"⚠ Требует проверки":job.status;
+ const when=plannedTimeText(job.status==="sent"?job.sent_at:job.run_at);
+ return {label:text+(when?" · "+when:""),className:job.status==="sent"?"sent":job.status==="scheduled"?"scheduled":job.status==="unknown"?"unknown":"",terminal:["sent","submitted","sending","unknown"].includes(job.status)};
+}
+function planMarkup(x){
+ return '<div class="queue-plan">'+editorialDestinations.map(([dest,label])=>{
+  const state=statusForArticle(x.id,dest);
+  return '<span class="'+state.className+'"><b>'+safe(label)+'</b> · '+safe(state.label)+'</span>';
+ }).join("")+'</div>';
+}
+function renderSelectedPlan(){
+ const el=$("selectedPublicationPlan"),x=current();
+ if(!el)return;
+ el.innerHTML=x?'<h3>◷ План выбранной статьи · Europe/Lisbon</h3>'+planMarkup(x):
+ '<h3>◷ План публикаций</h3><span class="muted">Выберите материал</span>';
+}
+function drawQueue(){
+ $("queue").innerHTML=filtered().map(x=>'<button data-id="'+safe(x.id)+'" class="'+(x.id===selected?"active":"")+'">'+
+ '<div class="tag '+(x.fact_verification==="verified"?"verified":"pending")+'">'+safe(fmt[x.format_type]||x.format_type)+" · "+safe(x.fact_verification)+'</div>'+
+ '<div class="queue-title">'+safe(x.title)+'</div>'+
+ '<div class="tag">Фото: '+(x.visual_status==="ready"?"✓ сохранено":"ожидает")+" · IG "+safe(x.status_instagram)+
+ ' · TG RU '+safe(x.status_telegram)+" · TG EN "+safe(x.status_telegram_en||"review")+'</div>'+
+ planMarkup(x)+'</button>').join("")||'<p class="muted">Материалов нет</p>';
+}
 function setField(id,val){$(id).value=val||""}
 function select(){
  const x=current();if(!x){$("chosenTitle").textContent="Нет материала";return}
@@ -416,7 +462,7 @@ function select(){
  $("approveTG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTGEN").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready"||!x.caption_telegram_en;
  updateTGButtons();updateBufferButtons();
- drawQueue();loadImage(x.image_url);
+ drawQueue();renderSelectedPlan();loadImage(x.image_url);
 }
 function loadImage(url){
  image=null;imageSource=url||"";
@@ -1040,7 +1086,7 @@ function renderScheduleQueue(){
 async function loadSchedule(){
  const response=await api("/schedule");
  scheduleData={settings:response.settings||[],queue:response.queue||[]};
- renderScheduleSettings();renderScheduleQueue();emitSummary();
+ renderScheduleSettings();renderScheduleQueue();drawQueue();renderSelectedPlan();emitSummary();
 }
 $("showSchedule").onclick=()=>{$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"})};
 $("refreshSchedule").onclick=()=>task(async()=>{await loadSchedule();info("Очередь обновлена")});
