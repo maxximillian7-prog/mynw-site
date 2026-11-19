@@ -87,6 +87,18 @@ window.StudioBrandHub=(function(){
   const brand=tabBrands[tab]||"green";
   if(brand==="green")state.lastGreen=tab;
   state.active=brand;document.body.dataset.studioBrand=brand;
+  const identities={
+   overview:{title:"Journal Studio · Все редакции | MyNow",favicon:"/assets/mynow-main-logo.webp",theme:"#173d31"},
+   green:{title:"NowGreen Journal | Journal Studio",favicon:"./brand-nowgreen.svg",theme:"#215a42"},
+   portugal:{title:"Португалия рядом | Journal Studio",favicon:"./brand-portugal.svg",theme:"#126a71"},
+   seriously:{title:"НЕТ! СЕРЬЁЗНО?! | Journal Studio",favicon:"./brand-seriously.svg",theme:"#111614"}
+  };
+  const identity=identities[brand]||identities.overview;
+  document.title=identity.title;
+  const favicon=document.querySelector('link[rel="icon"]');
+  if(favicon)favicon.setAttribute("href",identity.favicon);
+  const themeMeta=document.querySelector('meta[name="theme-color"]');
+  if(themeMeta)themeMeta.setAttribute("content",identity.theme);
   setSelected(brand);remember(brand);
   if(brand==="portugal"||brand==="seriously")whenFrameReady(brand,()=>{});
   if(brand==="overview")refreshGreen();
