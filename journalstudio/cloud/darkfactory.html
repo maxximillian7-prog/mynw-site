@@ -629,6 +629,18 @@ function updateCaption(x,en){
  $("igCaption").textContent=captionExpanded||!more?txt:txt.slice(0,194).trimEnd()+"…";
  $("igMore").hidden=!more;$("igMore").textContent=captionExpanded?(en?"less":"свернуть"):(en?"more":"ещё");
 }
+const tgWideCache=new Map(),tgWidePending=new Set();
+function ensureTGWide(x){
+ const key=x?.image_storage_path;
+ if(!key||tgWideCache.has(key)||tgWidePending.has(key))return;
+ tgWidePending.add(key);
+ api("/telegram/items/"+x.id+"/preview-wide","POST",{}).then(result=>{
+  if(!result?.ready||!result.url)throw Error("Сервер не подготовил фото 16:9");
+  tgWideCache.set(key,result.url);
+  if(current()?.image_storage_path===key&&(mode==="telegram"||mode==="telegram_en"))render();
+ }).catch(error=>info("Telegram 16:9: "+(error.message||error),true))
+ .finally(()=>tgWidePending.delete(key));
+}
 function updateTG(x,slides,en){
  // Telegram has ONE original text-free photo, regardless of Instagram slide count.
  const message=en?(x.caption_telegram_en||x.title_en+"\n\n"+x.body_en):(x.caption_telegram||x.title+"\n\n"+x.body);
@@ -643,7 +655,8 @@ function updateTG(x,slides,en){
  $("tgAlbum").hidden=true;$("tgAlbum").replaceChildren();
  const single=$("tgSingle");single.hidden=false;
  const photo=$("tgPhoto"),fallback=$("tgPhotoMissing");
- const url=imageSource||"";
+ const url=tgWideCache.get(x.image_storage_path)||imageSource||"";
+ if(x.image_storage_path&&!tgWideCache.has(x.image_storage_path))ensureTGWide(x);
  photo.hidden=!url;fallback.hidden=Boolean(url);
  if(url&&photo.dataset.currentUrl!==url){
   photo.dataset.currentUrl=url;photo.src=url;
