@@ -365,12 +365,12 @@ async function bufferDiscover(secretOverride?:string){
  const channels:any[]=[];
  for(const org of organizations.slice(0,20)){
   const result=await bufferRequest(
-   "query GetChannels($input:ChannelsInput!){ channels(input:$input){id name displayName service isQueuePaused} }",
+   "query GetChannels($input:ChannelsInput!){ channels(input:$input){id name displayName service isQueuePaused isDisconnected isLocked} }",
    {input:{organizationId:org.id}},secretOverride);
   for(const c of result.channels||[]){
    if(String(c.service).toLowerCase()==="instagram")channels.push({
     id:c.id,name:c.name,display_name:c.displayName,
-    organization_id:org.id,service:c.service,queue_paused:c.isQueuePaused===true
+    organization_id:org.id,service:c.service,queue_paused:c.isQueuePaused===true,disconnected:c.isDisconnected===true,locked:c.isLocked===true
    });
   }
  }
@@ -893,6 +893,11 @@ Deno.serve(async(req:Request)=>{
   const all=await bufferDiscover();
   const channel=all.find((c:any)=>c.id===channelId&&c.organization_id===orgId);
   if(!channel)return send(404,{error:"Buffer does not list this Instagram channel"});
+  const expectedHandle=locale==="ru"?"net_seryozno":"no.seriously.facts";
+  if(String(channel.name||"").toLowerCase()!==expectedHandle)
+   return send(409,{error:"Это Instagram другого проекта. Для НЕТ! СЕРЬЁЗНО?! разрешены только net_seryozno (RU) и no.seriously.facts (EN)"});
+  if(channel.disconnected||channel.locked)
+   return send(409,{error:"Instagram недоступен в Buffer. Проверьте подключение и ограничения аккаунта"});
   const [result]=await db("darkfactory_buffer_channels?on_conflict=destination","POST",{
    destination:"instagram_"+locale,organization_id:orgId,channel_id:channelId,
    channel_name:channel.display_name||channel.name,enabled:true,
