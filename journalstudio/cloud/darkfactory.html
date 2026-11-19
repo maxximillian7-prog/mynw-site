@@ -968,7 +968,8 @@ for(const locale of ["ru","en"]){
   const x=current(),channel=tgChannels[locale];if(!x||!channel?.enabled)return;
   if(!confirm((locale==="ru"?"Поставить в очередь ":"Queue ")+"«"+x.title+"» "+(locale==="ru"?"для канала ":"for ")+channel.title+" с соблюдением расписания?"))return;
   try{
-   const result=await api("/telegram/items/"+x.id+"/"+locale+"/publish","POST",{});
+   await prepareTelegramForPublishing(x,locale);
+    const result=await api("/telegram/items/"+x.id+"/"+locale+"/publish","POST",{});
    await loadSchedule();noteTG(locale,"✓ Материал в очереди. Ожидает назначенного времени: "+new Date(result.entry.run_at).toLocaleString("ru-RU",{timeZone:"Europe/Lisbon"}));
   }catch(e){noteTG(locale,e.message||String(e),true);throw e}
  });
@@ -1046,7 +1047,12 @@ $("approveAll").onclick=()=>task(async()=>{
   info("Автоматически готовлю слайды "+dest+"…");
   await prepareInstagramForPublishing(item,dest.slice(-2));
  }
- info("Подтверждаю медиа и четыре версии в редакции…");
+ for(const dest of ["telegram_ru","telegram_en"]){
+   if(hasPublicationRecord(id,dest))continue;
+   info("Готовлю квадратную обложку Telegram "+dest.slice(-2).toUpperCase()+"…");
+   await prepareTelegramForPublishing(item,dest.slice(-2));
+  }
+  info("Подтверждаю медиа и четыре версии в редакции…");
  await api("/items/"+id+"/approve-preview","POST",{destinations:publishingDestinations});
  const result=await api("/items/"+id+"/approve-all","POST",{});
  await reload();selected=id;select();await loadSchedule();
@@ -1368,6 +1374,36 @@ async function loadOriginalForPublishing(item){
  image=pic;imageSource=media.image_url;
  return pic;
 }
+// Upload exactly the square JPEG visible in Telegram preview, with one PIN renewal.
+async function uploadEditorJpeg(path,blob){
+ const send=async(canRenew)=>{
+  const u=session();if(!u?.access_token||!unlocked)throw Error("Войдите в редакцию");
+  const res=await fetch(ROOT+"/functions/v1/darkfactory"+path,{
+   method:"PUT",cache:"no-store",headers:{apikey:PUB,Authorization:"Bearer "+u.access_token,
+    "x-darkfactory-session":unlocked,"Content-Type":"image/jpeg"},body:blob
+  });
+  const data=await res.json().catch(()=>({}));
+  if(res.status===423&&canRenew){await promptPinRenewal();return send(false)}
+  if(!res.ok)throw Error(data.error||"Не удалось загрузить JPEG "+res.status);
+  return data;
+ };
+ return send(true);
+}
+async function prepareTelegramForPublishing(item,locale){
+ if(!item?.id||!item.image_storage_path||!["ru","en"].includes(locale))
+  throw Error("Нет исходного изображения или выбран неверный язык");
+ const existing=await api("/telegram/items/"+item.id+"/"+locale+"/asset");
+ if(existing.ready)return existing.url;
+ const picture=await loadOriginalForPublishing(item);
+ const canvas=document.createElement("canvas");
+ drawTelegramSquare(canvas,item,locale==="en",picture);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.88));
+ if(!blob||blob.size<1000||blob.size>8*1024*1024)throw Error("Не удалось подготовить JPEG 1600×1600");
+ const result=await uploadEditorJpeg("/telegram/items/"+item.id+"/"+locale+"/asset",blob);
+ if(!result.saved||result.asset?.width!==1600||result.asset?.height!==1600)
+  throw Error("Сервер не подтвердил Telegram-обложку 1:1");
+ return result.asset.url;
+}
 async function prepareInstagramForPublishing(item,locale){
  if(item.format_type==="reel_story")
   throw Error("Instagram Reels требует настоящее видео. Сначала выберите формат карточки или фотоистории, если хотите обычный фотопост.");
@@ -1426,15 +1462,14 @@ async function publishSelectedDestinations(requested){
   info("Готовлю Instagram "+locale.toUpperCase()+" · слайды по утверждённому предпросмотру…");
   await prepareInstagramForPublishing(saved,locale);
  }
+ for(const dest of pending.filter(d=>d.startsWith("telegram_"))){
+  info("Готовлю Telegram 1:1 с заголовком · "+dest.slice(-2).toUpperCase()+"…");
+  await prepareTelegramForPublishing(saved,dest.slice(-2));
+ }
  info("Проверяю сохранённое фото и утверждаю выбранные версии…");
  const approval=await api("/items/"+id+"/approve-preview","POST",{destinations:pending});
  if(!approval.verified_media)throw Error("Сервер не подтвердил сохранённое изображение");
  const index=items.findIndex(v=>v.id===id);if(index>=0)items[index]=approval.item;
- const telegramPending=pending.filter(d=>d.startsWith("telegram_"));
- if(telegramPending.length){
-  info("Подготавливаю горизонтальное фото 16:9…");
-  await api("/telegram/items/"+id+"/preview-wide","POST",{});
- }
  const successes=[],failures=[];
  for(const dest of pending){
   const locale=dest.slice(-2);
@@ -1490,13 +1525,16 @@ $("illustrate").onclick=()=>task(async()=>{const x=current();if(!x)return;if(!co
 $("download").onclick=()=>task(async()=>{
  const x=current();if(!x)return;
  if(mode==="telegram"||mode==="telegram_en"){
-  if(!imageSource)throw Error("У этого факта ещё нет оригинального фото");
-  const r=await fetch(imageSource);if(!r.ok)throw Error("Не удалось скачать исходное фото");
-  const b=await r.blob();const url=URL.createObjectURL(b);
-  try{const a=document.createElement("a");a.href=url;a.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_Telegram."+(b.type==="image/jpeg"?"jpg":b.type==="image/png"?"png":"webp");a.click()}
-  finally{setTimeout(()=>URL.revokeObjectURL(url),1000)}
-  info("Исходное фото без текста скачано.");
- }else{
+  const original=await loadOriginalForPublishing(x);
+   const canvas=document.createElement("canvas");
+   drawTelegramSquare(canvas,draft()||x,mode==="telegram_en",original);
+   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.88));
+   if(!blob)throw Error("Не удалось экспортировать Telegram 1:1 JPEG");
+   const url=URL.createObjectURL(blob);
+   try{const a=document.createElement("a");a.href=url;a.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_"+mode+"_1600x1600.jpg";a.click()}
+   finally{setTimeout(()=>URL.revokeObjectURL(url),1500)}
+   info("✓ Скачана квадратная Telegram-обложка с заголовком.");
+  }else{
   const c=$("canvas"),a=document.createElement("a");a.href=c.toDataURL("image/png");
   a.download="NET_SERIOZNO_"+x.id.slice(0,8)+"_"+mode+"_slide_"+(slideIndex+1)+".png";
   a.click();info("PNG с текстом для Instagram сохранён.");
