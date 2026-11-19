@@ -119,7 +119,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .editor-inline .inline-actions{display:flex;gap:8px;margin-top:9px}
 .preview-toolbar{max-width:480px;margin:9px auto;display:flex;gap:7px;flex-wrap:wrap}
 .preview-toolbar button{font-size:11px;flex:1;min-width:100px}
-.tg-single img{width:100%;display:block;aspect-ratio:16/9;height:auto;object-fit:cover;object-position:center;background:#17211e}
+.tg-single img{width:100%;display:block;aspect-ratio:1/1;height:auto;object-fit:cover;object-position:center;background:#17211e}
 .tg-no-image{min-height:240px;display:grid;place-items:center;background:#1b282a;color:#e5e9e5;padding:20px;text-align:center}
 .calendar-panel{margin-top:18px}
 .calendar-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:15px}
@@ -248,7 +248,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
    <div class="tg-from" id="tgFrom">НЕТ! СЕРЬЁЗНО?</div>
    <div id="tgSingle" class="tg-single" hidden><img id="tgPhoto" alt="Оригинальная иллюстрация без наложенного текста" hidden><div id="tgPhotoMissing" class="tg-no-image">Ожидает постоянное фото</div></div>
    <div id="tgAlbum" class="tg-album" hidden></div>
-   <div id="tgCaption" class="tg-message"></div><div class="tg-meta">Один Telegram-пост · фото 16:9 + полный текст · ◉</div>
+   <div id="tgCaption" class="tg-message"></div><div class="tg-meta">Один Telegram-пост · квадрат 1:1 с заголовком + полный текст · ◉</div>
   </div><div id="tgOverflow" class="tg-bubble" hidden><div id="tgOverflowText" class="tg-message"></div><div class="tg-meta">Продолжение публикации · ◉</div></div></div>
   <div class="tg-bottom">Канал · только просмотр публикации</div>
  </div>
@@ -264,7 +264,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
  <div class="selected-plan" id="selectedPublicationPlan" aria-live="polite"><h3>План публикаций · время Лиссабона</h3><span class="muted">Выберите материал в очереди</span></div>
   <div class="platform-publish" aria-label="Публикация в отдельные каналы">
-   <div class="platform-card telegram"><strong>✈ Telegram</strong><small>Одно фото 16:9 и полный текст в одном сообщении</small><div class="platform-buttons"><button type="button" class="primary" id="publishTGNowRU">⚡ RU · сейчас</button><button type="button" class="primary" id="publishTGNowEN">⚡ EN · сейчас</button></div></div>
+   <div class="platform-card telegram"><strong>✈ Telegram</strong><small>Квадратная обложка 1:1 с заголовком + полный текст</small><div class="platform-buttons"><button type="button" class="primary" id="publishTGNowRU">⚡ RU · сейчас</button><button type="button" class="primary" id="publishTGNowEN">⚡ EN · сейчас</button></div></div>
    <div class="platform-card instagram"><strong>◎ Instagram / Buffer</strong><small>Карточки из предпросмотра подготавливаются автоматически</small><div class="platform-buttons"><button type="button" class="primary" id="publishIGNowRU">⚡ RU · сейчас</button><button type="button" class="primary" id="publishIGNowEN">⚡ EN · сейчас</button></div></div>
   </div>
   <button type="button" class="primary" id="publishAllNow">⚡ Опубликовать во все 4 канала</button>
@@ -766,50 +766,76 @@ function updateCaption(x,en){
  $("igCaption").textContent=captionExpanded||!more?txt:txt.slice(0,194).trimEnd()+"…";
  $("igMore").hidden=!more;$("igMore").textContent=captionExpanded?(en?"less":"свернуть"):(en?"more":"ещё");
 }
-const tgWideCache=new Map(),tgWidePending=new Set();
-function ensureTGWide(x){
- const key=x?.image_storage_path;
- if(!key||tgWideCache.has(key)||tgWidePending.has(key))return;
- tgWidePending.add(key);
- api("/telegram/items/"+x.id+"/preview-wide","POST",{}).then(result=>{
-  if(!result?.ready||!result.url)throw Error("Сервер не подготовил фото 16:9");
-  tgWideCache.set(key,result.url);
-  if(current()?.image_storage_path===key&&(mode==="telegram"||mode==="telegram_en"))render();
- }).catch(error=>info("Telegram 16:9: "+(error.message||error),true))
- .finally(()=>tgWidePending.delete(key));
+// Instagram and Telegram have independent image templates. This exact function renders
+// the local Telegram preview, the exported JPEG and the media used for publishing.
+function drawTelegramSquare(canvas,item,en,picture=image){
+ const W=1600,H=1600;canvas.width=W;canvas.height=H;
+ const ctx=canvas.getContext("2d");if(!ctx)throw Error("Canvas недоступен");
+ ctx.fillStyle="#122320";ctx.fillRect(0,0,W,H);
+ if(picture?.width>0&&picture?.height>0){
+  const scale=Math.max(W/picture.width,H/picture.height);
+  const w=picture.width*scale,h=picture.height*scale;
+  ctx.drawImage(picture,(W-w)/2,(H-h)/2,w,h);
+ }
+ const upper=ctx.createLinearGradient(0,0,0,480);
+ upper.addColorStop(0,"rgba(2,6,7,.80)");upper.addColorStop(1,"rgba(2,6,7,0)");
+ ctx.fillStyle=upper;ctx.fillRect(0,0,W,480);
+ const lower=ctx.createLinearGradient(0,670,0,H);
+ lower.addColorStop(0,"rgba(2,6,7,0)");
+ lower.addColorStop(.46,"rgba(2,6,7,.38)");
+ lower.addColorStop(1,"rgba(2,6,7,.91)");
+ ctx.fillStyle=lower;ctx.fillRect(0,670,W,930);
+ const lime="#cbf43d",white="#fff";
+ ctx.fillStyle=lime;ctx.fillRect(128,129,11,118);
+ ctx.textBaseline="top";ctx.textAlign="left";
+ ctx.font="italic 900 76px Arial, sans-serif";ctx.fillStyle=white;
+ ctx.fillText(en?"NO,":"НЕТ!",172,134);
+ ctx.font="italic 900 74px Arial, sans-serif";ctx.fillStyle=lime;
+ ctx.fillText(en?"SERIOUSLY?!":"СЕРЬЁЗНО?!",172,222);
+ const raw=String((en?item.title_en||item.title:item.title)||"").trim().replace(/\s+/g," ").toUpperCase();
+ const maxWidth=W-264;let size=112,lines=[];
+ for(;size>=64;size-=4){
+  ctx.font="900 "+size+"px Arial, sans-serif";
+  lines=wrapCanvas(ctx,raw,maxWidth);
+  if(lines.length<=3)break;
+ }
+ if(lines.length>3){
+  lines=lines.slice(0,3);
+  ctx.font="900 "+size+"px Arial, sans-serif";
+  let last=lines[2];
+  while(last.length>1&&ctx.measureText(last+"…").width>maxWidth)last=last.slice(0,-1);
+  lines[2]=last+"…";
+ }
+ const lineHeight=size*1.15,startY=Math.max(966,1397-lines.length*lineHeight);
+ ctx.fillStyle=lime;ctx.fillRect(130,startY-28,143,8);
+ ctx.font="900 "+size+"px Arial, sans-serif";
+ ctx.shadowColor="rgba(0,0,0,.65)";ctx.shadowBlur=24;ctx.shadowOffsetY=4;
+ lines.forEach((t,i)=>{ctx.fillStyle=i===lines.length-1&&lines.length>1?lime:white;ctx.fillText(t,130,startY+i*lineHeight)});
+ ctx.shadowColor="transparent";ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+ ctx.fillStyle="#e8f8e3";ctx.font="700 29px Arial, sans-serif";
+ ctx.fillText(en?"A FACT THAT SOUNDS IMPOSSIBLE":"ФАКТ, КОТОРЫЙ ЗВУЧИТ КАК ВЫДУМКА",130,1514);
+ return canvas;
 }
 function updateTG(x,slides,en){
- // Telegram has ONE original text-free photo, regardless of Instagram slide count.
  const message=en?(x.caption_telegram_en||x.title_en+"\n\n"+x.body_en):(x.caption_telegram||x.title+"\n\n"+x.body);
  const plain=String(message||"").replace(/<\/?b>/gi,"").replace(/<[^>]*>/g,"").replace(/https?:\/\/[^\s]+/g,"").trim();
  $("tgChannelTitle").textContent=en?"NO, SERIOUSLY?! · preview":"НЕТ! СЕРЬЁЗНО?! · макет";
  $("tgChannelSubtitle").textContent=en?"Channel · editorial preview":"Канал · предпросмотр сообщения";
  $("tgFrom").textContent=en?"NO, SERIOUSLY?!":"НЕТ! СЕРЬЁЗНО?!";
- // The backend sends one text message with a 16:9 image link preview above it.
- setRich($("tgCaption"),plain);
- $("tgCaption").hidden=false;
- $("tgOverflow").hidden=true;
- $("tgAlbum").hidden=true;$("tgAlbum").replaceChildren();
- const single=$("tgSingle");single.hidden=false;
+ setRich($("tgCaption"),plain);$("tgCaption").hidden=false;$("tgOverflow").hidden=true;
+ $("tgAlbum").hidden=true;$("tgAlbum").replaceChildren();$("tgSingle").hidden=false;
  const photo=$("tgPhoto"),fallback=$("tgPhotoMissing");
- const url=tgWideCache.get(x.image_storage_path)||imageSource||"";
- if(x.image_storage_path&&!tgWideCache.has(x.image_storage_path))ensureTGWide(x);
- photo.hidden=!url;fallback.hidden=Boolean(url);
- if(url&&photo.dataset.currentUrl!==url){
-  photo.dataset.currentUrl=url;photo.src=url;
+ if(image?.width>0&&image?.height>0){
+  const canvas=document.createElement("canvas");
+  drawTelegramSquare(canvas,x,en,image);
+  const data=canvas.toDataURL("image/jpeg",.88);
+  if(photo.dataset.currentUrl!==data){photo.dataset.currentUrl=data;photo.src=data}
+  photo.hidden=false;fallback.hidden=true;
+ }else{
+  photo.hidden=true;fallback.hidden=false;
+  fallback.textContent=x.image_storage_path?"Загружаю фото для квадратной обложки 1:1…":"Загрузите оригинальное фото";
  }
- if(!url)fallback.textContent="Чистое фото ещё не создано — выбери загрузку или генерацию";
- photo.onerror=async()=>{
-  if(mediaRefreshPending||!current()?.id)return;
-  mediaRefreshPending=true;
-  try{
-   const response=await api("/items/"+current().id+"/media");
-   if(response.image_url&&response.image_url!==photo.dataset.currentUrl){
-    photo.dataset.currentUrl=response.image_url;imageSource=response.image_url;photo.src=response.image_url;
-   }else{photo.hidden=true;fallback.hidden=false;fallback.textContent="Обнови страницу для восстановления фото"}
-  }catch{photo.hidden=true;fallback.hidden=false;fallback.textContent="Фото временно недоступно"}
-  finally{mediaRefreshPending=false}
- };
+ photo.onerror=()=>{photo.hidden=true;fallback.hidden=false;fallback.textContent="Квадратная обложка временно недоступна"};
  $("canvas").hidden=true;
 }
 function renderRail(x,slides,en){
@@ -826,8 +852,8 @@ function render(){
  slideIndex=Math.max(0,Math.min(slides.length-1,slideIndex));
  const ig=mode==="ig_ru"||mode==="ig_en",tg=mode==="telegram"||mode==="telegram_en";
  $("instagramFrame").hidden=!ig;$("telegramFrame").hidden=!tg;$("reelsFrame").hidden=!reel;
- $("proofHint").textContent=tg?"Один пост · фото 16:9 над полным текстом":slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
- $("download").textContent=tg?"↓ Скачать исходное фото":"↓ Экспорт слайда PNG";
+ $("proofHint").textContent=tg?"Обложка 1:1 с заголовком · один пост":slides.length>1?"Свайп / стрелки / миниатюры":"Одиночная публикация";
+ $("download").textContent=tg?"↓ Скачать Telegram-обложку 1:1":"↓ Экспорт слайда PNG";
  $("slideTools").hidden=tg||slides.length<=1;$("slideRail").hidden=tg||slides.length<=1;
  $("slidePrev").disabled=slideIndex===0;$("slideNext").disabled=slideIndex===slides.length-1;
  $("slideLabel").textContent=(slideIndex+1)+" / "+slides.length+" · "+(fmt[x.format_type]||x.format_type);
@@ -856,7 +882,7 @@ function render(){
  const statusOK=tg?(en?current()?.status_telegram_en:current()?.status_telegram)==="approved":current()?.status_instagram==="approved";
  manual.disabled=!current()||!connected; // Save, verify and approve in the publish handler
  $("proofDescription").textContent=tg?
-  "Telegram: одно сообщение с широким фото 16:9 над всем текстом (до 4000 символов). Изображение без надписей; ссылка на фото скрыта. Второго сообщения нет.":
+  "Telegram: один пост с полным текстом до 4000 символов и квадратной обложкой 1600×1600, содержащей лаконичный заголовок; второго сообщения нет.":
   reel?"Это предпросмотр обложки Reels в интерфейсе Instagram, НЕ готовое видео. Обложка экспортируется в PNG 9:16.":
   (slides.length>1?"Листайте как настоящую Instagram-карусель: кнопками, свайпом или миниатюрами ниже.":"Лента Instagram: изображение, профиль, панель реакций и настоящая подпись.");
 }
