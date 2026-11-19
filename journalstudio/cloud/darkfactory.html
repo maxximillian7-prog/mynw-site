@@ -705,7 +705,7 @@ function render(){
  const connected=tg?tgChannels[en?"en":"ru"]?.enabled:
   (bufferState.channels||[]).some(c=>c.destination==="instagram_"+(en?"en":"ru")&&c.enabled);
  const statusOK=tg?(en?current()?.status_telegram_en:current()?.status_telegram)==="approved":current()?.status_instagram==="approved";
- manual.disabled=!connected||!approved||!statusOK||isDraftDirty();
+ manual.disabled=!current()||!connected; // Save, verify and approve in the publish handler
  $("proofDescription").textContent=tg?
   "Telegram: ровно одно оригинальное фото без надписей и полный текст под ним. При тексте длиннее 1024 символов Telegram отправляет продолжение отдельным ответом.":
   reel?"Это предпросмотр обложки Reels в интерфейсе Instagram, НЕ готовое видео. Обложка экспортируется в PNG 9:16.":
@@ -858,7 +858,7 @@ async function persistCurrent(){
   source_urls:$("fSources").value.split(/\n+/).map(x=>x.trim()).filter(x=>x.startsWith("https://"))
  });
 }
-$("quickSave").onclick=()=>task(async()=>{await persistCurrent();info("Правки сохранены, медиа не удалены.")});
+$("quickSave").onclick=()=>task(async()=>{await persistCurrent();if(isDraftDirty())throw Error("Сервер не подтвердил сохранение");info("✓ Правки сохранены, медиа не удалены.")});
 $("approveAll").onclick=()=>task(async()=>{
  const x=current();if(!x)return;
  info("Сохраняю правки, проверяю факт и утверждаю 4 версии…");
@@ -1162,17 +1162,37 @@ for(const locale of ["ru","en"]){
  $("bufferSchedule"+suf).onclick=()=>task(()=>sendBufferNowOrSchedule("schedule"));
 }
 
-$("publishNowPreview").onclick=()=>{
- if(isDraftDirty()){info("Сначала сохраните и повторно утвердите несохранённые изменения",true);return;}
- const target={
-  telegram:"tgPublishNowRU",telegram_en:"tgPublishNowEN",
-  ig_ru:"bufferNowRU",ig_en:"bufferNowEN"
- }[mode];
- if(!target){info("Публикация Reels требует готового видео. Пока доступен только экспорт обложки.",true);return}
- const action=$(target);
- if(!action||action.disabled){info("Для публикации сначала подтвердите факт, медиа и подключение канала",true);return}
- action.click();
-};
+$("publishNowPreview").onclick=()=>task(async()=>{
+ const item=current(),chosenMode=mode;
+ if(!item)throw Error("Выберите материал");
+ const tg=chosenMode==="telegram"||chosenMode==="telegram_en";
+ const locale=chosenMode==="telegram_en"||chosenMode==="ig_en"?"en":"ru";
+ if(!["telegram","telegram_en","ig_ru","ig_en"].includes(chosenMode))throw Error("Для Reels необходимо готовое видео");
+ const channel=tg?tgChannels[locale]:(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
+ if(!channel?.enabled)throw Error("Подключите выбранный канал");
+ if(!confirm("ОПУБЛИКОВАТЬ СЕЙЧАС только "+locale.toUpperCase()+"-версию «"+item.title+"» в "+(tg?"Telegram":"Instagram")+"?\\n\\nПравки будут сохранены и выбранная версия утверждена. Остальная очередь не изменится."))return;
+ info("Сохраняю и проверяю факт…");
+ await persistCurrent();
+ if(current()?.fact_verification!=="verified"){
+  const check=await api("/items/"+item.id+"/recheck","POST",{});
+  if(!check.verified){await reload();throw Error("Проверка не пройдена: "+(check.reason||"нет подтверждения"))}
+  await reload();
+ }
+ if(current()?.visual_status!=="ready")throw Error("Изображение не готово. Сначала сохраните или создайте фото");
+ const field=tg?(locale==="ru"?"status_telegram":"status_telegram_en"):"status_instagram";
+ if(current()?.[field]!=="approved")await patch({[field]:"approved"});
+ info("Отправляю публикацию…");
+ if(tg){
+  const result=await api("/telegram/items/"+item.id+"/"+locale+"/publish-now","POST",{});
+  await loadSchedule();noteTG(locale,"✓ Telegram ID: "+result.message_id);
+  info("✓ Опубликована одна "+locale.toUpperCase()+"-версия в Telegram. Очередь не сдвинута.");
+ }else{
+  const result=await api("/instagram/items/"+item.id+"/"+locale+"/buffer-publish","POST",{mode:"now"});
+  await loadBufferPosts();
+  info("✓ Передано Buffer. Статус: "+(result.buffer_status||"ожидает публикации")+".");
+ }
+ await reload();
+});
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
@@ -1189,7 +1209,7 @@ let previewPending=false;$("editor").addEventListener("input",e=>{if(!current()|
 $("editor").addEventListener("change",()=>{if(current())render()});
 $("refresh").onclick=()=>task(reload);
 $("close").onclick=()=>{unlocked="";sessionStorage.removeItem("darkfactory_access");$("app").classList.add("layout-hidden");$("login").classList.remove("layout-hidden")};
-$("save").onclick=()=>task(async()=>{await persistCurrent();info("Правки сохранены, медиа остаются в хранилище.")});
+$("save").onclick=()=>task(async()=>{await persistCurrent();if(isDraftDirty())throw Error("Сервер не подтвердил сохранение");info("✓ Правки сохранены, медиа остаются в хранилище.")});
 $("illustrate").onclick=()=>task(async()=>{const x=current();if(!x)return;if(!confirm("Создать платную AI-иллюстрацию для «"+x.title+"»?"))return;info("Запрос к генератору изображений…");const d=await api("/items/"+x.id+"/generate-image","POST",{});await reload();info(d.image_url?"Иллюстрация сохранена в Journal Studio.":"Иллюстрация готова; обновите просмотр.")});
 $("download").onclick=()=>task(async()=>{
  const x=current();if(!x)return;
