@@ -560,6 +560,35 @@ function archiveDetailsMarkup(itemId){
    '<pre>'+safe(entry.text_snapshot||"Текст недоступен для старой публикации")+'</pre></details></article>';
  }).join("")+'</div>';
 }
+function updatePublishArchiveButtons(){
+ const item=current();
+ for(const [id,dest,label] of [
+  ["publishTGNowRU","telegram_ru","RU"],["publishTGNowEN","telegram_en","EN"],
+  ["publishIGNowRU","instagram_ru","RU"],["publishIGNowEN","instagram_en","EN"]
+ ]){
+  const button=$(id);if(!button)continue;
+  const done=item&&Boolean(publicationFor(item.id,dest));
+  const pending=item&&!done&&hasPublicationRecord(item.id,dest);
+  button.disabled=!item||done||pending;
+  button.textContent=done?"✓ Опубликовано":pending?"◷ В обработке":"⚡ "+label+" · сейчас";
+ }
+ const all=$("publishAllNow");
+ if(all){
+  const remaining=item?editorialDestinations.filter(([dest])=>!hasPublicationRecord(item.id,dest)).length:0;
+  const sent=item?publishedEntries(item.id).length:0;
+  all.disabled=!item||remaining===0;
+  all.textContent=remaining===0?"✓ Все каналы обработаны":sent?"⚡ Опубликовать в остальные каналы ("+remaining+")":"⚡ Опубликовать во все 4 канала";
+ }
+}
+function refreshPublishedViews(){
+ const previous=selected;
+ if($("filter").value==="review"&&selected&&isAlreadyPublished(selected))$("filter").value="published";
+ const visible=filtered();
+ if(!visible.some(x=>x.id===selected))selected=visible[0]?.id||null;
+ syncEditorialTabs();drawQueue();
+ if(previous!==selected)select();else renderSelectedPlan();
+ updatePublishArchiveButtons();emitSummary();
+}
 function renderSelectedPlan(){
  const el=$("selectedPublicationPlan"),x=current();if(!el)return;
  el.innerHTML=x?'<h3>◷ План выбранной статьи · Europe/Lisbon</h3>'+planMarkup(x)+archiveDetailsMarkup(x.id):
@@ -591,7 +620,7 @@ function select(){
  $("approveTG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTGEN").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready"||!x.caption_telegram_en;
  updateTGButtons();updateBufferButtons();
- drawQueue();renderSelectedPlan();loadImage(x.image_url);
+ drawQueue();renderSelectedPlan();updatePublishArchiveButtons();loadImage(x.image_url);
 }
 function loadImage(url){
  image=null;imageSource=url||"";
@@ -1263,7 +1292,8 @@ function renderScheduleQueue(){
 async function loadSchedule(){
  const response=await api("/schedule");
  scheduleData={settings:response.settings||[],queue:response.queue||[],instant_deliveries:response.instant_deliveries||[]};
- renderScheduleSettings();renderScheduleQueue();drawQueue();renderSelectedPlan();emitSummary();
+ await loadPublishedArchive();
+ renderScheduleSettings();renderScheduleQueue();refreshPublishedViews();
 }
 $("showSchedule").onclick=()=>{$("schedulePanel").scrollIntoView({behavior:"smooth",block:"start"})};
 $("showConfig").onclick=()=>{$("calendarConfig").open=true;$("calendarConfig").scrollIntoView({behavior:"smooth",block:"start"})};
@@ -1327,6 +1357,7 @@ async function loadBufferPosts(){
    (p.error?'<small>'+safe(p.error)+'</small>':"")+'</div>';
  }).join(""):'<p class="muted">Пока нет публикаций через Buffer</p>';
  updateBufferButtons();
+ await loadPublishedArchive();refreshPublishedViews();
 }
 $("bufferCheckPosts").onclick=()=>task(async()=>{
  await loadBufferPosts();
@@ -1425,6 +1456,7 @@ for(const locale of ["ru","en"]){
 
 const publishingDestinations=["telegram_ru","telegram_en","instagram_ru","instagram_en"];
 function hasPublicationRecord(itemId,destination){
+ if(publicationFor(itemId,destination))return true;
  const jobs=(scheduleData.queue||[]).filter(j=>j.item_id===itemId&&j.destination===destination);
  const posted=jobs.some(j=>["sent","submitted","sending","unknown"].includes(j.status))||
   (scheduleData.instant_deliveries||[]).some(d=>d.item_id===itemId&&d.destination===destination);
@@ -1561,7 +1593,9 @@ async function publishSelectedDestinations(requested){
   (failures.length?" · Ошибки (без автоматического повтора): "+failures.join("; "):"");
  info(output,failures.length>0);
  // Keep selection stable even when selected item leaves the review filter.
- await reload();selected=id;select();
+ await reload();
+ if(isAlreadyPublished(id)&&$("filter").value==="review")$("filter").value="published";
+ if(filtered().some(row=>row.id===id)){selected=id;select()}else refreshPublishedViews();
 }
 $("publishTGNowRU").onclick=()=>task(()=>publishSelectedDestinations(["telegram_ru"]));
 $("publishTGNowEN").onclick=()=>task(()=>publishSelectedDestinations(["telegram_en"]));
@@ -1577,6 +1611,12 @@ $("publishNowPreview").onclick=()=>task(()=>{
 $("pinForm").onsubmit=e=>{e.preventDefault();task(async()=>{const v=await api("/unlock","POST",{pin:$("pin").value},false);unlocked=v.token;sessionStorage.setItem("darkfactory_access",unlocked);await open()})};
 $("queue").onclick=e=>{const button=e.target.closest("[data-id]");if(button){selected=button.dataset.id;select()}};
 $("filter").onchange=()=>{selected=null;reload().catch(e=>info(e.message,true))};
+document.querySelectorAll("[data-editorial-view]").forEach(button=>{
+ button.onclick=()=>{const view=button.dataset.editorialView;
+  if(view!=="review"&&view!=="published")return;
+  $("filter").value=view;selected=null;reload().catch(e=>info(e.message,true));
+ };
+});
 document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;$("status").textContent="";document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));updateQuickEditor();render()});
 $("igMore").onclick=()=>{captionExpanded=!captionExpanded;render()};
 $("slidePrev").onclick=()=>moveSlide(-1);$("slideNext").onclick=()=>moveSlide(1);
