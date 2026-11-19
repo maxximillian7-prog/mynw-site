@@ -1029,9 +1029,9 @@ function updateBufferButtons(){
  for(const locale of ["ru","en"]){
   const suf=locale.toUpperCase();
   const link=(bufferState.channels||[]).find(c=>c.destination==="instagram_"+locale&&c.enabled);
-  const approved=Boolean(x&&x.fact_verification==="verified"&&x.visual_status==="ready"&&x.status_instagram==="approved");
+  const approved=Boolean(x&&x.format_type!=="reel_story"&&x.fact_verification==="verified"&&x.visual_status==="ready"&&x.status_instagram==="approved");
   const already=Boolean(x&&(bufferState.posts||[]).some(p=>p.item_id===x.id&&p.destination==="instagram_"+locale));
-  $("bufferMedia"+suf).disabled=!x||!x.image_storage_path||already;
+  $("bufferMedia"+suf).disabled=!x||!x.image_storage_path||x.format_type==="reel_story"||already;
   $("bufferCheckMedia"+suf).disabled=!x;
   $("bufferNow"+suf).disabled=!link||!approved||already;
   $("bufferSchedule"+suf).disabled=!link||!approved||already;
