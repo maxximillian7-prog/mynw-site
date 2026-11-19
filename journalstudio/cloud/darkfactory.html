@@ -294,12 +294,13 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
   <div class="fact-review-heading">Проверка факта и публикация позже</div>
   <div class="fact-review-state" id="factReviewState" aria-live="polite">Загрузка статуса проверки…</div>
   <div class="fact-review-buttons">
-    <button type="button" class="verified" id="verifyFact">🔎 Проверить и подтвердить</button>
+    <button type="button" class="verified" id="verifyFact">✓ Подтвердить факт вручную</button>
+    <button type="button" class="deferred" id="autoCheckFact">↻ Автопроверка источников</button>
     <button type="button" class="unconfirmed" id="markUnconfirmed">⚠ Не подтверждён</button>
     <button type="button" class="deferred" id="deferPublication">◷ Сохранить на потом</button>
     <button type="button" class="deferred" id="resumePublication" hidden>↩ Вернуть к публикации</button>
   </div>
-  <div class="review-note">Подтверждение проверяет минимум два независимых источника. Ни одна из этих кнопок не публикует статью. После проверки можно отправить сейчас либо запланировать.</div>
+  <div class="review-note">Для ручного подтверждения редактор лично проверяет два независимых HTTPS-источника. Автопроверка может не прочитать некоторые сайты. Ни одна кнопка проверки не публикует статью — после подтверждения можно отправить сейчас либо запланировать.</div>
 </div>
  <div class="selected-plan" id="selectedPublicationPlan" aria-live="polite"><h3>План публикаций · время Лиссабона</h3><span class="muted">Выберите материал в очереди</span></div>
   <div class="platform-publish" aria-label="Публикация в отдельные каналы">
@@ -592,16 +593,17 @@ function archiveDetailsMarkup(itemId){
 }
 function updateFactReviewButtons(){
  const x=current(),verified=x?.fact_verification==="verified",held=Boolean(x?.editorial_deferred);
- const verify=$("verifyFact"),unconfirmed=$("markUnconfirmed");
+ const verify=$("verifyFact"),auto=$("autoCheckFact"),unconfirmed=$("markUnconfirmed");
  const defer=$("deferPublication"),resume=$("resumePublication"),state=$("factReviewState");
  if(!verify||!state)return;
  verify.disabled=!x||verified;
- verify.textContent=verified?"✓ Факт подтверждён":"🔎 Проверить и подтвердить факт";
- unconfirmed.disabled=!x||!verified;
+ verify.textContent=verified?"✓ Факт подтверждён":"✓ Подтвердить вручную";
+ auto.disabled=!x;
+ unconfirmed.disabled=!x;
  unconfirmed.textContent=verified?"⚠ Отметить как неподтверждённый":"⚠ Факт не подтверждён";
  defer.hidden=held;defer.disabled=!x;
  resume.hidden=!held;resume.disabled=!x;
- const label=verified?"✓ Подтверждён по источникам":"⚠ Не подтверждён";
+ const label=verified?(String(x.creative_notes||"").startsWith("Manual editorial verification:")?"✓ Подтверждён редактором":"✓ Подтверждён автоматической проверкой"):"⚠ Не подтверждён";
  const reason=String(x?.creative_notes||"").slice(0,300);
  state.textContent=x?label+" · "+(held?"Публикация отложена · ":"")+
   (Array.isArray(x.source_urls)?x.source_urls.length:0)+" источников"+
@@ -1189,18 +1191,39 @@ async function persistCurrent(){
 $("quickSave").onclick=()=>task(async()=>{await persistCurrent();if(isDraftDirty())throw Error("Сервер не подтвердил сохранение");info("✓ Правки сохранены, медиа не удалены.")});
 
 $("verifyFact").onclick=()=>task(async()=>{
- const x=current();if(!x)throw Error("Выберите материал");
- if(x.fact_verification==="verified"){info("Факт уже подтверждён. Можно запланировать или опубликовать позднее.");return}
+ const x=current();if(!x)throw Error("Выберите факт");
  const id=x.id;
- info("Сохраняю правки и проверяю источники факта…");
- await persistCurrent();
+ if(x.fact_verification==="verified"){info("✓ Этот факт уже подтверждён. Можно публиковать позднее.");return}
+ if(isDraftDirty())await persistCurrent();
  const material=current();
- if((material.source_urls||[]).length<2)throw Error("Для подтверждения нужны минимум две ссылки на независимые источники. Добавьте их ниже и сохраните.");
+ const links=Array.isArray(material.source_urls)?material.source_urls:[];
+ if(links.length<2)throw Error("Нужно минимум два независимых источника. Добавьте HTTPS-ссылки в поле «Внутренний фактчекинг» и сохраните.");
+ const question="РЕДАКТОРСКОЕ ПОДТВЕРЖДЕНИЕ ФАКТА\n\n"+
+  "Вы лично сверили точное утверждение и детали статьи как минимум с двумя независимыми источниками?\n\n"+
+  links.slice(0,4).map((u,i)=>(i+1)+". "+u).join("\n")+
+  "\n\nПодтверждение сохранит ваше решение в журнале проверок, но НЕ опубликует статью.";
+ if(!confirm(question))return;
+ const result=await api("/items/"+id+"/verify-editor","POST",{
+  confirmed:true,
+  note:"Факт проверен редактором по указанным независимым источникам"
+ });
+ if(!result.verified)throw Error("Сервер не подтвердил проверку факта");
+ await afterFactAction(id,material.editorial_deferred?"deferred":"review",
+  "✓ Факт подтверждён редактором и сохранён. Публикация не запущена. Можно опубликовать сразу или запланировать.");
+});
+$("autoCheckFact").onclick=()=>task(async()=>{
+ const x=current();if(!x)throw Error("Выберите факт");
+ const id=x.id;
+ if(isDraftDirty())await persistCurrent();
+ const material=current();
+ if((material.source_urls||[]).length<2)throw Error("Автопроверке нужны два независимых HTTPS-источника");
+ info("Проверяю страницы источников автоматически…");
  const check=await api("/items/"+id+"/recheck","POST",{});
  const view=material.editorial_deferred?"deferred":check.verified?"review":"unconfirmed";
  await afterFactAction(id,view,check.verified?
-  "✓ Факт подтверждён двумя независимыми источниками. Статья сохранена и не опубликована. Можете запланировать её позже.":
-  "⚠ Факт не подтверждён: "+(check.reason||"источники не подтвердили утверждение")+". Материал сохранён для доработки.");
+  "✓ Автопроверка подтвердила факт. Статья сохранена без публикации.":
+  "⚠ Автопроверка не смогла подтвердить факт: "+(check.reason||"неясная причина")+
+  ". Если сайт не читается автоматически, проверьте два источника сами и воспользуйтесь «Подтвердить вручную».");
 });
 $("markUnconfirmed").onclick=()=>task(async()=>{
  const x=current();if(!x)return;
