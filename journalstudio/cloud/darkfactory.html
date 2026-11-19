@@ -1375,29 +1375,62 @@ function scheduleCard(x){
  '<div><label>Конец · Лиссабон</label><input type="time" data-field="active_end" max="23:59" value="'+safe(String(x.active_end||"23:59").slice(0,5))+'"></div></div>'+
  '<label>Дни недели</label><div class="weekdays">'+week+'</div>'+
  '<label>Исключить даты (ГГГГ-ММ-ДД, по одной в строке)</label><textarea data-field="excluded_dates" rows="2">'+safe((x.excluded_dates||[]).join("\n"))+'</textarea>'+
- '<div class="actions"><button class="primary" data-calendar-save="'+safeDest+'">Сохранить настройки</button></div></div>';
+ '<div class="actions"><button type="button" class="primary" data-calendar-save="'+safeDest+'">Сохранить настройки</button></div>'+
+ '<div class="note" data-calendar-feedback role="status" aria-live="polite" style="min-height:20px;margin:7px 0 0">Нажмите «Сохранить настройки» для применения изменений.</div></div>';
 }
 function renderScheduleSettings(){
  $("scheduleSettings").innerHTML=(scheduleData.settings||[]).map(scheduleCard).join("");
  $("scheduleSettings").querySelectorAll("[data-calendar-save]").forEach(btn=>btn.onclick=()=>task(async()=>{
   const dest=btn.dataset.calendarSave,card=btn.closest("[data-destination]");
+  const feedback=card.querySelector("[data-calendar-feedback]");
   const val=k=>card.querySelector('[data-field="'+k+'"]').value;
   const checked=k=>card.querySelector('[data-field="'+k+'"]').checked;
-  const min=Number(val("min_gap_minutes")),max=Number(val("max_per_day"));
-  if(!Number.isInteger(min)||min<60)throw Error("Минимум 60 минут между публикациями");
-  if(!Number.isInteger(max)||max<1||max>16)throw Error("Лимит от 1 до 16 публикаций");
-  const start=val("active_start"),end=val("active_end");
-  if(start<"08:00"||end>"23:59"||start>=end)throw Error("Публикации разрешены только с 08:00 до 23:59");
-  const days=Array.from(card.querySelectorAll("[data-week]")).filter(el=>el.checked).map(el=>Number(el.dataset.week));
-  if(!days.length)throw Error("Нужен хотя бы один день недели");
-  const dates=val("excluded_dates").split(/\s+/).map(x=>x.trim()).filter(Boolean);
-  const result=await api("/schedule/settings/"+dest,"PATCH",{
-   enabled:checked("enabled"),auto_queue:checked("auto_queue"),
-   min_gap_minutes:min,max_per_day:max,active_start:start,active_end:end,
-   allowed_weekdays:days,excluded_dates:dates
-  });
-  await loadSchedule();
-  info("Настройки "+destinationLabels[dest]+" сохранены. Тихие часы 00:00–08:00 защищены.");
+  const show=(msg,error=false)=>{feedback.textContent=msg;feedback.style.color=error?"#ff9789":"#c7f39f"};
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent="⏳ Сохраняю…";
+  show("Отправляю настройки на сервер…");
+  try{
+   const min=Number(val("min_gap_minutes")),max=Number(val("max_per_day"));
+   if(!Number.isInteger(min)||min<60||min>1440)throw Error("Интервал должен быть от 60 до 1440 минут.");
+   if(!Number.isInteger(max)||max<1||max>16)throw Error("Постов в сутки должно быть от 1 до 16.");
+   const start=val("active_start"),end=val("active_end");
+   if(!/^\d\d:\d\d$/.test(start)||!/^\d\d:\d\d$/.test(end)||start<"08:00"||end>"23:59"||start>=end)
+    throw Error("Неправильное время: начало с 08:00, конец позже начала и не позже 23:59 (Лиссабон).");
+   const days=Array.from(card.querySelectorAll("[data-week]")).filter(el=>el.checked).map(el=>Number(el.dataset.week));
+   if(!days.length)throw Error("Выберите хотя бы один день недели.");
+   const dates=val("excluded_dates").split(/[\s,;]+/).map(x=>x.trim()).filter(Boolean);
+   for(const date of dates){
+    if(!/^20\d\d-\d\d-\d\d$/.test(date)||Number.isNaN(Date.parse(date+"T12:00:00Z"))||
+       new Date(date+"T12:00:00Z").toISOString().slice(0,10)!==date)
+     throw Error("Некорректная исключённая дата: "+date+". Используйте ГГГГ-ММ-ДД.");
+   }
+   const payload={
+    enabled:checked("enabled"),auto_queue:checked("auto_queue"),min_gap_minutes:min,
+    max_per_day:max,active_start:start,active_end:end,
+    allowed_weekdays:days,excluded_dates:[...new Set(dates)]
+   };
+   const response=await api("/schedule/settings/"+dest,"PATCH",payload);
+   const confirmed=response?.settings;
+   if(!confirmed||confirmed.destination!==dest||
+      Number(confirmed.min_gap_minutes)!==min||Number(confirmed.max_per_day)!==max||
+      String(confirmed.active_start).slice(0,5)!==start||
+      String(confirmed.active_end).slice(0,5)!==end||
+      confirmed.enabled!==payload.enabled||confirmed.auto_queue!==payload.auto_queue)
+    throw Error("Сервер не подтвердил сохранение всех параметров. Проверьте подключение.");
+   scheduleData.settings=(scheduleData.settings||[]).map(x=>x.destination===dest?confirmed:x);
+   const stamp=new Date().toLocaleTimeString("ru-RU",{timeZone:"Europe/Lisbon",hour:"2-digit",minute:"2-digit"});
+   show("✓ Сохранено на сервере в "+stamp+" (Лиссабон).");
+   btn.textContent="✓ Сохранено";
+   info("✓ Настройки "+destinationLabels[dest]+" сохранены в Supabase.");
+  }catch(err){
+   const message=String(err?.message||err);
+   show("⚠ Не удалось сохранить: "+message,true);
+   info("Ошибка настроек "+(destinationLabels[dest]||dest)+": "+message,true);
+   btn.textContent=originalLabel;
+  }finally{
+   btn.disabled=false;
+   if(btn.textContent==="⏳ Сохраняю…")btn.textContent=originalLabel;
+  }
  }));
 }
 function renderScheduleQueue(){
