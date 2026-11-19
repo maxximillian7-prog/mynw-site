@@ -230,6 +230,31 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 .fact-review-controls button.unconfirmed{border-color:#866353;background:#352822;color:#f9b7a8}
 .fact-review-controls button.deferred{border-color:#708389;background:#243036;color:#deeee8}
 .fact-review-controls .review-note{font-size:11px;color:#95aaa5;margin-top:8px;line-height:1.6}
+
+/* Private media-library: visual thumbnails and explicit photo approval. */
+.media-archive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:11px;margin:12px 0}
+.media-archive-card{background:#151e22;border:1px solid #45534d;border-radius:12px;padding:8px;min-width:0}
+.media-archive-card.is-current{border-color:#b6f449;box-shadow:0 0 0 1px #b6f44955}
+.media-archive-thumb{display:block;width:100%;border:0;border-radius:9px;padding:0;overflow:hidden;aspect-ratio:4/5;background:#283439;cursor:zoom-in}
+.media-archive-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.media-archive-thumb span{display:flex;height:100%;align-items:center;justify-content:center;padding:15px;font-size:12px;color:#d2a49b;line-height:1.5}
+.media-archive-card h4{font-size:12px;line-height:1.4;color:#eaf1e9;margin:8px 0 4px;overflow-wrap:anywhere}
+.media-archive-card small{display:block;color:#aec4ba;font-size:11px;line-height:1.45}
+.media-archive-card .archive-current{display:inline-block;font-size:11px;color:#cafa76;margin-top:7px}
+.media-archive-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.media-archive-actions button{flex:1;min-width:125px;font-size:12px;padding:10px 8px}
+.media-archive-actions button.active{background:#c9f343;color:#111c0d;border-color:#c9f343}
+.media-archive-shade{position:fixed;inset:0;z-index:2147482800;background:rgba(0,0,0,.88);display:grid;place-items:center;padding:14px}
+.media-archive-shade[hidden],#mediaHistory[hidden]{display:none!important}
+.media-archive-dialog{width:100%;max-width:830px;max-height:95vh;overflow-y:auto;position:relative;border:1px solid #5b6c5c;border-radius:16px;background:#161e20;padding:17px;box-shadow:0 25px 100px #000c}
+.media-archive-dialog .archive-close{position:absolute;right:12px;top:9px;z-index:2;min-width:42px}
+.media-archive-dialog img{display:block;max-height:62vh;max-width:100%;object-fit:contain;margin:11px auto 9px;border-radius:9px;background:#263237}
+.media-archive-dialog h3{font-size:15px;color:#e5f3e1;max-width:92%;line-height:1.45}
+.media-archive-dialog p{font-size:12px;color:#b7c6c0}
+.media-archive-dialog .archive-modal-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0 3px}
+.media-archive-dialog .archive-modal-actions button{flex:1;min-width:170px}
+.media-archive-feedback{min-height:18px;color:#f5b2a7;font-size:12px}
+@media(max-width:520px){.media-archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.media-archive-card h4{font-size:11px}.media-archive-dialog{padding:14px}.media-archive-dialog img{max-height:57vh}}
 </style></head><body>
 <div id="login" class="panel"><div class="logo">НЕТ! <span>СЕРЬЁЗНО?</span></div><p class="gate-note muted">Закрытая редакция Journal Studio. Войдите в основной Журнал и введите дополнительный PIN.</p>
 <form id="pinForm"><label>Редакторский PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="12" required autocomplete="off"><button class="primary" style="width:100%;margin-top:12px" type="submit">Открыть редакцию</button></form><p id="loginInfo" class="status"></p></div>
@@ -294,7 +319,32 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
  <canvas id="canvas" width="1080" height="1350" hidden></canvas>
  <div id="tgViewer" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотоальбома Telegram"><button id="viewerClose" class="viewer-close" title="Закрыть просмотр">✕</button><div class="viewer-inner"><canvas id="viewerCanvas" width="1080" height="1350"></canvas><div class="viewer-controls"><button id="viewerPrev">←</button><strong id="viewerLabel">1 / 5</strong><button id="viewerNext">→</button></div><small>Листайте фотографии пальцем или стрелками</small></div></div>
  <div class="actions"><button id="download">↓ Экспорт текущего слайда PNG</button></div>
- <div id="mediaHistory" class="block" hidden><strong>История сохранённых изображений</strong><div id="mediaHistoryEntries"></div></div>
+ <div id="mediaHistory" class="block" hidden>
+ <strong>▤ Архив фотографий для приёмки</strong>
+ <p class="note">Здесь можно посмотреть все ранее созданные фотографии и выбрать правильную версию для статьи. Утверждение фото само по себе не публикует статью.</p>
+ <div class="media-archive-actions">
+  <button type="button" id="mediaScopeArticle" class="active">Фото этой статьи</button>
+  <button type="button" id="mediaScopeLibrary">Все сгенерированные</button>
+  <button type="button" id="mediaArchiveRefresh">↻ Обновить</button>
+  <button type="button" id="mediaArchiveClose">Закрыть архив</button>
+ </div>
+ <div id="mediaHistoryMessage" role="status" aria-live="polite" class="note">Выберите категорию архива.</div>
+ <div id="mediaHistoryEntries" class="media-archive-grid"></div>
+ </div>
+ <div id="mediaArchiveViewer" class="media-archive-shade" role="dialog" aria-modal="true" aria-label="Просмотр архивного изображения" hidden>
+  <div class="media-archive-dialog">
+   <button type="button" class="archive-close" id="mediaArchiveViewerClose" aria-label="Закрыть просмотр">✕</button>
+   <h3 id="mediaArchiveViewerTitle">Просмотр изображения</h3>
+   <img id="mediaArchiveViewerImage" alt="Изображение из архива" loading="eager">
+   <p id="mediaArchiveViewerMeta"></p>
+   <div class="archive-modal-actions">
+    <button type="button" class="primary" id="mediaArchiveApprove">✓ Утвердить это фото для статьи</button>
+    <button type="button" id="mediaArchiveGoToArticle" hidden>Открыть статью</button>
+    <button type="button" id="mediaArchiveViewerCancel">Закрыть</button>
+   </div>
+   <p id="mediaArchiveViewerError" class="media-archive-feedback" aria-live="polite"></p>
+  </div>
+ </div>
  <div class="fact-review-controls" id="factReviewControls">
   <div class="fact-review-heading">Проверка факта и публикация позже</div>
   <div class="fact-review-state" id="factReviewState" aria-live="polite">Загрузка статуса проверки…</div>
@@ -677,6 +727,7 @@ function drawQueue(){
 function setField(id,val){$(id).value=val||""}
 function select(){
  const x=current();if(!x){$("chosenTitle").textContent="Нет материала";return}
+ if(archiveItemId&&archiveItemId!==x.id&&!$("mediaHistory").hidden&&archiveScope==="article")closeMediaHistory();
  quickEditOpen=false;$("quickEditor").hidden=true;
  $("chosenTitle").textContent=x.title;$("formatName").textContent=fmt[x.format_type]||x.format_type;
  [["fTitle",x.title],["fTitleEN",x.title_en],["fHook",x.hook],["fHookEN",x.hook_en],["fBody",x.body],["fBodyEN",x.body_en],["fIGRU",x.caption_instagram],["fIGEN",x.caption_instagram_en],["fTG",x.caption_telegram],["fTGEN",x.caption_telegram_en],["fVisual",x.visual_prompt_en||x.visual_prompt],["fSources",(x.source_urls||[]).join("\n")],["fFormat",x.format_type]].forEach(([id,v])=>setField(id,v));
@@ -1320,19 +1371,135 @@ $("mediaFile").onchange=()=>task(async()=>{
  $("mediaFile").value="";await reload();
  info("✓ Новое фото сохранено. Старые версии остались в архиве.");
 });
+// The private source images are signed on demand by the editor API.
+// A saved photo remains attached to its original fact, never to a different story.
+let archiveScope="article",archiveItemId=null,archiveVersions=[],archivePreview=null,archiveRequestId=0;
+function archiveDate(v){
+ const t=new Date(v);
+ return Number.isFinite(t.getTime())?t.toLocaleString("ru-RU",{timeZone:"Europe/Lisbon",
+  day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"Дата неизвестна";
+}
+function closeArchiveViewer(){
+ $("mediaArchiveViewer").hidden=true;$("mediaArchiveViewerImage").removeAttribute("src");
+ $("mediaArchiveViewerError").textContent="";archivePreview=null;
+}
+function closeMediaHistory(){
+ archiveRequestId++;$("mediaHistory").hidden=true;closeArchiveViewer();
+ $("mediaHistoryEntries").replaceChildren();archiveVersions=[];
+}
+function renderMediaArchive(){
+ $("mediaScopeArticle").classList.toggle("active",archiveScope==="article");
+ $("mediaScopeLibrary").classList.toggle("active",archiveScope==="library");
+ const msg=$("mediaHistoryMessage"),list=$("mediaHistoryEntries");
+ msg.textContent=archiveVersions.length?
+  "Сохранено фотографий: "+archiveVersions.length+". Нажмите на миниатюру для просмотра в полном размере.":
+  (archiveScope==="article"?"У этой статьи ещё нет сохранённых версий. Откройте «Все сгенерированные», чтобы посмотреть остальную медиатеку.":
+   "В архиве пока нет созданных фотографий.");
+ list.innerHTML=archiveVersions.map(v=>{
+  const canOpen=Boolean(v.available&&v.image_url);
+  const kind=v.kind==="generated"?"✦ AI-иллюстрация":v.kind==="uploaded"?"↑ Загруженное фото":"▤ Архивное фото";
+  return '<article class="media-archive-card '+(v.current?"is-current":"")+'">'+
+   '<button type="button" class="media-archive-thumb" data-media-preview="'+safe(v.id)+'" '+
+   (!canOpen?"disabled":"")+' aria-label="Открыть фото: '+safe(v.title)+'">'+
+   (canOpen?'<img src="'+safe(v.image_url)+'" alt="'+safe(v.title)+'" loading="lazy">':
+    '<span>⚠ Файл недоступен. Обновите архив.</span>')+'</button>'+
+   '<h4>'+safe(v.title)+'</h4>'+
+   '<small>'+safe(kind)+' · '+safe(archiveDate(v.created_at))+'</small>'+
+   (v.current?'<span class="archive-current">✓ Выбрано для этой статьи</span>':'')+
+   '<div class="media-archive-actions"><button type="button" data-media-preview="'+safe(v.id)+'" '+
+   (!canOpen?"disabled":"")+'>'+(canOpen?"Просмотреть":"Недоступно")+'</button></div>'+
+   '</article>';
+ }).join("");
+ list.querySelectorAll("[data-media-preview]").forEach(btn=>btn.onclick=()=>{
+  const v=archiveVersions.find(x=>x.id===btn.dataset.mediaPreview);if(v)openArchivedPhoto(v);
+ });
+ list.querySelectorAll("img").forEach(img=>{
+  img.onerror=()=>{img.style.opacity=".2";img.alt="Миниатюра недоступна; нажмите «Обновить»"};
+ });
+}
+async function fetchMediaHistory(scope=archiveScope){
+ const selectedItem=current();if(!selectedItem)return;
+ const id=selectedItem.id,request=++archiveRequestId;
+ archiveScope=scope;archiveItemId=id;
+ $("mediaHistoryMessage").textContent="⏳ Загружаю сохранённые фото и временные защищённые ссылки…";
+ $("mediaHistoryEntries").replaceChildren();
+ $("mediaScopeArticle").classList.toggle("active",scope==="article");
+ $("mediaScopeLibrary").classList.toggle("active",scope==="library");
+ try{
+  const data=await api(scope==="article"?"/items/"+id+"/media-history":"/media-library");
+  if(request!==archiveRequestId||$("mediaHistory").hidden)return;
+  archiveVersions=Array.isArray(data.versions)?data.versions:[];
+  renderMediaArchive();
+ }catch(e){
+  if(request===archiveRequestId){
+   $("mediaHistoryMessage").textContent="⚠ Не удалось открыть архив: "+String(e?.message||e);
+  }
+ }
+}
+function openArchivedPhoto(v){
+ if(!v.available||!v.image_url){info("Изображение недоступно. Обновите ссылки в архиве.",true);return}
+ archivePreview=v;
+ $("mediaArchiveViewerTitle").textContent=v.title;
+ $("mediaArchiveViewerMeta").textContent=
+  (v.kind==="generated"?"AI-иллюстрация":v.kind==="uploaded"?"Загруженное фото":"Архивная версия")+
+  " · "+archiveDate(v.created_at)+
+  (v.current?" · ✓ Текущая выбранная версия":"");
+ $("mediaArchiveViewerError").textContent="";
+ const img=$("mediaArchiveViewerImage");
+ img.onerror=()=>{$("mediaArchiveViewerError").textContent="Не удалось открыть оригинал. Закройте просмотр и обновите архив для новой защищённой ссылки."};
+ img.src=v.image_url;
+ const isSelectedArticle=current()?.id===v.item_id;
+ const button=$("mediaArchiveApprove"),go=$("mediaArchiveGoToArticle");
+ button.hidden=!isSelectedArticle;
+ button.disabled=!isSelectedArticle||v.current;
+ button.textContent=v.current?"✓ Уже выбрано для статьи":"✓ Утвердить это фото для статьи";
+ go.hidden=isSelectedArticle;
+ $("mediaArchiveViewer").hidden=false;
+}
+async function approveArchivedPhoto(){
+ const v=archivePreview;
+ if(!v||!current()||current().id!==v.item_id)throw Error("Выберите исходную статью фотографии");
+ if(v.current){closeArchiveViewer();info("✓ Это фото уже выбрано для статьи.");return}
+ if(!confirm("Утвердить это изображение для статьи «"+v.title+"»?\n\nОно станет основным фото в Telegram и Instagram. История фотографий сохранится; ранее утверждённые посты потребуют повторной приёмки. Публикации не отправятся автоматически."))return;
+ const itemId=v.item_id;
+ const out=await api("/items/"+itemId+"/media-restore","POST",{version_id:v.id});
+ if(!out?.restored||out?.item?.image_storage_path===undefined)
+  throw Error("Сервер не подтвердил выбор фотографии");
+ closeArchiveViewer();
+ await reload();
+ if(!filtered().some(row=>row.id===itemId))$("filter").value="all";
+ selected=itemId;select();
+ if(!$("mediaHistory").hidden)await fetchMediaHistory(archiveScope);
+ info("✓ Фото утверждено для статьи. Можно посмотреть предпросмотр и отдельно утвердить публикации.");
+}
 $("mediaHistoryOpen").onclick=()=>task(async()=>{
- const item=current();if(!item)return;
- const history=$("mediaHistory");history.hidden=!history.hidden;if(history.hidden)return;
- const data=await api("/items/"+item.id+"/media-history");
- const list=(data.versions||[]).map(v=>'<div class="source"><span>'+
-  safe(v.kind)+" · "+safe(new Date(v.created_at).toLocaleString())+
-  '</span> <button data-media-version="'+safe(v.id)+'" style="padding:4px 8px;font-size:11px">Восстановить</button></div>').join("");
- $("mediaHistoryEntries").innerHTML=list||'<p class="muted">История медиа пока пустая</p>';
- $("mediaHistoryEntries").querySelectorAll("[data-media-version]").forEach(btn=>btn.onclick=()=>task(async()=>{
-  if(!confirm("Восстановить предыдущую версию фото без удаления остальных?"))return;
-  await api("/items/"+item.id+"/media-restore","POST",{version_id:btn.dataset.mediaVersion});
-  await reload();info("Предыдущая версия фото восстановлена.");
- }));
+ const item=current();if(!item)throw Error("Выберите статью");
+ const box=$("mediaHistory");
+ if(!box.hidden){closeMediaHistory();return}
+ box.hidden=false;archiveScope="article";
+ await fetchMediaHistory("article");
+ box.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+$("mediaScopeArticle").onclick=()=>task(()=>fetchMediaHistory("article"));
+$("mediaScopeLibrary").onclick=()=>task(()=>fetchMediaHistory("library"));
+$("mediaArchiveRefresh").onclick=()=>task(()=>fetchMediaHistory(archiveScope));
+$("mediaArchiveClose").onclick=closeMediaHistory;
+$("mediaArchiveViewerClose").onclick=closeArchiveViewer;
+$("mediaArchiveViewerCancel").onclick=closeArchiveViewer;
+$("mediaArchiveViewer").addEventListener("click",event=>{
+ if(event.target===$("mediaArchiveViewer"))closeArchiveViewer();
+});
+$("mediaArchiveApprove").onclick=()=>task(approveArchivedPhoto);
+$("mediaArchiveGoToArticle").onclick=()=>task(async()=>{
+ const v=archivePreview;if(!v)return;
+ if(isDraftDirty()&&!confirm("Текущие несохранённые изменения в редакторе будут потеряны. Открыть исходную статью изображения?"))return;
+ closeArchiveViewer();
+ $("filter").value="all";selected=v.item_id;select();
+ await fetchMediaHistory("article");
+ $("mediaHistory").scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&!$("mediaArchiveViewer").hidden)closeArchiveViewer();
 });
 
 
