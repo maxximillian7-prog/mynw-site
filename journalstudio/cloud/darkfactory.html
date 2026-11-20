@@ -863,11 +863,25 @@ function fitCanvas(ctx,text,maxWidth,maxLines,initial,min,weight){
  }
  return {size,lines};
 }
+// Accent is a property of the editorial FORMAT, not the alternate dark theme.
+// Keep one format colour across every slide and every language of a post.
+// This applies to previews, exported Instagram slides and future regenerated assets.
+const SERIOUSLY_FORMAT_ACCENTS=Object.freeze({
+ card:"#FF6659",        // coral: single-card fact
+ carousel:"#D7FF38",    // acid yellow: carousel
+ photo_story:"#38D5EC", // electric cyan: visual fact
+ comparison:"#FFBD45",  // amber: numerical comparison
+ timeline:"#B895F7",    // violet: timeline
+ reel_story:"#F47DB9"   // neon pink: short video
+});
+function seriouslyAccent(x){
+ return SERIOUSLY_FORMAT_ACCENTS[String(x?.format_type||"card")]||SERIOUSLY_FORMAT_ACCENTS.card;
+}
 function drawCard(canvas,x,slide,en,reel,thumbnail=false,number=0,total=1){
  const W=1080,H=reel?1920:1350;
  canvas.width=thumbnail?166:W;canvas.height=thumbnail?(reel?295:208):H;
  const ctx=canvas.getContext("2d");ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);
- const accent=x.theme_variant==="acid_brutal"?"#ff6a57":"#c9f532";
+ const accent=seriouslyAccent(x);
  const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,"#132724");g.addColorStop(.54,"#21212b");g.addColorStop(1,"#4e3534");
  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
  if(image){
