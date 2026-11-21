@@ -1816,17 +1816,23 @@ for(const locale of ["ru","en"]){
   if(!slides.length||slides.length>10)throw Error("Допускается 1–10 слайдов");
   const active=session();if(!active?.access_token||!unlocked)throw Error("Нет редакционной сессии");
   for(let i=0;i<slides.length;i++){
+   $("bufferMediaStatus"+suf).textContent="⏳ Instagram "+suf+": загрузка "+(i+1)+" / "+slides.length+
+     " · при временном сбое хранилища сервер повторит попытку";
    const canvas=document.createElement("canvas");
    drawCard(canvas,preview,slides[i],en,false,false,i,slides.length);
-   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.89));
+   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.85));
    if(!blob||blob.size>8*1024*1024)throw Error("Не удалось экспортировать слайд "+(i+1));
    const response=await fetch(ROOT+"/functions/v1/darkfactory/instagram/items/"+fact.id+
      "/"+locale+"/slides/"+(i+1),{method:"PUT",cache:"no-store",
     headers:{apikey:PUB,Authorization:"Bearer "+active.access_token,
      "x-darkfactory-session":unlocked,"Content-Type":"image/jpeg"},body:blob});
    const body=await response.json().catch(()=>({}));
-   if(!response.ok)throw Error(body.error||"Не сохранён слайд "+(i+1));
-   $("bufferMediaStatus"+suf).textContent="Сохранено "+(i+1)+" / "+slides.length+" слайдов";
+   if(!response.ok){
+    $("bufferMediaStatus"+suf).textContent="⚠ Instagram "+suf+": слайд "+(i+1)+" / "+slides.length+" · "+(body.error||"ошибка хранилища");
+    throw Error("Instagram "+suf+", слайд "+(i+1)+" / "+slides.length+": "+(body.error||"не сохранён"));
+   }
+   $("bufferMediaStatus"+suf).textContent="✓ Сохранено "+(i+1)+" / "+slides.length+" слайдов";
+   if(i+1<slides.length)await new Promise(resolve=>setTimeout(resolve,240));
   }
   info("✓ Instagram "+suf+": "+slides.length+" изображений сохранены. Проверьте и утвердите факт перед публикацией.");
  });
@@ -1907,17 +1913,24 @@ async function prepareInstagramForPublishing(item,locale){
  const active=session();if(!active?.access_token||!unlocked)throw Error("Войдите в Journal Studio");
  for(let i=0;i<slides.length;i++){
   image=source;
+  const status=$("bufferMediaStatus"+locale.toUpperCase());
+  status.textContent="⏳ Instagram "+locale.toUpperCase()+" · слайд "+(i+1)+" / "+slides.length+
+   " · сервер автоматически повторяет временные ошибки";
   const canvas=document.createElement("canvas");
   drawCard(canvas,x,slides[i],locale==="en",false,false,i,slides.length);
-  const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.89));
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.85));
   if(!blob||blob.size>8*1024*1024)throw Error("Не удалось подготовить Instagram-слайд "+(i+1));
   const response=await fetch(ROOT+"/functions/v1/darkfactory/instagram/items/"+item.id+"/"+locale+"/slides/"+(i+1),{
    method:"PUT",cache:"no-store",headers:{apikey:PUB,Authorization:"Bearer "+active.access_token,
     "x-darkfactory-session":unlocked,"Content-Type":"image/jpeg"},body:blob
   });
   const result=await response.json().catch(()=>({}));
-  if(!response.ok)throw Error(result.error||"Не удалось сохранить Instagram-слайд "+(i+1));
-  $("bufferMediaStatus"+locale.toUpperCase()).textContent="✓ Сохранён "+(i+1)+" / "+slides.length;
+  if(!response.ok){
+   status.textContent="⚠ Слайд "+(i+1)+" / "+slides.length+" · "+(result.error||"ошибка загрузки");
+   throw Error("Instagram "+locale.toUpperCase()+", слайд "+(i+1)+" / "+slides.length+": "+(result.error||"Не удалось сохранить"));
+  }
+  status.textContent="✓ Сохранён "+(i+1)+" / "+slides.length;
+  if(i+1<slides.length)await new Promise(resolve=>setTimeout(resolve,240));
  }
  return slides.length;
 }
