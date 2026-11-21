@@ -254,8 +254,8 @@ window.StudioBrandHub=(function(){
     '<div class="studio-brand-workspace-header portugal">'+
      '<div class="title-cluster"><img src="'+logo("portugal")+'" alt=""><div><h2>Португалия рядом</h2>'+
      '<p>Новости, полезные статьи, афиша, сообщения и календарь публикаций</p></div></div>'+
-     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><a class="open-external" href="./portugal/?v=20261118-unified-5" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
-    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1&v=20261118-unified-5" src="about:blank"></iframe>'+
+     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><a class="open-external" href="./portugal/?v=20261121-review-newest-first" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
+    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1&v=20261121-review-newest-first" src="about:blank"></iframe>'+
     '</section>');
   }
  }
