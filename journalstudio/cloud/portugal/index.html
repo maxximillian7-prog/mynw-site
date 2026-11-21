@@ -393,7 +393,7 @@ body.studio-embedded .workspace{padding:13px}}
   <div class="preview pt-live-preview" id="livePreview"></div>
   <div class="pt-screen-notice" id="previewHint">Мобильный макет Telegram на основе подготовленных текста и фотографии.</div>
   <div class="sourcebox" style="margin:12px 0"><strong>Рубрика: </strong><strong id="categoryTagPreview">—</strong><div class="faint">Навигационный хештег всегда добавляется в конец публикации.</div></div>
-  <div class="btns"><button class="btn" id="copyTelegramBtn">Копировать текст Telegram</button><button class="btn hidden" id="copyInstagramBtn">Копировать подпись Instagram</button><button class="btn hidden" id="copyCorrectedInstagramBtn">Копировать исправленную подпись</button><span class="secondary" id="tgLength">—</span></div>
+  <div class="btns"><button class="btn" id="copyTelegramBtn">Копировать текст Telegram</button><button class="btn hidden" id="copyInstagramBtn">Копировать подпись Instagram</button><button class="btn hidden" id="copyCorrectedInstagramBtn">Копировать исправленную подпись</button><button class="btn hidden" id="toggleCorrectedInstagramBtn">Показать исходную подпись</button><span class="secondary" id="tgLength">—</span></div>
   <p class="secondary" style="margin-top:9px">Предпросмотр обновляется при каждом изменении. Для копирования публикация должна быть утверждена.</p>
  </div>
  <div class="card" id="photoPanel"><h3>④ Фотографии — быстро выбрать и заменить</h3>
@@ -456,7 +456,7 @@ const statuses={candidate:"В обработке",needs_facts:"Нужны фак
 let session,me,categories=[],items=[],current=null,activeStatus="incoming",activeChannel="main",dirty=false,loading=false;
 let contactMode=false,selectedContactId=null,contactPairCommand="";
 let toastTimeout=0,approvalPending=false;
-let previewMode="phone",previewPhotoId=null,photoSearchResults=[],instagramCaptionCached="";
+let previewMode="phone",previewPhotoId=null,photoSearchResults=[],instagramCaptionCached="",instagramShowProposed=true;
 let lastArticleDestinationChoice=null;
 function toast(msg,error=false){const el=$("toast");el.textContent=msg;el.classList.toggle("error",error);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.hidden=true,4800)}
 function login(message){$("loginMessage").textContent=message||"Войдите в Journal Studio и вернитесь в этот раздел.";$("loginOverlay").hidden=false}
@@ -718,8 +718,11 @@ function activeTags(i){
 function isEventPreview(i){return i?.primary_category==="events";}
 function instagramCaption(f,i,img){
  // A post already handed to Buffer must preview the exact caption sent there.
- if(!dirty&&current?.instagram?.buffer_post_id&&current?.instagram?.caption)
+ if(!dirty&&current?.instagram?.buffer_post_id&&current?.instagram?.caption){
+  const revised=String(i.instagram_caption||"");
+  if(instagramShowProposed&&revised&&revised!==current.instagram.caption)return revised;
   return current.instagram.caption;
+ }
  // Server is the single source of truth for short editorial copy and curated briefs.
  if(!dirty&&!previewPhotoId&&i.instagram_caption)return i.instagram_caption;
  const ev=i.trailyo_event||{},isEvent=i.primary_category==="events";
@@ -850,7 +853,16 @@ function renderPreview(){
     $("previewHint").textContent="⚠️ "+suffix;
   }
   // PT_CORRECTED_BUFFER_COPY_BUTTON_20261117
-  $("copyCorrectedInstagramBtn").classList.toggle("hidden",!(bufferExists&&freshCopy&&freshCopy!==bufferCopy));
+  const hasRevision=bufferExists&&freshCopy&&freshCopy!==bufferCopy;
+  $("copyCorrectedInstagramBtn").classList.toggle("hidden",!hasRevision);
+  $("toggleCorrectedInstagramBtn").classList.toggle("hidden",!hasRevision);
+  $("toggleCorrectedInstagramBtn").textContent=instagramShowProposed?"Показать исходную подпись":"Показать расширенную статью";
+  if(hasRevision&&instagramShowProposed){
+   $("previewHint").textContent="📝 Расширенная редакционная версия: "+caption.length+
+    " символов. "+(current?.instagram?.status==="published"?
+    "Исходный пост в Instagram НЕ изменён — скопируйте эту подпись и отредактируйте его в Instagram.":
+    "Запланированный пост в Buffer НЕ изменён — скопируйте новую подпись и обновите существующую запись в Buffer.");
+  }
   $("tgLength").textContent=caption.length+" / 2200 символов · "+(approvedMedia?"фото утверждено":"фото не подтверждено");
  }else if(previewMode==="phone"){
   root.innerHTML='<div class="pt-phone-shell"><div class="pt-phone">'+
@@ -1194,6 +1206,7 @@ function bind(){
  
  $("copyInstagramBtn").onclick=async()=>{if(!instagramCaptionCached){toast("Нет подписи Instagram",true);return}try{await navigator.clipboard.writeText(instagramCaptionCached);toast("Подпись Instagram скопирована")}catch{toast("Не удалось скопировать текст",true)}};
  $("copyCorrectedInstagramBtn").onclick=async()=>{const fresh=String(current?.article?.instagram_caption||"");if(!fresh){toast("Исправленная подпись пока недоступна",true);return}try{await navigator.clipboard.writeText(fresh);toast("Исправленная подпись Instagram скопирована")}catch{toast("Не удалось скопировать подпись",true)}};
+ $("toggleCorrectedInstagramBtn").onclick=()=>{instagramShowProposed=!instagramShowProposed;renderPreview()};
  updateApprovalButtons();
  $("approveBtn").onclick=()=>approveAndQueue("telegram");
  $("approveInstagramBtn").onclick=()=>{previewMode="instagram";renderPreview();approveAndQueue("instagram")};
