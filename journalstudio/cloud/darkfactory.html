@@ -56,7 +56,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .ig-dots button{width:6px;height:6px;border:0;border-radius:50%;background:#c8cbd0;padding:0}
 .ig-dots button.active{background:#0097ec;width:7px;height:7px}
 .ig-feedback{padding:0 13px 5px;font-size:11px;color:#878a90}
-.ig-caption{white-space:pre-wrap;overflow-wrap:anywhere;padding:0 13px 6px;font-size:12px;line-height:1.55;max-height:250px;overflow:auto}
+.ig-caption{white-space:pre-wrap;overflow-wrap:anywhere;padding:0 13px 12px;font-size:13px;line-height:1.65;max-height:none;overflow:visible}
 .ig-caption strong{font-size:12px}.ig-more{border:0;background:none;color:#8a8b92;padding:0 0 0 5px;font-size:12px}
 .ig-comment{color:#a1a4aa;padding:8px 13px 13px;font-size:11px}
 .tg-proof{max-width:480px;margin:0 auto;background:#cddbd9;color:#15232c;border:1px solid #364549;border-radius:16px;overflow:hidden;box-shadow:0 18px 48px #0005}
@@ -65,7 +65,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .tg-avatar{width:39px;height:39px;background:#151b19;border-radius:50%;color:#ceff37;font-weight:950;display:grid;place-items:center}
 .tg-top strong{font-size:14px}.tg-top small{display:block;color:#77858a;font-size:11px}
 .tg-search{margin-left:auto;font-size:22px;color:#7f8b8e}
-.tg-chat{background-color:#cfdfd8;background-image:radial-gradient(#afc6bc66 1px,transparent 1px),linear-gradient(30deg,#cae0db,#dee5db);background-size:23px 23px,100% 100%;padding:14px 14px 35px;max-height:680px;overflow-y:auto}
+.tg-chat{background-color:#cfdfd8;background-image:radial-gradient(#afc6bc66 1px,transparent 1px),linear-gradient(30deg,#cae0db,#dee5db);background-size:23px 23px,100% 100%;padding:14px 14px 35px;max-height:none;overflow:visible}
 .tg-date{text-align:center;margin:0 auto 12px;padding:5px 13px;background:#6284787d;color:#fff;border-radius:20px;width:max-content;font-size:11px}
 .tg-bubble{background:#fff;box-shadow:0 1px 3px #42534c30;border-radius:10px 10px 10px 3px;overflow:hidden;max-width:410px;margin:0 auto 10px}
 .tg-from{color:#359bc9;font-size:12px;font-weight:780;padding:10px 12px 7px}
@@ -78,7 +78,7 @@ h1,h2,h3,p{margin:0}.muted{color:var(--muted)}a{color:var(--lime);word-break:bre
 .tg-message a{color:#2787c0;text-decoration:none}
 .tg-meta{display:flex;justify-content:flex-end;gap:8px;padding:0 12px 9px;color:#8c9a9f;font-size:10px}
 .tg-bottom{background:#fff;color:#95a0a5;border-top:1px solid #dfe6e8;padding:12px 18px;font-size:12px}
-.reel-proof{max-width:405px;margin:0 auto;position:relative;border-radius:16px;overflow:hidden;background:#030506;border:1px solid #343b42;color:#fff}
+.reel-proof{max-width:405px;margin:0 auto;position:relative;border-radius:16px;overflow:hidden;background:#030506;border:1px solid #343b42;color:#fff}.reel-full-text{padding:16px 17px 22px;background:#15181b;border-top:1px solid #394047}.reel-full-text>strong{display:block;color:#d8ff50;margin-bottom:9px;font-size:12px}.reel-caption-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.65;color:#f2f5ee}
 .reel-proof .mock-media canvas{width:100%}
 .reel-head{position:absolute;z-index:4;top:20px;left:18px;font-size:20px;font-weight:750;text-shadow:0 1px 4px #000}
 .reel-right{position:absolute;right:12px;bottom:105px;display:grid;gap:25px;z-index:4;text-align:center;font-size:12px;text-shadow:0 1px 5px #000}
@@ -311,7 +311,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
   <div class="tg-bottom">Канал · только просмотр публикации</div>
  </div>
  <div id="reelsFrame" class="reel-proof" hidden>
-  <div id="reelMedia" class="mock-media" tabindex="0"><div class="reel-head">Reels</div><span class="reel-marker">МАКЕТ ОБЛОЖКИ · БЕЗ ВИДЕО</span><div class="reel-right"><div style="font-size:27px">♡</div><div style="font-size:26px">♧</div><div style="font-size:27px">➤</div><div style="font-size:26px">⋯</div></div><div class="reel-caption"><strong>◉ no.seriously · макет</strong><small id="reelSnippet">Короткая история</small></div></div>
+  <div id="reelMedia" class="mock-media" tabindex="0"><div class="reel-head">Reels</div><span class="reel-marker">МАКЕТ ОБЛОЖКИ · БЕЗ ВИДЕО</span><div class="reel-right"><div style="font-size:27px">♡</div><div style="font-size:26px">♧</div><div style="font-size:27px">➤</div><div style="font-size:26px">⋯</div></div><div class="reel-caption"><strong>◉ no.seriously · макет</strong><small id="reelSnippet">Короткая история</small></div></div><div class="reel-full-text"><strong id="reelFullTitle">Полный текст публикации · Reels</strong><div id="reelFullCaption" class="reel-caption-text"></div></div>
  </div>
  <div id="slideTools" class="slide-tools"><button id="slidePrev" aria-label="Предыдущий слайд">←</button><span id="slideLabel">1 / 1</span><button id="slideNext" aria-label="Следующий слайд">→</button></div>
  <div id="slideRail" class="slide-rail" aria-label="Миниатюры слайдов карусели"></div>
@@ -469,7 +469,7 @@ body.studio-embedded .tg-setup,body.studio-embedded .calendar-panel{margin-top:1
 "use strict";
 const ROOT="https://npsfaymjckcqhtyiafms.supabase.co", PUB="sb_publishable_-HPESNuXtfZQo-gLREwi2Q_1_aAoxee";
 const $=id=>document.getElementById(id);
-let items=[],selected=null,mode="telegram",unlocked=sessionStorage.getItem("darkfactory_access")||"",settings={},image=null,imageSource="",busy=false,slideIndex=0,viewerIndex=0,captionExpanded=false;
+let items=[],selected=null,mode="telegram",unlocked=sessionStorage.getItem("darkfactory_access")||"",settings={},image=null,imageSource="",busy=false,slideIndex=0,viewerIndex=0,captionExpanded=true;
 if(new URLSearchParams(location.search).get("embedded")==="1")document.body.classList.add("studio-embedded");
 let tgChannels={ru:null,en:null};
 let quickEditOpen=false,mediaRefreshPending=false,scheduleData={settings:[],queue:[],instant_deliveries:[]};
@@ -727,6 +727,7 @@ function drawQueue(){
 function setField(id,val){$(id).value=val||""}
 function select(){
  const x=current();if(!x){$("chosenTitle").textContent="Нет материала";return}
+ captionExpanded=true;
  if(archiveItemId&&archiveItemId!==x.id&&!$("mediaHistory").hidden&&archiveScope==="article")closeMediaHistory();
  quickEditOpen=false;$("quickEditor").hidden=true;
  $("chosenTitle").textContent=x.title;$("formatName").textContent=fmt[x.format_type]||x.format_type;
@@ -1001,11 +1002,17 @@ function setRich(el,text){
   if(bold){const strong=document.createElement("strong");strong.appendChild(node);el.appendChild(strong)}else el.appendChild(node);
  }
 }
+// The editorial preview defaults to the ENTIRE caption. Only an explicit click
+// on "свернуть" may collapse it. Never silently cut the publication to 194 chars.
+function postCaption(x,en){
+ return String((en?x.caption_instagram_en:x.caption_instagram)||
+   ((en?(x.title_en||x.title):x.title)+"\n\n"+(en?(x.body_en||x.body):x.body))||"");
+}
 function updateCaption(x,en){
- let txt=(en?x.caption_instagram_en:x.caption_instagram)||((en?x.title_en:x.title)+"\n\n"+(en?x.body_en:x.body));
- const more=txt.length>200;
+ const txt=postCaption(x,en),more=txt.length>200;
  $("igCaption").textContent=captionExpanded||!more?txt:txt.slice(0,194).trimEnd()+"…";
- $("igMore").hidden=!more;$("igMore").textContent=captionExpanded?(en?"less":"свернуть"):(en?"more":"ещё");
+ $("igMore").hidden=!more;
+ $("igMore").textContent=captionExpanded?(en?"Collapse":"Свернуть"):(en?"Show full text":"Показать полностью");
 }
 // Instagram and Telegram have independent image templates. This exact function renders
 // the local Telegram preview, the exported JPEG and the media used for publishing.
@@ -1059,7 +1066,7 @@ function drawTelegramSquare(canvas,item,en,picture=image){
 }
 function updateTG(x,slides,en){
  const message=en?(x.caption_telegram_en||x.title_en+"\n\n"+x.body_en):(x.caption_telegram||x.title+"\n\n"+x.body);
- const plain=String(message||"").replace(/<\/?b>/gi,"").replace(/<[^>]*>/g,"").replace(/https?:\/\/[^\s]+/g,"").trim();
+ const plain=String(message||"").replace(/<(?!\/?b>)[^>]*>/gi,"").trim();
  $("tgChannelTitle").textContent=en?"NO, SERIOUSLY?! · preview":"НЕТ! СЕРЬЁЗНО?! · макет";
  $("tgChannelSubtitle").textContent=en?"Channel · editorial preview":"Канал · предпросмотр сообщения";
  $("tgFrom").textContent=en?"NO, SERIOUSLY?!":"НЕТ! СЕРЬЁЗНО?!";
@@ -1112,6 +1119,8 @@ function render(){
  if(reel){
   $("reelMedia").insertBefore(canvas,$("reelMedia").firstChild);canvas.hidden=false;
   $("reelSnippet").textContent=(en?x.hook_en:x.hook)||"История";
+  $("reelFullTitle").textContent=en?"Full post text · Reels":"Полный текст публикации · Reels";
+  $("reelFullCaption").textContent=postCaption(x,en);
  }
  if(!tg)renderRail(x,slides,en);
  const manual=$("publishNowPreview");
@@ -2002,7 +2011,7 @@ document.querySelectorAll("[data-editorial-view]").forEach(button=>{
   $("filter").value=view;selected=null;reload().catch(e=>info(e.message,true));
  };
 });
-document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=false;$("status").textContent="";document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));updateQuickEditor();render()});
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;captionExpanded=true;$("status").textContent="";document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));updateQuickEditor();render()});
 $("igMore").onclick=()=>{captionExpanded=!captionExpanded;render()};
 $("slidePrev").onclick=()=>moveSlide(-1);$("slideNext").onclick=()=>moveSlide(1);
 document.querySelectorAll("[data-slide-dir]").forEach(b=>b.onclick=e=>{e.stopPropagation();moveSlide(Number(b.dataset.slideDir))});
