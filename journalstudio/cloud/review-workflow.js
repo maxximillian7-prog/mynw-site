@@ -44,7 +44,15 @@
  function renderQueue(rows){
   const area=$("reviewQueueList");if(!area)return;
   if(!rows.length){area.innerHTML='<div class="studio-review-empty">В этой категории материалов пока нет.</div>';return}
-  area.innerHTML=rows.map(p=>{
+  // Show the latest submissions at the top for every review status/filter.
+  const newestFirst=(a,b)=>{
+   const stamp=p=>{
+    const raw=p.submitted_at||p.review_submitted_at||p.created_at||p.updated_at||"";
+    const value=Date.parse(raw);return Number.isFinite(value)?value:0;
+   };
+   return stamp(b)-stamp(a)||String(b.id).localeCompare(String(a.id));
+  };
+  area.innerHTML=[...rows].sort(newestFirst).map(p=>{
    const actions=(p.status==="in_review"
      ?'<button type="button" data-review-open="'+E(p.id)+'">Проверить →</button>'
      :'<button type="button" data-review-open="'+E(p.id)+'">Открыть →</button>')+
