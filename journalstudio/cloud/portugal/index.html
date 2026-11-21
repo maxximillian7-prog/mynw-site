@@ -937,6 +937,16 @@ async function list(){
  const p=new URLSearchParams({status:activeStatus,channel:activeChannel,category:$("categoryFilter").value,q:$("search").value});
  try{
   const r=await call("/api/articles?"+p);items=r.articles||[];
+  // Editorial intake order is independent from source publication date and server ranking.
+  // Do not change the publishing queue: its order is determined by scheduled send time.
+  if(!["queued","approved"].includes(activeStatus)){
+   const freshness=x=>{
+    const raw=x.review_submitted_at||x.submitted_at||x.draft_created_at||
+      x.created_at||x.discovered_at||x.updated_at||"";
+    const ms=Date.parse(raw);return Number.isFinite(ms)?ms:0;
+   };
+   items.sort((a,b)=>freshness(b)-freshness(a)||String(b.id).localeCompare(String(a.id)));
+  }
   if(activeStatus==="queued"&&activeChannel==="main"&&!items.length){
    items=await recoverTelegramQueue(p);
   }
