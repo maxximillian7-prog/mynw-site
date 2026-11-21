@@ -887,18 +887,62 @@ async function selectArticle(id){
  if(dirty&&!confirm("Остались несохранённые изменения. Перейти к другой статье?"))return;
  try{loading=true;const item=await call("/api/article?id="+encodeURIComponent(id));previewPhotoId=null;photoSearchResults=[];$("commonsResults").innerHTML="";$("commonsStatus").textContent="";current=item;$("commonsQuery").value=[item.article.location_city,item.article.title_original||item.article.headline_ru||item.article.title_ru].filter(Boolean).join(" ").trim().slice(0,85);fill(item);document.querySelectorAll(".articleRow").forEach(x=>x.classList.toggle("active",x.dataset.id===id))}catch(e){toast(e.message,true)}finally{loading=false}
 }
+// The Telegram tab must not report an empty queue when the API's queued
+// status index omits approved stories which already have pr_posts reservations.
+// Read the normal approved article list and resolve each item's delivery status
+// through the existing authorized article API, without modifying any approvals.
+async function recoverTelegramQueue(params){
+ const queueStates=new Set(["queued","scheduled","sending","failed"]);
+ const lookup=new URLSearchParams(params);
+ let approved=[];
+ for(const status of ["approved","all"]){
+  lookup.set("status",status);
+  try{const result=await call("/api/articles?"+lookup);
+   if(Array.isArray(result.articles)&&result.articles.length){approved=result.articles;break}
+  }catch(error){if(status==="all")throw error}
+ }
+ const recovered=[];
+ for(let offset=0;offset<Math.min(approved.length,100);offset+=8){
+  const batch=await Promise.all(approved.slice(offset,offset+8).map(async article=>{
+   try{
+    let posts=Array.isArray(article.publications)?article.publications:[];
+    if(!posts.some(p=>queueStates.has(p.status))){
+     const detail=await call("/api/article?id="+encodeURIComponent(article.id));
+     posts=Array.isArray(detail.publications)?detail.publications:[];
+    }
+    const matching=posts.filter(p=>queueStates.has(p.status)
+      &&(!p.destination_code||p.destination_code===activeChannel));
+    if(!matching.length)return null;
+    matching.sort((a,b)=>Date.parse(a.scheduled_for||0)-Date.parse(b.scheduled_for||0));
+    return {...article,publications:posts,scheduled_for:matching[0].scheduled_for};
+   }catch(error){return null}
+  }));
+  recovered.push(...batch.filter(Boolean));
+ }
+ return recovered.sort((a,b)=>Date.parse(a.scheduled_for||0)-Date.parse(b.scheduled_for||0));
+}
 async function list(){
  const p=new URLSearchParams({status:activeStatus,channel:activeChannel,category:$("categoryFilter").value,q:$("search").value});
- try{const r=await call("/api/articles?"+p);items=r.articles||[];$("itemsCount").textContent=items.length+" материалов";
+ try{
+  const r=await call("/api/articles?"+p);items=r.articles||[];
+  if(activeStatus==="queued"&&activeChannel==="main"&&!items.length){
+   items=await recoverTelegramQueue(p);
+  }
+  if(activeStatus==="queued"){
+   const knownPending=items.filter(i=>(i.publications||[]).some(x=>["queued","scheduled","sending"].includes(x.status))).length;
+   $("countQueued").textContent=Math.max(Number($("countQueued").textContent)||0,knownPending);
+  }
+  $("itemsCount").textContent=items.length+" материалов";
  $("items").innerHTML=items.map(i=>{
  const costLabel=activeChannel==="afisha"?(i.is_free===true&&i.price_known===true?" · Бесплатно":i.price_known===true&&i.price!=null?" · "+Number(i.price).toLocaleString("ru-RU",{maximumFractionDigits:2})+" €":" · Цена уточняется"):"";
  const picture=/^https:\/\//i.test(i.media_preview_url||"")?'<img loading="lazy" class="thumb" src="'+escapeHtml(i.media_preview_url)+'" alt="Иллюстрация к статье">':
  '<div class="thumb thumbPlaceholder" title="Иллюстрация пока не утверждена">'+(i.primary_category==="events"?"🎭":i.primary_category==="places"?"🌿":i.primary_category==="documents"?"📑":i.primary_category==="family"?"👨‍👩‍👧":i.primary_category==="life"?"🏡":"📰")+'</div>';
- const pub=(i.publications||[]).find(p=>["queued","scheduled"].includes(p.status));const when=i.scheduled_for||pub?.scheduled_for;
- return '<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+(i.intake_ready?"green":badge(i.editorial_status))+'">'+escapeHtml(i.item_status==="approved"&&i.editorial_status==="approved"?"Утверждено":i.intake_ready?"На приёмку":i.editorial_status==="approved"?"Ожидает согласования":(statuses[i.editorial_status||"candidate"]||"В подготовке"))+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at)+costLabel)+'</span></div><div class="articleHero">'+picture+'<div class="copy"><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong>'+(i.article_excerpt?'<div class="articleSummary">'+escapeHtml(i.article_excerpt)+'</div>':"")+(i.category_hashtag?'<div class="faint">'+escapeHtml(i.category_hashtag)+'</div>':"")+'</div></div><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div>'+(['queued','approved'].includes(activeStatus)?'<div class="meta" style="font-weight:700;color:#12666b" data-publication-id="'+escapeHtml(i.id)+'">'+(pub?'🕒 Запланировано: '+escapeHtml(when?lisbonSchedule(when):'уточняется…'):'🕒 Проверяем статус публикации…')+'</div>':'')+'</button>';
+ const pub=(i.publications||[]).find(p=>["queued","scheduled","sending","failed"].includes(p.status));const when=i.scheduled_for||pub?.scheduled_for;
+ return '<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+(i.intake_ready?"green":badge(i.editorial_status))+'">'+escapeHtml(i.item_status==="approved"&&i.editorial_status==="approved"?"Утверждено":i.intake_ready?"На приёмку":i.editorial_status==="approved"?"Ожидает согласования":(statuses[i.editorial_status||"candidate"]||"В подготовке"))+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at)+costLabel)+'</span></div><div class="articleHero">'+picture+'<div class="copy"><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong>'+(i.article_excerpt?'<div class="articleSummary">'+escapeHtml(i.article_excerpt)+'</div>':"")+(i.category_hashtag?'<div class="faint">'+escapeHtml(i.category_hashtag)+'</div>':"")+'</div></div><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div>'+(['queued','approved'].includes(activeStatus)?'<div class="meta" style="font-weight:700;color:#12666b" data-publication-id="'+escapeHtml(i.id)+'">'+(pub?.status==="failed"?'⚠ Ошибка Telegram: '+escapeHtml(pub.last_error||"отправка не прошла"):
+ pub?'🕒 Запланировано: '+escapeHtml(when?lisbonSchedule(when):'уточняется…'):'🕒 Проверяем статус публикации…')+'</div>':'')+'</button>';
  }).join("")||"<p class='secondary'>В этой очереди пока пусто.</p>";
  document.querySelectorAll(".articleRow").forEach(x=>x.onclick=()=>selectArticle(x.dataset.id));
- if(["queued","approved"].includes(activeStatus)){await Promise.all(items.map(async i=>{const node=document.querySelector('[data-publication-id="'+i.id+'"]');if(!node)return;try{const d=await call("/api/article?id="+encodeURIComponent(i.id));const pubs=d.publications||[];const sent=pubs.filter(p=>p.status==="sent").sort((a,b)=>Date.parse(b.sent_at||0)-Date.parse(a.sent_at||0))[0];const scheduled=pubs.filter(p=>["queued","scheduled","sending"].includes(p.status)).sort((a,b)=>Date.parse(a.scheduled_for||0)-Date.parse(b.scheduled_for||0))[0];const reasons={event_outdated_or_unconfirmed:"Событие завершилось или дата не подтверждена",photo_rights_unverified:"Права на фотографию не подтверждены",no_usable_photo_for_telegram:"Нет пригодной фотографии",missing_usable_photo_for_rich_message:"Нет пригодной фотографии",missing_https_source:"Нет проверенного источника",not_approved:"Статья не утверждена"};
+ if(["queued","approved"].includes(activeStatus)){await Promise.all(items.map(async i=>{const node=document.querySelector('[data-publication-id="'+i.id+'"]');if(!node)return;try{const d=await call("/api/article?id="+encodeURIComponent(i.id));const pubs=d.publications||[];const sent=pubs.filter(p=>p.status==="sent").sort((a,b)=>Date.parse(b.sent_at||0)-Date.parse(a.sent_at||0))[0];const scheduled=pubs.filter(p=>["queued","scheduled","sending"].includes(p.status)).sort((a,b)=>Date.parse(a.scheduled_for||0)-Date.parse(b.scheduled_for||0))[0];const failed=pubs.find(p=>p.status==="failed");const reasons={event_outdated_or_unconfirmed:"Событие завершилось или дата не подтверждена",photo_rights_unverified:"Права на фотографию не подтверждены",no_usable_photo_for_telegram:"Нет пригодной фотографии",missing_usable_photo_for_rich_message:"Нет пригодной фотографии",missing_https_source:"Нет проверенного источника",not_approved:"Статья не утверждена"};
 const blocked=!sent&&scheduled&&(d.article?.publication_allowed===false||d.article?.photo_delivery_ready===false);
 const overdue=!sent&&scheduled&&Number.isFinite(Date.parse(scheduled.scheduled_for))&&Date.now()-Date.parse(scheduled.scheduled_for)>10*60000;
 const issue=d.article?.photo_delivery_ready===false?"Фото не готово к Telegram":(reasons[d.article?.publication_block_reason]||"Не пройдена проверка публикации");
@@ -906,11 +950,12 @@ node.textContent=sent?"✓ Опубликовано: "+lisbonSchedule(sent.sent_
  :scheduled&&blocked?"⚠ Отправка заблокирована: "+issue
  :scheduled&&overdue?"⚠ Время прошло: ожидается отправка Telegram"
  :scheduled?"🕒 Запланировано: "+lisbonSchedule(scheduled.scheduled_for)
+ :failed?"⚠ Ошибка отправки Telegram: "+(failed.last_error||"проверьте фотографию и повторную постановку")
  :"⚠ Утверждено, но не поставлено в очередь";
 node.style.color=!sent&&(!scheduled||blocked||overdue)?"#ad4e22":"#12666b"}catch(e){node.textContent="⚠ Статус публикации недоступен"}}))}
  }catch(e){toast(e.message,true)}
 }
-async function counts(){try{const {summary:s}=await call("/api/summary?channel="+encodeURIComponent(activeChannel));$("countIncoming").textContent=s.incoming;$("countFacts").textContent=s.needs_facts;$("countDraft").textContent=s.drafts;$("countApproved").textContent=s.approved;$("countQueued").textContent=s.queued;$("countMainInbox").textContent=s.total_main;$("countAfishaInbox").textContent=s.total_afisha}catch(e){toast(e.message,true)}}
+async function counts(){try{const {summary:s}=await call("/api/summary?channel="+encodeURIComponent(activeChannel));$("countIncoming").textContent=s.incoming;$("countFacts").textContent=s.needs_facts;$("countDraft").textContent=s.drafts;$("countApproved").textContent=s.approved;$("countQueued").textContent=Math.max(Number(s.queued)||0,activeStatus==="queued"?items.filter(i=>(i.publications||[]).some(p=>["queued","scheduled","sending"].includes(p.status))).length:0);$("countMainInbox").textContent=s.total_main;$("countAfishaInbox").textContent=s.total_afisha}catch(e){toast(e.message,true)}}
 async function refreshSelected(){if(current){const id=current.article.id;current=await call("/api/article?id="+encodeURIComponent(id));fill(current)}await Promise.all([counts(),list()])}
 async function saveArticle(){if(!current)return;try{$("saveBtn").disabled=true;await call("/api/save",{method:"POST",body:{item_id:current.article.id,fields:gather()}});dirty=false;toast("Изменения сохранены");await refreshSelected()}catch(e){toast(e.message,true)}finally{$("saveBtn").disabled=false}}
 async function approveAndQueue(target="telegram"){
