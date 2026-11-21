@@ -588,7 +588,12 @@ function filtered(){
  f==="facts"&&(x.source==="fact_research_v1"||x.source===pilot));
  if(f==="published")rows.sort((a,b)=>{
   const da=publishedEntries(a.id)[0]?.published_at||"",db=publishedEntries(b.id)[0]?.published_at||"";
-  return Date.parse(db||0)-Date.parse(da||0);
+  return (Date.parse(db)||0)-(Date.parse(da)||0) || String(b.id).localeCompare(String(a.id));
+ });
+ else rows.sort((a,b)=>{
+  // Chronological intake: creation time, not the last edit or publication time.
+  const freshness=x=>{const t=Date.parse(x.created_at||x.inserted_at||x.updated_at||"");return Number.isFinite(t)?t:0};
+  return freshness(b)-freshness(a)||String(b.id).localeCompare(String(a.id));
  });
  return rows;
 }
