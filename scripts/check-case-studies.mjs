@@ -26,6 +26,10 @@ const dimensions=p=>{
 };
 verify(rd('qwin/index.html').includes(officialQwin+'?v=approved-20261112'),'Official Qwin website still uses approved logo');
 verify(rd('trailyo/index.html').includes('./assets/trailyo-logo.png'),'Official Trailyo website still uses branded wordmark');
+const portfolioCSS=rd('case-studies/index.html').match(/\/case-studies\/style\.css\?v=(20261122-v\d+)/);
+const expectedCss=portfolioCSS?.[1]||'';
+verify(!!portfolioCSS && Number(expectedCss.split('-v')[1])>=4,'Current portfolio CSS version is at least v4');
+verify(rd('case-studies/style.css').includes('.portfolio-gallery-section .gallery-card:first-child img')&&rd('case-studies/style.css').includes('object-position:50% 0%'),'Portrait top-alignment fix exists in stylesheet');
 const pages=['case-studies/index.html',...slugs.map(x=>'case-studies/'+x+'/index.html'),'services/index.html'];
 for(const p of pages) {
  const html=rd(p);
@@ -40,7 +44,7 @@ for(const p of pages) {
  }
  if(p.startsWith('case-studies/')) {
   verify(html.includes('rel="canonical"'),'Canonical SEO URL in '+p);
-  verify(html.includes('/case-studies/style.css?v=20261122-v3'),'Up-to-date portfolio CSS in '+p);
+  verify(html.includes('/case-studies/style.css?v='+expectedCss),'Consistent current portfolio CSS in '+p);
  }
 }
 const overview=rd('case-studies/index.html');
