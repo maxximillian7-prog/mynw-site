@@ -42,6 +42,11 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+          name: site-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Allow uploaded artifact to become visible
+        run: sleep 12
       - name: Deploy site to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: site-${{ github.run_id }}-${{ github.run_attempt }}
