@@ -424,7 +424,7 @@ body.studio-embedded .workspace{padding:13px}}
 <button id="approveBtn" class="btn primary" type="button">✓ Утвердить для Telegram</button>
 <button id="approveInstagramBtn" class="btn primary" type="button">✓ Утвердить для Instagram</button>
 </div>
-<p class="secondary">Нажмите кнопку нужной площадки один раз. Telegram и Instagram утверждаются отдельно; в Instagram требуется одобренное фото с проверенными правами. Выбранное время применяется только к площадке, кнопку которой вы нажали.</p>
+<p class="secondary">Нажмите кнопку нужной площадки один раз. Telegram и Instagram утверждаются отдельно; в Instagram требуется одобренное фото с проверенными правами. Если этот материал уже стоит в очереди Telegram, Instagram автоматически получает то же время по Лиссабону. Опубликованные материалы не переносятся.</p>
   <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
@@ -1537,6 +1537,10 @@ async function start(){
   const dialog=ensureDialog(),check=renderFinal(target);
   finalState={target,id:current.article.id,text:JSON.stringify(gather()),schedule:publicationSnapshot()};
   $f('ptFinalInfo').textContent=scheduleLabel(schedule)+' · Просмотр модели публикации (без публикации до подтверждения).';
+  if(target==='instagram'){
+   const tgSlot=(current?.publications||[]).find(p=>p.destination_code==='main'&&['queued','scheduled'].includes(p.status)&&Date.parse(p.scheduled_for||'')>Date.now()+120000);
+   if(tgSlot)$f('ptFinalInfo').textContent+=' 🕒 Синхронизация с Telegram: '+lisbonSchedule(tgSlot.scheduled_for)+'.';
+  }
   const quietPlan=(target==='telegram'&&current?.article?.source_code==='trailyo_events')?window.prAfishaQuietScheduleMessage?.(schedule):null;
   if(quietPlan?.note)$f('ptFinalInfo').textContent+=' 🌙 '+quietPlan.note;
   const confirm=$f('ptFinalConfirm');
