@@ -1,0 +1,40 @@
+name: Export official Qwin PDF asset
+on:
+  push:
+    paths:
+      - .github/workflows/export-qwin-pdf-logo.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Check out approved brand from website source
+        uses: actions/checkout@v4
+      - name: Render approved Qwin logo for print
+        run: |
+          python3 -m pip install --quiet --user pillow
+          python3 - <<'PY'
+          from PIL import Image
+          import io, base64, hashlib
+          path='qwin/assets/qwin_home_logo_transparent.png'
+          original=open(path,'rb').read()
+          im=Image.open(io.BytesIO(original)).convert('RGBA')
+          assert im.width==1633 and im.height==963, (im.width,im.height)
+          # Crop only tagline & excess space: source logo itself remains unaltered.
+          logo=im.crop((90,155,1570,765))
+          bg=Image.new('RGBA',logo.size,'white')
+          bg.alpha_composite(logo)
+          target=bg.convert('RGB')
+          target.thumbnail((440,180),Image.Resampling.LANCZOS)
+          output=io.BytesIO()
+          target.save(output,format='JPEG',quality=91,optimize=True,subsampling=0)
+          encoded=base64.b64encode(output.getvalue()).decode('ascii')
+          print('QWIN_SOURCE_SHA256='+hashlib.sha256(original).hexdigest())
+          print('QWIN_RESIZED='+str(target.size)+' BYTES='+str(len(output.getvalue())))
+          for n in range(0,len(encoded),2800):
+              print('QWIN_PDF_CHUNK_'+str(n//2800).zfill(2)+'='+encoded[n:n+2800])
+          print('QWIN_PDF_CHUNK_COUNT='+str((len(encoded)+2799)//2800))
+          PY
