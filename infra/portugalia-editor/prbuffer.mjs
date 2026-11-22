@@ -149,6 +149,10 @@ async function syncQueuedInstagram(pub,target){
   await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=coalesce(published_at,$2::timestamptz,now()),updated_at=now() WHERE id=$1::uuid AND status='queued'",[pub.id,remote.sentAt||null]);
   return {action:"already_published",buffer_post_id:pub.buffer_post_id};
  }
+ if(String(remote.status).toLowerCase()==="error"){
+  await sql("UPDATE public.pr_instagram_publications SET status='failed',last_error='Buffer сообщил об ошибке публикации; требуется проверить публикацию в Buffer перед повтором',updated_at=now() WHERE id=$1::uuid AND status='queued'",[pub.id]);
+  return {action:"needs_review",buffer_post_id:pub.buffer_post_id};
+ }
  if(!["scheduled","buffer","queued"].includes(String(remote.status).toLowerCase()))throw fail("Пост Buffer нельзя перенести из статуса "+remote.status,409);
  const targetMs=Date.parse(target),remoteMs=Date.parse(remote.dueAt||"");
  if(Number.isFinite(remoteMs)&&Math.abs(targetMs-remoteMs)<60000){
@@ -166,13 +170,14 @@ async function syncQueuedInstagram(pub,target){
 }
 async function syncQueuedBatch(limit=25){
  const rows=await sql("SELECT ig.id,ig.item_id,ig.status,ig.buffer_post_id,ig.scheduled_for,tg.scheduled_for AS telegram_due FROM public.pr_instagram_publications ig JOIN public.pr_posts tg ON tg.item_id=ig.item_id AND tg.destination_code='main' WHERE ig.account_key='pt_ryadom' AND ig.status='queued' AND ig.buffer_post_id IS NOT NULL AND tg.status IN ('queued','scheduled') AND tg.scheduled_for>now()+interval '2 minutes' AND (ig.scheduled_for IS DISTINCT FROM tg.scheduled_for) ORDER BY tg.scheduled_for LIMIT $1",[Math.max(1,Math.min(25,Number(limit)||25))]);
- const out={ok:true,checked:rows.length,rescheduled:0,aligned:0,already_published:0,failed:0,errors:[]};
+ const out={ok:true,checked:rows.length,rescheduled:0,aligned:0,already_published:0,needs_review:0,failed:0,errors:[]};
  for(const pub of rows){
   try{
    const result=await syncQueuedInstagram(pub,new Date(pub.telegram_due).toISOString());
    if(result.action==="rescheduled")out.rescheduled++;
    else if(result.action==="already_aligned")out.aligned++;
    else if(result.action==="already_published")out.already_published++;
+   else if(result.action==="needs_review")out.needs_review++;
   }catch(e){
    out.failed++;
    const error=String(e?.message||"Buffer error").slice(0,200);
