@@ -792,7 +792,11 @@ async function refreshInstagramState(id){
   const status=result.instagram?.status;
   const statusLabel=status==="published"?"опубликовано":status==="queued"?"запланировано в Buffer":status==="awaiting_media"?"нужно утвердить фото":status==="awaiting_approval"?"готово к отправке":status==="failed"?"предыдущая отправка не удалась":status==="draft"?"готово к отправке":"ещё не запланировано";
   const link=String(result.instagram?.public_url||"");
-  $("instagramQueueStatus").textContent="Instagram: "+statusLabel+(result.instagram?.buffer_status?" ("+result.instagram.buffer_status+")":"");
+  const igTime=result.instagram?.scheduled_for;
+  const tgTime=(current?.publications||[]).find(p=>p.destination_code==="main"&&["queued","scheduled"].includes(p.status))?.scheduled_for;
+  const timesMatch=status==="queued"&&igTime&&tgTime&&Math.abs(Date.parse(igTime)-Date.parse(tgTime))<60000;
+  const timeDetails=status==="queued"&&igTime?" · "+lisbonSchedule(igTime)+(timesMatch?" · ✓ синхронно с Telegram":""):"";
+  $("instagramQueueStatus").textContent="Instagram: "+statusLabel+timeDetails+(result.instagram?.buffer_status?" ("+result.instagram.buffer_status+")":"");
   if(status==="published"&&/^https:\/\//.test(link)){
    const a=document.createElement("a");a.href=link;a.target="_blank";a.rel="noopener noreferrer";a.textContent=" · Открыть опубликованный пост";$("instagramQueueStatus").append(a);
   }
