@@ -129,16 +129,76 @@ async function verifiedInstagramGeolocation(itemId){
  );
  return locations[0]?{id:locations[0].facebook_place_id,text:locations[0].place_name}:null;
 }
+
+/* Synchronize Instagram with the actual queued Telegram main-channel slot.
+   Do not alter sent posts, media, or existing captions; Buffer is authoritative
+   until its editPost response confirms the new scheduled timestamp. */
+async function telegramTarget(itemId){
+ const rows=await sql("SELECT scheduled_for,status FROM public.pr_posts WHERE item_id=$1::uuid AND destination_code='main' ORDER BY created_at DESC LIMIT 1",[itemId]);
+ const tg=rows[0];
+ if(!tg||!["queued","scheduled"].includes(tg.status)||!tg.scheduled_for)return null;
+ const stamp=Date.parse(tg.scheduled_for);
+ if(!Number.isFinite(stamp)||stamp<=Date.now()+2*60000)return null;
+ return new Date(stamp).toISOString();
+}
+async function syncQueuedInstagram(pub,target){
+ if(!pub?.buffer_post_id||pub.status!=="queued"||!target)return {action:"skipped"};
+ const remote=(await buffer("query GetPost($input:PostInput!){post(input:$input){id status sentAt dueAt}}",{input:{id:pub.buffer_post_id}})).post;
+ if(!remote||remote.id!==pub.buffer_post_id)throw fail("Buffer не нашёл исходный пост; расписание не менялось",409);
+ if(String(remote.status).toLowerCase()==="sent"){
+  await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=coalesce(published_at,$2::timestamptz,now()),updated_at=now() WHERE id=$1::uuid AND status='queued'",[pub.id,remote.sentAt||null]);
+  return {action:"already_published",buffer_post_id:pub.buffer_post_id};
+ }
+ if(!["scheduled","buffer","queued"].includes(String(remote.status).toLowerCase()))throw fail("Пост Buffer нельзя перенести из статуса "+remote.status,409);
+ const targetMs=Date.parse(target),remoteMs=Date.parse(remote.dueAt||"");
+ if(Number.isFinite(remoteMs)&&Math.abs(targetMs-remoteMs)<60000){
+  await sql("UPDATE public.pr_instagram_publications SET scheduled_for=$2::timestamptz,last_error=NULL,updated_at=now() WHERE id=$1::uuid AND status='queued' AND buffer_post_id=$3",[pub.id,target,pub.buffer_post_id]);
+  return {action:"already_aligned",buffer_post_id:pub.buffer_post_id,scheduled_for:target};
+ }
+ const data=await buffer("mutation Update($input:EditPostInput!){editPost(input:$input){... on PostActionSuccess{post{id status dueAt}} ... on MutationError{message}}}",{input:{id:pub.buffer_post_id,mode:"customScheduled",dueAt:target}});
+ const result=data.editPost;
+ if(!result?.post||result.post.id!==pub.buffer_post_id)throw fail("Buffer не подтвердил перенос: "+String(result?.message||"unknown").slice(0,180),502);
+ const actual=Date.parse(result.post.dueAt||"");
+ if(!Number.isFinite(actual)||Math.abs(actual-targetMs)>=60000)throw fail("Buffer вернул несовпадающее время; запись в базе не менялась",502);
+ await sql("UPDATE public.pr_instagram_publications SET scheduled_for=$2::timestamptz,last_error=NULL,updated_at=now() WHERE id=$1::uuid AND status='queued' AND buffer_post_id=$3",[pub.id,new Date(actual).toISOString(),pub.buffer_post_id]);
+ await sql("INSERT INTO public.pr_instagram_delivery_events(publication_id,event_type,meta_object_id) VALUES($1::uuid,$2,$3)",[pub.id,"buffer_time_aligned_to_telegram",pub.buffer_post_id]).catch(()=>{});
+ return {action:"rescheduled",buffer_post_id:pub.buffer_post_id,scheduled_for:new Date(actual).toISOString()};
+}
+async function syncQueuedBatch(limit=25){
+ const rows=await sql("SELECT ig.id,ig.item_id,ig.status,ig.buffer_post_id,ig.scheduled_for,tg.scheduled_for AS telegram_due FROM public.pr_instagram_publications ig JOIN public.pr_posts tg ON tg.item_id=ig.item_id AND tg.destination_code='main' WHERE ig.account_key='pt_ryadom' AND ig.status='queued' AND ig.buffer_post_id IS NOT NULL AND tg.status IN ('queued','scheduled') AND tg.scheduled_for>now()+interval '2 minutes' AND (ig.scheduled_for IS DISTINCT FROM tg.scheduled_for) ORDER BY tg.scheduled_for LIMIT $1",[Math.max(1,Math.min(25,Number(limit)||25))]);
+ const out={ok:true,checked:rows.length,rescheduled:0,aligned:0,already_published:0,failed:0,errors:[]};
+ for(const pub of rows){
+  try{
+   const result=await syncQueuedInstagram(pub,new Date(pub.telegram_due).toISOString());
+   if(result.action==="rescheduled")out.rescheduled++;
+   else if(result.action==="already_aligned")out.aligned++;
+   else if(result.action==="already_published")out.already_published++;
+  }catch(e){
+   out.failed++;
+   const error=String(e?.message||"Buffer error").slice(0,200);
+   out.errors.push({item_id:pub.item_id,error});
+   await sql("UPDATE public.pr_instagram_publications SET last_error=$2,updated_at=now() WHERE id=$1::uuid AND status='queued'",[pub.id,"Telegram sync: "+error]).catch(()=>{});
+  }
+ }
+ return out;
+}
+
 async function schedule(id,options,userId){
  const original=await ensureStage(id);
  if(original.item_status!=="approved"||original.draft_status!=="approved")throw fail("Сначала утвердите статью",409);
  if(original.account_status!=="connected"||original.buffer_channel_id!==CHANNEL)throw fail("Instagram не подключён",503);
+ const pairedTime=await telegramTarget(id);
+ if(original.status==="queued"&&options.schedule_mode!=="now"&&pairedTime&&original.buffer_post_id){
+  const sync=await syncQueuedInstagram(original,pairedTime);
+  return {ok:true,already_scheduled:true,sync_action:sync.action,buffer_post_id:original.buffer_post_id,scheduled_for:sync.scheduled_for||pairedTime};
+ }
  if(["published","publishing","preparing","container_created"].includes(original.status)||(original.status==="queued"&&options.schedule_mode!=="now"))return {ok:true,already_scheduled:true,buffer_post_id:original.buffer_post_id,scheduled_for:original.scheduled_for};
  if(!["draft","awaiting_approval","failed","queued"].includes(original.status))throw fail("Подготовка Instagram не завершена: "+original.status,409);
  const media=await verifyMedia(original);
  let dueAt,mode=options.schedule_mode||"default";
  const immediate=mode==="now";
  if(immediate){dueAt=new Date().toISOString()}
+ else if(pairedTime){dueAt=pairedTime;mode="manual"}
  else if(mode==="manual"){
   const value=String(options.publish_at||options.scheduled_for||"");
   if(!/^\d{4}-\d{2}-\d{2}T/.test(value)||!Number.isFinite(Date.parse(value))||Date.parse(value)<Date.now()+60000)throw fail("Укажите будущую дату для Instagram",400);
@@ -188,11 +248,16 @@ async function schedule(id,options,userId){
 export default {async fetch(request){
  const url=new URL(request.url),origin=ALLOWED.has(request.headers.get("origin"))?request.headers.get("origin"):"";
  if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":origin,"access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"Authorization,Content-Type","access-control-max-age":"600"}});
- if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:2,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
+ if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:3,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
  if(request.method==="POST"&&url.pathname==="/verify"){
   if(!process.env.PR_BUFFER_SETUP_SECRET||request.headers.get("x-pr-buffer-secret")!==process.env.PR_BUFFER_SETUP_SECRET)return json({error:"unauthorized"},401,origin);
   try{const r=await buffer('query{channel(input:{id:"'+CHANNEL+'"}){id name service}}'); const c=r.channel;return json({ok:!!c&&c.id===CHANNEL,channel_id:c?.id,name:c?.name,service:c?.service},200,origin)}
   catch(e){return json({ok:false,error:e.message},503,origin)}
+ }
+ if(request.method==="POST"&&url.pathname==="/internal/sync"){
+  if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
+  try{return json(await syncQueuedBatch(25),200,origin)}
+  catch(e){return json({ok:false,error:String(e.message).slice(0,220)},503,origin)}
  }
  try{
   const editor=await identity(request);
@@ -206,6 +271,11 @@ export default {async fetch(request){
    if(!isUuid(data.item_id))throw fail("Неверный ID статьи",400);
    const result=await sql("SELECT * FROM public.pr_owner_approve_for_instagram($1::uuid,$2::uuid,$3::text)",[data.item_id,editor.id,String(data.note||"").slice(0,1500)]);
    return json({ok:true,approval:result[0]||null},200,origin);
+  }
+  if(url.pathname==="/api/instagram/sync"&&request.method==="POST"){
+   if(editor.role!=="owner")throw fail("Сверка очереди доступна владельцу",403);
+   const data=await request.json().catch(()=>({}));
+   return json(await syncQueuedBatch(data.limit||25),200,origin);
   }
   if(url.pathname==="/api/instagram/schedule"&&request.method==="POST"){
    const data=await request.json().catch(()=>({}));
