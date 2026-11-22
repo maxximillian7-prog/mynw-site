@@ -11,7 +11,7 @@ const assetExists=p=>fs.existsSync(path.join(root,p));
 const verify=(test,msg)=>{if(!test)errors.push(msg);else checks.push(msg)};
 const officialQwin='/qwin/assets/qwin_home_logo_transparent.png';
 const officialTrailyo='/trailyo/assets/trailyo-logo.png';
-const imageRefs=html=>[...html.matchAll(/<img\\b[^>]*?\\bsrc="([^"]+)"/g)].map(x=>x[1]);
+const imageRefs=html=>[...html.matchAll(/<img\b[^>]*?\bsrc="([^"]+)"/g)].map(x=>x[1]);
 const dimensions=p=>{
  try {
   const b=fs.readFileSync(path.join(root,p));
@@ -56,7 +56,7 @@ const playIDs={nowwhat:'com.nowwhatapp.app',nowcook:'com.nowapps.nowcook',nowkid
 for(const [slug,id] of Object.entries(playIDs))verify(rd('case-studies/'+slug+'/index.html').includes('https://play.google.com/store/apps/details?id='+id),'Verified Google Play link '+slug);
 for(const slug of slugs){
  const p='case-studies/'+slug+'/index.html',html=rd(p);
- const sec=html.match(/<div class="hero-media[^"]*">([\\s\\S]*?)<p class="visual-caption">/);
+ const sec=html.match(/<div class="hero-media[^"]*">([\s\S]*?)<p class="visual-caption">/);
  verify(!!sec,'Hero image gallery present '+slug);
  if(!sec)continue;
  const imgs=imageRefs(sec[0]),uniq=new Set(imgs.map(x=>x.split('?')[0]));
@@ -68,5 +68,5 @@ for(const slug of slugs){
   if(d)verify(d.width>=600&&d.height>=380,'No low-resolution enlarged hero '+slug+': '+d.width+'x'+d.height);
  }
 }
-if(errors.length) {console.error('Portfolio audit FAILED:\\n'+errors.map(x=>' • '+x).join('\\n'));process.exit(1)}
+if(errors.length) {console.error('Portfolio audit FAILED:\n'+errors.map(x=>' • '+x).join('\n'));process.exit(1)}
 console.log('Portfolio audit PASSED: '+checks.length+' checks across '+pages.length+' pages; original logos, varied images, links and image resolution verified.');
