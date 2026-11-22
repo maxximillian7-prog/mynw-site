@@ -23,3 +23,31 @@
 .media-card.secondary img{object-fit:cover;object-position:center}
 @media(max-width:850px){.project-icon--wide{width:113px;height:64px}.project-card .head{gap:11px}.project-card h3{font-size:17px}.hero-media--single{max-width:600px}}
 @media(max-width:560px){.hero-logo--wordmark{gap:11px}.hero-logo--wordmark img{width:135px;height:67px;padding:7px 10px}.hero-logo--wordmark strong{font-size:15px}.hero-logo--wordmark small{font-size:10px}.hero-media--single .media-card--landscape{min-height:0;padding:6px;border-radius:17px}.hero-media--single .media-card--landscape img{height:auto;border-radius:12px}.project-icon--wide{width:112px;height:60px}}
+
+
+/* Portfolio visual audit: verified project images, diverse hero gallery, responsive brand marks */
+.project-card{min-height:0;padding:21px 21px 24px}
+.project-card .head{min-height:70px}
+.project-card p{margin:0 0 18px;line-height:1.65}
+.project-card .status{display:flex;gap:12px;align-items:center}
+.project-cover{display:block;overflow:hidden;position:relative;margin:16px 0 18px;border:1px solid var(--line);border-radius:14px;background:#edf3f6;aspect-ratio:16/10}
+.project-cover img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .2s}
+.project-cover--trailyo img{object-position:center 42%}
+.project-cover--qwin img{object-position:center 43%}
+.project-cover--banner{background:#f6f8fa}
+.project-cover--banner img{object-fit:contain}
+.project-card:hover .project-cover img{transform:scale(1.025)}
+.hero-logo--qwin img{width:202px;height:97px;max-width:202px}
+.hero-media .media-card.secondary img{object-position:center 38%}
+.case-gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.gallery-card{margin:0;overflow:hidden;border-radius:19px;border:1px solid var(--line);background:#fff;box-shadow:0 12px 33px rgba(18,49,68,.06)}
+.gallery-card img{width:100%;height:295px;object-fit:cover;object-position:center 43%}
+.gallery-card figcaption{display:flex;flex-direction:column;gap:6px;padding:17px 20px 21px}
+.gallery-card figcaption strong{font-size:16px;font-weight:790}
+.gallery-card figcaption span{font-size:13px;color:var(--muted);line-height:1.55}
+.gallery-actions{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-top:21px}
+.gallery-actions .fine{max-width:430px}
+.case-cta .button{white-space:normal}
+@media(max-width:850px){.case-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-logo--qwin img{width:183px;height:91px}}
+@media(max-width:560px){.case-gallery-grid{grid-template-columns:1fr}.gallery-card img{height:255px}.hero-logo--qwin img{width:152px;height:73px}.project-cover{aspect-ratio:16/9}.gallery-actions{flex-direction:column;align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){.project-cover img{transition:none}.project-card:hover .project-cover img{transform:none}}
