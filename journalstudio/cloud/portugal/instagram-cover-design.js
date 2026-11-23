@@ -62,25 +62,18 @@ function draw(canvas,photo,title,category,variant="editorial"){
  if(!w||!h)throw Error("Пустая фотография");
  const scale=Math.max(WIDTH/w,HEIGHT/h),rw=WIDTH/scale,rh=HEIGHT/scale;
  ctx.drawImage(photo,(w-rw)/2,(h-rh)/2,rw,rh,0,0,WIDTH,HEIGHT);
- const overlay=ctx.createLinearGradient(0,0,0,HEIGHT);
- overlay.addColorStop(0,"rgba(1,19,24,.49)");
- overlay.addColorStop(.32,"rgba(1,19,24,.12)");
- overlay.addColorStop(.51,"rgba(1,19,24,.43)");
- overlay.addColorStop(.74,"rgba(1,19,24,.86)");
- overlay.addColorStop(1,theme.shade);
- ctx.fillStyle=overlay;ctx.fillRect(0,0,WIDTH,HEIGHT);
- // The color bar and tile-like quads echo azulejo without imitating the logo.
- ctx.fillStyle=theme.accent;ctx.fillRect(67,70,8,113);
- ctx.strokeStyle=theme.edge;ctx.lineWidth=3;
- for(let k=0;k<3;k++){
-  ctx.save();ctx.translate(861+55*k,93);ctx.rotate(Math.PI/4);
-  ctx.strokeRect(-17,-17,34,34);ctx.restore();
- }
+ // Original photograph stays bright: no full-frame darkening,
+ // gradients, vignettes or decorative diamonds.
+ // A compact light editorial label keeps the name readable on any photo.
+ rounded(ctx,58,47,636,150,17);
+ ctx.fillStyle="rgba(255,255,255,.88)";ctx.fill();
+ ctx.strokeStyle="rgba(18,67,68,.16)";ctx.lineWidth=1.5;ctx.stroke();
+ ctx.fillStyle=theme.shade;ctx.fillRect(78,67,6,108);
  ctx.textBaseline="alphabetic";
- ctx.font='700 27px "Manrope","Arial",sans-serif';ctx.fillStyle="#F9FAF7";
- ctx.letterSpacing="4px";ctx.fillText("PORTUGAL / РЯДОМ",96,102);ctx.letterSpacing="0px";
+ ctx.font='700 27px "Manrope","Arial",sans-serif';ctx.fillStyle="#163A3D";
+ ctx.letterSpacing="2px";ctx.fillText("ПОРТУГАЛИЯ / РЯДОМ",106,106);ctx.letterSpacing="0px";
  ctx.font='700 23px "Manrope","Arial",sans-serif';
- ctx.fillStyle=theme.accent;ctx.fillText(tr(category),96,173);
+ ctx.fillStyle="#336A6A";ctx.fillText(tr(category),106,164);
  // Compact Instagram headline: at most four lines, confined to the
  // bottom 25% of the image. The full article title remains in the caption.
  const x=92,maxWidth=895;
@@ -89,24 +82,27 @@ function draw(canvas,photo,title,category,variant="editorial"){
  const blockTop=firstBaseline-size-24;
  const blockHeight=(rows.length-1)*rowHeight+size+73;
  rounded(ctx,70,blockTop,940,blockHeight,19);
- ctx.fillStyle=variant==="noir"?"rgba(3,17,22,.48)":"rgba(3,25,32,.40)";
- ctx.fill();ctx.strokeStyle="rgba(255,255,255,.15)";ctx.lineWidth=1.5;ctx.stroke();
+ // The photo is never dimmed; only the typographic panel is translucent white.
+ ctx.fillStyle="rgba(255,255,255,.88)";
+ ctx.fill();ctx.strokeStyle="rgba(20,72,73,.18)";ctx.lineWidth=1.5;ctx.stroke();
  ctx.save();ctx.beginPath();ctx.rect(86,blockTop+8,908,blockHeight-16);ctx.clip();
- ctx.shadowColor="rgba(0,0,0,.32)";ctx.shadowBlur=13;ctx.shadowOffsetY=3;
+ ctx.shadowColor="rgba(255,255,255,.18)";ctx.shadowBlur=7;ctx.shadowOffsetY=1;
  rows.forEach((line,i)=>{
-  ctx.fillStyle=i===0?theme.accent:"#FFFFFF";
+  ctx.fillStyle=i===0?theme.shade:"#173A40";
   ctx.font='800 '+size+'px "Manrope","Arial",sans-serif';
   ctx.fillText(line,x,firstBaseline+i*rowHeight,maxWidth);
  });
  ctx.restore();
  const lower=1185;
- ctx.fillStyle=theme.accent;ctx.fillRect(69,lower,72,6);
+ rounded(ctx,56,1168,968,151,18);
+ ctx.fillStyle="rgba(255,255,255,.86)";ctx.fill();
+ ctx.fillStyle="#336A6A";ctx.fillRect(76,1191,72,5);
  ctx.font='600 23px "Manrope","Arial",sans-serif';
- ctx.fillStyle="#FFFFFF";ctx.fillText("О ПОРТУГАЛИИ — ПОНЯТНО И ПО ДЕЛУ",69,lower+49);
- ctx.fillStyle="rgba(255,255,255,.74)";ctx.font='600 19px "Manrope","Arial",sans-serif';
- ctx.fillText("instagram.com/pt_ryadom",69,1300);
- ctx.font='700 18px "Manrope","Arial",sans-serif';ctx.fillStyle=theme.edge;
- ctx.fillText("◈  MYNOW EDITORIAL",827,1300);
+ ctx.fillStyle="#163A3D";ctx.fillText("О ПОРТУГАЛИИ — ПОНЯТНО И ПО ДЕЛУ",76,1233);
+ ctx.fillStyle="#466E6C";ctx.font='600 19px "Manrope","Arial",sans-serif';
+ ctx.fillText("instagram.com/pt_ryadom",76,1294);
+ ctx.font='700 18px "Manrope","Arial",sans-serif';ctx.fillStyle="#466E6C";
+ ctx.fillText("MYNOW EDITORIAL",844,1294);
  return canvas;
 }
 async function createPreview(canvas,blob,title,category,variant){
