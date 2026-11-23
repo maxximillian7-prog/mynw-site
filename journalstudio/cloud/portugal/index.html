@@ -732,15 +732,15 @@ function renderTelegramMessage(text,isAfisha=false,event=null,approvedPhotoUrl=n
  const heading=blocks.shift()||"Публикация";
  // Instagram CTA is shown ONCE and immediately after the editorial text,
  // including previews of older queued payloads without the new server line.
- const articleBlocks=blocks.filter(x=>!/^Наш канал в Инстаграмм:/i.test(x.trim()));
+ const articleBlocks=blocks.filter(x=>!/^Наш канал в Инстаграмм:/i.test(x.trim())&&!(isAfisha&&/^Больше событий в приложении\s+Trailyo/i.test(x.trim())));
  let html='<div class="pt-message-title">'+escapeHtml(heading)+'</div>'+(isAfisha?previewEventMetadata(event):"")+articleBlocks.map(renderRichArticleText).join("");
+ if(isAfisha)html+='<div class="pt-instagram-cta">Больше событий в приложении '+previewLink("Trailyo","https://apps.apple.com/us/app/trailyo-events-in-portugal/id6832330654")+'</div>';
  html+='<div class="pt-instagram-cta">Наш канал в '+previewLink("Инстаграмм","https://www.instagram.com/pt_ryadom/")+'</div>';
  if(footer){
   const lines=footer.split("\n");
-  html+='<div class="pt-source">'+lines.filter(x=>!x.startsWith("#")&&!/^Наш канал в Инстаграмм:/i.test(x)).map(x=>previewFooterLine(x,approvedPhotoUrl)).filter(Boolean).join(" · ")+'</div>'+
+  html+='<div class="pt-source">'+lines.filter(x=>!x.startsWith("#")&&!/^Наш канал в Инстаграмм:/i.test(x)&&!(isAfisha&&/^Больше событий в приложении\s+Trailyo/i.test(x))).map(x=>previewFooterLine(x,approvedPhotoUrl)).filter(Boolean).join(" · ")+'</div>'+
    '<div class="pt-hashtags">'+lines.filter(x=>x.startsWith("#")).map(escapeHtml).join("<br>")+'</div>';
  }
- if(isAfisha)html+='<div class="pt-source">Больше событий в приложении '+previewLink("Trailyo","https://apps.apple.com/us/app/trailyo-events-in-portugal/id6832330654")+'.</div>';
  return html;
 }
 function activeTags(i){
