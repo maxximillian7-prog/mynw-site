@@ -511,10 +511,10 @@ function updateApprovalButtons(){
  $("approveBtn").disabled=unavailable||!!tgDone;
  $("approveBtn").textContent=tgDone?(tgDone.status==="sent"?"✓ Telegram опубликован":"✓ Telegram уже в очереди"):
   mode==="now"?"⚡ Опубликовать в Telegram":"✓ Утвердить для Telegram";
- const igDone=["queued","published","publishing","preparing","container_created"].includes(ig.status);
+ const igDone=["queued","published","publishing","preparing","container_created"].includes(ig.status)||["waiting","dispatching","scheduled"].includes(ig.waitlist_status);
  const ready=instagramReadyPhoto();
  $("approveInstagramBtn").disabled=unavailable||igDone||!ready;
- $("approveInstagramBtn").textContent=igDone?(ig.status==="published"?"✓ Instagram опубликован":"✓ Instagram уже в очереди"):
+ $("approveInstagramBtn").textContent=igDone?(ig.status==="published"?"✓ Instagram опубликован":ig.waitlist_status==="waiting"?"✓ Instagram в резерве Buffer":"✓ Instagram уже в очереди"):
   !ready?"🖼 Сначала утвердите фото":mode==="now"?"⚡ Опубликовать в Instagram":"✓ Утвердить для Instagram";
 }
 function updatePublicationMode(){
@@ -812,7 +812,8 @@ async function refreshInstagramState(id){
   if(current?.article?.id!==id)return;
   current.instagram=result.instagram;
   const status=result.instagram?.status;
-  const statusLabel=status==="published"?"опубликовано":status==="queued"?"запланировано в Buffer":status==="awaiting_media"?"нужно утвердить фото":status==="awaiting_approval"?"готово к отправке":status==="failed"?"предыдущая отправка не удалась":status==="draft"?"готово к отправке":"ещё не запланировано";
+  const reserved=["waiting","dispatching"].includes(result.instagram?.waitlist_status);
+  const statusLabel=reserved?"одобрено, в резерве Buffer до свободного слота":status==="published"?"опубликовано":status==="queued"?"запланировано в Buffer":status==="awaiting_media"?"нужно утвердить фото":status==="awaiting_approval"?"готово к отправке":status==="failed"?"предыдущая отправка не удалась":status==="draft"?"готово к отправке":"ещё не запланировано";
   const link=String(result.instagram?.public_url||"");
   const igTime=result.instagram?.scheduled_for;
   const tgTime=(current?.publications||[]).find(p=>p.destination_code==="main"&&["queued","scheduled"].includes(p.status))?.scheduled_for;
