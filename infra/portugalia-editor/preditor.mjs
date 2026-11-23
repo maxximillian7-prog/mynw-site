@@ -110,7 +110,8 @@ async function action(u,p){
   await audit(id,u,a,note,{}, {media_id:m.id});return{ok:true};
  }
  if(a==="request_changes"||a==="reject"||a==="reopen"){
-  if(a!=="reopen"&&note.length<10)throw err("Нужно пояснение для автора");
+  // One-click reject needs no author note. Require detail only for a revision request.
+  if(a==="request_changes"&&note.length<10)throw err("Нужно пояснение для доработки");
   const ds=a==="request_changes"?"needs_facts":a==="reject"?"rejected":"draft";
   const isRejected=a==="reject";
   await sql("UPDATE pr_story_drafts SET status=$2,needs_more_facts=CASE WHEN $2='needs_facts' THEN true ELSE needs_more_facts END,editorial_note=$3,reviewer=NULL,reviewed_at=NULL,updated_at=now() WHERE item_id=$1::uuid",[id,ds,note]);
