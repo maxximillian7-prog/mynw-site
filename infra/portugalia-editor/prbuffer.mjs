@@ -194,7 +194,7 @@ async function syncQueuedBatch(limit=25){
 // All slot calculations use the DST-aware Portugal SQL function.
 const BUFFER_PENDING_CAP=10;
 async function instagramCapacity(){
- const rows=await sql("SELECT (SELECT count(*) FROM public.pr_instagram_publications WHERE status='queued' AND buffer_post_id IS NOT NULL)+ (SELECT count(*) FROM public.pr_instagram_retrofit_20261123 WHERE stage IN ('scheduled_repost','dispatching') AND target_time IS NOT NULL AND target_time>now()-interval '2 hours')+ (SELECT count(*) FROM public.pr_instagram_waitlist_4slots WHERE state IN ('scheduled','dispatching') AND target_time IS NOT NULL AND target_time>now()-interval '2 hours') AS filled");
+ const rows=await sql("SELECT (SELECT count(*) FROM public.pr_instagram_publications WHERE status='queued' AND buffer_post_id IS NOT NULL)+ (SELECT count(*) FROM public.pr_instagram_retrofit_20261123 WHERE stage IN ('scheduled_repost','dispatching') AND target_time IS NOT NULL AND target_time>now()-interval '2 hours')+ (SELECT count(*) FROM public.pr_instagram_waitlist_4slots WHERE state='dispatching' AND target_time IS NOT NULL AND target_time>now()-interval '2 hours') AS filled");
  return Number(rows[0]?.filled||0);
 }
 async function nextInstagramDueAt(){
