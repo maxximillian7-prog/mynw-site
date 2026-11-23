@@ -12,7 +12,7 @@ const buffer=read("./prbuffer.mjs");
 const design=read("../../journalstudio/cloud/portugal/instagram-cover-design.js");
 const integration=read("../../journalstudio/cloud/portugal/instagram-cover-integration.js");
 const stage=read("./instagram-typography-stale-guard-20261123.sql");
-const telegramSql=read("./instagram-cover-and-telegram-footer-20261123.sql");
+const telegramSql=read("./telegram-instagram-hashtag-order-fix-20261123.sql");
 const hub=read("../../journalstudio/cloud/studio-brand-hub.js");
 const journalShell=read("../../journalstudio/cloud/index.html");
 
@@ -121,14 +121,16 @@ test("Embedded Portugal workspace cannot keep an older dark Instagram canvas",()
  assert.match(html,/if\(mode==='instagram'\)\{\s*root\.classList\.remove\('pt-photo-adjust-enabled'\);\s*return;/);
 });
 
-test("Telegram has full article and a clickable inline Instagram-word footer",()=>{
+test("Telegram has a prominent Instagram heading after the article, and keeps the category tag last",()=>{
  assert.match(telegramSql,/Наш канал в Инстаграмм: https:\/\/www\.instagram\.com\/pt_ryadom\//);
  assert.match(publisher,/richUrl\("Инстаграмм","https:\/\/www\.instagram\.com\/pt_ryadom\/"\)/);
- assert.match(publisher,/blocks\.push\(\{type:"footer",text:\["Наш канал в ",richUrl\("Инстаграмм"/);
- assert.ok(publisher.includes('return null; // always placed as the last footer below'));
+ assert.match(publisher,/blocks\.push\(\{type:"heading",size:4,text:\["Наш канал в ",richUrl\("Инстаграмм"/);
+ assert.match(publisher,/if\(!instagramPlaced\)addInstagramHeading\(\)/);
+ assert.match(html,/pt-instagram-cta/);
  assert.match(html,/previewLink\("Инстаграмм","https:\/\/www\.instagram\.com\/pt_ryadom\/"\)/);
  assert.match(publisher,/const blocks=\[\{type:"photo"/);
  assert.match(telegramSql,/nullif\(trim\(x\.story\),''\)/);
+ assert.match(telegramSql,/credit,topics,tg\)/);
 });
 
 test("Article rejection is exactly one click, no mandatory reason, no author note",()=>{
