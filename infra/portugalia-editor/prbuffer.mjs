@@ -293,7 +293,111 @@ async function scheduleWaitlisted(row,due){
  [row.item_id,remote.post.id,due]);
  return {ok:true,id:remote.post.id,dueAt:due};
 }
+
+// PT_RAPID_OLD_REPLACEMENTS_20261123:
+// One explicitly selected replacement per UTC minute. The selected 44 originals
+// range from "Потеряли документы" through "Подать заявление в PSP/GNR", inclusive.
+// Original Instagram posts are NEVER deleted here. Future/new queue entries are
+// NEVER edited, and regular 08/13/18/23 scheduling remains untouched.
+// A failed or ambiguous Buffer call PAUSES the batch to avoid double publishing.
+async function rapidReplacementStatus(){
+ const counts=await sql("SELECT state,count(*)::int n FROM public.pr_instagram_rapid_replace_20261123 GROUP BY state ORDER BY state");
+ const summary={waiting:0,submitting:0,submitted:0,sent:0,needs_review:0};
+ for(const c of counts)summary[c.state]=Number(c.n)||0;
+ return summary;
+}
+async function rapidMarkSent(row,posted){
+ const timestamp=posted?.sentAt&&Number.isFinite(Date.parse(posted.sentAt))?posted.sentAt:new Date().toISOString();
+ await sql("UPDATE public.pr_instagram_rapid_replace_20261123 SET state='sent',confirmed_sent_at=$2::timestamptz,last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND state IN ('submitting','submitted')",
+  [row.item_id,timestamp]);
+ await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='published_repost',target_time=coalesce(target_time,$2::timestamptz),synced_at=now(),last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND replacement_buffer_post_id=$3",
+ [row.item_id,timestamp,row.replacement_buffer_post_id]);
+ return {action:"published",ordinal:row.ordinal,item_id:row.item_id,buffer_post_id:row.replacement_buffer_post_id,sent_at:timestamp};
+}
+async function rapidMarkReview(row,reason){
+ const error=String(reason||"Unknown publishing error").slice(0,250);
+ await sql("UPDATE public.pr_instagram_rapid_replace_20261123 SET state='needs_review',last_error=$2,updated_at=now() WHERE item_id=$1::uuid AND state IN ('waiting','submitting','submitted')",[row.item_id,error]);
+ await sql("UPDATE public.pr_instagram_retrofit_20261123 SET last_error=$2,updated_at=now() WHERE item_id=$1::uuid",[row.item_id,"Fast replacement halted: "+error.slice(0,220)]).catch(()=>{});
+ return {action:"paused_for_review",ordinal:row.ordinal,item_id:row.item_id,error};
+}
+async function rapidReplacementTick(){
+ const tally=await rapidReplacementStatus();
+ if(tally.needs_review>0)return {ok:true,action:"paused_for_review",count:tally};
+ if(tally.waiting+tally.submitting+tally.submitted===0)return {ok:true,action:"complete",count:tally};
+ // Serialize ambiguous/in-flight requests: no two shareNow calls at once.
+ const ongoing=(await sql("SELECT ordinal,item_id,replacement_buffer_post_id,last_request_at,state FROM public.pr_instagram_rapid_replace_20261123 WHERE state IN ('submitting','submitted') ORDER BY ordinal LIMIT 1"))[0];
+ if(ongoing){
+  try{
+   const remote=await bufferPostStatus(ongoing.replacement_buffer_post_id);
+   const status=String(remote?.status||"").toLowerCase();
+   if(!remote||remote.id!==ongoing.replacement_buffer_post_id) return await rapidMarkReview(ongoing,"Buffer no longer returns this replacement ID");
+   if(status==="sent")return {ok:true,...await rapidMarkSent(ongoing,remote),count:await rapidReplacementStatus()};
+   if(status==="error"||status==="failed")return await rapidMarkReview(ongoing,"Buffer/Instagram publishing failed: "+status);
+   if(ongoing.last_request_at&&Date.now()-Date.parse(ongoing.last_request_at)>10*60000)
+      return await rapidMarkReview(ongoing,"Instagram publication not confirmed for 10 minutes; check Buffer and Instagram before retry");
+   if(ongoing.state==="submitting"&&status==="draft"){
+    // An ambiguous network response can leave a draft unchanged; never
+    // auto-send a second time without a human check.
+    return await rapidMarkReview(ongoing,"Publishing response was ambiguous; draft remains");
+   }
+   return {ok:true,action:"waiting_for_instagram_delivery",ordinal:ongoing.ordinal,remote_status:status,count:tally};
+  }catch(e){return {ok:false,action:"reconciliation_error",error:String(e.message||e).slice(0,200),count:tally}}
+ }
+ const last=(await sql("SELECT max(last_request_at) AS last_at FROM public.pr_instagram_rapid_replace_20261123"))[0]?.last_at;
+ // Keep at least 55 seconds between outgoing shareNow requests; scheduled
+ // worker ticks once per minute, never runs more than one per invocation.
+ if(last&&Date.now()-Date.parse(last)<55000)return {ok:true,action:"one_minute_spacing",count:tally};
+ const row=(await sql("SELECT q.ordinal,q.item_id,q.replacement_buffer_post_id,r.caption,r.cover_url,r.carousel_urls,r.stage,EXISTS(SELECT 1 FROM public.pr_media_assets m JOIN public.pr_items i ON i.id=m.item_id WHERE m.item_id=q.item_id AND m.public_url=i.photo_url AND m.status='approved' AND m.media_type='generated_illustration') AS is_ai FROM public.pr_instagram_rapid_replace_20261123 q JOIN public.pr_instagram_retrofit_20261123 r ON r.item_id=q.item_id WHERE q.state='waiting' ORDER BY q.ordinal LIMIT 1"))[0];
+ if(!row)return {ok:true,action:"no_waiting",count:tally};
+ if(!row.replacement_buffer_post_id||!["draft_created","scheduled_repost"].includes(row.stage)||!row.caption||row.caption.length>2200||row.caption.length<80)
+  return await rapidMarkReview(row,"Invalid draft, caption or replacement stage: "+row.stage);
+ const assets=[row.cover_url,...(Array.isArray(row.carousel_urls)?row.carousel_urls:JSON.parse(row.carousel_urls||"[]"))];
+ if(assets.length<1||assets.length>10||assets.some(url=>!/^https:\/\/mynw\.app\/journalstudio\/instagram-retrofit\/[0-9a-f-]{36}(?:-text-\d+)?\.jpg$/.test(url)))
+  return await rapidMarkReview(row,"Replacement assets invalid or too many for Instagram");
+ const claim=await sql("UPDATE public.pr_instagram_rapid_replace_20261123 SET state='submitting',attempts=attempts+1,last_request_at=now(),updated_at=now() WHERE item_id=$1::uuid AND state='waiting' RETURNING ordinal",[row.item_id]);
+ if(!claim.length)return {ok:true,action:"already_claimed"};
+ try{
+  const before=await bufferPostStatus(row.replacement_buffer_post_id);
+  if(!before||before.id!==row.replacement_buffer_post_id)return await rapidMarkReview(row,"Buffer replacement ID not found");
+  if(String(before.status||"").toLowerCase()==="sent")return {ok:true,...await rapidMarkSent(row,before),count:await rapidReplacementStatus()};
+  const status=String(before.status||"").toLowerCase();
+  if(!["draft","buffer","scheduled","queued"].includes(status))
+   return await rapidMarkReview(row,"Replacement is not editable/publishable: "+status);
+  // Change only this existing replacement Buffer post; NEVER create a new
+  // Buffer ID or alter the normal scheduled original/new post.
+  const result=(await buffer("mutation ReleaseOldReplacement($input:EditPostInput!){editPost(input:$input){... on PostActionSuccess{post{id status sentAt sharedNow shareMode text}} ... on MutationError{message}}}",
+  {input:{id:row.replacement_buffer_post_id,mode:"shareNow",saveToDraft:false,schedulingType:"automatic",
+    text:row.caption,metadata:{instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:row.is_ai===true||row.is_ai==="t"}},
+    assets:assets.map(url=>({image:{url}}))}})).editPost;
+  if(!result?.post?.id||result.post.id!==row.replacement_buffer_post_id||result.post.text!==row.caption)
+   return await rapidMarkReview(row,"Buffer did not confirm publish-now on existing draft: "+String(result?.message||"unknown"));
+  if(result.post.status==="sent")return {ok:true,...await rapidMarkSent(row,result.post),count:await rapidReplacementStatus()};
+  const remoteStatus=String(result.post.status||"").toLowerCase();
+  if(!["buffer","scheduled","queued","pending","publishing","sending"].includes(remoteStatus))
+   return await rapidMarkReview(row,"Buffer publish-now returned "+remoteStatus);
+  if(result.post.shareMode&&result.post.shareMode!=="shareNow")
+   return await rapidMarkReview(row,"Buffer ignored shareNow; returned "+result.post.shareMode);
+  await sql("UPDATE public.pr_instagram_rapid_replace_20261123 SET state='submitted',last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND state='submitting'",[row.item_id]);
+  await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='rapid_submitted',target_time=now(),updated_at=now() WHERE item_id=$1::uuid AND replacement_buffer_post_id=$2",[row.item_id,row.replacement_buffer_post_id]);
+  return {ok:true,action:"submitted_to_instagram",ordinal:row.ordinal,buffer_post_id:row.replacement_buffer_post_id,remote_status:remoteStatus,count:await rapidReplacementStatus()};
+ }catch(e){
+  // Do not blindly retry an ambiguous API failure. Resolve only this fixed
+  // Buffer ID and then stop the batch on non-confirmed status.
+  try{
+   const remote=await bufferPostStatus(row.replacement_buffer_post_id);
+   if(remote?.status==="sent")return {ok:true,...await rapidMarkSent(row,remote),count:await rapidReplacementStatus()};
+   if(remote?.id===row.replacement_buffer_post_id&&["buffer","scheduled","queued","sending","publishing"].includes(String(remote.status||"").toLowerCase())){
+    await sql("UPDATE public.pr_instagram_rapid_replace_20261123 SET state='submitted',last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND state='submitting'",[row.item_id]);
+    return {ok:true,action:"submission_reconciled",ordinal:row.ordinal,remote_status:remote.status};
+   }
+  }catch{}
+  return await rapidMarkReview(row,String(e.message||e).slice(0,220));
+ }
+}
+
 async function refillInstagramQueue(){
+ const rapid=(await sql("SELECT EXISTS(SELECT 1 FROM public.pr_instagram_rapid_replace_20261123 WHERE state<>'sent') AS active"))[0]?.active;
+ if(rapid)return {ok:true,action:"paused_while_old_replacements_republish"};
  const reconciliation=await reconcileInstagramPending();
  const count=await instagramCapacity();
  const report={ok:true,limit:BUFFER_PENDING_CAP,scheduled_count:count,reconciliation,action:"full"};
@@ -513,7 +617,7 @@ async function retrofitInstagramBatch(limit=4){
 export default {async fetch(request){
  const url=new URL(request.url),origin=ALLOWED.has(request.headers.get("origin"))?request.headers.get("origin"):"";
  if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":origin,"access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"Authorization,Content-Type","access-control-max-age":"600"}});
- if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:5,lisbon_slots:['08:00','13:00','18:00','23:00'],buffer_pending_cap:10,auto_refill:true,instagram_retrofit:true,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
+ if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:6,rapid_old_replacement_one_per_minute:true,lisbon_slots:['08:00','13:00','18:00','23:00'],buffer_pending_cap:10,auto_refill:true,instagram_retrofit:true,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
  if(request.method==="POST"&&url.pathname==="/verify"){
   if(!process.env.PR_BUFFER_SETUP_SECRET||request.headers.get("x-pr-buffer-secret")!==process.env.PR_BUFFER_SETUP_SECRET)return json({error:"unauthorized"},401,origin);
   try{const r=await buffer('query{channel(input:{id:"'+CHANNEL+'"}){id name service}}'); const c=r.channel;return json({ok:!!c&&c.id===CHANNEL,channel_id:c?.id,name:c?.name,service:c?.service},200,origin)}
@@ -523,6 +627,17 @@ export default {async fetch(request){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
   try{return json(await retrofitInstagramBatch(8),200,origin)}
   catch(e){return json({ok:false,error:String(e.message||e).slice(0,220)},503,origin)}
+ }
+ if(request.method==="POST"&&url.pathname==="/internal/rapid-replace"){
+  if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
+  try{
+   const result=await rapidReplacementTick();
+   console.log("PR_IG_RAPID_REPLACE",JSON.stringify(result));
+   return json(result,200,origin);
+  }catch(e){
+   console.error("PR_IG_RAPID_REPLACE_ERROR",String(e.message||e).slice(0,240));
+   return json({ok:false,error:String(e.message||e).slice(0,240)},503,origin);
+  }
  }
  if(request.method==="POST"&&url.pathname==="/internal/refill"){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
