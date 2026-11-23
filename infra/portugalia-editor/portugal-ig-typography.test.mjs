@@ -37,6 +37,42 @@ test("Instagram cover is art-directed 4:5 JPEG with legible exact Russian text",
  assert.equal(api.toJpeg(canvas),"data:image/jpeg;base64,AQID");
 });
 
+test("Compact Instagram covers keep 8 editorial titles inside a 4-line, <=350px headline panel",()=>{
+ const sandbox={window:{}};
+ vm.runInNewContext(design,sandbox,{timeout:3000});
+ const {layoutTitle,HEIGHT}=sandbox.window.PortugalInstagramCover;
+ const ctx={font:"",measureText(value){
+  const size=Number(this.font.match(/(\\d+)px/)?.[1]||60);
+  return {width:[...String(value)].length*size*.53};
+ }};
+ const titles=[
+  "В аптеке нет нужного лекарства? Не спешите объезжать весь город — есть другой порядок",
+  "Жёлтый, оранжевый или красный: как правильно читать предупреждения IPMA",
+  "Запомните номер 144: в Португалии есть круглосуточная социальная экстренная помощь",
+  "Пробежка у океана — всегда полезно? Проверьте качество воздуха на карте QualAr",
+  "Рейс из Португалии задержали или отменили? Иногда авиакомпания должна до €600",
+  "Сколько баллов у ваших водительских прав в Португалии? Проверить можно онлайн",
+  "Справка о несудимости в Португалии: €5, онлайн-запрос и важный нюанс для AIMA",
+  "Трудно платить кредит? В Португалии есть бесплатная сеть помощи RACE — до суда",
+  "Это исключительно длинный заголовок, который в любой ситуации должен показываться красиво и компактно даже тогда, когда редактор ошибочно вводит несколько очень длинных предложений, потому что изображение важнее стены текста, а весь текст статьи всегда останется в подписи к публикации"
+ ];
+ for(const t of titles){
+  const p=layoutTitle(ctx,t,895);
+  assert.ok(p.rows.length>=1&&p.rows.length<=4,t);
+  assert.ok(p.size>=44&&p.size<=60,t);
+  assert.ok(p.rows.every(row=>row.trim().length>0),t);
+  const height=(p.rows.length-1)*p.rowHeight+p.size+73;
+  assert.ok(height<=350,"Oversized headline block: "+height+" for "+t);
+  assert.ok(height/HEIGHT<.26,t);
+  assert.ok(p.rows.join(" ").length>30,t);
+ }
+ const oversized=layoutTitle(ctx,titles[8],895);
+ assert.equal(oversized.rows.length,4);
+ assert.ok(oversized.rows[3].endsWith("…"));
+ assert.ok(design.includes("rounded(ctx,70,blockTop,940,blockHeight,19)"));
+ assert.doesNotMatch(design,/let size=88,rowHeight=100/);
+});
+
 test("Telegram has full article and a clickable inline Instagram-word footer",()=>{
  assert.match(telegramSql,/Наш канал в Инстаграмм: https:\/\/www\.instagram\.com\/pt_ryadom\//);
  assert.match(publisher,/richUrl\("Инстаграмм","https:\/\/www\.instagram\.com\/pt_ryadom\/"\)/);
