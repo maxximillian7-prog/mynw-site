@@ -297,12 +297,13 @@ async function retrofitInstagramBatch(limit=4){
     "query GetPost($input:PostInput!){post(input:$input){id status dueAt sentAt text}}",
     {input:{id:row.current_buffer_id}})).post;
    if(!remote||remote.id!==row.current_buffer_id){await err("Buffer post not found");continue}
-   const alreadySent=String(remote.status||"").toLowerCase()==="sent";
+   const remoteStatus=String(remote.status||"").toLowerCase();
+   const alreadySent=remoteStatus==="sent";
    const ai= row.ai_original===true||row.ai_original==="t";
    const assets=urls.map(x=>({image:{url:x}}));
    const metadata={instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:ai}};
-   if(row.current_status==="published"||alreadySent){
-    if(row.current_status!=="published"){
+   if(row.current_status==="published"||alreadySent||remoteStatus==="error"){
+    if(alreadySent&&row.current_status!=="published"){
      await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=COALESCE(published_at,$2::timestamptz,now()),updated_at=now() WHERE id=$1::uuid AND status='queued'",[row.publication_id,remote.sentAt||null]);
     }
     // Reserve the one-time draft operation BEFORE Buffer API side effects.
@@ -320,6 +321,9 @@ async function retrofitInstagramBatch(limit=4){
      report.failed++;continue
     }
     await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='draft_created',replacement_buffer_post_id=$2,last_error=NULL,synced_at=now(),updated_at=now() WHERE item_id=$1::uuid AND stage='creating_draft'",[row.item_id,created.post.id]);
+    if(remoteStatus==="error"){
+      await sql("UPDATE public.pr_instagram_publications SET status='failed',last_error='Исходный пост Buffer в состоянии error; создан новый черновик для ручной проверки',updated_at=now() WHERE id=$1::uuid AND status='queued'",[row.publication_id]).catch(()=>{});
+    }
     report.drafts_created++;report.items.push({item_id:row.item_id,status:"draft_created",buffer_post_id:created.post.id});
     continue;
    }
