@@ -12,6 +12,8 @@ on:
       - "infra/portugalia-editor/instagram-retrofit.test.mjs"
       - "infra/portugalia-editor/portugal-four-slots.test.mjs"
       - "infra/portugalia-editor/portugal-rapid-replacements.test.mjs"
+      - "infra/portugalia-editor/portugal-instagram-interleave.test.mjs"
+      - "infra/portugalia-editor/instagram-interleaved-replacements-20261123.sql"
       - "infra/portugalia-editor/portugal-ig-typography.test.mjs"
       - "infra/portugalia-editor/*instagram*.sql"
       - "journalstudio/cloud/portugal/**"
@@ -28,6 +30,8 @@ on:
       - "infra/portugalia-editor/instagram-retrofit.test.mjs"
       - "infra/portugalia-editor/portugal-four-slots.test.mjs"
       - "infra/portugalia-editor/portugal-rapid-replacements.test.mjs"
+      - "infra/portugalia-editor/portugal-instagram-interleave.test.mjs"
+      - "infra/portugalia-editor/instagram-interleaved-replacements-20261123.sql"
       - "infra/portugalia-editor/portugal-ig-typography.test.mjs"
       - "infra/portugalia-editor/*instagram*.sql"
       - "journalstudio/cloud/portugal/**"
@@ -42,4 +46,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - run: node --test infra/portugalia-editor/preditor-manual-time.test.mjs infra/portugalia-editor/portugal-ig-typography.test.mjs infra/portugalia-editor/prbuffer-media.test.mjs infra/portugalia-editor/portugal-photo-diversity.test.mjs infra/portugalia-editor/portugal-nav-width.test.mjs infra/portugalia-editor/instagram-retrofit.test.mjs infra/portugalia-editor/portugal-four-slots.test.mjs infra/portugalia-editor/portugal-rapid-replacements.test.mjs
+      - run: node --test infra/portugalia-editor/preditor-manual-time.test.mjs infra/portugalia-editor/portugal-ig-typography.test.mjs infra/portugalia-editor/prbuffer-media.test.mjs infra/portugalia-editor/portugal-photo-diversity.test.mjs infra/portugalia-editor/portugal-nav-width.test.mjs infra/portugalia-editor/instagram-retrofit.test.mjs infra/portugalia-editor/portugal-four-slots.test.mjs infra/portugalia-editor/portugal-rapid-replacements.test.mjs infra/portugalia-editor/portugal-instagram-interleave.test.mjs
