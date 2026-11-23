@@ -25,9 +25,9 @@ test("Buffer approved old drafts are edited by stable id, not duplicated by crea
 test("Refill is locked to one post per run, then recovers ambiguous remote responses",()=>{
  const code=backend.slice(backend.indexOf("async function refillInstagramQueue("),backend.indexOf("async function schedule("));
  assert.match(code,/if\(count>=BUFFER_PENDING_CAP\)return report/);
- assert.match(code,/ORDER BY r\.created_at,r\.synced_at LIMIT 1/);
+ assert.match(code,/ORDER BY q\.ordinal LIMIT 1/);
  assert.match(code,/stage='dispatching'/);
- assert.match(code,/scheduled_reconciled/);
+ assert.match(code,/scheduled_old_reconciled/);
  assert.match(code,/state='needs_review'/);
  assert.match(backend,/status='queued' AND buffer_post_id IS NOT NULL/);
 });
