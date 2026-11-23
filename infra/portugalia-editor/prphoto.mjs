@@ -217,14 +217,81 @@ async function generateMediumCover(itemId){
  }
 }
 
+
+const IG_TYPO="pt_ryadom_instagram_typography_v1";
+async function instagramSource(itemId){
+  if(!uuid(itemId))throw bad("Неверная статья",400);
+  const [row]=await db("SELECT i.photo_url,i.photo_rights,m.media_type,m.rights_verified,m.status,m.license_details,m.attribution FROM public.pr_items i JOIN public.pr_media_assets m ON m.item_id=i.id AND m.public_url=i.photo_url WHERE i.id=$1::uuid AND m.rights_verified=true AND m.status IN ('candidate','approved') AND m.media_type IN ('licensed_original','owned_original','generated_illustration') ORDER BY m.status='approved' DESC,m.created_at DESC LIMIT 1",[itemId]);
+  if(!row||!row.photo_url||!["cc_licensed","owned","permission_confirmed"].includes(row.photo_rights))throw bad("Сначала выберите фото с подтверждёнными правами",409);
+  const url=new URL(row.photo_url),store=process.env.AWS_ENDPOINT_URL_S3?new URL(process.env.AWS_ENDPOINT_URL_S3).hostname:"";
+  if(url.protocol!=="https:"||url.username||url.password||
+    !["upload.wikimedia.org","thumb.wikimedia.org","images.unsplash.com","images.pexels.com","cdn.pixabay.com",store].includes(url.hostname))
+    throw bad("Недопустимый источник фотографии",422);
+  const response=await fetch(url,{redirect:"error",signal:AbortSignal.timeout(22000)});
+  if(!response.ok)throw bad("Исходная фотография не загрузилась. Замените её в галерее.",422);
+  const mime=(response.headers.get("content-type")||"").split(";")[0];
+  if(!["image/jpeg","image/png","image/webp"].includes(mime))throw bad("Исходная фотография не JPEG/PNG/WebP",422);
+  const bytes=new Uint8Array(await response.arrayBuffer());
+  if(bytes.byteLength>9_000_000||bytes.byteLength<500)throw bad("Фото слишком большое или повреждено",413);
+  return {bytes,mime,source:row};
+}
+function jpegDimensions(bytes){
+  let p=2;
+  while(p<bytes.length-12){
+    if(bytes[p]!==255){p++;continue}
+    const marker=bytes[p+1];
+    if(marker===0xD9||marker===0xDA)break;
+    const length=(bytes[p+2]<<8)|bytes[p+3];
+    if(length<2||p+2+length>bytes.length)break;
+    if([0xC0,0xC1,0xC2,0xC3,0xC5,0xC6,0xC7].includes(marker))
+      return {h:(bytes[p+5]<<8)|bytes[p+6],w:(bytes[p+7]<<8)|bytes[p+8]};
+    p+=2+length;
+  }
+  return null;
+}
+async function uploadInstagramCover(itemId,raw){
+  if(!uuid(itemId)||typeof raw!=="string"||raw.length>3_200_000||
+     !/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(raw))
+     throw bad("Нужна JPEG-обложка 1080×1350 до 2 МБ",422);
+  const encoded=raw.slice("data:image/jpeg;base64,".length);
+  const bytes=Uint8Array.from(atob(encoded),c=>c.charCodeAt(0));
+  const size=jpegDimensions(bytes);
+  if(bytes.length>2_000_000||bytes.length<10_000||
+     bytes[0]!==255||bytes[1]!==216||size?.w!==1080||size?.h!==1350)
+     throw bad("Неверные размеры или формат Instagram-обложки",422);
+  const [i]=await db("SELECT i.status,i.photo_url,i.photo_rights,d.id draft_id,d.headline_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
+  if(!i||!["candidate","approved"].includes(i.status))throw bad("Редактирование недоступно",409);
+  const [source]=await db("SELECT m.id,m.media_type,m.rights_verified,m.attribution,m.license_details FROM pr_media_assets m WHERE m.item_id=$1::uuid AND m.public_url=$2 AND m.rights_verified=true AND m.status IN ('candidate','approved') ORDER BY m.status='approved' DESC LIMIT 1",[itemId,i.photo_url]);
+  if(!source||!["cc_licensed","owned","permission_confirmed"].includes(i.photo_rights))throw bad("Нужно фото с подтверждёнными правами",409);
+  const uploaded=await db("SELECT count(*)::int n FROM pr_media_assets WHERE item_id=$1::uuid AND generation_model=$2 AND created_at>now()-interval '24 hours'",[itemId,IG_TYPO]);
+  if(Number(uploaded[0]?.n||0)>=10)throw bad("Не больше 10 оформлений за сутки",429);
+  const key="instagram-covers/"+itemId+"/"+randomUUID()+".jpg";
+  const url=await putCover(key,bytes);
+  const kind=source.media_type;
+  const credit="Instagram typography overlay (1080x1350), source: "+String(source.attribution||"").slice(0,250);
+  const [asset]=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,storage_bucket,storage_key,public_url,attribution,license_details,rights_verified,illustration_label_required,status) VALUES($1::uuid,$2::uuid,$3,$4,$5,$6,$7,$8,$9,true,$10,'candidate') RETURNING id",[itemId,i.draft_id,kind,IG_TYPO,BKT,key,url,credit,String(source.license_details||"")+"\nDerived with exact title typography; original rights preserved.",kind==="generated_illustration"]);
+  return {media_id:asset.id,image_url:url,needs_approval:true,instagram_only:true};
+}
+
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:9,image_provider:"openai",image_model:AI_COVER_MODEL,openai_key_configured:Boolean(process.env.OPENAI_API_KEY),storage_configured:Boolean(process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3),medium_generation_configured:Boolean(process.env.OPENAI_API_KEY&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:10,image_provider:"openai",image_model:AI_COVER_MODEL,openai_key_configured:Boolean(process.env.OPENAI_API_KEY),storage_configured:Boolean(process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3),medium_generation_configured:Boolean(process.env.OPENAI_API_KEY&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
 try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/import"){const raw=await req.text();if(raw.length>2500)throw bad("Слишком длинный запрос");return result(await importFromStock(JSON.parse(raw||"{}")),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/select"){const raw=await req.text();if(raw.length>1200)throw bad("Слишком длинный запрос");const b=JSON.parse(raw||"{}");return result(await selectApproved(b.item_id,b.media_id),200,origin);}
+if(req.method==="GET"&&u.pathname==="/api/instagram/source"){
+ const media=await instagramSource(u.searchParams.get("item_id"));
+ return new Response(media.bytes,{status:200,headers:{"content-type":media.mime,
+ "cache-control":"private, max-age=180","access-control-allow-origin":origin,
+ "x-content-type-options":"nosniff"}});
+}
+if(req.method==="POST"&&u.pathname==="/api/instagram/cover"){
+ const raw=await req.text();if(raw.length>3_300_000)throw bad("Слишком большой JPEG",413);
+ const body=JSON.parse(raw||"{}");
+ return result(await uploadInstagramCover(body.item_id,body.data_url),200,origin);
+}
 if(req.method==="POST"&&u.pathname==="/api/generate"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком большой запрос");const b=JSON.parse(raw||"{}");if(b.quality&&b.quality!=="medium")throw bad("Сейчас поддерживается качество Medium");return result(await generateMediumCover(b.item_id),200,origin);}
 return result({error:"Not found"},404,origin);
 }catch(e){return result({error:String(e.message||e).slice(0,200)},e.status||500,origin);}}};
