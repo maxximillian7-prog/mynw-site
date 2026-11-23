@@ -447,7 +447,7 @@ body.studio-embedded .workspace{padding:13px}}
 <button id="approveBtn" class="btn primary" type="button">✓ Утвердить для Telegram</button>
 <button id="approveInstagramBtn" class="btn primary" type="button">✓ Утвердить для Instagram</button>
 </div>
-<p class="secondary">Нажмите кнопку нужной площадки один раз. Telegram и Instagram утверждаются отдельно; в Instagram требуется одобренное фото с проверенными правами. Если этот материал уже стоит в очереди Telegram, Instagram автоматически получает то же время по Лиссабону. Опубликованные материалы не переносятся.</p>
+<p class="secondary">Нажмите кнопку нужной площадки один раз. <strong>Основной Telegram и Instagram: 08:00, 13:00, 18:00, 23:00 по Лиссабону (4 статьи в сутки).</strong> Instagram требует утверждённое фото с проверенными правами. При заполнении Buffer 10/10 утверждённая статья попадает во внутренний резерв и автоматически добавляется при освобождении места. Афиша живёт по отдельному расписанию. Уже опубликованные оригиналы не перемещаются.</p>
   <hr class="divider"><div class="btns"><button id="changesBtn" class="btn">Вернуть на доработку</button><button id="rejectBtn" class="btn danger">Отклонить</button><button id="reopenBtn" class="btn">Вернуть к правкам</button></div>
  </div>
  <div class="card"><h3>⑥ Комментарии и история</h3><div class="field"><label>Комментарий для редакции</label><textarea id="comment" rows="2"></textarea></div><button id="commentBtn" class="btn">Добавить комментарий</button><hr class="divider"><div class="timeline" id="historyArea"></div></div>
@@ -1065,7 +1065,9 @@ async function approveAndQueue(target="telegram"){
   if(approved&&sendIg){
    try{
     const result=await bufferCall("/api/instagram/schedule",{method:"POST",body:{item_id:id,...schedule}});
-    completed.push(result.already_scheduled?
+    completed.push(result.waitlisted?
+ "Instagram — утверждено, поставлено в резерв Buffer (10/10); автоматически получит время 08:00 / 13:00 / 18:00 / 23:00":
+ result.already_scheduled?
  "Instagram (уже запланировано)":
  schedule.schedule_mode==="now"?"Instagram — "+(result.published?"опубликовано":"команда немедленной отправки принята"):
  "Instagram — "+lisbonSchedule(result.scheduled_for));
