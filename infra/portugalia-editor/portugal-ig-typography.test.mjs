@@ -13,6 +13,8 @@ const design=read("../../journalstudio/cloud/portugal/instagram-cover-design.js"
 const integration=read("../../journalstudio/cloud/portugal/instagram-cover-integration.js");
 const stage=read("./instagram-typography-stale-guard-20261123.sql");
 const telegramSql=read("./instagram-cover-and-telegram-footer-20261123.sql");
+const hub=read("../../journalstudio/cloud/studio-brand-hub.js");
+const journalShell=read("../../journalstudio/cloud/index.html");
 
 test("Instagram cover is art-directed 4:5 JPEG with legible exact Russian text",()=>{
  const sandbox={window:{}};
@@ -105,6 +107,18 @@ test("Bright Instagram v3 preserves photo, removes right diamonds and uses ПО�
  assert.match(integration,/design_version:3/);
  assert.match(photo,/design_version:3/);
  assert.match(html,/instagram-cover-design\.js\?v=20261123-bright3/);
+});
+
+test("Embedded Portugal workspace cannot keep an older dark Instagram canvas",()=>{
+ assert.match(hub,/portugal\/\?embedded=1&v=20261123-photo-original4/);
+ assert.match(hub,/data-portugal-reload/);
+ assert.match(hub,/refreshPortugalFrame\(\)/);
+ assert.match(journalShell,/studio-brand-hub\.js\?v=20261123-photo-original4/);
+ assert.match(html,/instagram-cover-design\.js\?v=20261123-photo-original4/);
+ assert.match(html,/instagram-cover-integration\.js\?v=20261123-photo-original4/);
+ assert.match(integration,/\.ig-phone \.ig-cover, \.ig-phone \.ig-cover-canvas/);
+ assert.match(integration,/phone\.replaceWith\(canvas\)/);
+ assert.match(html,/if\(mode==='instagram'\)\{\s*root\.classList\.remove\('pt-photo-adjust-enabled'\);\s*return;/);
 });
 
 test("Telegram has full article and a clickable inline Instagram-word footer",()=>{
