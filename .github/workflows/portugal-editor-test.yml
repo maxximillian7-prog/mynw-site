@@ -4,12 +4,24 @@ on:
     paths:
       - "infra/portugalia-editor/preditor.mjs"
       - "infra/portugalia-editor/preditor-manual-time.test.mjs"
+      - "infra/portugalia-editor/prpublish.mjs"
+      - "infra/portugalia-editor/prphoto.mjs"
+      - "infra/portugalia-editor/prbuffer.mjs"
+      - "infra/portugalia-editor/portugal-ig-typography.test.mjs"
+      - "infra/portugalia-editor/*instagram*.sql"
+      - "journalstudio/cloud/portugal/**"
       - ".github/workflows/portugal-editor-test.yml"
   push:
     branches: [main]
     paths:
       - "infra/portugalia-editor/preditor.mjs"
       - "infra/portugalia-editor/preditor-manual-time.test.mjs"
+      - "infra/portugalia-editor/prpublish.mjs"
+      - "infra/portugalia-editor/prphoto.mjs"
+      - "infra/portugalia-editor/prbuffer.mjs"
+      - "infra/portugalia-editor/portugal-ig-typography.test.mjs"
+      - "infra/portugalia-editor/*instagram*.sql"
+      - "journalstudio/cloud/portugal/**"
       - ".github/workflows/portugal-editor-test.yml"
 jobs:
   manual-time:
@@ -21,4 +33,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - run: node --test infra/portugalia-editor/preditor-manual-time.test.mjs
+      - run: node --test infra/portugalia-editor/preditor-manual-time.test.mjs infra/portugalia-editor/portugal-ig-typography.test.mjs infra/portugalia-editor/prbuffer-media.test.mjs
