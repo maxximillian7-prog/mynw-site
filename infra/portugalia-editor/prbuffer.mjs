@@ -188,6 +188,153 @@ async function syncQueuedBatch(limit=25){
  return out;
 }
 
+
+// PT_FOUR_SLOTS_20261123: Buffer Free plan has 10 pending posts PER CHANNEL,
+// not 10 posts/day. Refill safely from preapproved Buffer drafts at most one per run.
+// All slot calculations use the DST-aware Portugal SQL function.
+const BUFFER_PENDING_CAP=10;
+async function instagramCapacity(){
+ const rows=await sql("SELECT (SELECT count(*) FROM public.pr_instagram_publications WHERE status='queued' AND buffer_post_id IS NOT NULL)+ (SELECT count(*) FROM public.pr_instagram_retrofit_20261123 WHERE stage IN ('scheduled_repost','dispatching') AND target_time IS NOT NULL AND target_time>now()-interval '2 hours')+ (SELECT count(*) FROM public.pr_instagram_waitlist_4slots WHERE state IN ('scheduled','dispatching') AND target_time IS NOT NULL AND target_time>now()-interval '2 hours') AS filled");
+ return Number(rows[0]?.filled||0);
+}
+async function nextInstagramDueAt(){
+ const rows=await sql(
+  "SELECT public.pr_next_portugal_publication_slot(greatest(now()+interval '5 minutes',COALESCE((SELECT max(t.due)+interval '1 minute' FROM ("+
+   "SELECT scheduled_for AS due FROM public.pr_instagram_publications WHERE status='queued' AND buffer_post_id IS NOT NULL "+
+   "UNION ALL SELECT target_time FROM public.pr_instagram_retrofit_20261123 WHERE stage IN ('scheduled_repost','dispatching') AND target_time IS NOT NULL "+
+   "UNION ALL SELECT target_time FROM public.pr_instagram_waitlist_4slots WHERE state IN ('scheduled','dispatching') AND target_time IS NOT NULL"+
+   ") t),now()+interval '5 minutes'))) AS next_due");
+ const time=rows[0]?.next_due;
+ if(!time||!Number.isFinite(Date.parse(time))||Date.parse(time)<Date.now()+60000)throw Error("Invalid next Lisbon calendar slot");
+ return new Date(time).toISOString();
+}
+function isBufferQueued(status){return ["scheduled","buffer","queued"].includes(String(status||"").toLowerCase())}
+async function bufferPostStatus(id){
+ const data=await buffer("query FourSlotGetPost($input:PostInput!){post(input:$input){id status dueAt sentAt text}}",{input:{id}});
+ return data.post;
+}
+async function reconcileInstagramPending(){
+ // Capacity must reflect Buffer's real SENT/ERROR states, not stale DB queue.
+ const rows=await sql("SELECT id,buffer_post_id,scheduled_for FROM public.pr_instagram_publications WHERE status='queued' AND buffer_post_id IS NOT NULL AND scheduled_for<now()+interval '8 minutes' ORDER BY scheduled_for LIMIT 12");
+ const result={published:0,failed:0};
+ for(const p of rows)try{
+  const remote=await bufferPostStatus(p.buffer_post_id);
+  if(String(remote?.status||"").toLowerCase()==="sent"){
+   await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=COALESCE(published_at,$2::timestamptz,now()),updated_at=now(),last_error=NULL WHERE id=$1::uuid AND status='queued' AND buffer_post_id=$3",[p.id,remote.sentAt||null,p.buffer_post_id]);
+   result.published++;
+  }else if(String(remote?.status||"").toLowerCase()==="error"){
+   await sql("UPDATE public.pr_instagram_publications SET status='failed',last_error='Buffer delivery failed, manual review required',updated_at=now() WHERE id=$1::uuid AND status='queued' AND buffer_post_id=$2",[p.id,p.buffer_post_id]);
+   result.failed++;
+  }
+ }catch(e){console.error("IG_CAPACITY_RECONCILE",String(e.message||e).slice(0,130))}
+ const reposts=await sql("SELECT item_id,replacement_buffer_post_id,target_time FROM public.pr_instagram_retrofit_20261123 WHERE stage='scheduled_repost' AND target_time<now()+interval '8 minutes' ORDER BY target_time LIMIT 12");
+ for(const r of reposts)try{
+  const remote=await bufferPostStatus(r.replacement_buffer_post_id);
+  if(String(remote?.status||"").toLowerCase()==="sent"){
+   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='published_repost',synced_at=now(),last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND stage='scheduled_repost'",[r.item_id]);
+   result.published++;
+  }else if(String(remote?.status||"").toLowerCase()==="error"){
+   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='needs_review',last_error='Buffer could not publish replacement; inspect Instagram before any retry',updated_at=now() WHERE item_id=$1::uuid AND stage='scheduled_repost'",[r.item_id]);
+   result.failed++;
+  }
+ }catch(e){console.error("IG_REPOST_RECONCILE",String(e.message||e).slice(0,130))}
+ return result;
+}
+async function scheduleRetrofitDraft(row,due){
+ const oldId=String(row.replacement_buffer_post_id||"");
+ if(!oldId)throw fail("Buffer draft ID missing; will not create a duplicate",409);
+ const before=await bufferPostStatus(oldId);
+ if(!before||before.id!==oldId)throw fail("Buffer draft was not found",409);
+ if(isBufferQueued(before.status)){
+  if(before.dueAt&&Math.abs(Date.parse(before.dueAt)-Date.parse(due))<60000){
+   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='scheduled_repost',target_time=$2::timestamptz,synced_at=now(),last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND stage IN ('draft_created','dispatching')",[row.item_id,due]);
+   return {ok:true,recovered:true,id:oldId};
+  }
+  throw fail("Draft already scheduled for a different time; manual review required",409);
+ }
+ if(String(before.status).toLowerCase()==="sent"){
+  await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='published_repost',synced_at=now(),updated_at=now() WHERE item_id=$1::uuid AND stage IN ('draft_created','dispatching')",[row.item_id]);
+  return {ok:true,already_published:true,id:oldId};
+ }
+ if(String(before.status).toLowerCase()!=="draft")throw fail("Buffer post not a draft: "+before.status,409);
+ const assets=[row.cover_url,...(Array.isArray(row.carousel_urls)?row.carousel_urls:JSON.parse(row.carousel_urls||"[]"))];
+ if(!assets.length||assets.length>10||assets.some(x=>!/^https:\/\/mynw\.app\/journalstudio\/instagram-retrofit\/[0-9a-f-]{36}(?:-text-\d+)?\.jpg$/.test(x)))throw fail("Invalid Instagram assets",422);
+ const input={id:oldId,text:row.caption,schedulingType:"automatic",mode:"customScheduled",dueAt:due,saveToDraft:false,
+  metadata:{instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:row.is_ai===true||row.is_ai==="t"}},
+  assets:assets.map(url=>({image:{url}}))};
+ const edited=(await buffer("mutation PromoteApprovedDraft($input:EditPostInput!){editPost(input:$input){... on PostActionSuccess{post{id status dueAt text}} ... on MutationError{message}}}",{input})).editPost;
+ if(!edited?.post?.id||edited.post.id!==oldId||!isBufferQueued(edited.post.status)||edited.post.text!==row.caption||
+   !edited.post.dueAt||Math.abs(Date.parse(edited.post.dueAt)-Date.parse(due))>=60000)
+   throw fail("Buffer draft scheduling not confirmed: "+String(edited?.message||edited?.post?.status||"unknown"),502);
+ await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='scheduled_repost',target_time=$2::timestamptz,synced_at=now(),last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND stage='dispatching'",[row.item_id,due]);
+ return {ok:true,id:oldId,dueAt:due,assets:assets.length};
+}
+async function scheduleWaitlisted(row,due){
+ const pub=await fetchDraft(row.item_id);
+ if(!pub||pub.id!==row.publication_id||pub.buffer_post_id||!["awaiting_approval","draft","failed"].includes(pub.status))throw fail("Instagram item was already submitted or no longer eligible",409);
+ if(pub.item_status!=="approved"||pub.draft_status!=="approved")throw fail("Editorial approval no longer valid",409);
+ const media=await verifyMedia(pub);
+ const finalCaption=(await sql("SELECT public.pr_prepare_instagram_caption($1::uuid) AS caption",[row.item_id]))[0]?.caption;
+ if(!finalCaption||finalCaption.length>2200)throw fail("Instagram caption invalid",422);
+ const mediaURL=await instagramImageUrl(pub.image_url);
+ const data=await buffer("mutation ScheduleWaitlisted($input:CreatePostInput!){createPost(input:$input){... on PostActionSuccess{post{id status dueAt text}} ... on MutationError{message}}}",{input:{
+  channelId:CHANNEL,mode:"customScheduled",dueAt:due,schedulingType:"automatic",saveToDraft:false,
+  text:finalCaption,
+  metadata:{instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:media.media_type==="generated_illustration"}},
+  assets:[{image:{url:mediaURL}}]
+ }});
+ const remote=data.createPost;
+ if(!remote?.post?.id||!isBufferQueued(remote.post.status)||remote.post.text!==finalCaption||
+    !remote.post.dueAt||Math.abs(Date.parse(remote.post.dueAt)-Date.parse(due))>=60000)
+    throw fail("Buffer did not confirm queued post: "+String(remote?.message||"unknown"),502);
+ await sql("UPDATE public.pr_instagram_publications SET status='queued',caption=$2,buffer_post_id=$3,scheduled_for=$4::timestamptz,approved_by=COALESCE(approved_by,$5),approved_at=COALESCE(approved_at,now()),last_error=NULL,updated_at=now() WHERE id=$1::uuid AND status IN ('awaiting_approval','draft','failed') AND buffer_post_id IS NULL",
+  [row.publication_id,finalCaption,remote.post.id,due,row.queued_by||null]);
+ await sql("UPDATE public.pr_instagram_waitlist_4slots SET state='scheduled',buffer_post_id=$2,target_time=$3::timestamptz,last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND state='dispatching'",
+ [row.item_id,remote.post.id,due]);
+ return {ok:true,id:remote.post.id,dueAt:due};
+}
+async function refillInstagramQueue(){
+ const reconciliation=await reconcileInstagramPending();
+ const count=await instagramCapacity();
+ const report={ok:true,limit:BUFFER_PENDING_CAP,scheduled_count:count,reconciliation,action:"full"};
+ if(count>=BUFFER_PENDING_CAP)return report;
+ // PREFER the 44 existing reviewed Buffer drafts, then explicitly approved
+ // new Instagram articles. The saved drafts already have verified headline JPEGs.
+ const retro=(await sql("SELECT r.item_id,r.replacement_buffer_post_id,r.cover_url,r.carousel_urls,r.caption,EXISTS(SELECT 1 FROM public.pr_media_assets m JOIN public.pr_items i ON i.id=m.item_id WHERE m.item_id=r.item_id AND m.public_url=i.photo_url AND m.media_type='generated_illustration' AND m.status='approved') AS is_ai FROM public.pr_instagram_retrofit_20261123 r WHERE r.stage='draft_created' AND r.replacement_buffer_post_id IS NOT NULL ORDER BY r.created_at,r.synced_at LIMIT 1"))[0];
+ const wait=retro?null:(await sql("SELECT w.* FROM public.pr_instagram_waitlist_4slots w JOIN public.pr_instagram_publications p ON p.id=w.publication_id WHERE w.state='waiting' AND p.buffer_post_id IS NULL ORDER BY w.requested_at LIMIT 1"))[0];
+ if(!retro&&!wait)return {...report,action:"no_waiting_posts"};
+ const due=await nextInstagramDueAt();
+ const id=retro?.item_id||wait.item_id;
+ const source=retro?"retrofit":"new_article";
+ const claim=retro?
+  await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='dispatching',target_time=$2::timestamptz,attempts=attempts+1,updated_at=now() WHERE item_id=$1::uuid AND stage='draft_created' RETURNING item_id",[id,due]):
+  await sql("UPDATE public.pr_instagram_waitlist_4slots SET state='dispatching',target_time=$2::timestamptz,attempt_count=attempt_count+1,updated_at=now() WHERE item_id=$1::uuid AND state='waiting' RETURNING item_id",[id,due]);
+ if(!claim.length)return {...report,action:"already_processing"};
+ try{
+  const out=retro?await scheduleRetrofitDraft(retro,due):await scheduleWaitlisted(wait,due);
+  return {...report,action:"scheduled",source,item_id:id,...out};
+ }catch(e){
+  const error=String(e.message||e).slice(0,260);
+  // A definite Buffer quota refusal means no media was scheduled. Retry later.
+  // Ambiguous API failures MUST be reconciled by ID before allowing a retry.
+  if(retro){
+   const remote=await bufferPostStatus(retro.replacement_buffer_post_id).catch(()=>null);
+   if(remote&&isBufferQueued(remote.status)&&remote.dueAt&&Math.abs(Date.parse(remote.dueAt)-Date.parse(due))<60000){
+    await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='scheduled_repost',target_time=$2::timestamptz,synced_at=now(),last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND stage='dispatching'",[id,due]);
+    return {...report,action:"scheduled_reconciled",source,item_id:id}
+   }
+   const definitelyDraft=remote&&String(remote.status||"").toLowerCase()==="draft";
+   const newStage=definitelyDraft?"draft_created":"needs_review";
+   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage=$2,last_error=$3,updated_at=now() WHERE item_id=$1::uuid AND stage='dispatching'",[id,newStage,error]);
+  }else{
+   // New createPost may have succeeded before the response was lost: do not
+   // create the same post twice without a confirmed response.
+   await sql("UPDATE public.pr_instagram_waitlist_4slots SET state='needs_review',last_error=$2,updated_at=now() WHERE item_id=$1::uuid AND state='dispatching'",[id,error]);
+  }
+  return {...report,action:"needs_review",source,item_id:id,error};
+ }
+}
+
 async function schedule(id,options,userId){
  const original=await ensureStage(id);
  if(original.item_status!=="approved"||original.draft_status!=="approved")throw fail("Сначала утвердите статью",409);
@@ -200,6 +347,11 @@ async function schedule(id,options,userId){
  if(["published","publishing","preparing","container_created"].includes(original.status)||(original.status==="queued"&&options.schedule_mode!=="now"))return {ok:true,already_scheduled:true,buffer_post_id:original.buffer_post_id,scheduled_for:original.scheduled_for};
  if(!["draft","awaiting_approval","failed","queued"].includes(original.status))throw fail("Подготовка Instagram не завершена: "+original.status,409);
  const media=await verifyMedia(original);
+ if(options.schedule_mode!=="now" && (await instagramCapacity())>=BUFFER_PENDING_CAP){
+  await sql("INSERT INTO public.pr_instagram_waitlist_4slots(item_id,publication_id,queued_by,request_mode,state) VALUES($1::uuid,$2::uuid,$3,$4,'waiting') ON CONFLICT(item_id) DO UPDATE SET queued_by=EXCLUDED.queued_by,request_mode=EXCLUDED.request_mode,updated_at=now() WHERE public.pr_instagram_waitlist_4slots.state IN ('waiting','needs_review')",
+   [id,original.id,userId,"automatic"]);
+  return {ok:true,waitlisted:true,buffer_queue_full:true,limit:BUFFER_PENDING_CAP,message:"Одобрено. Очередь Buffer 10/10; материал поставлен в резерв и будет автоматически опубликован в ближайший свободный слот 08:00/13:00/18:00/23:00 (Лиссабон)."};
+ }
  let dueAt,mode=options.schedule_mode||"default";
  const immediate=mode==="now";
  if(immediate){dueAt=new Date().toISOString()}
@@ -213,8 +365,7 @@ async function schedule(id,options,userId){
   if(!Number.isInteger(mins)||mins<1||mins>525600)throw fail("Неверная задержка",400);
   dueAt=new Date(Date.now()+mins*60000).toISOString();
  }else if(mode==="default"){
-  const max=await sql("SELECT greatest(now()+interval '2 hours',coalesce(max(scheduled_for)+interval '2 hours',now()+interval '2 hours')) AS next FROM public.pr_instagram_publications WHERE status IN ('queued','publishing') AND scheduled_for>now()-interval '1 day'");
-  dueAt=new Date(max[0].next).toISOString();
+  dueAt=await nextInstagramDueAt();
  }else throw fail("Неизвестный режим расписания",400);
  const acquired=await sql("UPDATE public.pr_instagram_publications SET status='preparing',attempts=attempts+1,last_error=NULL,updated_at=now() WHERE id=$1::uuid AND status IN ('draft','awaiting_approval','failed','queued') RETURNING id",[original.id]);
  if(!acquired.length)return {ok:true,already_processing:true};
@@ -355,7 +506,7 @@ async function retrofitInstagramBatch(limit=4){
 export default {async fetch(request){
  const url=new URL(request.url),origin=ALLOWED.has(request.headers.get("origin"))?request.headers.get("origin"):"";
  if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":origin,"access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"Authorization,Content-Type","access-control-max-age":"600"}});
- if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:4,instagram_retrofit:true,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
+ if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:5,lisbon_slots:['08:00','13:00','18:00','23:00'],buffer_pending_cap:10,auto_refill:true,instagram_retrofit:true,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
  if(request.method==="POST"&&url.pathname==="/verify"){
   if(!process.env.PR_BUFFER_SETUP_SECRET||request.headers.get("x-pr-buffer-secret")!==process.env.PR_BUFFER_SETUP_SECRET)return json({error:"unauthorized"},401,origin);
   try{const r=await buffer('query{channel(input:{id:"'+CHANNEL+'"}){id name service}}'); const c=r.channel;return json({ok:!!c&&c.id===CHANNEL,channel_id:c?.id,name:c?.name,service:c?.service},200,origin)}
@@ -365,6 +516,11 @@ export default {async fetch(request){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
   try{return json(await retrofitInstagramBatch(8),200,origin)}
   catch(e){return json({ok:false,error:String(e.message||e).slice(0,220)},503,origin)}
+ }
+ if(request.method==="POST"&&url.pathname==="/internal/refill"){
+  if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
+  try{return json(await refillInstagramQueue(),200,origin)}
+  catch(e){return json({ok:false,error:String(e.message||e).slice(0,260)},503,origin)}
  }
  if(request.method==="POST"&&url.pathname==="/internal/sync"){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
