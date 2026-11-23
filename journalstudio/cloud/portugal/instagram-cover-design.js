@@ -27,6 +27,33 @@ function linesFor(ctx,text,maxWidth){
  if(line)rows.push(line);
  return rows;
 }
+// Keep a visual editorial headline, not a full-screen wall of text.
+// Preserve whole words. Only exceptionally long cover titles receive an ellipsis;
+// the full original title always stays in the article and Instagram caption.
+function layoutTitle(ctx,source,maxWidth=895){
+ const title=String(source||"").replace(/\s+/g," ").trim();
+ if(!title)throw Error("Укажите заголовок статьи");
+ let rows=[],size=60,rowHeight=69;
+ for(;size>=44;size-=2){
+  ctx.font='800 '+size+'px "Manrope","Arial",sans-serif';
+  rows=linesFor(ctx,title,maxWidth);
+  rowHeight=Math.round(size*1.13);
+  if(rows.length<=4&&rows.length*rowHeight<=275)break;
+ }
+ if(rows.length>4){
+  const complete=rows.slice(0,3);
+  let fourth=rows[3]||"";
+  for(let i=4;i<rows.length;i++){
+   // Never add hidden/unreviewed words when the four-line limit is reached.
+   if(!fourth)break;
+  }
+  while(fourth&&ctx.measureText(fourth.replace(/[\s.,;:!—–-]+$/u,"")+"…").width>maxWidth){
+   fourth=fourth.slice(0,Math.max(0,fourth.lastIndexOf(" "))).trim();
+  }
+  rows=[...complete,(fourth.replace(/[\s.,;:!—–-]+$/u,"")+"…")];
+ }
+ return {rows,size,rowHeight,shortened:rows.join(" ")!==title};
+}
 function draw(canvas,photo,title,category,variant="editorial"){
  if(!canvas||!photo)throw Error("Нужно исходное фото");
  const theme=THEMES[safeColor(variant)];
@@ -55,29 +82,25 @@ function draw(canvas,photo,title,category,variant="editorial"){
  ctx.letterSpacing="4px";ctx.fillText("PORTUGAL / РЯДОМ",96,102);ctx.letterSpacing="0px";
  ctx.font='700 23px "Manrope","Arial",sans-serif';
  ctx.fillStyle=theme.accent;ctx.fillText(tr(category),96,173);
- const x=70,maxWidth=940;
- let size=88,rowHeight=100,rows=[];
- for(;size>=56;size-=4){
-  ctx.font='900 '+size+'px "Manrope","Arial",sans-serif';
-  rows=linesFor(ctx,title,maxWidth);
-  rowHeight=Math.round(size*1.16);
-  if(rows.length<=6&&rows.length*rowHeight<=620)break;
- }
- if(rows.length>7)throw Error("Слишком длинный заголовок для обложки: сократите его");
- const blockHeight=rows.length*rowHeight;
- const start=Math.min(1010-blockHeight,Math.max(405,900-blockHeight/2));
- rounded(ctx,54,start-48,972,blockHeight+130,24);
- ctx.fillStyle=variant==="noir"?"rgba(3,17,22,.56)":"rgba(3,25,32,.33)";
- ctx.fill();ctx.strokeStyle="rgba(255,255,255,.18)";ctx.lineWidth=2;ctx.stroke();
- ctx.save();ctx.beginPath();ctx.rect(70,start-33,940,blockHeight+90);ctx.clip();
- ctx.shadowColor="rgba(0,0,0,.36)";ctx.shadowBlur=18;ctx.shadowOffsetY=5;
+ // Compact Instagram headline: at most four lines, confined to the
+ // bottom 25% of the image. The full article title remains in the caption.
+ const x=92,maxWidth=895;
+ const {rows,size,rowHeight}=layoutTitle(ctx,title,maxWidth);
+ const firstBaseline=1055-(rows.length-1)*rowHeight;
+ const blockTop=firstBaseline-size-24;
+ const blockHeight=(rows.length-1)*rowHeight+size+73;
+ rounded(ctx,70,blockTop,940,blockHeight,19);
+ ctx.fillStyle=variant==="noir"?"rgba(3,17,22,.48)":"rgba(3,25,32,.40)";
+ ctx.fill();ctx.strokeStyle="rgba(255,255,255,.15)";ctx.lineWidth=1.5;ctx.stroke();
+ ctx.save();ctx.beginPath();ctx.rect(86,blockTop+8,908,blockHeight-16);ctx.clip();
+ ctx.shadowColor="rgba(0,0,0,.32)";ctx.shadowBlur=13;ctx.shadowOffsetY=3;
  rows.forEach((line,i)=>{
-  ctx.fillStyle=(i===0?theme.accent:"#FFFFFF");
-  ctx.font='900 '+size+'px "Manrope","Arial",sans-serif';
-  ctx.fillText(line,x,start+i*rowHeight,maxWidth);
+  ctx.fillStyle=i===0?theme.accent:"#FFFFFF";
+  ctx.font='800 '+size+'px "Manrope","Arial",sans-serif';
+  ctx.fillText(line,x,firstBaseline+i*rowHeight,maxWidth);
  });
  ctx.restore();
- const lower=Math.max(1175,start+blockHeight+62);
+ const lower=1185;
  ctx.fillStyle=theme.accent;ctx.fillRect(69,lower,72,6);
  ctx.font='600 23px "Manrope","Arial",sans-serif';
  ctx.fillStyle="#FFFFFF";ctx.fillText("О ПОРТУГАЛИИ — ПОНЯТНО И ПО ДЕЛУ",69,lower+49);
@@ -99,5 +122,5 @@ function toJpeg(canvas){
  }
  throw Error("Файл обложки слишком большой. Уменьшите исходное изображение.");
 }
-global.PortugalInstagramCover={draw,createPreview,toJpeg,WIDTH,HEIGHT,THEMES};
+global.PortugalInstagramCover={draw,layoutTitle,createPreview,toJpeg,WIDTH,HEIGHT,THEMES};
 })(window);
