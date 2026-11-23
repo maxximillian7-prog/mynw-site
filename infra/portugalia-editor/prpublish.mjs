@@ -115,8 +115,18 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eve
  const blocks=[{type:"photo",photo:{type:"photo",media:url.href}},{type:"heading",size:2,text:title}];
  if(isAiGenerated)blocks.push({type:"paragraph",text:"📷 AI-изображение · не документальное фото."});
  if(isAfisha)appendAfishaEventMetadata(blocks,eventMetadata);
+ // Prominent clickable Instagram heading immediately after article text.
+ // The category hashtag remains last in the stored Telegram payload.
+ let instagramPlaced=false;
+ const addInstagramHeading=()=>{
+  if(instagramPlaced)return;
+  blocks.push({type:"heading",size:4,text:["Наш канал в ",richUrl("Инстаграмм","https://www.instagram.com/pt_ryadom/")]});
+  instagramPlaced=true;
+ };
  for(const section of paragraphs){
+  if(/^Наш канал в Инстаграмм:/i.test(section)){addInstagramHeading();continue;}
   if(section.startsWith("Источник:")){
+   addInstagramHeading();
    for(const line of section.split("\n").map(s=>s.trim()).filter(Boolean)){
     const compact=footerLine(line,url.href);
     if(compact)blocks.push({type:"footer",text:compact});
@@ -128,10 +138,9 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eve
    blocks.push({type:"heading",size:5,text:embeddedLinks(first)},{type:"paragraph",text:embeddedLinks(rest)});
   }else blocks.push({type:"paragraph",text:embeddedLinks(section)});
  }
+ // Backward compatibility: older queued posts lack the new Instagram paragraph.
+ if(!instagramPlaced)addInstagramHeading();
  if(isAfisha)blocks.push({type:"paragraph",text:["Больше событий в приложении ",richUrl("Trailyo",TRAILYO_APP_URL),"."]});
- // This is the absolute last line for main and Afisha, including old queued posts.
- // footerLine intentionally skips it to prevent double insertion.
- blocks.push({type:"footer",text:["Наш канал в ",richUrl("Инстаграмм","https://www.instagram.com/pt_ryadom/")]});
  if(blocks.length>500)throw Error("Article has too many rich blocks");
  return blocks;
 }
