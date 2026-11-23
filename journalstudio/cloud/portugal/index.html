@@ -864,6 +864,7 @@ function renderPreview(){
    '<div class="ig-actionbar"><span>♡　♧　➤</span><span>▢</span></div>'+
    '<div class="ig-caption"><strong>pt_ryadom</strong> '+escapeHtml(caption)+'</div>'+
    '<div class="ig-bottom">⌂　　　 ⌕　　　 ⊞　　　 ♡　　　 ◉</div></div></div>';
+  if(window.PtIgCover)window.PtIgCover.onPreview();
   $("previewHint").textContent=img&&!approvedMedia?"⚠️ Фото видно для предпросмотра, но не подтверждено для Instagram":
    img?(isEventPreview(i)?"Афиша: дата без времени, место и ссылка на Trailyo в подписи. Кликабельная геометка Instagram потребует подключения через Facebook-страницу.":"Предпросмотр Instagram. Публикация через Buffer, текст редактируется вместе со статьёй."):"⚠️ Для Instagram требуется изображение. Для Telegram фото необязательно.";
   // PT_INSTAGRAM_BUFFER_MISMATCH_20261117
@@ -1023,6 +1024,11 @@ async function approveAndQueue(target="telegram"){
    dirty=false;
   }
   const latest=await call("/api/article?id="+encodeURIComponent(id));
+  // Instagram uses its own approved 4:5 artwork; Telegram keeps original photo.
+  if(sendIg){
+   if(!window.PtIgCover)throw Error("Редактор Instagram-обложки недоступен");
+   await window.PtIgCover.ensureApproved();
+  }
   let approved=latest.article.status==="approved"&&latest.article.editorial_status==="approved";
   if(me.user.role==="owner"){
    if(sendTg){
@@ -1543,9 +1549,11 @@ async function start(){
   }else{
    const approved=realPhoto&&instagramReadyPhoto();
    if(!approved)warnings.push('Instagram требует утверждённую обложку с проверенными правами. Пока она не готова, публикация заблокирована.');
+   const coverURL=window.PtIgCover?.approvedUrl()||window.PtIgCover?.previewDataUrl()||realPhoto;
+   if(coverURL===realPhoto)warnings.push("Дизайнерская обложка Instagram ещё не сохранена; она создастся при утверждении.");
    const caption=instagramCaption(f,i,chosen);
    render.innerHTML='<div class="pt-final-instagram"><div class="pt-final-ig-top"><span>🇵🇹 pt_ryadom</span><span>⋯</span></div>'+
-    (realPhoto?'<img src="'+escapeHtml(realPhoto)+'" alt="Фотография, которая будет передана в Instagram">':'<div class="pt-photo-prompt">Нет утверждённой фотографии</div>')+
+    (coverURL?'<img src="'+escapeHtml(coverURL)+'" alt="Отдельная типографская обложка Instagram">':'<div class="pt-photo-prompt">Нет утверждённой фотографии</div>')+
     '<div class="pt-final-ig-caption"><strong>pt_ryadom</strong> '+escapeHtml(caption)+'</div></div>';
   }
   $f('ptFinalTitle').textContent='Итоговый вид: '+modeName;
