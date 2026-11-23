@@ -120,8 +120,8 @@ input[type=search]{width:100%} .filters select{width:100%}
 .pt-instagram-cta a{font-weight:850;text-decoration:underline;text-underline-offset:3px}
 .pt-message-footer{text-align:right;color:#839491;font-size:10px;padding:0 11px 8px}
 /* The real inline keyboard is attached after Telegram confirms delivery by ptnav. */
-.pt-post-nav-preview{display:flex;gap:1px;padding:1px;background:#e0eee8;border-top:1px solid #dbeae3}
-.pt-post-nav-preview a{flex:1;text-align:center;background:#f5fbf8;color:#16817d;font-size:11px;font-weight:750;padding:10px 3px;text-decoration:none}
+.pt-post-nav-preview{display:flex;flex-direction:column;gap:2px;padding:2px;background:#e0eee8;border-top:1px solid #dbeae3}
+.pt-post-nav-preview a{display:block;width:100%;flex:none;text-align:center;background:#f5fbf8;color:#16817d;font-size:16px;font-weight:900;letter-spacing:.07em;padding:13px 8px;text-decoration:none}
 .pt-post-nav-preview a:first-child{border-bottom-left-radius:9px}
 .pt-post-nav-preview a:last-child{border-bottom-right-radius:9px}
 .pt-post-nav-preview a:hover{background:#d7f1e8}
@@ -843,7 +843,7 @@ function renderPreview(){
  const image=img?'<img class="pt-chat-cover" loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Обложка публикации">':'<div class="pt-photo-prompt">▧ Для статьи ещё нет выбранной фотографии</div>';
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
  const mainNavPreview=i.source_code!=="trailyo_events"?
-   '<nav class="pt-post-nav-preview" aria-label="Кнопки после публикации"><a href="https://t.me/pt_afisha" target="_blank" rel="noopener noreferrer">🎭 Афиша</a><a href="https://t.me/pt_ryadom_chat" target="_blank" rel="noopener noreferrer">💬 Чат и темы</a></nav>':"";
+   '<nav class="pt-post-nav-preview" aria-label="Кнопки после публикации"><a href="https://t.me/pt_afisha" target="_blank" rel="noopener noreferrer">🎭 АФИША</a><a href="https://t.me/pt_ryadom_chat" target="_blank" rel="noopener noreferrer">💬 ЧАТ</a></nav>':"";
   const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events",i.trailyo_event,img?.public_url||i.photo_url)+'</div>'+timestamp+mainNavPreview+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  for(const [id,mode] of [["modePhone","phone"],["modeInstagram","instagram"],["modeArticle","article"]]){
