@@ -35,7 +35,7 @@ async function editWideNavigation(chatId,messageId){
  throw Error("Telegram navigation "+resp.status+": "+safe(data.description||"unknown error"));
 }
 async function recordWideNavigation(postId,status,reason=null){
- await query("INSERT INTO public.pr_post_nav_wide_sync(post_id,status,attempts,applied_at,last_error,updated_at) VALUES($1::uuid,$2,1,CASE WHEN $2='done' THEN now() ELSE NULL END,$3,now()) ON CONFLICT(post_id) DO UPDATE SET status=EXCLUDED.status,attempts=public.pr_post_nav_wide_sync.attempts+1,applied_at=CASE WHEN EXCLUDED.status='done' THEN now() ELSE public.pr_post_nav_wide_sync.applied_at END,last_error=EXCLUDED.last_error,updated_at=now()",[postId,status,reason]);
+ await query("INSERT INTO public.pr_post_nav_wide_sync(post_id,status,attempts,applied_at,last_error,updated_at) VALUES($1::uuid,$2,1,now(),$3,now()) ON CONFLICT(post_id) DO UPDATE SET status=EXCLUDED.status,attempts=public.pr_post_nav_wide_sync.attempts+1,applied_at=CASE WHEN EXCLUDED.status='done' THEN now() ELSE public.pr_post_nav_wide_sync.applied_at END,last_error=EXCLUDED.last_error,updated_at=now()",[postId,status,reason]);
 }
 async function applyWideNavigation(postId,chatId,messageId){
  try{
