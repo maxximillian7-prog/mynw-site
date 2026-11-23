@@ -303,7 +303,7 @@ async function generateMediumCover(itemId){
  const draft=await checkItem(itemId);
  const [info]=await db("SELECT i.title_original,i.title_ru,i.summary_ru,i.primary_category,i.location_city,i.location_region,d.headline_ru,d.story_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
  if(!info)throw bad("Черновик не найден",404);
- const recent=await db("SELECT item_id,generation_prompt FROM pr_media_assets WHERE generation_model=  AND created_at>now()-interval '35 days' AND status IN ('generating','candidate','approved') ORDER BY created_at DESC LIMIT 65",[GENERATOR_NAME]);
+ const recent=await db("SELECT item_id,generation_prompt FROM pr_media_assets WHERE generation_model=$1 AND created_at>now()-interval '35 days' AND status IN ('generating','candidate','approved') ORDER BY created_at DESC LIMIT 65",[GENERATOR_NAME]);
  const direction=chooseCoverDirection(info,itemId,recent);
  const prompt=coverPrompt(info,direction);
  // Check server configuration before reserving an asset or consuming a generation attempt.
