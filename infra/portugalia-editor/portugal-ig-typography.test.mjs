@@ -106,7 +106,7 @@ test("Bright Instagram v3 preserves photo, removes right diamonds and uses ПО�
  assert.match(integration,/p\.design_version===3/);
  assert.match(integration,/design_version:3/);
  assert.match(photo,/design_version:3/);
- assert.match(html,/instagram-cover-design\.js\?v=20261123-bright3/);
+ assert.match(html,/instagram-cover-design\.js\?v=20261123-photo-original4/);
 });
 
 test("Embedded Portugal workspace cannot keep an older dark Instagram canvas",()=>{
