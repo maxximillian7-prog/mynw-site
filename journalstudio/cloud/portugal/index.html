@@ -466,7 +466,7 @@ body.studio-embedded .workspace{padding:13px}}
 </div>
 <div id="loginOverlay" class="overlay" hidden><div class="loginBox"><h2>🇵🇹 Португалия рядом</h2><p id="loginMessage">Для входа требуется действующая редакционная сессия Journal Studio.</p><a class="btn primary" href="../" style="display:inline-block;margin-top:14px">Войти в Journal Studio</a></div></div>
 <div id="toast" class="toast" hidden></div>
-<script src="./instagram-cover-design.js?v=20261123" defer></script>
+<script src="./instagram-cover-design.js?v=20261123"></script>
 <script>
 "use strict";
 const API="https://br-young-paper-b972wmgd-preditor.compute.c-7.eu-central-1.aws.neon.tech";
@@ -563,6 +563,8 @@ function fill(item){const i=item.article;
  ? (isApproved&&!i.intake_ready?"Утверждено лично владельцем с исключениями: "+reasons.join("; ")+". Правила приёмки не менялись. При необходимости можно повторно поставить утверждённый материал в очередь.":i.intake_ready?"Приёмка пройдена. Одно нажатие «Утвердить» сохранит решение и запланирует публикацию.":"Приёмка не пройдена: "+(reasons.join("; ")||"есть замечания")+". Нажатие «Утвердить» зафиксирует исключения под ответственность владельца и попытается запланировать публикацию. Если отсутствует пригодный текст или фотография, материал будет утверждён, но не отправлен.")
  : (i.intake_ready?"Техническая приёмка пройдена.":"Приёмка не пройдена: "+reasons.join("; "));
  dirty=false;instagramCaptionCached="";renderMedia(item.media);renderHistory(item);renderPreview();refreshInstagramState(i.id);
+ // Always render the Instagram art preview when a draft opens, even if Telegram tab is selected.
+ if(window.PtIgCover)window.PtIgCover.onPreview();
 }
 const PHOTO_API="https://br-young-paper-b972wmgd-prphoto.compute.c-7.eu-central-1.aws.neon.tech";
 async function photoCall(path,options={}){
@@ -1218,7 +1220,7 @@ function bind(){
  });
  document.querySelectorAll("[data-status]").forEach(x=>x.onclick=async()=>{if(contactMode)showContactMode(false);activeStatus=x.dataset.status;document.querySelectorAll("[data-status]").forEach(y=>y.classList.toggle("active",x===y));await list()});
  let searchTimer=null;$("search").oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(list,250)};$("categoryFilter").onchange=list;$("reload").onclick=async()=>{await Promise.all([counts(),list()]);toast("Список обновлён")};
- for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException"])$(id).addEventListener("input",()=>{dirty=true;renderPreview()});
+ for(const id of ["headline","hook","lead","story","why","style","subcategory","needsMoreFacts","imageNeeded","imageChoice","imageException"])$(id).addEventListener("input",()=>{dirty=true;renderPreview();if(id==="headline")window.PtIgCover?.onPreview()});
  $("copyTelegramBtn").onclick=async()=>{if(current?.article?.status!=="approved"||current?.article?.editorial_status!=="approved"){toast("Сначала утвердите материал в редакции",true);return}if(!current?.article?.telegram_text){toast("Нет готового текста",true);return}if(dirty){toast("Сначала сохраните изменения",true);return}try{await navigator.clipboard.writeText(current.article.telegram_text);toast("Готовый текст с хештегом скопирован")}catch(e){toast("Не удалось скопировать текст автоматически",true)}};
  $("saveBtn").onclick=saveArticle;
  $("modePhone").onclick=()=>{previewMode="phone";renderPreview()};
