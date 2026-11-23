@@ -519,8 +519,8 @@ export default {async fetch(request){
  }
  if(request.method==="POST"&&url.pathname==="/internal/refill"){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
-  try{return json(await refillInstagramQueue(),200,origin)}
-  catch(e){return json({ok:false,error:String(e.message||e).slice(0,260)},503,origin)}
+  try{const result=await refillInstagramQueue();console.log('PR_IG_REFILL',JSON.stringify(result));return json(result,200,origin)}
+  catch(e){console.error('PR_IG_REFILL_FAILED',String(e.message||e).slice(0,260));return json({ok:false,error:String(e.message||e).slice(0,260)},503,origin)}
  }
  if(request.method==="POST"&&url.pathname==="/internal/sync"){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
