@@ -9,7 +9,7 @@
     "rights": "Derechos de datos",
     "deletion": "Eliminar cuenta",
     "support": "Soporte",
-    "updated": "Actualizado: 6 de octubre de 2026",
+    "updated": "Última actualización: 23 de noviembre de 2026",
     "back": "Todos los documentos NowGreen",
     "footer": "© 2026 NowGreen / NowApps.",
     "developer": "Desarrollador y responsable de datos",
@@ -128,6 +128,12 @@
           "h": "7. Seguridad",
           "p": [
             "NowGreen utiliza acceso autenticado y controles a nivel de fila para los datos del usuario. No subas datos personales que no tengas derecho a tratar."
+          ]
+        },
+        {
+          "h": "Tratamiento mediante OpenAI y consentimiento",
+          "p": [
+            "Para las funciones de IA solicitadas, descripciones de plantas y jardines, datos de proyectos, notas, historial de cuidado, preguntas y fotos seleccionadas pueden enviarse a través del servidor Supabase de NowGreen a OpenAI (API de OpenAI) para identificación, consejos e imágenes. En iOS se solicita un permiso afirmativo independiente que identifica OpenAI antes del envío. Puedes rechazarlo y seguir utilizando funciones sin IA o revocarlo en Ajustes → Compartir datos con OpenAI. Es independiente de los créditos IA."
           ]
         }
       ]
@@ -268,6 +274,12 @@
           "h": "5. Generación de imágenes",
           "p": [
             "Las vistas previas y visualizaciones generadas pueden diferir de la realidad e inventar detalles visuales. Son ayudas de diseño, no planos de construcción ni una garantía de supervivencia de las plantas."
+          ]
+        },
+        {
+          "h": "Tratamiento mediante OpenAI y consentimiento",
+          "p": [
+            "Para las funciones de IA solicitadas, descripciones de plantas y jardines, datos de proyectos, notas, historial de cuidado, preguntas y fotos seleccionadas pueden enviarse a través del servidor Supabase de NowGreen a OpenAI (API de OpenAI) para identificación, consejos e imágenes. En iOS se solicita un permiso afirmativo independiente que identifica OpenAI antes del envío. Puedes rechazarlo y seguir utilizando funciones sin IA o revocarlo en Ajustes → Compartir datos con OpenAI. Es independiente de los créditos IA."
           ]
         }
       ]
