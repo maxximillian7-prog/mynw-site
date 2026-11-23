@@ -23,7 +23,7 @@ function attachedCover(i=current?.article,status="approved"){
  const matches=(current?.media||[]).filter(m=>m.generation_model===MODEL&&m.status===status&&m.public_url);
  const head=String(el("headline")?.value||i?.headline_ru||"").trim();
  return matches.find(m=>{
-  try{const p=JSON.parse(m.generation_prompt||"{}");return p.headline===head&&p.source_photo_url===i.photo_url&&p.variant===selection()}
+  try{const p=JSON.parse(m.generation_prompt||"{}");return p.headline===head&&p.source_photo_url===i.photo_url&&p.variant===selection()&&p.design_version===2}
   catch{return false}
  })||null;
 }
