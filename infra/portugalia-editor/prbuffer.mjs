@@ -415,15 +415,18 @@ async function rapidReplacementTick(){
 }
 
 async function refillInstagramQueue(){
- const rapid=(await sql("SELECT EXISTS(SELECT 1 FROM public.pr_instagram_rapid_replace_20261123 WHERE state<>'sent') AS active"))[0]?.active;
- if(rapid)return {ok:true,action:"paused_while_old_replacements_republish"};
+ const rapidState=(await sql("SELECT COUNT(*) FILTER(WHERE state='needs_review')::int AS flagged,COUNT(*) FILTER(WHERE state IN ('waiting','submitting','submitted'))::int AS active FROM public.pr_instagram_rapid_replace_20261123"))[0];
+ const rapidFlagged=Number(rapidState?.flagged||0)>0;
+ if(Number(rapidState?.active||0)>0&&!rapidFlagged)return {ok:true,action:"paused_while_old_replacements_republish"};
+ // If Instagram flags any accelerated replacement as spam, permanently stop
+ // automatic OLD repost promotion. Keep normal NEW article scheduling alive.
  const reconciliation=await reconcileInstagramPending();
  const count=await instagramCapacity();
  const report={ok:true,limit:BUFFER_PENDING_CAP,scheduled_count:count,reconciliation,action:"full"};
  if(count>=BUFFER_PENDING_CAP)return report;
  // PREFER the 44 existing reviewed Buffer drafts, then explicitly approved
  // new Instagram articles. The saved drafts already have verified headline JPEGs.
- const retro=(await sql("SELECT r.item_id,r.replacement_buffer_post_id,r.cover_url,r.carousel_urls,r.caption,EXISTS(SELECT 1 FROM public.pr_media_assets m JOIN public.pr_items i ON i.id=m.item_id WHERE m.item_id=r.item_id AND m.public_url=i.photo_url AND m.media_type='generated_illustration' AND m.status='approved') AS is_ai FROM public.pr_instagram_retrofit_20261123 r WHERE r.stage='draft_created' AND r.replacement_buffer_post_id IS NOT NULL ORDER BY r.created_at,r.synced_at LIMIT 1"))[0];
+ const retro=rapidFlagged?null:(await sql("SELECT r.item_id,r.replacement_buffer_post_id,r.cover_url,r.carousel_urls,r.caption,EXISTS(SELECT 1 FROM public.pr_media_assets m JOIN public.pr_items i ON i.id=m.item_id WHERE m.item_id=r.item_id AND m.public_url=i.photo_url AND m.media_type='generated_illustration' AND m.status='approved') AS is_ai FROM public.pr_instagram_retrofit_20261123 r WHERE r.stage='draft_created' AND r.replacement_buffer_post_id IS NOT NULL ORDER BY r.created_at,r.synced_at LIMIT 1"))[0];
  const wait=retro?null:(await sql("SELECT w.* FROM public.pr_instagram_waitlist_4slots w JOIN public.pr_instagram_publications p ON p.id=w.publication_id WHERE w.state='waiting' AND p.buffer_post_id IS NULL ORDER BY w.requested_at LIMIT 1"))[0];
  if(!retro&&!wait)return {...report,action:"no_waiting_posts"};
  const due=await nextInstagramDueAt();
@@ -471,7 +474,7 @@ async function schedule(id,options,userId){
  if(!["draft","awaiting_approval","failed","queued"].includes(original.status))throw fail("Подготовка Instagram не завершена: "+original.status,409);
  const media=await verifyMedia(original);
  if(options.schedule_mode!=="now" && ((await instagramCapacity())>=BUFFER_PENDING_CAP ||
-   (await sql("SELECT EXISTS(SELECT 1 FROM public.pr_instagram_retrofit_20261123 WHERE stage='draft_created' AND replacement_buffer_post_id IS NOT NULL) AS has_older"))[0]?.has_older===true)){
+   (await sql("SELECT EXISTS(SELECT 1 FROM public.pr_instagram_retrofit_20261123 WHERE stage='draft_created' AND replacement_buffer_post_id IS NOT NULL) AND NOT EXISTS(SELECT 1 FROM public.pr_instagram_rapid_replace_20261123 WHERE state='needs_review') AS has_older"))[0]?.has_older===true)){
   await sql("INSERT INTO public.pr_instagram_waitlist_4slots(item_id,publication_id,queued_by,request_mode,state) VALUES($1::uuid,$2::uuid,$3,$4,'waiting') ON CONFLICT(item_id) DO UPDATE SET queued_by=EXCLUDED.queued_by,request_mode=EXCLUDED.request_mode,updated_at=now() WHERE public.pr_instagram_waitlist_4slots.state IN ('waiting','needs_review')",
    [id,original.id,userId,"automatic"]);
   return {ok:true,waitlisted:true,buffer_queue_full:true,limit:BUFFER_PENDING_CAP,message:"Одобрено. Очередь Buffer 10/10; материал поставлен в резерв и будет автоматически опубликован в ближайший свободный слот 08:00/13:00/18:00/23:00 (Лиссабон)."};
