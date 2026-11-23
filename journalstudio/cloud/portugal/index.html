@@ -116,6 +116,8 @@ input[type=search]{width:100%} .filters select{width:100%}
 .pt-chat-body .sectionSubtitle{color:#263b3c!important;font-size:13px!important;margin:0 0 5px!important;font-weight:800!important}
 .pt-chat-body .pt-source{margin:10px 0 0;padding-top:7px;border-top:1px solid #eaf0ee;font-size:10.5px;color:#66807e;overflow-wrap:anywhere}
 .pt-chat-body .pt-hashtags{margin-top:8px;font-size:11.3px;color:#2080ad;word-break:break-word}
+.pt-instagram-cta{margin:17px 0 12px;padding:11px 12px;border-left:3px solid #167e78;background:#f1faf7;font-size:17px;font-weight:850;line-height:1.36;overflow-wrap:anywhere}
+.pt-instagram-cta a{font-weight:850;text-decoration:underline;text-underline-offset:3px}
 .pt-message-footer{text-align:right;color:#839491;font-size:10px;padding:0 11px 8px}
 /* The real inline keyboard is attached after Telegram confirms delivery by ptnav. */
 .pt-post-nav-preview{display:flex;gap:1px;padding:1px;background:#e0eee8;border-top:1px solid #dbeae3}
@@ -728,7 +730,11 @@ function renderTelegramMessage(text,isAfisha=false,event=null,approvedPhotoUrl=n
  const footer=idx>=0?content.slice(idx+2):"";
  const blocks=body.split(/\n\s*\n/).filter(Boolean);
  const heading=blocks.shift()||"Публикация";
- let html='<div class="pt-message-title">'+escapeHtml(heading)+'</div>'+(isAfisha?previewEventMetadata(event):"")+blocks.map(renderRichArticleText).join("");
+ // Instagram CTA is shown ONCE and immediately after the editorial text,
+ // including previews of older queued payloads without the new server line.
+ const articleBlocks=blocks.filter(x=>!/^Наш канал в Инстаграмм:/i.test(x.trim()));
+ let html='<div class="pt-message-title">'+escapeHtml(heading)+'</div>'+(isAfisha?previewEventMetadata(event):"")+articleBlocks.map(renderRichArticleText).join("");
+ html+='<div class="pt-instagram-cta">Наш канал в '+previewLink("Инстаграмм","https://www.instagram.com/pt_ryadom/")+'</div>';
  if(footer){
   const lines=footer.split("\n");
   html+='<div class="pt-source">'+lines.filter(x=>!x.startsWith("#")).map(x=>previewFooterLine(x,approvedPhotoUrl)).filter(Boolean).join(" · ")+'</div>'+
