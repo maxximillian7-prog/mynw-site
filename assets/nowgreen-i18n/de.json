@@ -9,7 +9,7 @@
     "rights": "Datenrechte",
     "deletion": "Konto löschen",
     "support": "Support",
-    "updated": "Aktualisiert: 6. Oktober 2026",
+    "updated": "Zuletzt aktualisiert: 23. November 2026",
     "back": "Alle NowGreen-Dokumente",
     "footer": "© 2026 NowGreen / NowApps.",
     "developer": "Entwickler und Verantwortlicher",
@@ -128,6 +128,12 @@
           "h": "7. Sicherheit",
           "p": [
             "NowGreen verwendet authentifizierten Zugriff und zeilenbasierte Zugriffskontrollen für Nutzerdaten. Laden Sie keine personenbezogenen Daten hoch, zu deren Verarbeitung Sie nicht berechtigt sind."
+          ]
+        },
+        {
+          "h": "Datenverarbeitung durch OpenAI und Einwilligung",
+          "p": [
+            "Für angeforderte KI-Funktionen können ausgewählte Pflanzen- und Gartenbeschreibungen, Projektdaten, Notizen, Pflegeverlauf, Fragen und Fotos über den NowGreen-Supabase-Server an OpenAI (OpenAI API) zur Pflanzenerkennung, Beratung und Bilderzeugung gesendet werden. Auf iOS wird vor der Übermittlung eine gesonderte ausdrückliche Einwilligung unter Nennung von OpenAI eingeholt. Nutzer können ablehnen und Funktionen ohne KI verwenden oder unter Einstellungen → Datenfreigabe für OpenAI widerrufen. Dies ist unabhängig von KI-Credits."
           ]
         }
       ]
@@ -268,6 +274,12 @@
           "h": "5. Bildgenerierung",
           "p": [
             "Generierte Vorschauen und Visualisierungen können von der Realität abweichen und visuelle Details erfinden. Sie sind Gestaltungshilfen, keine Bauzeichnungen und keine Garantie für das Überleben von Pflanzen."
+          ]
+        },
+        {
+          "h": "Datenverarbeitung durch OpenAI und Einwilligung",
+          "p": [
+            "Für angeforderte KI-Funktionen können ausgewählte Pflanzen- und Gartenbeschreibungen, Projektdaten, Notizen, Pflegeverlauf, Fragen und Fotos über den NowGreen-Supabase-Server an OpenAI (OpenAI API) zur Pflanzenerkennung, Beratung und Bilderzeugung gesendet werden. Auf iOS wird vor der Übermittlung eine gesonderte ausdrückliche Einwilligung unter Nennung von OpenAI eingeholt. Nutzer können ablehnen und Funktionen ohne KI verwenden oder unter Einstellungen → Datenfreigabe für OpenAI widerrufen. Dies ist unabhängig von KI-Credits."
           ]
         }
       ]
