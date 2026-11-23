@@ -17,6 +17,52 @@ async function query(q,params=[]){
  return data.rows??data;
 }
 const TRAILYO_APP_URL="https://apps.apple.com/us/app/trailyo-events-in-portugal/id6832330654";
+// PT_FULL_WIDTH_NAV_V1: one native Telegram button per full-width row.
+// Font size is controlled by Telegram; uppercase labels increase prominence.
+export const MAIN_NAV_MARKUP={inline_keyboard:[
+ [{text:"🎭 АФИША",url:"https://t.me/pt_afisha"}],
+ [{text:"💬 ЧАТ",url:"https://t.me/pt_ryadom_chat"}]
+]};
+async function editWideNavigation(chatId,messageId){
+ if(!token||!chatId||!Number.isSafeInteger(Number(messageId))||Number(messageId)<=0)throw Error("Missing Telegram navigation credentials or message");
+ const resp=await fetch("https://api.telegram.org/bot"+token+"/editMessageReplyMarkup",{
+  method:"POST",headers:{"content-type":"application/json"},
+  body:JSON.stringify({chat_id:String(chatId),message_id:Number(messageId),reply_markup:MAIN_NAV_MARKUP}),
+  signal:AbortSignal.timeout(12000)
+ });
+ const data=await resp.json().catch(()=>({}));
+ if(data.ok===true||/message is not modified/i.test(String(data.description||"")))return;
+ throw Error("Telegram navigation "+resp.status+": "+safe(data.description||"unknown error"));
+}
+async function recordWideNavigation(postId,status,reason=null){
+ await query("INSERT INTO public.pr_post_nav_wide_sync(post_id,status,attempts,applied_at,last_error,updated_at) VALUES($1::uuid,$2,1,CASE WHEN $2='done' THEN now() ELSE NULL END,$3,now()) ON CONFLICT(post_id) DO UPDATE SET status=EXCLUDED.status,attempts=public.pr_post_nav_wide_sync.attempts+1,applied_at=CASE WHEN EXCLUDED.status='done' THEN now() ELSE public.pr_post_nav_wide_sync.applied_at END,last_error=EXCLUDED.last_error,updated_at=now()",[postId,status,reason]);
+}
+async function applyWideNavigation(postId,chatId,messageId){
+ try{
+  await editWideNavigation(chatId,messageId);
+  // Upsert the existing ptnav state to prevent the legacy keyboard worker
+  // from overwriting this new one-row-per-button markup.
+  await query("INSERT INTO public.pr_post_nav_sync(post_id,status,attempts,last_error,updated_at) VALUES($1::uuid,'done',1,NULL,now()) ON CONFLICT(post_id) DO UPDATE SET status='done',last_error=NULL,updated_at=now()",[postId]);
+  await recordWideNavigation(postId,"done");
+  return {ok:true};
+ }catch(e){
+  const error=safe(e?.message||e);
+  try{await recordWideNavigation(postId,"failed",error)}catch{}
+  return {ok:false,error};
+ }
+}
+async function reconcileWideNavigation(){
+ // Existing sent posts are edited IN PLACE, without resending messages.
+ // Retry occasional failures, skip permanent errors and preserve queue order.
+ const rows=await query("SELECT p.id AS post_id,p.telegram_message_id AS message_id,d.telegram_chat_id AS chat_id FROM public.pr_posts p JOIN public.pr_destinations d ON d.code=p.destination_code JOIN public.pr_post_nav_sync n ON n.post_id=p.id AND n.status='done' LEFT JOIN public.pr_post_nav_wide_sync w ON w.post_id=p.id WHERE p.destination_code='main' AND p.status='sent' AND p.sent_at>now()-interval '30 days' AND p.telegram_message_id IS NOT NULL AND d.telegram_chat_id IS NOT NULL AND (w.post_id IS NULL OR (w.status='failed' AND w.attempts<3 AND w.updated_at<now()-interval '20 minutes')) ORDER BY p.sent_at DESC LIMIT 16");
+ const report={checked:rows.length,updated:0,failed:0};
+ for(const p of rows){
+  const nav=await applyWideNavigation(p.post_id,p.chat_id,p.message_id);
+  if(nav.ok)report.updated++;else report.failed++;
+ }
+ return report;
+}
+
 const richUrl=(word,url)=>({type:"url",text:word,url});
 function publicHttps(source){
  try{
@@ -204,10 +250,16 @@ async function execute(){
   try{
    await query("UPDATE public.pr_posts SET status='sent',telegram_message_id=$2::bigint,telegram_photo_message_id=NULL,sent_at=now(),last_error=NULL WHERE id=$1::uuid AND status='sending'",[post.post_id,String(messageId)]);
    report.sent++;
+   if(post.destination_code==="main"){
+    const nav=await applyWideNavigation(post.post_id,post.telegram_chat_id,messageId);
+    if(!nav.ok)report.errors.push({post_id:post.post_id,navigation_only:true,error:nav.error});
+   }
   }catch(e){
    report.errors.push({post_id:post.post_id,needs_manual_reconciliation:true,telegram_message_id:messageId,error:safe(e?.message||e)});
   }
  }
+ try{report.navigation=await reconcileWideNavigation()}
+ catch(e){report.errors.push({navigation_reconcile:true,error:safe(e?.message||e)})}
  return report;
 }
 export default {async fetch(req){
@@ -216,7 +268,7 @@ export default {async fetch(req){
   try{
    const rows=await query("SELECT destination_code,count(*) FILTER(WHERE status IN ('queued','scheduled')) AS pending,min(scheduled_for) FILTER(WHERE status IN ('queued','scheduled')) AS next_due_at,max(sent_at) FILTER(WHERE status='sent') AS last_sent_at FROM public.pr_posts WHERE destination_code IN ('main','afisha') GROUP BY destination_code");
    const channels=Object.fromEntries(rows.map(r=>[r.destination_code,{pending:Number(r.pending||0),next_due_at:r.next_due_at||null,last_sent_at:r.last_sent_at||null}]));
-   return json({service:"portugalia-telegram-publisher",version:5,event_details_bold:true,event_location_maps:true,delivery_format:"RichMessage",ready:!!token&&!!dbConn,channels,policy:{main:{min_interval_minutes:120,quiet_hours_lisbon:"00:00-08:00"},afisha:{min_interval_minutes:0,quiet_hours_lisbon:null}},cron_every_minutes:5,photo_and_article_in_one:true});
+   return json({service:"portugalia-telegram-publisher",version:6,full_width_main_navigation:true,event_details_bold:true,event_location_maps:true,delivery_format:"RichMessage",ready:!!token&&!!dbConn,channels,policy:{main:{min_interval_minutes:120,quiet_hours_lisbon:"00:00-08:00"},afisha:{min_interval_minutes:0,quiet_hours_lisbon:null}},cron_every_minutes:5,photo_and_article_in_one:true});
   }catch(e){return json({service:"portugalia-telegram-publisher",version:5,ready:false,error:safe(e.message)},503);}
  }
  if(path!=="/run"&&path!=="/")return json({error:"Route not found"},404);
