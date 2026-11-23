@@ -2051,15 +2051,23 @@ $("illustrate").onclick=()=>task(async()=>{
  if(isDraftDirty()||$("fVisual").value.trim()!==String(initial.visual_prompt_en||initial.visual_prompt||"").trim())
   await persistCurrent();
  const x=current(),regenerate=Boolean(x.image_storage_path);
+ // Editorial preview is intentionally available BEFORE approving a publication.
+ // Server requires this explicit flag only for pre-approval paid generation.
+ const preapprovalGeneration=![x.status_instagram,x.status_telegram,x.status_telegram_en].includes("approved");
  const confirmation=regenerate?
   "Перегенерировать фото для «"+x.title+"»?\n\nНовая платная генерация. Предыдущее изображение сохранится в архиве; очередь выбранной статьи потребуется утвердить повторно.":
+  preapprovalGeneration?
+  "Создать фото до утверждения статьи «"+x.title+"»?\n\nЭто платная генерация для предпросмотра. Текст останется в приёмке, статья НЕ будет утверждена или опубликована автоматически. После генерации проверьте фото и отдельно утвердите материал.":
   "Создать фото для «"+x.title+"»?\n\nПлатная генерация в едином стиле журнала. Статья НЕ публикуется автоматически.";
  if(!confirm(confirmation))return;
  info(regenerate?"Перегенерирую фото, старое остаётся в архиве…":"Создаю изображение в стиле «НЕТ! СЕРЬЁЗНО?!»…");
  $("illustrate").disabled=true;$("illustrate").textContent="⏳ Генерация фото…";
  $("photoGenStatus").textContent="⏳ Генерация началась. Готовое фото будет сохранено в архив и показано в предпросмотре.";
  try{
-  const result=await api("/items/"+itemId+"/generate-image","POST",{replace_existing:regenerate});
+  const result=await api("/items/"+itemId+"/generate-image","POST",{
+   replace_existing:regenerate,
+   confirm_preapproval_generation:preapprovalGeneration
+  });
   if(!result.item||result.item.visual_status!=="ready"||!result.item.image_storage_path)
    throw Error("Сервер не подтвердил сохранение готового изображения");
   await reload();
