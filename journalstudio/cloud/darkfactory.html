@@ -748,7 +748,7 @@ function select(){
    x.visual_status==="generating"?"⏳ Создаю фото в едином стиле журнала. Повторный запуск заблокирован.":
    x.visual_status==="failed"?"⚠ "+(x.image_generation_error||"Генерация не завершилась")+" · Можно попробовать ещё раз.":
    x.fact_verification==="disputed"?"⚠ Спорный факт: исправьте утверждение до генерации фото.":
-   "✦ Премиальный тёмный редакционный стиль, без надписей. Фото можно создать до проверки факта; публикация отдельно.";
+   "✦ Фото для предпросмотра можно создать до утверждения публикации. Платная генерация потребует подтверждения; текст и очередь не изменятся.";
  genState.style.color=x.visual_status==="failed"?"#ff9d91":x.visual_status==="ready"?"#c1f48e":"";
  $("approveIG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
  $("approveTG").disabled=x.fact_verification!=="verified"||x.visual_status!=="ready";
