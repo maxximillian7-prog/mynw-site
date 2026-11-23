@@ -324,7 +324,8 @@ async function retrofitInstagramBatch(limit=4){
     continue;
    }
    if(!["scheduled","buffer","queued"].includes(String(remote.status||"").toLowerCase())){
-    await err("Buffer post in non-editable status: "+String(remote.status||"unknown"));continue;
+    await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='needs_review',attempts=attempts+1,last_error=$2,updated_at=now() WHERE item_id=$1::uuid AND stage='ready'",[row.item_id,"Existing Buffer post is "+String(remote.status||"unknown")+"; reconcile it before replacement"]).catch(()=>{});
+    report.skipped++;report.items.push({item_id:row.item_id,status:"needs_review",buffer_status:remote.status});continue;
    }
    if(row.scheduled_for && new Date(row.scheduled_for).getTime()<Date.now()+4*60000){
     await err("Queued post is too close to its publishing time; avoid race with Buffer",false);continue;
@@ -358,7 +359,7 @@ export default {async fetch(request){
  }
  if(request.method==="POST"&&url.pathname==="/internal/retrofit"){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
-  try{return json(await retrofitInstagramBatch(4),200,origin)}
+  try{return json(await retrofitInstagramBatch(8),200,origin)}
   catch(e){return json({ok:false,error:String(e.message||e).slice(0,220)},503,origin)}
  }
  if(request.method==="POST"&&url.pathname==="/internal/sync"){
