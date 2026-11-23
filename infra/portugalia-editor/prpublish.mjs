@@ -53,6 +53,7 @@ function footerLine(line,approvedPhotoUrl){
    ||publicHttps(approvedPhotoUrl)?.href||matches[matches.length-1];
   return photo?richUrl("Фото",photo):null;
  }
+ if(/^Наш канал в Инстаграмм:/i.test(source))return ["Наш канал в ",richUrl("Инстаграмм","https://www.instagram.com/pt_ryadom/")];
  if(/^#/.test(source))return source;
  return embeddedLinks(source);
 }
@@ -128,6 +129,9 @@ function richBlocks(preparedText,photoUrl,isAiGenerated=false,isAfisha=false,eve
   }else blocks.push({type:"paragraph",text:embeddedLinks(section)});
  }
  if(isAfisha)blocks.push({type:"paragraph",text:["Больше событий в приложении ",richUrl("Trailyo",TRAILYO_APP_URL),"."]});
+ // Older queued Telegram posts need the same footer, without duplication.
+ if(!full.includes("https://www.instagram.com/pt_ryadom/"))
+   blocks.push({type:"footer",text:["Наш канал в ",richUrl("Инстаграмм","https://www.instagram.com/pt_ryadom/")]});
  if(blocks.length>500)throw Error("Article has too many rich blocks");
  return blocks;
 }
