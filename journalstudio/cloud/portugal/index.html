@@ -578,11 +578,11 @@ async function photoCall(path,options={}){
  return data;
 }
 function choosePreviewPhoto(){
- const i=current?.article||{},media=(current?.media||[]).filter(m=>m.public_url&&((m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type))||(m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&current?.article?.source_code==="trailyo_events"))&&["candidate","approved"].includes(m.status));
+ const i=current?.article||{},media=(current?.media||[]).filter(m=>m.generation_model!=="pt_ryadom_instagram_typography_v1"&&m.public_url&&((m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type))||(m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&current?.article?.source_code==="trailyo_events"))&&["candidate","approved"].includes(m.status));
  return media.find(m=>m.id===previewPhotoId)||media.find(m=>m.public_url===i.photo_url&&m.status==="approved")||media.find(m=>m.status==="approved")||media.find(m=>m.public_url===i.photo_url)||media[0]||null;
 }
 function renderMedia(media){
- const area=$("mediaArea");const options=(media||[]).filter(m=>m.public_url&&((m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type))||(m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&current?.article?.source_code==="trailyo_events"))&&["candidate","approved"].includes(m.status));
+ const area=$("mediaArea");const options=(media||[]).filter(m=>m.generation_model!=="pt_ryadom_instagram_typography_v1"&&m.public_url&&((m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type))||(m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&current?.article?.source_code==="trailyo_events"))&&["candidate","approved"].includes(m.status));
  if(!options.length){area.innerHTML='<div class="imagePending">🖼 Фотографий для этой статьи пока нет. Воспользуйтесь поиском ниже.</div>';return;}
  const chosen=choosePreviewPhoto(),canChange=!!me?.user?.edit&&current?.article?.status==="candidate";
  area.innerHTML='<div class="pt-photo-gallery">'+options.map(m=>{
@@ -692,6 +692,7 @@ function previewFooterLine(text,coverUrl){
   const url=urls.find(x=>/(?:файл|оригинал)\s*:\s*$/i.test(line.slice(0,line.indexOf(x))))||coverUrl||urls[urls.length-1];
   return url?previewLink("Фото",url):"";
  }
+ if(/^Наш канал в Инстаграмм:/i.test(line))return "Наш канал в "+previewLink("Инстаграмм","https://www.instagram.com/pt_ryadom/");
  return /^#/.test(line)?escapeHtml(line):escapeHtml(line).replace(/https:\/\/[^\s&<]+/g,m=>previewLink("Ссылка",m));
 }
 function previewEventMetadata(event){
