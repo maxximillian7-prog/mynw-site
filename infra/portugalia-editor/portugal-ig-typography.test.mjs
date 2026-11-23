@@ -73,6 +73,40 @@ test("Compact Instagram covers keep 8 editorial titles inside a 4-line, <=350px 
  assert.doesNotMatch(design,/let size=88,rowHeight=100/);
 });
 
+
+test("Bright Instagram v3 preserves photo, removes right diamonds and uses ПОРТУГАЛИЯ",()=>{
+ const vmGlobals={window:{}};
+ vm.runInNewContext(design,vmGlobals,{timeout:3000});
+ const api=vmGlobals.window.PortugalInstagramCover;
+ const draws=[],labels=[];
+ const ctx={
+   font:"",createLinearGradient:()=>{throw Error("Photo must not be darkened with a gradient")},
+   drawImage:()=>draws.push(["photo"]),fillRect:(...args)=>draws.push(["fill",...args]),
+   beginPath(){},moveTo(){},arcTo(){},closePath(){},fill(){},stroke(){},
+   save(){},translate(){},rotate:()=>{throw Error("No decorative diamonds")},
+   strokeRect:()=>{throw Error("No decorative diamonds")},restore(){},rect(){},clip(){},
+   measureText:v=>({width:[...String(v)].length*24}),
+   fillText:t=>labels.push(t)
+ };
+ const c={getContext:()=>ctx};
+ api.draw(c,{width:1920,height:1080},
+   "Рейс из Португалии задержали или отменили? Иногда авиакомпания должна до €600",
+   "tips","editorial");
+ assert.equal(c.width,1080);assert.equal(c.height,1350);
+ assert.ok(draws.some(r=>r[0]==="photo"));
+ assert.ok(!draws.some(r=>r[0]==="fill"&&r[3]===1080&&r[4]===1350),
+   "Never paint a global dark rectangle over the original photo");
+ assert.ok(labels.includes("ПОРТУГАЛИЯ / РЯДОМ"));
+ assert.ok(!labels.some(v=>v.includes("PORTUGAL /")||v.includes("◈")));
+ assert.match(design,/rgba\(255,255,255,\.88\)/);
+ assert.ok(!design.includes("ctx.rotate(Math.PI/4)"));
+ assert.ok(!design.includes("const overlay=ctx.createLinearGradient"));
+ assert.match(integration,/p\.design_version===3/);
+ assert.match(integration,/design_version:3/);
+ assert.match(photo,/design_version:3/);
+ assert.match(html,/instagram-cover-design\.js\?v=20261123-bright3/);
+});
+
 test("Telegram has full article and a clickable inline Instagram-word footer",()=>{
  assert.match(telegramSql,/Наш канал в Инстаграмм: https:\/\/www\.instagram\.com\/pt_ryadom\//);
  assert.match(publisher,/richUrl\("Инстаграмм","https:\/\/www\.instagram\.com\/pt_ryadom\/"\)/);
