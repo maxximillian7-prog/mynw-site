@@ -41,16 +41,15 @@ function layoutTitle(ctx,source,maxWidth=895){
   if(rows.length<=4&&rows.length*rowHeight<=275)break;
  }
  if(rows.length>4){
+  size=44;
   const complete=rows.slice(0,3);
   let fourth=rows[3]||"";
-  for(let i=4;i<rows.length;i++){
-   // Never add hidden/unreviewed words when the four-line limit is reached.
-   if(!fourth)break;
-  }
   while(fourth&&ctx.measureText(fourth.replace(/[\s.,;:!—–-]+$/u,"")+"…").width>maxWidth){
-   fourth=fourth.slice(0,Math.max(0,fourth.lastIndexOf(" "))).trim();
+   const cut=fourth.lastIndexOf(" ");
+   if(cut<1)break; // An unusually long word is scaled by canvas fillText.
+   fourth=fourth.slice(0,cut).trim();
   }
-  rows=[...complete,(fourth.replace(/[\s.,;:!—–-]+$/u,"")+"…")];
+  rows=[...complete,fourth.replace(/[\s.,;:!—–-]+$/u,"")+"…"];
  }
  return {rows,size,rowHeight,shortened:rows.join(" ")!==title};
 }
