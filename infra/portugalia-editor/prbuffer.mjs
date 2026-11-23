@@ -331,16 +331,22 @@ async function rapidReplacementTick(){
    const remote=await bufferPostStatus(ongoing.replacement_buffer_post_id);
    const status=String(remote?.status||"").toLowerCase();
    if(!remote||remote.id!==ongoing.replacement_buffer_post_id) return await rapidMarkReview(ongoing,"Buffer no longer returns this replacement ID");
-   if(status==="sent")return {ok:true,...await rapidMarkSent(ongoing,remote),count:await rapidReplacementStatus()};
-   if(status==="error"||status==="failed")return await rapidMarkReview(ongoing,"Buffer/Instagram publishing failed: "+status);
-   if(ongoing.last_request_at&&Date.now()-Date.parse(ongoing.last_request_at)>10*60000)
-      return await rapidMarkReview(ongoing,"Instagram publication not confirmed for 10 minutes; check Buffer and Instagram before retry");
-   if(ongoing.state==="submitting"&&status==="draft"){
-    // An ambiguous network response can leave a draft unchanged; never
-    // auto-send a second time without a human check.
-    return await rapidMarkReview(ongoing,"Publishing response was ambiguous; draft remains");
+   if(status==="sent"){
+    await rapidMarkSent(ongoing,remote);
+    // This same minute's tick may submit the next waiting article below,
+    // preserving one actual outgoing submission per minute rather than
+    // wasting every second tick on status confirmation.
+   }else{
+    if(status==="error"||status==="failed")return await rapidMarkReview(ongoing,"Buffer/Instagram publishing failed: "+status);
+    if(ongoing.last_request_at&&Date.now()-Date.parse(ongoing.last_request_at)>10*60000)
+       return await rapidMarkReview(ongoing,"Instagram publication not confirmed for 10 minutes; check Buffer and Instagram before retry");
+    if(ongoing.state==="submitting"&&status==="draft"){
+     // An ambiguous network response can leave a draft unchanged; never
+     // auto-send a second time without a human check.
+     return await rapidMarkReview(ongoing,"Publishing response was ambiguous; draft remains");
+    }
+    return {ok:true,action:"waiting_for_instagram_delivery",ordinal:ongoing.ordinal,remote_status:status,count:tally};
    }
-   return {ok:true,action:"waiting_for_instagram_delivery",ordinal:ongoing.ordinal,remote_status:status,count:tally};
   }catch(e){return {ok:false,action:"reconciliation_error",error:String(e.message||e).slice(0,200),count:tally}}
  }
  const last=(await sql("SELECT max(last_request_at) AS last_at FROM public.pr_instagram_rapid_replace_20261123"))[0]?.last_at;
