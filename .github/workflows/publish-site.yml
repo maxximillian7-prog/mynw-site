@@ -36,6 +36,8 @@ jobs:
           grep -q 'href="/qwin/docs/"' qwin/index.html
       - name: Validate Qwin site policies and 3 languages
         run: node qwin/check-docs.mjs
+      - name: Test Seriously image previews before editorial approval
+        run: node --test infra/darkfactory/preview-approval.test.mjs
       - name: Audit original brand logos and portfolio imagery
         run: node scripts/check-case-studies.mjs
       - name: Configure Pages
