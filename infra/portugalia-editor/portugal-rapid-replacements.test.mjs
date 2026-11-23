@@ -9,7 +9,8 @@ test("Fast replacement is a separate authenticated Neon task, not the new-articl
  assert.match(publisher,/x-neon-trigger-invocation-id/);
  assert.match(publisher,/async function rapidReplacementTick\(\)/);
  assert.match(publisher,/async function refillInstagramQueue\(\)/);
- assert.match(publisher,/paused_while_old_replacements_republish/);
+ assert.match(publisher,/async function reconcileInterleavedReplacements/);
+ assert.match(publisher,/const old=wait\|\|oldBlocked\?null:/);
 });
 test("Only existing approved replacement Buffer IDs are shared now; never create or delete Instagram originals",()=>{
  const a=publisher.indexOf("async function rapidReplacementTick()");
