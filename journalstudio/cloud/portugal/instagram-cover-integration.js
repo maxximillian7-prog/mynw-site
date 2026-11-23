@@ -62,6 +62,7 @@ async function draw(){
 async function refresh(){
  if(!current?.article?.id||!el("ptIgCoverComposer"))return;
  const i=current.article;
+ const expectedArticleId=i.id;
  const ready=attachedCover(i,"approved");
  const hasOriginal=Boolean(i.photo_url);
  if(ready&&el("headline")?.value?.trim()===i.headline_ru)note("✓ Обложка уже утверждена для Instagram. В Telegram остаётся оригинал.");
@@ -69,15 +70,21 @@ async function refresh(){
  else note("Сначала выберите фото в разделе выше.",true);
  try{
   const result=await draw();
-  if(!result)return;
-  const phone=document.querySelector(".ig-phone img.ig-cover");
+  if(!result||current?.article?.id!==expectedArticleId)return;
+  // Always update the actual phone poster, even if an older preview
+  // already replaced its IMG with a CANVAS. A one-shot IMG query left old
+  // diamonds/dark gradients permanently visible until a full iframe reload.
+  const phone=document.querySelector(".ig-phone .ig-cover, .ig-phone .ig-cover-canvas");
   if(phone&&current?.article?.id===result.item.id){
    const approved=attachedCover(i,"approved");
    if(approved&&!dirty&&el("headline")?.value?.trim()===i.headline_ru){
-    phone.src=approved.public_url;
+    const image=document.createElement("img");
+    image.className="ig-cover";image.src=approved.public_url;
+    image.alt="Утверждённая светлая Instagram-обложка с русским заголовком";
+    phone.replaceWith(image);
    }else{
     const canvas=document.createElement("canvas");
-    canvas.className="ig-cover-canvas";canvas.setAttribute("aria-label","Предпросмотр фирменной обложки Instagram");
+    canvas.className="ig-cover-canvas";canvas.setAttribute("aria-label","Instagram-обложка: фото без затемнения и ромбиков, ПОРТУГАЛИЯ");
     const bmp=await createImageBitmap(result.blob);
     try{window.PortugalInstagramCover.draw(canvas,bmp,result.item.title,result.item.category,selection())}finally{bmp.close()}
     phone.replaceWith(canvas);
