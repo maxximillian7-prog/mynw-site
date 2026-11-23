@@ -249,7 +249,7 @@ function jpegDimensions(bytes){
   }
   return null;
 }
-async function uploadInstagramCover(itemId,raw){
+async function uploadInstagramCover(itemId,raw,headline,variant){
   if(!uuid(itemId)||typeof raw!=="string"||raw.length>3_200_000||
      !/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(raw))
      throw bad("Нужна JPEG-обложка 1080×1350 до 2 МБ",422);
@@ -261,6 +261,7 @@ async function uploadInstagramCover(itemId,raw){
      throw bad("Неверные размеры или формат Instagram-обложки",422);
   const [i]=await db("SELECT i.status,i.photo_url,i.photo_rights,d.id draft_id,d.headline_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
   if(!i||!["candidate","approved"].includes(i.status))throw bad("Редактирование недоступно",409);
+  if(String(headline||"").trim()!==String(i.headline_ru||"").trim()||!["editorial","noir","sunset"].includes(variant))throw bad("Заголовок или стиль изменились — обновите обложку",409);
   const [source]=await db("SELECT m.id,m.media_type,m.rights_verified,m.attribution,m.license_details FROM pr_media_assets m WHERE m.item_id=$1::uuid AND m.public_url=$2 AND m.rights_verified=true AND m.status IN ('candidate','approved') ORDER BY m.status='approved' DESC LIMIT 1",[itemId,i.photo_url]);
   if(!source||!["cc_licensed","owned","permission_confirmed"].includes(i.photo_rights))throw bad("Нужно фото с подтверждёнными правами",409);
   const uploaded=await db("SELECT count(*)::int n FROM pr_media_assets WHERE item_id=$1::uuid AND generation_model=$2 AND created_at>now()-interval '24 hours'",[itemId,IG_TYPO]);
@@ -269,7 +270,8 @@ async function uploadInstagramCover(itemId,raw){
   const url=await putCover(key,bytes);
   const kind=source.media_type;
   const credit="Instagram typography overlay (1080x1350), source: "+String(source.attribution||"").slice(0,250);
-  const [asset]=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,storage_bucket,storage_key,public_url,attribution,license_details,rights_verified,illustration_label_required,status) VALUES($1::uuid,$2::uuid,$3,$4,$5,$6,$7,$8,$9,true,$10,'candidate') RETURNING id",[itemId,i.draft_id,kind,IG_TYPO,BKT,key,url,credit,String(source.license_details||"")+"\nDerived with exact title typography; original rights preserved.",kind==="generated_illustration"]);
+  const origin=JSON.stringify({headline:String(i.headline_ru||"").trim(),source_photo_url:i.photo_url,variant});
+  const [asset]=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,storage_bucket,storage_key,public_url,attribution,license_details,rights_verified,illustration_label_required,status) VALUES($1::uuid,$2::uuid,$3,$4,$5,$6,$7,$8,$9,$10,true,$11,'candidate') RETURNING id",[itemId,i.draft_id,kind,IG_TYPO,origin,BKT,key,url,credit,String(source.license_details||"")+"\nDerived with exact title typography; original rights preserved.",kind==="generated_illustration"]);
   return {media_id:asset.id,image_url:url,needs_approval:true,instagram_only:true};
 }
 
@@ -290,7 +292,7 @@ if(req.method==="GET"&&u.pathname==="/api/instagram/source"){
 if(req.method==="POST"&&u.pathname==="/api/instagram/cover"){
  const raw=await req.text();if(raw.length>3_300_000)throw bad("Слишком большой JPEG",413);
  const body=JSON.parse(raw||"{}");
- return result(await uploadInstagramCover(body.item_id,body.data_url),200,origin);
+ return result(await uploadInstagramCover(body.item_id,body.data_url,body.headline,body.variant),200,origin);
 }
 if(req.method==="POST"&&u.pathname==="/api/generate"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком большой запрос");const b=JSON.parse(raw||"{}");if(b.quality&&b.quality!=="medium")throw bad("Сейчас поддерживается качество Medium");return result(await generateMediumCover(b.item_id),200,origin);}
 return result({error:"Not found"},404,origin);
