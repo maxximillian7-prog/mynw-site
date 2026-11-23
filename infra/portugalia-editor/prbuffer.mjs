@@ -347,7 +347,8 @@ async function schedule(id,options,userId){
  if(["published","publishing","preparing","container_created"].includes(original.status)||(original.status==="queued"&&options.schedule_mode!=="now"))return {ok:true,already_scheduled:true,buffer_post_id:original.buffer_post_id,scheduled_for:original.scheduled_for};
  if(!["draft","awaiting_approval","failed","queued"].includes(original.status))throw fail("Подготовка Instagram не завершена: "+original.status,409);
  const media=await verifyMedia(original);
- if(options.schedule_mode!=="now" && (await instagramCapacity())>=BUFFER_PENDING_CAP){
+ if(options.schedule_mode!=="now" && ((await instagramCapacity())>=BUFFER_PENDING_CAP ||
+   (await sql("SELECT EXISTS(SELECT 1 FROM public.pr_instagram_retrofit_20261123 WHERE stage='draft_created' AND replacement_buffer_post_id IS NOT NULL) AS has_older"))[0]?.has_older===true)){
   await sql("INSERT INTO public.pr_instagram_waitlist_4slots(item_id,publication_id,queued_by,request_mode,state) VALUES($1::uuid,$2::uuid,$3,$4,'waiting') ON CONFLICT(item_id) DO UPDATE SET queued_by=EXCLUDED.queued_by,request_mode=EXCLUDED.request_mode,updated_at=now() WHERE public.pr_instagram_waitlist_4slots.state IN ('waiting','needs_review')",
    [id,original.id,userId,"automatic"]);
   return {ok:true,waitlisted:true,buffer_queue_full:true,limit:BUFFER_PENDING_CAP,message:"Одобрено. Очередь Buffer 10/10; материал поставлен в резерв и будет автоматически опубликован в ближайший свободный слот 08:00/13:00/18:00/23:00 (Лиссабон)."};
@@ -397,7 +398,13 @@ async function schedule(id,options,userId){
   await sql("INSERT INTO public.pr_instagram_delivery_events(publication_id,event_type,meta_object_id) VALUES($1::uuid,$2,$3)",[original.id,immediate?"buffer_share_now_requested":"buffer_scheduled",result.post.id]);
   return {ok:true,scheduled:!immediate,dispatched:immediate,published,buffer_post_id:result.post.id,scheduled_for:dueAt,status:result.post.status,optimized_image:deliveryImageUrl!==original.image_url};
  }catch(e){
-  await sql("UPDATE public.pr_instagram_publications SET status='failed',last_error=$2,updated_at=now() WHERE id=$1::uuid",[original.id,String(e.message||"Buffer error").slice(0,250)]).catch(()=>{});
+  const error=String(e.message||"Buffer error");
+  if(!immediate && /scheduled posts limit reached|10 scheduled posts out of 10 allowed|posts limit reached/i.test(error)){
+   await sql("UPDATE public.pr_instagram_publications SET status='awaiting_approval',last_error=NULL,updated_at=now() WHERE id=$1::uuid AND status='preparing' AND buffer_post_id IS NULL",[original.id]);
+   await sql("INSERT INTO public.pr_instagram_waitlist_4slots(item_id,publication_id,queued_by,request_mode,state) VALUES($1::uuid,$2::uuid,$3,'automatic','waiting') ON CONFLICT(item_id) DO UPDATE SET state='waiting',queued_by=EXCLUDED.queued_by,updated_at=now() WHERE public.pr_instagram_waitlist_4slots.state IN ('waiting','needs_review')",[id,original.id,userId]);
+   return {ok:true,waitlisted:true,buffer_queue_full:true,limit:BUFFER_PENDING_CAP,message:"Buffer 10/10: статья принята в резерв автоматической публикации по 4 фиксированным часам."};
+  }
+  await sql("UPDATE public.pr_instagram_publications SET status='failed',last_error=$2,updated_at=now() WHERE id=$1::uuid",[original.id,error.slice(0,250)]).catch(()=>{});
   throw e;
  }
 }
