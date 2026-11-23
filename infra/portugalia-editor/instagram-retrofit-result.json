@@ -131,13 +131,25 @@
     },
     {
       "item_id": "7f61ce71-9c14-43ca-909d-8e3c7d212341",
-      "status": "failed",
-      "error": "Original image host not approved: commons.wikimedia.org"
+      "status": "ready",
+      "files": [
+        "journalstudio/instagram-retrofit/7f61ce71-9c14-43ca-909d-8e3c7d212341.jpg",
+        "journalstudio/instagram-retrofit/7f61ce71-9c14-43ca-909d-8e3c7d212341-text-1.jpg",
+        "journalstudio/instagram-retrofit/7f61ce71-9c14-43ca-909d-8e3c7d212341-text-2.jpg",
+        "journalstudio/instagram-retrofit/7f61ce71-9c14-43ca-909d-8e3c7d212341-text-3.jpg",
+        "journalstudio/instagram-retrofit/7f61ce71-9c14-43ca-909d-8e3c7d212341-text-4.jpg"
+      ]
     },
     {
       "item_id": "269bd0e5-758c-4dba-9453-47a051e4c257",
-      "status": "failed",
-      "error": "Original image host not approved: commons.wikimedia.org"
+      "status": "ready",
+      "files": [
+        "journalstudio/instagram-retrofit/269bd0e5-758c-4dba-9453-47a051e4c257.jpg",
+        "journalstudio/instagram-retrofit/269bd0e5-758c-4dba-9453-47a051e4c257-text-1.jpg",
+        "journalstudio/instagram-retrofit/269bd0e5-758c-4dba-9453-47a051e4c257-text-2.jpg",
+        "journalstudio/instagram-retrofit/269bd0e5-758c-4dba-9453-47a051e4c257-text-3.jpg",
+        "journalstudio/instagram-retrofit/269bd0e5-758c-4dba-9453-47a051e4c257-text-4.jpg"
+      ]
     },
     {
       "item_id": "3f4bddfd-555d-4359-b81b-779f11f7b053",
