@@ -41,7 +41,7 @@ test("Telegram has full article and a clickable inline Instagram-word footer",()
  assert.match(telegramSql,/Наш канал в Инстаграмм: https:\/\/www\.instagram\.com\/pt_ryadom\//);
  assert.match(publisher,/richUrl\("Инстаграмм","https:\/\/www\.instagram\.com\/pt_ryadom\/"\)/);
  assert.match(publisher,/blocks\.push\(\{type:"footer",text:\["Наш канал в ",richUrl\("Инстаграмм"/);
- assert.match(publisher,/if\(\^Наш канал в Инстаграмм:/);
+ assert.ok(publisher.includes('return null; // always placed as the last footer below'));
  assert.match(html,/previewLink\("Инстаграмм","https:\/\/www\.instagram\.com\/pt_ryadom\/"\)/);
  assert.match(publisher,/const blocks=\[\{type:"photo"/);
  assert.match(telegramSql,/nullif\(trim\(x\.story\),''\)/);
