@@ -14,7 +14,7 @@ test("Seriously photo preview explicitly confirms paid generation before article
  assert.match(handler,/confirm_preapproval_generation:preapprovalGeneration/);
  assert.ok(handler.indexOf("if(!confirm(confirmation))return") <
    handler.indexOf('await api("/items/"+itemId+"/generate-image"'),"Never incur image costs before explicit confirmation");
- assert.match(handler,/Статья НЕ будет утверждена или опубликована автоматически/);
+ assert.match(handler,/статья НЕ будет утверждена или опубликована автоматически/i);
 });
 
 test("Image previews do not approve or publish editorial content",()=>{
