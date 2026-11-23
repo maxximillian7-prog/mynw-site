@@ -270,7 +270,7 @@ async function uploadInstagramCover(itemId,raw,headline,variant){
   const url=await putCover(key,bytes);
   const kind=source.media_type;
   const credit="Instagram typography overlay (1080x1350), source: "+String(source.attribution||"").slice(0,250);
-  const origin=JSON.stringify({headline:String(i.headline_ru||"").trim(),source_photo_url:i.photo_url,variant});
+  const origin=JSON.stringify({headline:String(i.headline_ru||"").trim(),source_photo_url:i.photo_url,variant,design_version:2});
   const [asset]=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,storage_bucket,storage_key,public_url,attribution,license_details,rights_verified,illustration_label_required,status) VALUES($1::uuid,$2::uuid,$3,$4,$5,$6,$7,$8,$9,$10,true,$11,'candidate') RETURNING id",[itemId,i.draft_id,kind,IG_TYPO,origin,BKT,key,url,credit,String(source.license_details||"")+"\nDerived with exact title typography; original rights preserved.",kind==="generated_illustration"]);
   return {media_id:asset.id,image_url:url,needs_approval:true,instagram_only:true};
 }
