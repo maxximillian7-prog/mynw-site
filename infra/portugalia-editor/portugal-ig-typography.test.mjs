@@ -80,7 +80,7 @@ test("Only image-based Instagram posts; no Reels. Editor and Buffer keep full co
  assert.match(html,/const room=Math\.min\(1900/);
  assert.match(html,/const story=String\(f\.story_ru\|\|""\)\.trim\(\)/);
  assert.match(design,/toDataURL\("image\/jpeg"/);
- assert.match(photo,/data:image\\/jpeg;base64/);
+ assert.ok(photo.includes('"data:image/jpeg;base64,"'));
  assert.match(html,/instagram-cover-design\.js/);
  assert.match(html,/instagram-cover-integration\.js/);
 });
