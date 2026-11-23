@@ -9,7 +9,7 @@
     "rights": "Droits sur les données",
     "deletion": "Supprimer le compte",
     "support": "Support",
-    "updated": "Mis à jour : 6 octobre 2026",
+    "updated": "Dernière mise à jour : 23 novembre 2026",
     "back": "Tous les documents NowGreen",
     "footer": "© 2026 NowGreen / NowApps.",
     "developer": "Développeur et responsable des données",
@@ -128,6 +128,12 @@
           "h": "7. Sécurité",
           "p": [
             "NowGreen utilise un accès authentifié et des contrôles au niveau des lignes pour les données utilisateur. N’importez pas de données personnelles que vous n’êtes pas autorisé à traiter."
+          ]
+        },
+        {
+          "h": "Traitement via OpenAI et votre consentement",
+          "p": [
+            "Pour les fonctions IA demandées, descriptions de plantes et jardins, données de projets, notes, historique de soins, questions et photos sélectionnées peuvent être transmises via le serveur Supabase de NowGreen à OpenAI (API OpenAI) pour identification, conseils et génération d’images. Sur iOS, une autorisation affirmative distincte identifiant OpenAI est demandée avant l’envoi. Vous pouvez refuser et utiliser les fonctions sans IA, ou retirer votre accord dans Paramètres → Partage de données avec OpenAI. Les crédits IA sont indépendants."
           ]
         }
       ]
@@ -268,6 +274,12 @@
           "h": "5. Génération d’images",
           "p": [
             "Les aperçus et visualisations générés peuvent différer de la réalité et inventer des détails visuels. Ce sont des aides à la conception, pas des plans de construction ni une garantie de survie des plantes."
+          ]
+        },
+        {
+          "h": "Traitement via OpenAI et votre consentement",
+          "p": [
+            "Pour les fonctions IA demandées, descriptions de plantes et jardins, données de projets, notes, historique de soins, questions et photos sélectionnées peuvent être transmises via le serveur Supabase de NowGreen à OpenAI (API OpenAI) pour identification, conseils et génération d’images. Sur iOS, une autorisation affirmative distincte identifiant OpenAI est demandée avant l’envoi. Vous pouvez refuser et utiliser les fonctions sans IA, ou retirer votre accord dans Paramètres → Partage de données avec OpenAI. Les crédits IA sont indépendants."
           ]
         }
       ]
