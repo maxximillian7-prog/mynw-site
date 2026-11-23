@@ -54,11 +54,11 @@ async function applyWideNavigation(postId,chatId,messageId){
 async function reconcileWideNavigation(){
  // Existing sent posts are edited IN PLACE, without resending messages.
  // Retry occasional failures, skip permanent errors and preserve queue order.
- const rows=await query("SELECT p.id AS post_id,p.telegram_message_id AS message_id,d.telegram_chat_id AS chat_id FROM public.pr_posts p JOIN public.pr_destinations d ON d.code=p.destination_code JOIN public.pr_post_nav_sync n ON n.post_id=p.id AND n.status='done' LEFT JOIN public.pr_post_nav_wide_sync w ON w.post_id=p.id WHERE p.destination_code='main' AND p.status='sent' AND p.sent_at>now()-interval '30 days' AND p.telegram_message_id IS NOT NULL AND d.telegram_chat_id IS NOT NULL AND (w.post_id IS NULL OR (w.status='failed' AND w.attempts<3 AND w.updated_at<now()-interval '20 minutes')) ORDER BY p.sent_at DESC LIMIT 16");
+ const rows=await query("SELECT p.id AS post_id,p.telegram_message_id AS message_id,d.telegram_chat_id AS chat_id FROM public.pr_posts p JOIN public.pr_destinations d ON d.code=p.destination_code JOIN public.pr_post_nav_sync n ON n.post_id=p.id AND n.status='done' LEFT JOIN public.pr_post_nav_wide_sync w ON w.post_id=p.id WHERE p.destination_code='main' AND p.status='sent' AND p.sent_at>now()-interval '30 days' AND p.telegram_message_id IS NOT NULL AND d.telegram_chat_id IS NOT NULL AND (w.post_id IS NULL OR (w.status='failed' AND w.attempts<3 AND w.updated_at<now()-interval '20 minutes')) ORDER BY p.sent_at DESC LIMIT 2");
  const report={checked:rows.length,updated:0,failed:0};
  for(const p of rows){
   const nav=await applyWideNavigation(p.post_id,p.chat_id,p.message_id);
-  if(nav.ok)report.updated++;else report.failed++;
+  if(nav.ok)report.updated++;else {report.failed++;if(/\b429\b|Too Many Requests/i.test(nav.error||"")){report.rate_limited=true;break;}}
  }
  return report;
 }
