@@ -267,7 +267,7 @@ async function retrofitInstagramBatch(limit=4){
   "JOIN public.pr_items i ON i.id=r.item_id "+
   "WHERE r.stage='ready' AND r.attempts<3 AND p.status IN ('queued','published') "+
   "AND p.buffer_post_id IS NOT NULL AND i.status='approved' "+
-  "ORDER BY CASE WHEN p.status='queued' THEN 0 ELSE 1 END,p.scheduled_for NULLS LAST,r.created_at LIMIT $1",[size]);
+  "ORDER BY CASE WHEN p.status='published' THEN 0 ELSE 1 END,p.scheduled_for NULLS LAST,r.created_at LIMIT $1",[size]);
  const report={ok:true,checked:rows.length,queued_updated:0,drafts_created:0,already_sent:0,skipped:0,failed:0,items:[]};
  for(const row of rows){
   const err=async(message,failed=true)=>{
