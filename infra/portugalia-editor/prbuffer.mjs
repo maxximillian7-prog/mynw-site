@@ -210,7 +210,7 @@ async function nextInstagramDueAt(){
 }
 function isBufferQueued(status){return ["scheduled","buffer","queued"].includes(String(status||"").toLowerCase())}
 async function bufferPostStatus(id){
- const data=await buffer("query FourSlotGetPost($input:PostInput!){post(input:$input){id status dueAt sentAt text}}",{input:{id}});
+ const data=await buffer("query FourSlotGetPost($input:PostInput!){post(input:$input){id status dueAt sentAt text error{message rawError supportUrl}}}",{input:{id}});
  return data.post;
 }
 async function reconcileInstagramPending(){
@@ -322,7 +322,20 @@ async function rapidMarkReview(row,reason){
 }
 async function rapidReplacementTick(){
  const tally=await rapidReplacementStatus();
- if(tally.needs_review>0)return {ok:true,action:"paused_for_review",count:tally};
+ if(tally.needs_review>0){
+  const failed=(await sql("SELECT item_id,ordinal,replacement_buffer_post_id,last_error FROM public.pr_instagram_rapid_replace_20261123 WHERE state='needs_review' ORDER BY ordinal LIMIT 1"))[0];
+  if(failed){
+   try{
+    const p=await bufferPostStatus(failed.replacement_buffer_post_id);
+    if(p?.error?.message){
+     const detail="Instagram/Buffer: "+String(p.error.message).slice(0,190);
+     await sql("UPDATE public.pr_instagram_rapid_replace_20261123 SET last_error=$2,updated_at=now() WHERE item_id=$1::uuid AND state='needs_review' AND last_error IS DISTINCT FROM $2",[failed.item_id,detail]);
+     return {ok:true,action:"paused_for_review",ordinal:failed.ordinal,error:detail,count:tally};
+    }
+   }catch(e){console.error("PR_IG_RAPID_DIAGNOSTIC",String(e.message||e).slice(0,200))}
+  }
+  return {ok:true,action:"paused_for_review",error:failed?.last_error,count:tally};
+ }
  if(tally.waiting+tally.submitting+tally.submitted===0)return {ok:true,action:"complete",count:tally};
  // Serialize ambiguous/in-flight requests: no two shareNow calls at once.
  const ongoing=(await sql("SELECT ordinal,item_id,replacement_buffer_post_id,last_request_at,state FROM public.pr_instagram_rapid_replace_20261123 WHERE state IN ('submitting','submitted') ORDER BY ordinal LIMIT 1"))[0];
@@ -337,7 +350,7 @@ async function rapidReplacementTick(){
     // preserving one actual outgoing submission per minute rather than
     // wasting every second tick on status confirmation.
    }else{
-    if(status==="error"||status==="failed")return await rapidMarkReview(ongoing,"Buffer/Instagram publishing failed: "+status);
+    if(status==="error"||status==="failed")return await rapidMarkReview(ongoing,"Buffer/Instagram publishing failed: "+String(remote.error?.message||status));
     if(ongoing.last_request_at&&Date.now()-Date.parse(ongoing.last_request_at)>10*60000)
        return await rapidMarkReview(ongoing,"Instagram publication not confirmed for 10 minutes; check Buffer and Instagram before retry");
     if(ongoing.state==="submitting"&&status==="draft"){
