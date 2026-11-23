@@ -23,7 +23,7 @@ function attachedCover(i=current?.article,status="approved"){
  const matches=(current?.media||[]).filter(m=>m.generation_model===MODEL&&m.status===status&&m.public_url);
  const head=String(el("headline")?.value||i?.headline_ru||"").trim();
  return matches.find(m=>{
-  try{const p=JSON.parse(m.generation_prompt||"{}");return p.headline===head&&p.source_photo_url===i.photo_url}
+  try{const p=JSON.parse(m.generation_prompt||"{}");return p.headline===head&&p.source_photo_url===i.photo_url&&p.variant===selection()}
   catch{return false}
  })||null;
 }
@@ -93,6 +93,16 @@ function onPreview(){
  onPreview.timer=setTimeout(refresh,180);
 }
 async function save({approve=false}={}){
+ // Save text first if the headline was edited, so both the poster and the
+ // database staging guard refer to the exact same reviewed headline.
+ if(dirty){
+  if(current?.article?.status==="approved")throw Error("Утверждённую статью сначала верните к правкам");
+  const id=current?.article?.id;
+  if(!id)throw Error("Сначала откройте статью");
+  await call("/api/save",{method:"POST",body:{item_id:id,fields:gather()}});
+  dirty=false;
+  await refreshSelected();
+ }
  const original=info(),existing=attachedCover(current.article,"approved");
  if(existing&&!dirty&&el("headline")?.value?.trim()===current.article.headline_ru)return existing;
  const candidate=attachedCover(current.article,"candidate");
