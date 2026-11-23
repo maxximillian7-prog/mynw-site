@@ -42,7 +42,7 @@ def wrap(draw,text,ft,max_width):
 def load_photo(url):
  if not url or not url.startswith("https://"):raise ValueError("Missing HTTPS original image")
  host=urllib.parse.urlsplit(url).hostname or ""
- if host not in {"thumb.wikimedia.org","upload.wikimedia.org","br-young-paper-b972wmgd.storage.c-7.eu-central-1.aws.neon.tech","images.unsplash.com","images.pexels.com","cdn.pixabay.com","live.staticflickr.com"}:
+ if host not in {"thumb.wikimedia.org","upload.wikimedia.org","commons.wikimedia.org","br-young-paper-b972wmgd.storage.c-7.eu-central-1.aws.neon.tech","images.unsplash.com","images.pexels.com","cdn.pixabay.com","live.staticflickr.com"}:
   raise ValueError("Original image host not approved: "+host)
  headers={"User-Agent":"Portugal-Ryadom-Editorial-Cover/2.0 (https://mynw.app); contact: editorial"}
  resp=requests.get(url,headers=headers,timeout=25)
