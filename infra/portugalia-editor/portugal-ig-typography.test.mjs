@@ -42,7 +42,7 @@ test("Compact Instagram covers keep 8 editorial titles inside a 4-line, <=350px 
  vm.runInNewContext(design,sandbox,{timeout:3000});
  const {layoutTitle,HEIGHT}=sandbox.window.PortugalInstagramCover;
  const ctx={font:"",measureText(value){
-  const size=Number(this.font.match(/(\\d+)px/)?.[1]||60);
+  const size=Number(this.font.match(/(\d+)px/)?.[1]||60);
   return {width:[...String(value)].length*size*.53};
  }};
  const titles=[
