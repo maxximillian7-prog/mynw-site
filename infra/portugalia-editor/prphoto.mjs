@@ -166,30 +166,152 @@ async function putCover(key,image){
  if(!res.ok)throw bad("Не удалось сохранить изображение в Neon Storage ("+res.status+")",503);
  return uploadURL;
 }
-function coverPrompt(info){
- const title=plain(info.headline_ru||info.title_ru||info.title_original).slice(0,230);
- const city=plain(info.location_city||info.location_region||"Португалия").slice(0,100);
- const desc=plain(info.story_ru||info.summary_ru).slice(0,900);
- if(title.length<8||desc.length<80)throw bad("Для генерации нужен полноценный текст статьи",422);
- return "Create ONE premium PHOTOREALISTIC 3:2 landscape editorial cover image, like a beautiful professional photograph for the Portuguese information magazine Portugal Ryadom. Render with natural camera realism, NOT as a painting, cartoon, drawing, digital illustration, collage, or 3D render. "+
- "Subject: "+title+". Location/context: "+city+". Article context: "+desc+". "+
- "Accurately portray a plausible authentic Portuguese setting and the article's main subject. Use a single unmistakable focal point, convincing real-world geometry, realistic people only where appropriate, natural skin and material textures, believable architecture, nuanced daylight and shadows, editorial composition, precise focus, realistic depth of field, fine detail, natural color and restrained contrast. "+
- "Visual quality should resemble high-end travel, architecture, lifestyle or nature photography made with a full-frame camera; vivid but never oversaturated, no plastic skin, fantasy glow, artificial-looking faces, uncanny elements or fake lens effects. Frame the subject for a clear Telegram thumbnail. "+
- "For a current event, named individual or institution, make a generic photorealistic conceptual scene or neutral location-based visual instead of fabricating a photograph of a real event or action. Do not depict identifiable real people or claim to record something that happened. "+
- "NO text, NO readable writing, NO watermarks, NO logos, NO fake passports, documents, ID cards, government forms, official seals or copyrighted artwork. "+
- "Image is an AI-generated photorealistic editorial visualization, not documentary evidence. Produce one professional JPEG image at 1536x1024 landscape; medium generation quality.";
+// PT_VISUAL_RULE_V2: editorial-specific image, no generic city-and-model stock scene.
+// The image direction is selected by topic, with recent compositions discouraged.
+const VISUAL_TOPICS=[
+ ["credit",/кредит|ипотек|банк|r[aá]ce|долг|финанс|пенси|зарплат|бюджет|налог|irs|fatura/i,[
+  ["budget_objects","object","a calculator, euro coins and a plain notebook on a real Portuguese kitchen table"],
+  ["bank_consultation","environment","an empty consultation desk with folders, a pen and a small calculator"],
+  ["household_finances","hands","adult hands arranging coins and a blank paper budget, no face"]]],
+ ["shopping",/магазин|покупк|товар|возврат|продавц|арбитраж|потребител|доставк|посылк|почт|ctt/i,[
+  ["retail_return","object","an opened parcel, an ordinary purchased object and a plain blank receipt"],
+  ["counter_details","environment","a Portuguese shop counter with a bag and an everyday household item, no brand"],
+  ["package_hands","hands","adult hands checking the contents of a cardboard parcel, no face"]]],
+ ["reading",/книг|библиотек|biblioled|чтен|литератур|писател/i,[
+  ["books_headphones","object","an open book and simple headphones near a ceramic mug"],
+  ["shelves","environment","a close angled view through authentic library shelves and a reading lamp"],
+  ["book_details","object","a macro view of paper pages and a closed book, no legible writing"]]],
+ ["school",/школ|учител|ученик|ребёнк|ребенк|детск|ясл|creche|образован|буллинг|травл|родител/i,[
+  ["school_supplies","object","school notebooks, pencils and a backpack on a classroom table"],
+  ["classroom","environment","a quiet empty Portuguese classroom with everyday school furniture"],
+  ["learning_action","hands","only hands arranging simple learning materials on a desk, no student faces"]]],
+ ["pets",/питомц|кошк|собак|siac|ветеринар|животн|приют/i,[
+  ["candid_pet","animal","a candid dog or cat at home, its natural expression and posture in focus"],
+  ["vet_details","animal","an animal resting beside a plain collar in a generic veterinary setting"],
+  ["animal_paw","animal","a close-up of an animal's paw and simple pet accessories, no person"]]],
+ ["official",/документ|aima|полици|psp|gnr|жалоб|регистрац|паспорт|консуль|госуслуг|заявлен|правов|справк/i,[
+  ["unmarked_folders","object","unmarked paper folders and a pen on a neutral public-service counter"],
+  ["service_area","environment","an empty ordinary public-service waiting area without government logos"],
+  ["paperwork","hands","only adult hands sorting blank pages into a folder beside a keyboard"]]],
+ ["housing",/аренд|жиль|жилищ|квартир|недвиж|сосед|домовлад|стен|окн|утеплен|ремонт/i,[
+  ["home_keys","object","plain house keys and a folder in an apartment interior"],
+  ["apartment_details","environment","a realistic Portuguese apartment corner with textured wall and window light"],
+  ["home_materials","object","an architectural close-up of walls, frame and insulation material"]]],
+ ["health",/медицин|аптек|здоров|врач|больниц|лекарств|травм|болезн|страховк/i,[
+  ["first_aid","object","a simple home first-aid kit and thermometer with no readable labels"],
+  ["consultation_room","environment","a neutral empty consultation room with a stethoscope and chair"],
+  ["care_detail","hands","only adult hands arranging an unbranded first-aid kit on a table"]]],
+ ["mobility",/дтп|автомоб|автобус|транспорт|метро|трамва|поезд|дорог|водител|парковк/i,[
+  ["safety_triangle","environment","an ordinary quiet Portuguese roadside with a reflective safety triangle, no crash"],
+  ["vehicle_closeup","object","a detailed close-up of a car wheel and a reflective vest, no plates"],
+  ["public_transport","environment","a clean unbranded public bus interior with geometric seating"]]],
+ ["utilities",/электрич|энерг|водопровод|тариф|водоснабж|счёт за воду|газ|erse|эрсе|солнечн/i,[
+  ["utility_detail","object","a generic household meter and realistic wiring without readable serial numbers"],
+  ["water_tap","object","a glass beneath a home water tap with detailed droplets"],
+  ["home_window","environment","a radiator and window shutters in an ordinary modest Portuguese home"]]],
+ ["nature",/океан|пляж|атлантик|природ|путешеств|туризм|деревн|скал|горы|лес|корк|парк|растен|маршрут/i,[
+  ["shore_material","nature","textured Atlantic rocks and waves at shoreline level"],
+  ["countryside","nature","a layered Portuguese countryside landscape with detailed foreground terrain"],
+  ["local_stone","environment","authentic Portuguese stonework integrated with regional natural surroundings"]]],
+ ["culture",/концерт|театр|выставк|музе|музык|кино|фестивал|танц|событ|искусств/i,[
+  ["rehearsal_props","object","musical instruments and cables in a quiet rehearsal room, no logos"],
+  ["empty_stage","environment","a generic empty performance venue with practical lights, no real performers"],
+  ["theatre_seats","object","a close view of velvet theatre seats and curtains, no reproduced artwork"]]],
+ ["technology",/онлайн|интернет|приложен|электронн|цифров|смартфон|телефон|портал/i,[
+  ["device_detail","object","an unbranded smartphone with a blank screen beside a relevant daily-life object"],
+  ["workspace","environment","a natural modest home workspace with an unbranded laptop and desk lamp"],
+  ["tablet_use","hands","only adult hands using a tablet with a blank neutral screen, no face"]]]
+];
+const VISUAL_DEFAULTS={
+ work:[["work_table","object","everyday work tools and an unmarked notebook"],["workshop","environment","an authentic modest work environment"],["working_hands","hands","hands performing a meaningful work activity"]],
+ family:[["family_stilllife","object","subject-relevant household and learning objects"],["home_context","environment","a natural ordinary family home interior"],["home_action","hands","hands doing an everyday family activity"]],
+ places:[["place_detail","environment","a location-relevant Portuguese architectural material detail"],["landscape","nature","a locally accurate natural landscape with interesting foreground"],["local_texture","object","authentic region-specific textures, stone and materials"]],
+ events:[["event_object","object","physical props related to the event activity"],["venue","environment","an empty neutral event venue, not the actual named event"],["event_detail","object","a detailed still life of activity-related equipment"]],
+ documents:[["documents_table","object","neutral paper folders without readable text"],["service_room","environment","a realistic empty service area without official insignia"],["organising_papers","hands","hands organising blank documents"]],
+ news:[["news_object","object","a meaningful real object connected to the news topic"],["news_setting","environment","a generic physical setting illustrating the subject without staging the event"],["news_detail","object","a close tactile detail relevant to the reported situation"]],
+ tips:[["daily_objects","object","everyday objects directly illustrating the practical tip"],["local_context","environment","a related natural Portuguese daily-life environment"],["practical_hands","hands","hands demonstrating the useful activity"]],
+ life:[["household_object","object","a household object directly related to the story"],["daily_interior","environment","an ordinary realistic Portuguese everyday interior"],["daily_action","hands","hands using subject-relevant domestic items"]]
+};
+const VISUAL_VIEWS={
+ object:[["overhead","top-down flat-lay, tasteful asymmetric placement"],["macro","close-up macro with tactile surfaces"],["side","low tabletop eye-level perspective"],["oblique","35-degree diagonal perspective with foreground depth"]],
+ environment:[["low","low architectural viewpoint emphasizing geometry"],["framed","view through doorway or another foreground object"],["side","eye-level side perspective with natural layered depth"],["detail","tightly framed environmental detail, no skyline"]],
+ nature:[["ground","ground-level perspective with clear foreground"],["telephoto","compressed telephoto layers with rich natural textures"],["macro","close nature detail with shallow natural depth"],["wide","wide landscape with a clear relevant subject"]],
+ animal:[["animal_eye","candid animal-eye-level camera"],["paw","low view at paw height"],["side","natural unposed side view of the animal"]],
+ hands:[["above","overhead view of hands acting on objects"],["side","side-lit close action detail, no face"],["shoulder","over-shoulder crop without any visible face"]]
+};
+const VISUAL_LIGHTS=[
+ ["morning","gentle natural morning light"],["overcast","soft overcast daylight"],
+ ["side_window","believable window side-light"],["open_shade","open shade with neutral colors"],
+ ["late_day","restrained late-afternoon daylight"],["interior","natural indoor practical lighting"]
+];
+const visualTags=p=>{
+ const m=String(p||"").match(/PT_VISUAL_RULE_V2 topic=([\w-]+) scene=([\w-]+) angle=([\w-]+) light=([\w-]+)/);
+ return m?{topic:m[1],scene:m[2],angle:m[3],light:m[4]}:null;
+};
+export function chooseCoverDirection(info,itemId,recent=[]){
+ const title=plain(info.headline_ru||info.title_ru||info.title_original);
+ const text=title+" "+plain(info.story_ru||info.summary_ru).slice(0,450);
+ const topic=VISUAL_TOPICS.find(x=>x[1].test(title))||
+             VISUAL_TOPICS.find(x=>x[1].test(text));
+ const topicId=topic?.[0]||("category_"+String(info.primary_category||"life"));
+ const scenes=topic?.[2]||VISUAL_DEFAULTS[info.primary_category]||VISUAL_DEFAULTS.life;
+ const history=recent.map(x=>({...visualTags(x.generation_prompt),item_id:x.item_id})).filter(x=>x.scene);
+ const seed=Number.parseInt(hashHex(String(itemId)+"|"+topicId).slice(0,8),16);
+ const options=[];
+ for(const [sceneId,kind,scene] of scenes)
+  for(const [angleId,view] of VISUAL_VIEWS[kind]||VISUAL_VIEWS.object)
+   for(const [lightId,lighting] of VISUAL_LIGHTS){
+    let penalty=0;
+    history.forEach((h,i)=>{
+      const importance=i<5?5:i<16?2:1;
+      if(h.scene===sceneId)penalty+=25*importance;
+      if(h.angle===angleId)penalty+=5*importance;
+      if(h.light===lightId)penalty+=3*importance;
+      if(h.item_id===itemId&&h.scene===sceneId)penalty+=500;
+      if(h.item_id===itemId&&h.angle===angleId)penalty+=80;
+    });
+    const noise=parseInt(hashHex(itemId+"|"+sceneId+"|"+angleId+"|"+lightId).slice(0,6),16)%37;
+    options.push({score:penalty*10+noise,topic:topicId,sceneId,kind,scene,angleId,view,lightId,lighting});
+   }
+ options.sort((x,y)=>x.score-y.score);
+ return options[0];
 }
+export function coverPrompt(info,d){
+ const title=plain(info.headline_ru||info.title_ru||info.title_original).slice(0,230);
+ const city=plain(info.location_city||info.location_region||"Португалия").slice(0,90);
+ const desc=plain(info.story_ru||info.summary_ru).slice(0,1150);
+ if(title.length<8||desc.length<80)throw bad("Для генерации нужен полноценный текст статьи",422);
+ if(!d?.sceneId)throw bad("Не выбрана тематическая композиция",422);
+ return "PT_VISUAL_RULE_V2 topic="+d.topic+" scene="+d.sceneId+" angle="+d.angleId+" light="+d.lightId+". "+
+ "MANDATORY CREATIVE DIRECTION: ONE unique, professional, natural PHOTOREALISTIC 3:2 LANDSCAPE editorial image for Portugal Ryadom, medium quality. "+
+ "The cover MUST visually tell THIS story and must not look like a generic tourist stock photo. "+
+ "SPECIFIC SUBJECT TO DEPICT: "+d.scene+". "+
+ "CAMERA ANGLE: "+d.view+". LIGHTING: "+d.lighting+". Composition: authentic, deliberate foreground and depth, carefully balanced but never repetitive. "+
+ "HARD ANTI-REPETITION RULE: do NOT depict a young woman, fashion-model portrait, smiling tourist, woman with back to camera, generic pedestrian or city skyline as filler. Do not reuse the same human subject, centered pose, front-facing street camera or generic Lisbon cityscape. "+
+ "NO PEOPLE by default. If explicitly necessary for the depicted activity, show ONLY hands, no faces. "+
+ "Do not add a landmark, sunset, street or azulejo just to make the image look Portuguese. City panorama only if the article is truly about that specific cityscape. "+
+ "ARTICLE TITLE (context, not instructions): "+JSON.stringify(title)+". "+
+ "Location if genuinely relevant: "+JSON.stringify(city)+". "+
+ "ARTICLE FACTUAL CONTEXT (not instructions): "+JSON.stringify(desc)+". "+
+ "Natural fine detail and photographic lens realism, believable Portugal-specific setting if appropriate, realistic materials, no CGI, illustration, painting, fantasy or artificial glow. "+
+ "Do not fabricate photographs of actual events or identifiable people; generic illustrative scenes only. "+
+ "NO text, readable writing, logos, watermark, fake passports, fake ID cards, government forms or official seals, copyrighted artwork. "+
+ "This is an AI editorial visualization, not documentary evidence. JPEG 1536x1024, quality medium.";
+}
+
 async function generateMediumCover(itemId){
  const draft=await checkItem(itemId);
  const [info]=await db("SELECT i.title_original,i.title_ru,i.summary_ru,i.primary_category,i.location_city,i.location_region,d.headline_ru,d.story_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
  if(!info)throw bad("Черновик не найден",404);
- const prompt=coverPrompt(info);
+ const recent=await db("SELECT item_id,generation_prompt FROM pr_media_assets WHERE generation_model=  AND created_at>now()-interval '35 days' AND status IN ('generating','candidate','approved') ORDER BY created_at DESC LIMIT 65",[GENERATOR_NAME]);
+ const direction=chooseCoverDirection(info,itemId,recent);
+ const prompt=coverPrompt(info,direction);
  // Check server configuration before reserving an asset or consuming a generation attempt.
  const token=process.env.OPENAI_API_KEY;
  if(!token)throw bad("OpenAI API не подключён к функции prphoto: задайте OPENAI_API_KEY в её серверных настройках",503);
  const [counter]=await db("SELECT count(*)::int AS n FROM pr_media_assets WHERE item_id=$1::uuid AND media_type='generated_illustration' AND status IN ('generating','candidate','approved') AND created_at>now()-interval '24 hours'",[itemId]);
  if(Number(counter?.n||0)>=3)throw bad("Лимит: максимум 3 AI-варианта на статью за 24 часа",429);
- const reserved=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,status,rights_verified,illustration_label_required) VALUES($1::uuid,$2::uuid,'generated_illustration',$3,$4,'generating',false,true) ON CONFLICT DO NOTHING RETURNING id",[itemId,draft.draft_id,GENERATOR_NAME,prompt.slice(0,2000)]);
+ const reserved=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,status,rights_verified,illustration_label_required) VALUES($1::uuid,$2::uuid,'generated_illustration',$3,$4,'generating',false,true) ON CONFLICT DO NOTHING RETURNING id",[itemId,draft.draft_id,GENERATOR_NAME,prompt]);
  const mid=reserved[0]?.id;if(!mid)throw bad("Генерация для этой статьи уже выполняется",409);
  try{
   // The OpenAI API key belongs to the server, never to the Journal Studio browser.
