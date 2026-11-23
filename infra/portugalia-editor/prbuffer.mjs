@@ -305,6 +305,10 @@ async function retrofitInstagramBatch(limit=4){
     if(row.current_status!=="published"){
      await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=COALESCE(published_at,$2::timestamptz,now()),updated_at=now() WHERE id=$1::uuid AND status='queued'",[row.publication_id,remote.sentAt||null]);
     }
+    // Reserve the one-time draft operation BEFORE Buffer API side effects.
+    // If a response is ambiguous, never retry blindly and create duplicates.
+    const claimed=await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='creating_draft',attempts=attempts+1,updated_at=now() WHERE item_id=$1::uuid AND stage='ready' RETURNING item_id",[row.item_id]);
+    if(!claimed.length){report.skipped++;continue}
     // Already-published Buffer posts are immutable: save distinct drafts
     // using their own Buffer IDs, retaining originals and their analytics.
     const created=(await buffer(
@@ -312,9 +316,10 @@ async function retrofitInstagramBatch(limit=4){
      {input:{channelId:CHANNEL,text:row.caption,mode:"addToQueue",saveToDraft:true,needsApproval:false,
        schedulingType:"automatic",metadata,assets}})).createPost;
     if(!created?.post?.id||String(created.post.status||"").toLowerCase()!=="draft"||created.post.text!==row.caption){
-     await err("Buffer did not confirm replacement draft: "+String(created?.message||"unexpected response"));continue
+     await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='needs_review',last_error=$2,updated_at=now() WHERE item_id=$1::uuid AND stage='creating_draft'",[row.item_id,"Buffer did not confirm unique draft: "+String(created?.message||"unexpected response").slice(0,150)]);
+     report.failed++;continue
     }
-    await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='draft_created',replacement_buffer_post_id=$2,attempts=attempts+1,last_error=NULL,synced_at=now(),updated_at=now() WHERE item_id=$1::uuid AND stage='ready'",[row.item_id,created.post.id]);
+    await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='draft_created',replacement_buffer_post_id=$2,last_error=NULL,synced_at=now(),updated_at=now() WHERE item_id=$1::uuid AND stage='creating_draft'",[row.item_id,created.post.id]);
     report.drafts_created++;report.items.push({item_id:row.item_id,status:"draft_created",buffer_post_id:created.post.id});
     continue;
    }
