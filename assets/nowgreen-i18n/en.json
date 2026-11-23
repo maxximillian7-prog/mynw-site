@@ -9,7 +9,7 @@
     "rights": "Data rights",
     "deletion": "Delete account",
     "support": "Support",
-    "updated": "Last updated: October 6, 2026",
+    "updated": "Last updated: November 23, 2026",
     "back": "All NowGreen documents",
     "footer": "© 2026 NowGreen / NowApps.",
     "developer": "Developer and data controller",
@@ -135,6 +135,12 @@
           "h": "7. Security",
           "p": [
             "NowGreen uses authenticated access and row-level controls for user data. Do not upload personal data you do not have the right to process."
+          ]
+        },
+        {
+          "h": "External AI processing and your permission",
+          "p": [
+            "If you request AI features, selected plant and garden descriptions, project details, notes, care history, questions and photos may be sent via the NowGreen Supabase backend to OpenAI (OpenAI API), which processes these inputs to generate identification, advice and images. The iOS app requests a separate affirmative permission naming OpenAI before sending user-selected data for AI processing. You may decline and still use non-AI functions, or withdraw permission in Settings → Third-party AI data sharing. This is independent of payment or AI credits."
           ]
         }
       ]
@@ -275,6 +281,12 @@
           "h": "5. Image generation",
           "p": [
             "Generated previews and visualisations can differ from reality and may invent visual details. They are design aids, not construction drawings or a guarantee of plant survival."
+          ]
+        },
+        {
+          "h": "External AI processing and your permission",
+          "p": [
+            "If you request AI features, selected plant and garden descriptions, project details, notes, care history, questions and photos may be sent via the NowGreen Supabase backend to OpenAI (OpenAI API), which processes these inputs to generate identification, advice and images. The iOS app requests a separate affirmative permission naming OpenAI before sending user-selected data for AI processing. You may decline and still use non-AI functions, or withdraw permission in Settings → Third-party AI data sharing. This is independent of payment or AI credits."
           ]
         }
       ]
