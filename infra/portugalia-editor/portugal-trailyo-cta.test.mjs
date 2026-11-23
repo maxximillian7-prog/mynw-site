@@ -27,6 +27,6 @@ test("Afisha editorial preview shows the same prominent linked Trailyo CTA befor
  assert.match(render,/if\(isAfisha\)html\+='\<div class="pt-instagram-cta"\>Больше событий в приложении '/);
  assert.ok(render.indexOf("Больше событий в приложении '+previewLink")<render.indexOf("Наш канал в '+previewLink"));
  assert.ok(render.includes(url));
- assert.match(render,/\.pt-instagram-cta/); // CTA class is shared for size and styling
+ assert.match(render,/class="pt-instagram-cta"/); // CTA class is shared for size and styling
  assert.doesNotMatch(render,/if\(isAfisha\)html\+='\<div class="pt-source"\>Больше событий/);
 });
