@@ -47,6 +47,18 @@ window.StudioBrandHub=(function(){
    history.replaceState(history.state,"",u.pathname+u.search+u.hash);
   }catch{}
  }
+ // A new child iframe is essential: an old in-memory Instagram canvas
+ // is not updated by deploying a newer JavaScript file to GitHub Pages.
+ function refreshPortugalFrame(){
+  const frame=$("portugalFrame");if(!frame)return;
+  const u=new URL("./portugal/?embedded=1&v=20261123-photo-original4",location.href);
+  u.searchParams.set("refresh",String(Date.now()));
+  frame.dataset.src=u.pathname+u.search;
+  frame.dataset.loaded="1";
+  frame.dataset.ready="0";
+  frame.addEventListener("load",()=>{frame.dataset.ready="1";deliverIntent("portugal")},{once:true});
+  frame.src=frame.dataset.src;
+ }
  function whenFrameReady(brand,fn){
   const frame=$(brand==="portugal"?"portugalFrame":"darkfactoryFrame");
   if(!frame)return;
@@ -254,8 +266,8 @@ window.StudioBrandHub=(function(){
     '<div class="studio-brand-workspace-header portugal">'+
      '<div class="title-cluster"><img src="'+logo("portugal")+'" alt=""><div><h2>Португалия рядом</h2>'+
      '<p>Новости, полезные статьи, афиша, сообщения и календарь публикаций</p></div></div>'+
-     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><a class="open-external" href="./portugal/?v=20261121-review-newest-first" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
-    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1&v=20261121-review-newest-first" src="about:blank"></iframe>'+
+     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><button type="button" data-portugal-reload title="Перезагрузить встроенный редактор с новой Instagram-обложкой">↻ Обновить обложки</button><a class="open-external" href="./portugal/?v=20261123-photo-original4" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
+    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1&v=20261123-photo-original4" src="about:blank"></iframe>'+
     '</section>');
   }
  }
@@ -264,6 +276,9 @@ window.StudioBrandHub=(function(){
   if(state.bound)return;state.bound=true;
   mount();
   document.addEventListener("click",e=>{
+   if(e.target.closest("[data-portugal-reload]")){
+    e.preventDefault();refreshPortugalFrame();return;
+   }
    const t=e.target.closest("[data-hub-go],[data-hub-action]");
    if(!t)return;
    e.preventDefault();
