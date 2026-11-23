@@ -250,14 +250,111 @@ async function schedule(id,options,userId){
   throw e;
  }
 }
+
+// Instagram cover+caption retrofit (2026-11-23).
+// Buffer cannot edit or delete already SENT Instagram media: create unposted
+// replacement DRAFTS for those originals; never duplicate published Instagram posts.
+// For queued posts, edit existing Buffer ID without changing the publishing slot.
+async function retrofitInstagramBatch(limit=4){
+ const size=Math.max(1,Math.min(8,Number(limit)||4));
+ const rows=await sql(
+  "SELECT r.item_id,r.publication_id,r.source_status,r.source_buffer_post_id,r.cover_url,r.carousel_urls,r.caption,r.full_text,r.attempts,"+
+  "p.status AS current_status,p.buffer_post_id AS current_buffer_id,p.scheduled_for,"+
+  "i.photo_url AS source_photo,"+
+  "EXISTS(SELECT 1 FROM public.pr_media_assets m WHERE m.item_id=i.id AND m.public_url=i.photo_url AND m.status='approved' AND m.rights_verified=true AND m.media_type='generated_illustration') AS ai_original "+
+  "FROM public.pr_instagram_retrofit_20261123 r "+
+  "JOIN public.pr_instagram_publications p ON p.id=r.publication_id AND p.item_id=r.item_id "+
+  "JOIN public.pr_items i ON i.id=r.item_id "+
+  "WHERE r.stage='ready' AND r.attempts<3 AND p.status IN ('queued','published') "+
+  "AND p.buffer_post_id IS NOT NULL AND i.status='approved' "+
+  "ORDER BY CASE WHEN p.status='queued' THEN 0 ELSE 1 END,p.scheduled_for NULLS LAST,r.created_at LIMIT $1",[size]);
+ const report={ok:true,checked:rows.length,queued_updated:0,drafts_created:0,already_sent:0,skipped:0,failed:0,items:[]};
+ for(const row of rows){
+  const err=async(message,failed=true)=>{
+   const reason=String(message||"unknown").slice(0,280);
+   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET attempts=attempts+1,last_error=$2,stage=CASE WHEN attempts>=2 THEN 'needs_review' ELSE 'ready' END,updated_at=now() WHERE item_id=$1::uuid AND stage='ready'",[row.item_id,reason]).catch(()=>{});
+   if(failed)report.failed++;else report.skipped++;
+   report.items.push({item_id:row.item_id,error:reason});
+  };
+  try{
+   if(!row.current_buffer_id||row.current_buffer_id!==row.source_buffer_post_id){
+    await err("Buffer ID changed since the editorial retrofit snapshot");continue;
+   }
+   if(!row.caption||row.caption.length>2200||row.caption.length<80){
+    await err("Instagram caption outside 80..2200 characters");continue;
+   }
+   const urls=[row.cover_url,...(Array.isArray(row.carousel_urls)?row.carousel_urls:JSON.parse(row.carousel_urls||"[]"))];
+   if(urls.length>10||urls.length<1||urls.some(x=>!/^https:\/\/mynw\.app\/journalstudio\/instagram-retrofit\/[0-9a-f-]{36}(?:-text-\d+)?\.jpg$/.test(x))){
+    await err("Invalid or excessive Instagram carousel assets");continue;
+   }
+   let missing=[];
+   for(const asset of urls){
+    const check=await fetch(asset,{method:"HEAD",signal:AbortSignal.timeout(12000)});
+    if(!check.ok)missing.push(asset.slice(-65)+":"+check.status);
+   }
+   if(missing.length){await err("Cover upload not yet visible: "+missing.join(", "),false);continue}
+   const remote=(await buffer(
+    "query GetPost($input:PostInput!){post(input:$input){id status dueAt sentAt text}}",
+    {input:{id:row.current_buffer_id}})).post;
+   if(!remote||remote.id!==row.current_buffer_id){await err("Buffer post not found");continue}
+   const alreadySent=String(remote.status||"").toLowerCase()==="sent";
+   const ai= row.ai_original===true||row.ai_original==="t";
+   const assets=urls.map(x=>({image:{url:x}}));
+   const metadata={instagram:{type:"post",shouldShareToFeed:true,isAiGenerated:ai}};
+   if(row.current_status==="published"||alreadySent){
+    if(row.current_status!=="published"){
+     await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=COALESCE(published_at,$2::timestamptz,now()),updated_at=now() WHERE id=$1::uuid AND status='queued'",[row.publication_id,remote.sentAt||null]);
+    }
+    // Already-published Buffer posts are immutable: save distinct drafts
+    // using their own Buffer IDs, retaining originals and their analytics.
+    const created=(await buffer(
+     "mutation RetrofitDraft($input:CreatePostInput!){createPost(input:$input){... on PostActionSuccess{post{id text status}} ... on MutationError{message}}}",
+     {input:{channelId:CHANNEL,text:row.caption,mode:"addToQueue",saveToDraft:true,needsApproval:false,
+       schedulingType:"automatic",metadata,assets}})).createPost;
+    if(!created?.post?.id||String(created.post.status||"").toLowerCase()!=="draft"||created.post.text!==row.caption){
+     await err("Buffer did not confirm replacement draft: "+String(created?.message||"unexpected response"));continue
+    }
+    await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='draft_created',replacement_buffer_post_id=$2,attempts=attempts+1,last_error=NULL,synced_at=now(),updated_at=now() WHERE item_id=$1::uuid AND stage='ready'",[row.item_id,created.post.id]);
+    report.drafts_created++;report.items.push({item_id:row.item_id,status:"draft_created",buffer_post_id:created.post.id});
+    continue;
+   }
+   if(!["scheduled","buffer","queued"].includes(String(remote.status||"").toLowerCase())){
+    await err("Buffer post in non-editable status: "+String(remote.status||"unknown"));continue;
+   }
+   if(row.scheduled_for && new Date(row.scheduled_for).getTime()<Date.now()+4*60000){
+    await err("Queued post is too close to its publishing time; avoid race with Buffer",false);continue;
+   }
+   const changed=(await buffer(
+    "mutation RetrofitEdit($input:EditPostInput!){editPost(input:$input){... on PostActionSuccess{post{id text status dueAt}} ... on MutationError{message}}}",
+    {input:{id:row.current_buffer_id,text:row.caption,metadata,assets}})).editPost;
+   if(!changed?.post?.id||changed.post.id!==row.current_buffer_id||changed.post.text!==row.caption) {
+    await err("Buffer edit not confirmed: "+String(changed?.message||"unexpected response"));continue
+   }
+   if(row.scheduled_for&&changed.post.dueAt&&Math.abs(Date.parse(changed.post.dueAt)-Date.parse(row.scheduled_for))>60000){
+    await err("Buffer returned a different publishing slot; requires reconciliation");continue;
+   }
+   await sql("UPDATE public.pr_instagram_publications SET caption=$2,image_url=$3,updated_at=now(),last_error=NULL WHERE id=$1::uuid AND status='queued' AND buffer_post_id=$4",
+     [row.publication_id,row.caption,row.cover_url,row.current_buffer_id]);
+   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage='queued_updated',attempts=attempts+1,last_error=NULL,synced_at=now(),updated_at=now() WHERE item_id=$1::uuid AND stage='ready'",[row.item_id]);
+   report.queued_updated++;report.items.push({item_id:row.item_id,status:"queued_updated",buffer_post_id:row.current_buffer_id,assets:urls.length});
+  }catch(e){await err(String(e.message||e))}
+ }
+ return report;
+}
+
 export default {async fetch(request){
  const url=new URL(request.url),origin=ALLOWED.has(request.headers.get("origin"))?request.headers.get("origin"):"";
  if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":origin,"access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"Authorization,Content-Type","access-control-max-age":"600"}});
- if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:3,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
+ if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:4,instagram_retrofit:true,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
  if(request.method==="POST"&&url.pathname==="/verify"){
   if(!process.env.PR_BUFFER_SETUP_SECRET||request.headers.get("x-pr-buffer-secret")!==process.env.PR_BUFFER_SETUP_SECRET)return json({error:"unauthorized"},401,origin);
   try{const r=await buffer('query{channel(input:{id:"'+CHANNEL+'"}){id name service}}'); const c=r.channel;return json({ok:!!c&&c.id===CHANNEL,channel_id:c?.id,name:c?.name,service:c?.service},200,origin)}
   catch(e){return json({ok:false,error:e.message},503,origin)}
+ }
+ if(request.method==="POST"&&url.pathname==="/internal/retrofit"){
+  if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
+  try{return json(await retrofitInstagramBatch(4),200,origin)}
+  catch(e){return json({ok:false,error:String(e.message||e).slice(0,220)},503,origin)}
  }
  if(request.method==="POST"&&url.pathname==="/internal/sync"){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
