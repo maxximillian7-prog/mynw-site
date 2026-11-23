@@ -6,6 +6,7 @@ on:
       - "infra/portugalia-editor/preditor-manual-time.test.mjs"
       - "infra/portugalia-editor/prpublish.mjs"
       - "infra/portugalia-editor/prphoto.mjs"
+      - "infra/portugalia-editor/portugal-photo-diversity.test.mjs"
       - "infra/portugalia-editor/prbuffer.mjs"
       - "infra/portugalia-editor/portugal-ig-typography.test.mjs"
       - "infra/portugalia-editor/*instagram*.sql"
@@ -33,4 +34,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - run: node --test infra/portugalia-editor/preditor-manual-time.test.mjs infra/portugalia-editor/portugal-ig-typography.test.mjs infra/portugalia-editor/prbuffer-media.test.mjs
+      - run: node --test infra/portugalia-editor/preditor-manual-time.test.mjs infra/portugalia-editor/portugal-ig-typography.test.mjs infra/portugalia-editor/prbuffer-media.test.mjs infra/portugalia-editor/portugal-photo-diversity.test.mjs
