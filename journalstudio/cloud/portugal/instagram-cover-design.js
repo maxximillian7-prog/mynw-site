@@ -9,7 +9,19 @@ const THEMES={
  noir:{accent:"#E9F2ED",shade:"#091F29",edge:"#77B3B0"},
  sunset:{accent:"#FFC08E",shade:"#4A2638",edge:"#F4D4B2"},
 };
-const tr=k=>({documents:"ДОКУМЕНТЫ",family:"СЕМЬЯ",life:"ЖИЗНЬ",work:"РАБОТА",tips:"ПОЛЕЗНОЕ",travel:"ПУТЕШЕСТВИЯ",events:"СОБЫТИЯ",news:"НОВОСТИ"})[k]||"ПОРТУГАЛИЯ";
+// Single consistent category palette for every new Instagram editorial cover.
+const CATEGORY_COLORS=Object.freeze({
+ news:"#E34450",events:"#F28D24",work:"#2776E8",tips:"#25B765",
+ life:"#0CB5A6",family:"#8558D9",documents:"#E6B92F",places:"#37A5DF",
+ default:"#72879C"
+});
+const categoryKey=value=>{
+ const key=String(value||"").trim().toLowerCase();
+ if(key==="travel"||key.startsWith("places"))return "places";
+ return Object.prototype.hasOwnProperty.call(CATEGORY_COLORS,key)?key:"default";
+};
+const accentFor=value=>CATEGORY_COLORS[categoryKey(value)];
+const tr=k=>({documents:"ДОКУМЕНТЫ",family:"СЕМЬЯ",life:"ЖИЗНЬ",work:"РАБОТА",tips:"ПОЛЕЗНОЕ",places:"ПУТЕШЕСТВИЯ",travel:"ПУТЕШЕСТВИЯ",events:"СОБЫТИЯ",news:"НОВОСТИ"})[categoryKey(k)]||"ПОРТУГАЛИЯ";
 const safeColor=v=>THEMES[v]?v:"editorial";
 function rounded(ctx,x,y,w,h,r){
  const radius=Math.min(r,w/2,h/2);
@@ -56,19 +68,28 @@ function layoutTitle(ctx,source,maxWidth=895){
 function draw(canvas,photo,title,category,variant="editorial"){
  if(!canvas||!photo)throw Error("Нужно исходное фото");
  const theme=THEMES[safeColor(variant)];
+ const categoryAccent=accentFor(category);
  canvas.width=WIDTH;canvas.height=HEIGHT;
  const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw Error("Canvas недоступен");
  const w=photo.width||photo.naturalWidth,h=photo.height||photo.naturalHeight;
  if(!w||!h)throw Error("Пустая фотография");
  const scale=Math.max(WIDTH/w,HEIGHT/h),rw=WIDTH/scale,rh=HEIGHT/scale;
  ctx.drawImage(photo,(w-rw)/2,(h-rh)/2,rw,rh,0,0,WIDTH,HEIGHT);
+ // Mandatory category stripes: bold but compact; never dim the photograph.
+ // Identical accent top/bottom, a thin light separator for contrast, no diamonds.
+ ctx.fillStyle=categoryAccent;
+ ctx.fillRect(0,0,WIDTH,24);
+ ctx.fillRect(0,HEIGHT-24,WIDTH,24);
+ ctx.fillStyle="rgba(255,255,255,.87)";
+ ctx.fillRect(0,24,WIDTH,3);
+ ctx.fillRect(0,HEIGHT-27,WIDTH,3);
  // Original photograph stays bright: no full-frame darkening,
  // gradients, vignettes or decorative diamonds.
  // A compact light editorial label keeps the name readable on any photo.
  rounded(ctx,58,47,636,150,17);
  ctx.fillStyle="rgba(255,255,255,.88)";ctx.fill();
  ctx.strokeStyle="rgba(18,67,68,.16)";ctx.lineWidth=1.5;ctx.stroke();
- ctx.fillStyle=theme.shade;ctx.fillRect(78,67,6,108);
+ ctx.fillStyle=categoryAccent;ctx.fillRect(78,67,9,108);
  ctx.textBaseline="alphabetic";
  ctx.font='700 27px "Manrope","Arial",sans-serif';ctx.fillStyle="#163A3D";
  ctx.letterSpacing="2px";ctx.fillText("ПОРТУГАЛИЯ / РЯДОМ",106,106);ctx.letterSpacing="0px";
@@ -96,7 +117,7 @@ function draw(canvas,photo,title,category,variant="editorial"){
  const lower=1185;
  rounded(ctx,56,1168,968,151,18);
  ctx.fillStyle="rgba(255,255,255,.86)";ctx.fill();
- ctx.fillStyle="#336A6A";ctx.fillRect(76,1191,72,5);
+ ctx.fillStyle=categoryAccent;ctx.fillRect(76,1191,100,9);
  ctx.font='600 23px "Manrope","Arial",sans-serif';
  ctx.fillStyle="#163A3D";ctx.fillText("О ПОРТУГАЛИИ — ПОНЯТНО И ПО ДЕЛУ",76,1233);
  ctx.fillStyle="#466E6C";ctx.font='600 19px "Manrope","Arial",sans-serif';
@@ -117,5 +138,5 @@ function toJpeg(canvas){
  }
  throw Error("Файл обложки слишком большой. Уменьшите исходное изображение.");
 }
-global.PortugalInstagramCover={draw,layoutTitle,createPreview,toJpeg,WIDTH,HEIGHT,THEMES};
+global.PortugalInstagramCover={draw,layoutTitle,createPreview,toJpeg,accentFor,CATEGORY_COLORS,WIDTH,HEIGHT,THEMES,DESIGN_VERSION:5};
 })(window);
