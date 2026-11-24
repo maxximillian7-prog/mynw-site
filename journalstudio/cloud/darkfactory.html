@@ -838,14 +838,31 @@ function slidesFor(x,en){
  // The amount of real story content determines the number of slides.
  // Around 200-240 characters per interior slide is readable at 1080x1350.
  const storyCount=isCarousel?Math.max(2,Math.min(7,Math.ceil(longer/(x.format_type==="carousel"?215:240)))):0;
- const panels=storyCount?chunksOf(sentenceParts(body),storyCount):[];
+ // Reserve the final original sentence for the outro alone. The old layout
+ // duplicated the last two body sentences on the penultimate and final cards.
+ const sentences=sentenceParts(body).filter(Boolean);
+ const copyKey=t=>String(t||"").toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu," ").trim();
+ const lastCandidate=sentences.length>=4?sentences[sentences.length-1]:"";
+ const previousSentences=sentences.slice(0,-1);
+ const ending=copyKey(lastCandidate).length>=25 &&
+   !copyKey(previousSentences.join(" ")).includes(copyKey(lastCandidate))?lastCandidate:"";
+ const storyParts=ending?previousSentences:sentences;
+ const panels=storyCount?chunksOf(storyParts,storyCount):[];
  const slides=[{type:"cover",heading:title,body:hook,teaser:!storyCount&&x.format_type!=="reel_story"?sentenceParts(body).slice(0,2).join(" "):"",tag:en?"UNBELIEVABLE FACT":"НЕВЕРОЯТНО, НО ФАКТ"}];
  if(!storyCount)return slides;
  const headers=en?["HOW IS THIS POSSIBLE?","HERE'S THE STRANGE PART","WHAT SCIENCE FOUND","THE SURPRISING DETAIL","BUT THERE'S A CATCH","ONE LAST TWIST","WHAT DOES IT MEAN?"]:
  ["КАК ЭТО ВОЗМОЖНО?","ВОТ ЧТО УДИВЛЯЕТ","ЧТО УЗНАЛИ УЧЁНЫЕ","САМАЯ СТРАННАЯ ДЕТАЛЬ","НО ЕСТЬ НЮАНС","И ЭТО ЕЩЁ НЕ ВСЁ","ЧТО ЭТО ЗНАЧИТ?"];
  panels.forEach((t,i)=>slides.push({type:i%2?"detail":"story",heading:headers[i]||headers[headers.length-1],body:t,tag:en?"THE REAL EXPLANATION":"ВОТ КАК ЭТО РАБОТАЕТ"}));
- const punch=en?(sentenceParts(body).slice(-2).join(" ")):[sentenceParts(body).slice(-2).join(" "),String(x.punch||"").trim()].filter(Boolean).join(" ");
- slides.push({type:"outro",heading:en?"NO WAY. IT'S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:punch+"\n"+(en?"Would your friends believe this? Send it to someone who loves surprising facts.":"Отправь человеку, который тоже скажет: «Не может быть!»"),tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
+ // Avoid reusing text already shown in the story, even if the editor's
+ // punch line happens to repeat a paragraph. EN has its own EN conclusion.
+ const originalPunch=en?"":String(x.punch||"").trim();
+ const punchKey=copyKey(originalPunch);
+ const uniquePunch=punchKey.length>=12 &&
+   !copyKey(body).includes(punchKey) &&
+   !copyKey(hook).includes(punchKey)?originalPunch:"";
+ const invitation=en?"Would your friends believe this? Send it to someone who loves surprising facts.":"Отправь человеку, который тоже скажет: «Не может быть!»";
+ const closing=[ending,uniquePunch,invitation].filter(Boolean).join("\n\n");
+ slides.push({type:"outro",heading:en?"NO WAY. IT'S REAL.":"НЕЕЕТ. ЭТО ПРАВДА.",body:closing,tag:en?"SHARE THE SURPRISE":"ПОДЕЛИСЬ УДИВЛЕНИЕМ"});
  return slides;
 }
 function wrapCanvas(ctx,text,maxW){
@@ -1934,6 +1951,14 @@ async function prepareInstagramForPublishing(item,locale){
  const source=await loadOriginalForPublishing(item);
  const x=draft(),slides=slidesFor(x,locale==="en");
  if(!slides.length||slides.length>10)throw Error("Instagram допускает от 1 до 10 слайдов");
+ // Do not export any carousel that repeats the penultimate slide in its outro.
+ if(slides.length>=3){
+  const penultimate=String(slides[slides.length-2].body||"").toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu," ");
+  const endSentences=sentenceParts(slides[slides.length-1].body||"").map(t=>
+   t.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu," ").trim());
+  if(endSentences.some(t=>t.length>45&&penultimate.includes(t)))
+   throw Error("Повтор текста на последних слайдах: исправьте заключение перед экспортом");
+ }
  const active=session();if(!active?.access_token||!unlocked)throw Error("Войдите в Journal Studio");
  for(let i=0;i<slides.length;i++){
   image=source;
