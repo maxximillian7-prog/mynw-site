@@ -1,4 +1,3 @@
-import {retrofitQueuedCategoryStripes} from "./category-stripe-backfill.mjs";
 // Instagram/Buffer publisher for Portugal Journal. Authenticated editorial actions only.
 const CHANNEL="6af8b0f062b70b94b031a50c";
 const STUDIO="https://npsfaymjckcqhtyiafms.supabase.co";
@@ -469,6 +468,33 @@ async function alignOldScheduledReplacement(){
   return {action:"needs_review",ordinal:row.ordinal,error:message};
  }
 }
+// Reclaim missed historic slots without blocking the rest of the archive.
+// The old slot calendar remains 10:30 / 15:30 / 20:30 Europe/Lisbon (DST-aware).
+// Select a future unoccupied slot while retaining the *same* approved Buffer draft ID.
+async function nextOldReplacementDue(requested){
+ const rows=await sql(
+  "WITH proposed AS ("+
+  "SELECT (((now() AT TIME ZONE 'Europe/Lisbon')::date+g.n)+v.t) AT TIME ZONE 'Europe/Lisbon' AS due "+
+  "FROM generate_series(0,35) AS g(n) CROSS JOIN (VALUES (TIME '10:30'),(TIME '15:30'),(TIME '20:30')) AS v(t)) "+
+  "SELECT due FROM proposed s "+
+  "WHERE due >= greatest(now()+interval '18 minutes',$1::timestamptz) "+
+  "AND NOT EXISTS (SELECT 1 FROM public.pr_instagram_interleave_20261123 q "+
+  "WHERE q.state IN ('scheduled','dispatching','reschedule_pending') "+
+  "AND abs(extract(epoch from (q.target_time-s.due)))<3600) "+
+  "AND NOT EXISTS (SELECT 1 FROM public.pr_instagram_publications p "+
+  "WHERE p.status='queued' AND p.buffer_post_id IS NOT NULL "+
+  "AND abs(extract(epoch from (p.scheduled_for-s.due)))<3600) "+
+  "AND NOT EXISTS (SELECT 1 FROM public.pr_instagram_waitlist_4slots w "+
+  "WHERE w.state IN ('dispatching','scheduled') AND w.target_time IS NOT NULL "+
+  "AND abs(extract(epoch from (w.target_time-s.due)))<3600) "+
+  "ORDER BY due LIMIT 1",
+  [requested]
+ );
+ const due=rows[0]?.due;
+ if(!due||!Number.isFinite(Date.parse(due))||Date.parse(due)<Date.now()+17*60000)
+  throw Error("No eligible old replacement slot in the next 35 days");
+ return new Date(due).toISOString();
+}
 async function refillInstagramQueue(){
  const reconciliation=await reconcileInstagramPending();
  const interleaveReconciliation=await reconcileInterleavedReplacements();
@@ -479,22 +505,22 @@ async function refillInstagramQueue(){
  // Current NEW approved articles always take priority, and keep exact original
  // 08/13/18/23 Lisbon slots. Only after those are staged, add old replacements.
  const wait=(await sql("SELECT w.* FROM public.pr_instagram_waitlist_4slots w JOIN public.pr_instagram_publications p ON p.id=w.publication_id WHERE w.state='waiting' AND p.buffer_post_id IS NULL ORDER BY w.requested_at LIMIT 1"))[0];
- const oldBlocked=(await sql("SELECT EXISTS(SELECT 1 FROM public.pr_instagram_interleave_20261123 WHERE state='needs_review') AS blocked"))[0]?.blocked===true;
- const old=wait||oldBlocked?null:(await sql(
+ // A spam-flagged or failed article remains isolated in needs_review:
+ // never let it disable unrelated old drafts.
+ const old=wait?null:(await sql(
  "SELECT q.item_id,q.ordinal,q.replacement_buffer_post_id,q.target_time AS interleave_due,r.cover_url,r.carousel_urls,r.caption,"+
  "EXISTS(SELECT 1 FROM public.pr_media_assets m JOIN public.pr_items i ON i.id=m.item_id WHERE m.item_id=q.item_id AND m.public_url=i.photo_url AND m.status='approved' AND m.media_type='generated_illustration') AS is_ai "+
  "FROM public.pr_instagram_interleave_20261123 q "+
  "JOIN public.pr_instagram_retrofit_20261123 r ON r.item_id=q.item_id AND r.replacement_buffer_post_id=q.replacement_buffer_post_id "+
  "WHERE q.state='waiting' AND r.stage='draft_created' "+
- "AND q.target_time>now()+interval '18 minutes' "+
  "ORDER BY q.ordinal LIMIT 1"))[0];
- if(!wait&&!old)return {...report,action:oldBlocked?"old_replacements_require_review":"nothing_to_fill"};
+ if(!wait&&!old)return {...report,action:"nothing_to_fill"};
  const source=wait?"new_article":"old_replacement";
  const id=(wait||old).item_id;
- const due=wait?await nextInstagramDueAt():new Date(old.interleave_due).toISOString();
+ const due=wait?await nextInstagramDueAt():await nextOldReplacementDue(old.interleave_due);
  const claim=wait?
   await sql("UPDATE public.pr_instagram_waitlist_4slots SET state='dispatching',target_time=$2::timestamptz,attempt_count=attempt_count+1,updated_at=now() WHERE item_id=$1::uuid AND state='waiting' RETURNING item_id",[id,due]):
-  await sql("UPDATE public.pr_instagram_interleave_20261123 SET state='dispatching',attempts=attempts+1,updated_at=now() WHERE item_id=$1::uuid AND state='waiting' RETURNING item_id",[id]);
+  await sql("UPDATE public.pr_instagram_interleave_20261123 SET state='dispatching',target_time=$2::timestamptz,attempts=attempts+1,updated_at=now() WHERE item_id=$1::uuid AND state='waiting' RETURNING item_id",[id,due]);
  if(!claim.length)return {...report,action:"already_processing",source};
  try{
   if(wait){
@@ -544,8 +570,7 @@ async function schedule(id,options,userId){
  if(["published","publishing","preparing","container_created"].includes(original.status)||(original.status==="queued"&&options.schedule_mode!=="now"))return {ok:true,already_scheduled:true,buffer_post_id:original.buffer_post_id,scheduled_for:original.scheduled_for};
  if(!["draft","awaiting_approval","failed","queued"].includes(original.status))throw fail("Подготовка Instagram не завершена: "+original.status,409);
  const media=await verifyMedia(original);
- if(options.schedule_mode!=="now" && ((await instagramCapacity())>=BUFFER_PENDING_CAP ||
-   (await sql("SELECT EXISTS(SELECT 1 FROM public.pr_instagram_retrofit_20261123 WHERE stage='draft_created' AND replacement_buffer_post_id IS NOT NULL) AND NOT EXISTS(SELECT 1 FROM public.pr_instagram_rapid_replace_20261123 WHERE state='needs_review') AS has_older"))[0]?.has_older===true)){
+ if(options.schedule_mode!=="now" && (await instagramCapacity())>=BUFFER_PENDING_CAP){
   await sql("INSERT INTO public.pr_instagram_waitlist_4slots(item_id,publication_id,queued_by,request_mode,state) VALUES($1::uuid,$2::uuid,$3,$4,'waiting') ON CONFLICT(item_id) DO UPDATE SET queued_by=EXCLUDED.queued_by,request_mode=EXCLUDED.request_mode,updated_at=now() WHERE public.pr_instagram_waitlist_4slots.state IN ('waiting','needs_review')",
    [id,original.id,userId,"automatic"]);
   return {ok:true,waitlisted:true,buffer_queue_full:true,limit:BUFFER_PENDING_CAP,message:"Одобрено. Очередь Buffer 10/10; материал поставлен в резерв и будет автоматически опубликован в ближайший свободный слот 08:00/13:00/18:00/23:00 (Лиссабон)."};
@@ -720,9 +745,8 @@ export default {async fetch(request){
   // Only Neon scheduled triggers may invoke; no user request ever creates a new post.
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
   try{
-   const report=await retrofitQueuedCategoryStripes({sql,buffer,bufferPostStatus,limit:2});
-   console.log("PR_INSTAGRAM_CATEGORY_STRIPES",JSON.stringify(report));
-   return json({ok:true,...report},200,origin);
+   // Legacy 24px full-width color bands are retired. Never rewrite approved media.
+   return json({ok:true,disabled:true,reason:"full_width_category_stripes_retired"},200,origin);
   }catch(e){
    console.error("PR_INSTAGRAM_CATEGORY_STRIPES_ERROR",String(e.message||e).slice(0,180));
    return json({ok:false,error:String(e.message||e).slice(0,180)},503,origin);
