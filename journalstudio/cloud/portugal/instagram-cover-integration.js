@@ -5,6 +5,9 @@
 "use strict";
 const BASE="https://br-young-paper-b972wmgd-prphoto.compute.c-7.eu-central-1.aws.neon.tech";
 const MODEL="pt_ryadom_instagram_typography_v1";
+// Older approved JPEGs contain full-width category bands. Do not reuse them
+// after the compact-accent release; the server retains design_version=5.
+const ACCENT_ONLY_CUTOFF=Date.parse("2026-11-24T18:00:00.000Z");
 let pending=0,photoCacheKey="",photoCache=null,lastSavedKey="";
 const el=id=>document.getElementById(id);
 const pane=()=>el("ptIgCoverCanvas");
@@ -20,7 +23,7 @@ function info(){
  return {id:i.id,photo:i.photo_url,title:headline(),category:i.primary_category};
 }
 function attachedCover(i=current?.article,status="approved"){
- const matches=(current?.media||[]).filter(m=>m.generation_model===MODEL&&m.status===status&&m.public_url);
+ const matches=(current?.media||[]).filter(m=>m.generation_model===MODEL&&m.status===status&&m.public_url&&m.created_at&&Date.parse(m.created_at)>=ACCENT_ONLY_CUTOFF);
  const head=String(el("headline")?.value||i?.headline_ru||"").trim();
  return matches.find(m=>{
   try{const p=JSON.parse(m.generation_prompt||"{}");return p.headline===head&&p.source_photo_url===i.photo_url&&p.variant===selection()&&p.design_version===5}
