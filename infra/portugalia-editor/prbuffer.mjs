@@ -507,7 +507,7 @@ async function refillInstagramQueue(){
  const wait=(await sql("SELECT w.* FROM public.pr_instagram_waitlist_4slots w JOIN public.pr_instagram_publications p ON p.id=w.publication_id WHERE w.state='waiting' AND p.buffer_post_id IS NULL ORDER BY w.requested_at LIMIT 1"))[0];
  // A spam-flagged or failed article remains isolated in needs_review:
  // never let it disable unrelated old drafts.
- const old=wait?null:(await sql(
+ const old=(await sql(
  "SELECT q.item_id,q.ordinal,q.replacement_buffer_post_id,q.target_time AS interleave_due,r.cover_url,r.carousel_urls,r.caption,"+
  "EXISTS(SELECT 1 FROM public.pr_media_assets m JOIN public.pr_items i ON i.id=m.item_id WHERE m.item_id=q.item_id AND m.public_url=i.photo_url AND m.status='approved' AND m.media_type='generated_illustration') AS is_ai "+
  "FROM public.pr_instagram_interleave_20261123 q "+
@@ -515,15 +515,21 @@ async function refillInstagramQueue(){
  "WHERE q.state='waiting' AND r.stage='draft_created' "+
  "ORDER BY q.ordinal LIMIT 1"))[0];
  if(!wait&&!old)return {...report,action:"nothing_to_fill"};
- const source=wait?"new_article":"old_replacement";
- const id=(wait||old).item_id;
- const due=wait?await nextInstagramDueAt():await nextOldReplacementDue(old.interleave_due);
- const claim=wait?
+ // Fair interleaving: 4 daily NEW slots versus 3 daytime OLD slots.
+ // Compare the *actual next free slot*, not the presence of a new waitlist item.
+ // A steady stream of new approvals must not permanently starve old updates.
+ const newDue=wait?await nextInstagramDueAt():null;
+ const oldDue=old?await nextOldReplacementDue(old.interleave_due):null;
+ const sendNew=Boolean(wait)&&(!old||Date.parse(newDue)<=Date.parse(oldDue));
+ const source=sendNew?"new_article":"old_replacement";
+ const id=(sendNew?wait:old).item_id;
+ const due=sendNew?newDue:oldDue;
+ const claim=sendNew?
   await sql("UPDATE public.pr_instagram_waitlist_4slots SET state='dispatching',target_time=$2::timestamptz,attempt_count=attempt_count+1,updated_at=now() WHERE item_id=$1::uuid AND state='waiting' RETURNING item_id",[id,due]):
   await sql("UPDATE public.pr_instagram_interleave_20261123 SET state='dispatching',target_time=$2::timestamptz,attempts=attempts+1,updated_at=now() WHERE item_id=$1::uuid AND state='waiting' RETURNING item_id",[id,due]);
  if(!claim.length)return {...report,action:"already_processing",source};
  try{
-  if(wait){
+  if(sendNew){
    const out=await scheduleWaitlisted(wait,due);
    return {...report,action:"scheduled_new",source,item_id:id,...out};
   }
@@ -535,7 +541,7 @@ async function refillInstagramQueue(){
   return {...report,action:"scheduled_old_between_new",source,ordinal:old.ordinal,item_id:id,...out};
  }catch(e){
   const error=String(e?.message||e).slice(0,240);
-  if(wait){
+  if(sendNew){
    // Buffer CreatePost can succeed before its response is lost, so never
    // blindly retry the same new article without reconciling its channel.
    await sql("UPDATE public.pr_instagram_waitlist_4slots SET state='needs_review',last_error=$2,updated_at=now() WHERE item_id=$1::uuid AND state='dispatching'",[id,error]);
