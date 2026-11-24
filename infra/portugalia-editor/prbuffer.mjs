@@ -1,3 +1,4 @@
+import {retrofitQueuedCategoryStripes} from "./category-stripe-backfill.mjs";
 // Instagram/Buffer publisher for Portugal Journal. Authenticated editorial actions only.
 const CHANNEL="6af8b0f062b70b94b031a50c";
 const STUDIO="https://npsfaymjckcqhtyiafms.supabase.co";
@@ -709,11 +710,23 @@ async function retrofitInstagramBatch(limit=4){
 export default {async fetch(request){
  const url=new URL(request.url),origin=ALLOWED.has(request.headers.get("origin"))?request.headers.get("origin"):"";
  if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":origin,"access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"Authorization,Content-Type","access-control-max-age":"600"}});
- if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:8,interleaved_old_replacements:true,rapid_old_replacement_one_per_minute:false,lisbon_slots:['08:00','13:00','18:00','23:00'],buffer_pending_cap:10,auto_refill:true,instagram_retrofit:true,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
+ if(["GET","POST"].includes(request.method)&&url.pathname==="/health"){const state={ok:true,service:"prbuffer",version:9,category_stripe_buffer_in_place:true,category_stripe_storage_configured:Boolean(process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3),interleaved_old_replacements:true,rapid_old_replacement_one_per_minute:false,lisbon_slots:['08:00','13:00','18:00','23:00'],buffer_pending_cap:10,auto_refill:true,instagram_retrofit:true,instagram_image_delivery:"wikimedia_1600",token_configured:!!process.env.BUFFER_API_KEY,database_configured:!!process.env.DATABASE_URL,verification_secret_configured:!!process.env.PR_BUFFER_SETUP_SECRET};console.log("PRBUFFER_HEALTH",JSON.stringify(state));return json(state,200,origin)}
  if(request.method==="POST"&&url.pathname==="/verify"){
   if(!process.env.PR_BUFFER_SETUP_SECRET||request.headers.get("x-pr-buffer-secret")!==process.env.PR_BUFFER_SETUP_SECRET)return json({error:"unauthorized"},401,origin);
   try{const r=await buffer('query{channel(input:{id:"'+CHANNEL+'"}){id name service}}'); const c=r.channel;return json({ok:!!c&&c.id===CHANNEL,channel_id:c?.id,name:c?.name,service:c?.service},200,origin)}
   catch(e){return json({ok:false,error:e.message},503,origin)}
+ }
+ if(request.method==="POST"&&url.pathname==="/internal/category-stripes"){
+  // Only Neon scheduled triggers may invoke; no user request ever creates a new post.
+  if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
+  try{
+   const report=await retrofitQueuedCategoryStripes({sql,buffer,bufferPostStatus,limit:2});
+   console.log("PR_INSTAGRAM_CATEGORY_STRIPES",JSON.stringify(report));
+   return json({ok:true,...report},200,origin);
+  }catch(e){
+   console.error("PR_INSTAGRAM_CATEGORY_STRIPES_ERROR",String(e.message||e).slice(0,180));
+   return json({ok:false,error:String(e.message||e).slice(0,180)},503,origin);
+  }
  }
  if(request.method==="POST"&&url.pathname==="/internal/retrofit"){
   if(!request.headers.get("x-neon-trigger-invocation-id"))return json({error:"forbidden"},403,origin);
