@@ -1662,14 +1662,19 @@ function renderScheduleQueue(){
  if(!q.length){$("scheduleQueue").innerHTML='<p class="muted" style="padding:15px">Очередь пуста. Утверди первый проверенный материал одной кнопкой.</p>';return}
  const list=q.map(j=>{
   const item=items.find(x=>x.id===j.item_id),name=item?.title||"Факт "+j.item_id.slice(0,7);
-  const editable=["scheduled","blocked"].includes(j.status);
+  const instagramUncertain=j.destination.startsWith("instagram_")&&Boolean(j.buffer_post_id)&&["blocked","unknown"].includes(j.status);
+  // Never offer reschedule/retry for an Instagram post that Buffer already accepted:
+  // an error in Buffer can coexist with a published Instagram post.
+  const editable=["scheduled","blocked"].includes(j.status)&&!instagramUncertain;
   const when=lisbonTimeValue(j.run_at);
   const input=editable?'<input type="datetime-local" data-schedule-datetime="'+safe(j.id)+'" value="'+safe(when)+'">':
    safe(new Date(j.run_at).toLocaleString("ru-RU",{timeZone:"Europe/Lisbon",dateStyle:"short",timeStyle:"short"}));
-  const actions=editable?'<div class="s-actions"><button data-move-queue="'+safe(j.id)+'">Перенести</button><button data-cancel-queue="'+safe(j.id)+'">Отменить</button></div>':
+  const actions=instagramUncertain?'<div class="s-actions"><button data-confirm-instagram="'+safe(j.id)+'">✓ Уже опубликовано</button></div>':
+   editable?'<div class="s-actions"><button data-move-queue="'+safe(j.id)+'">Перенести</button><button data-cancel-queue="'+safe(j.id)+'">Отменить</button></div>':
    j.message_id?'<span class="muted">#'+Number(j.message_id)+'</span>':'';
+  const visibleStatus=instagramUncertain?"Проверить в Instagram":j.status==="submitted"?"Передано Buffer":j.status==="sent"&&j.destination.startsWith("instagram_")?"Опубликовано":j.status;
   return '<tr><td>'+safe(name)+'</td><td>'+safe(destinationLabels[j.destination]||j.destination)+'</td>'+
-   '<td class="status-'+safe(j.status)+'">'+safe(j.status==="submitted"?"Передано Buffer":j.status)+'</td><td>'+input+'</td><td>'+actions+
+   '<td class="status-'+safe(j.status)+'">'+safe(visibleStatus)+'</td><td>'+input+'</td><td>'+actions+
    (j.error?'<small style="color:#ff9b8c">'+safe(j.error)+'</small>':'')+'</td></tr>';
  }).join("");
  $("scheduleQueue").innerHTML='<table><thead><tr><th>Материал</th><th>Канал</th><th>Статус</th>'+
@@ -1679,6 +1684,20 @@ function renderScheduleQueue(){
   const after=parseLisbonDateTime(field.value);
   await api("/schedule/queue/"+id+"/reschedule","POST",{after});
   await loadSchedule();info("Время пересчитано с учётом интервала и тихих часов.");
+ }));
+ $("scheduleQueue").querySelectorAll("[data-confirm-instagram]").forEach(btn=>btn.onclick=()=>task(async()=>{
+  const id=btn.dataset.confirmInstagram;
+  const job=(scheduleData.queue||[]).find(row=>row.id===id);
+  if(!job||!job.destination.startsWith("instagram_"))throw Error("Не найдена публикация Instagram");
+  const handle=job.destination==="instagram_ru"?"net_seryozno":"no.seriously.facts";
+  const permalink=prompt("Этот пост уже опубликован в @"+handle+"?\\n\\nВставьте прямую ссылку на него (instagram.com/"+handle+"/p/...). Это НЕ повторная отправка.");
+  if(permalink===null)return;
+  if(!permalink.trim())throw Error("Нужна ссылка на реально опубликованный пост");
+  if(!confirm("Вы лично проверили публикацию в Instagram и подтверждаете, что это именно нужный материал?\\n\\nПосле подтверждения очередь будет помечена как опубликованная. Ничего повторно не отправляется."))return;
+  await api("/schedule/queue/"+id+"/confirm-instagram","POST",{public_url:permalink.trim(),confirmed:true});
+  await loadBufferPosts();
+  await loadSchedule();
+  info("✓ Публикация подтверждена, архив и очередь обновлены. Повторной отправки не было.");
  }));
  $("scheduleQueue").querySelectorAll("[data-cancel-queue]").forEach(btn=>btn.onclick=()=>task(async()=>{
   if(!confirm("Отменить эту запланированную публикацию?"))return;
@@ -1758,7 +1777,7 @@ async function loadBufferPosts(){
 }
 $("bufferCheckPosts").onclick=()=>task(async()=>{
  await loadBufferPosts();
- info("Статусы Buffer обновлены по данным сервера. Фактическая публикация подтверждается ответом Buffer.");
+ info("Состояния Buffer загружены. Если Buffer ошибочно сообщил о сбое, сверьте Instagram и подтвердите существующий пост в календаре.");
 });
 
 async function refreshBufferChannels(){
