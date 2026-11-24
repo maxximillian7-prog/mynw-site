@@ -51,7 +51,7 @@ window.StudioBrandHub=(function(){
  // is not updated by deploying a newer JavaScript file to GitHub Pages.
  function refreshPortugalFrame(){
   const frame=$("portugalFrame");if(!frame)return;
-  const u=new URL("./portugal/?embedded=1&v=20261124-category-stripes5",location.href);
+  const u=new URL("./portugal/?embedded=1&v=20261124-local-accents-v6",location.href);
   u.searchParams.set("refresh",String(Date.now()));
   frame.dataset.src=u.pathname+u.search;
   frame.dataset.loaded="1";
@@ -266,8 +266,8 @@ window.StudioBrandHub=(function(){
     '<div class="studio-brand-workspace-header portugal">'+
      '<div class="title-cluster"><img src="'+logo("portugal")+'" alt=""><div><h2>Португалия рядом</h2>'+
      '<p>Новости, полезные статьи, афиша, сообщения и календарь публикаций</p></div></div>'+
-     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><button type="button" data-portugal-reload title="Перезагрузить встроенный редактор с новой Instagram-обложкой">↻ Обновить обложки</button><a class="open-external" href="./portugal/?v=20261124-category-stripes5" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
-    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1&v=20261124-category-stripes5" src="about:blank"></iframe>'+
+     '<div class="studio-brand-quickactions"><button type="button" data-hub-go="portugal" data-hub-intent="review">✓ Приёмка</button><button type="button" data-hub-go="portugal" data-hub-intent="queue">◷ Очередь</button><button type="button" data-portugal-reload title="Перезагрузить встроенный редактор с новой Instagram-обложкой">↻ Обновить обложки</button><a class="open-external" href="./portugal/?v=20261124-local-accents-v6" target="_blank" rel="noopener">↗ Отдельно</a></div></div>'+
+    '<iframe id="portugalFrame" class="studio-embedded-frame" loading="lazy" title="Редакция Португалия рядом" data-src="./portugal/?embedded=1&v=20261124-local-accents-v6" src="about:blank"></iframe>'+
     '</section>');
   }
  }
