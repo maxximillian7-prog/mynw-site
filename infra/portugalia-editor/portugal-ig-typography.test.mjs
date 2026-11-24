@@ -11,7 +11,7 @@ const photo=read("./prphoto.mjs");
 const buffer=read("./prbuffer.mjs");
 const design=read("../../journalstudio/cloud/portugal/instagram-cover-design.js");
 const integration=read("../../journalstudio/cloud/portugal/instagram-cover-integration.js");
-const stage=read("./instagram-typography-stale-guard-20261123.sql");
+const stage=read("./instagram-category-stripes-v5-20261124.sql");
 const telegramSql=read("./telegram-instagram-hashtag-order-fix-20261123.sql");
 const hub=read("../../journalstudio/cloud/studio-brand-hub.js");
 const journalShell=read("../../journalstudio/cloud/index.html");
@@ -103,19 +103,51 @@ test("Bright Instagram v3 preserves photo, removes right diamonds and uses ПО�
  assert.match(design,/rgba\(255,255,255,\.88\)/);
  assert.ok(!design.includes("ctx.rotate(Math.PI/4)"));
  assert.ok(!design.includes("const overlay=ctx.createLinearGradient"));
- assert.match(integration,/p\.design_version===3/);
- assert.match(integration,/design_version:3/);
- assert.match(photo,/design_version:3/);
- assert.match(html,/instagram-cover-design\.js\?v=20261123-photo-original4/);
+ assert.match(integration,/p\.design_version===5/);
+ assert.match(integration,/design_version:5/);
+ assert.match(photo,/design_version:5/);
+ assert.match(html,/instagram-cover-design\.js\?v=20261124-category-stripes5/);
+});
+
+
+test("Eight visually distinct categories have matching strong top/bottom stripes",()=>{
+ const sandbox={window:{}};
+ vm.runInNewContext(design,sandbox,{timeout:3000});
+ const api=sandbox.window.PortugalInstagramCover;
+ assert.equal(api.DESIGN_VERSION,5);
+ const keys=["news","events","work","tips","life","family","documents","places"];
+ assert.equal(new Set(keys.map(k=>api.accentFor(k))).size,8);
+ assert.equal(api.accentFor("travel"),api.accentFor("places"));
+ assert.equal(api.accentFor("unknown"),"#72879C");
+ for(const category of keys){
+  const rects=[],output=[];
+  const ctx={font:"",
+   beginPath(){},moveTo(){},arcTo(){},closePath(){},fill(){},stroke(){},save(){},restore(){},rect(){},clip(){},
+   drawImage(){},fillRect:(...args)=>rects.push({fill:ctx.fillStyle,args}),
+   measureText:s=>({width:String(s).length*20}),fillText:s=>output.push(s)};
+  const canvas={getContext:()=>ctx};
+  api.draw(canvas,{width:1600,height:1200},"Полезная проверочная статья",category,"editorial");
+  const top=rects.find(r=>r.args.join(",")==="0,0,1080,24");
+  const bottom=rects.find(r=>r.args.join(",")==="0,1326,1080,24");
+  assert.equal(top?.fill,api.accentFor(category),category+" top");
+  assert.equal(bottom?.fill,api.accentFor(category),category+" bottom");
+  assert.ok(output.some(t=>t==="ПОРТУГАЛИЯ / РЯДОМ"));
+ }
+ assert.match(html,/\.articleRow::before,\.articleRow::after/);
+ assert.match(html,/pt-chat-post.*border-top:6px/);
+ assert.match(html,/--pt-category-accent/);
+ assert.match(integration,/p\.design_version===5/);
+ assert.match(photo,/Number\(designVersion\)!==5/);
+ assert.match(stage,/\(m\.generation_prompt::jsonb->>'category'\)=i\.primary_category/);
 });
 
 test("Embedded Portugal workspace cannot keep an older dark Instagram canvas",()=>{
- assert.match(hub,/portugal\/\?embedded=1&v=20261123-photo-original4/);
+ assert.match(hub,/portugal\/\?embedded=1&v=20261124-category-stripes5/);
  assert.match(hub,/data-portugal-reload/);
  assert.match(hub,/refreshPortugalFrame\(\)/);
- assert.match(journalShell,/studio-brand-hub\.js\?v=20261123-photo-original4/);
- assert.match(html,/instagram-cover-design\.js\?v=20261123-photo-original4/);
- assert.match(html,/instagram-cover-integration\.js\?v=20261123-photo-original4/);
+ assert.match(journalShell,/studio-brand-hub\.js\?v=20261124-category-stripes5/);
+ assert.match(html,/instagram-cover-design\.js\?v=20261124-category-stripes5/);
+ assert.match(html,/instagram-cover-integration\.js\?v=20261124-category-stripes5/);
  assert.match(integration,/\.ig-phone \.ig-cover, \.ig-phone \.ig-cover-canvas/);
  assert.match(integration,/phone\.replaceWith\(canvas\)/);
  assert.match(html,/if\(mode==='instagram'\)\{\s*root\.classList\.remove\('pt-photo-adjust-enabled'\);\s*return;/);
