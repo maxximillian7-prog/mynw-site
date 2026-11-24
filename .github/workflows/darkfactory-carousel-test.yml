@@ -1,0 +1,24 @@
+name: DarkFactory Instagram carousel copy
+on:
+  push:
+    branches: [main]
+    paths:
+      - "journalstudio/cloud/darkfactory.html"
+      - "infra/darkfactory/instagram-carousel-dedup.test.mjs"
+      - ".github/workflows/darkfactory-carousel-test.yml"
+  pull_request:
+    paths:
+      - "journalstudio/cloud/darkfactory.html"
+      - "infra/darkfactory/instagram-carousel-dedup.test.mjs"
+      - ".github/workflows/darkfactory-carousel-test.yml"
+permissions:
+  contents: read
+jobs:
+  carousel-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node --test infra/darkfactory/instagram-carousel-dedup.test.mjs
