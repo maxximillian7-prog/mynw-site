@@ -23,6 +23,14 @@ input[type=search]{width:100%} .filters select{width:100%}
 .listhead{font-size:12px;color:var(--muted);padding:4px 4px 9px;display:flex;justify-content:space-between}
 .items{overflow-y:auto;flex:1;min-height:140px;padding-bottom:10px}
 .articleRow{width:100%;background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;text-align:left;margin:0 0 9px;display:block;color:var(--ink);transition:.1s}
+
+/* Shared category identity: intake list plus Telegram / article previews. */
+.articleRow{position:relative;overflow:hidden;--pt-category-accent:#72879C}
+.articleRow::before,.articleRow::after{content:"";position:absolute;left:0;right:0;height:5px;background:var(--pt-category-accent);pointer-events:none}
+.articleRow::before{top:0}.articleRow::after{bottom:0}
+.pt-chat-post{border-top:6px solid var(--pt-category-accent,#72879C);border-bottom:6px solid var(--pt-category-accent,#72879C)}
+.pt-article-view{border-top:7px solid var(--pt-category-accent,#72879C);border-bottom:7px solid var(--pt-category-accent,#72879C)}
+#categoryTagPreview{display:inline-block;border-bottom:4px solid var(--pt-category-accent,#72879C);padding-bottom:3px}
 .articleRow.active{border-color:#26928d;box-shadow:0 0 0 2px #cae9e6}.articleRow:hover{border-color:#9fc8c4}
 .articleRow strong{display:block;font-weight:750;font-size:13px;line-height:1.4;margin:7px 0}.articleRow .articleSummary{color:#60787b;font-size:11px;line-height:1.45;margin:7px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.articleRow .articleHero{display:flex;gap:10px;align-items:flex-start}.articleRow .articleHero .copy{min-width:0;flex:1}.articleRow .thumb{width:76px;height:70px;border-radius:9px;object-fit:cover;flex:none;background:#e7f0ed}.articleRow .thumbPlaceholder{display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#d8e9e5,#bcd6d2);font-size:24px;color:#317c74}.imagePending{margin:10px 0;border:1px dashed #b9d6cf;color:#638580;border-radius:11px;padding:22px;text-align:center;background:#edf5f3;font-size:12px}
 .articleRow .meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
@@ -468,7 +476,7 @@ body.studio-embedded .workspace{padding:13px}}
 </div>
 <div id="loginOverlay" class="overlay" hidden><div class="loginBox"><h2>🇵🇹 Португалия рядом</h2><p id="loginMessage">Для входа требуется действующая редакционная сессия Journal Studio.</p><a class="btn primary" href="../" style="display:inline-block;margin-top:14px">Войти в Journal Studio</a></div></div>
 <div id="toast" class="toast" hidden></div>
-<script src="./instagram-cover-design.js?v=20261123-photo-original4"></script>
+<script src="./instagram-cover-design.js?v=20261124-category-stripes5"></script>
 <script>
 "use strict";
 const API="https://br-young-paper-b972wmgd-preditor.compute.c-7.eu-central-1.aws.neon.tech";
@@ -827,10 +835,14 @@ async function refreshInstagramState(id){
   if(previewMode==="instagram")renderPreview();
  }catch(e){if(current?.article?.id===id){$("instagramQueueStatus").textContent="Instagram: "+e.message;updateApprovalButtons()}}
 }
+function categoryAccent(category){
+ return window.PortugalInstagramCover?.accentFor(category)||"#72879C";
+}
 function renderPreview(){
  const root=$("livePreview");if(!root||!current)return;
  const oldTop=$("ptChatScroll")?.scrollTop||0;
  const f=gather(),i=current.article||{},img=choosePreviewPhoto();
+ const accent=categoryAccent(i.primary_category);$("categoryTagPreview").style.setProperty("--pt-category-accent",accent);
  const url=/^https:\/\//i.test(i.canonical_url||"")?i.canonical_url:"";
  const tag=i.category_hashtag||categories.find(x=>x.code===i.primary_category)?.telegram_hashtag||"";
  const topicTags=activeTags(i),credit=img?.public_url?"Фото: "+img.public_url:(i.photo_url?"Фото: "+i.photo_url:"");
@@ -845,7 +857,7 @@ function renderPreview(){
  const timestamp='<div class="pt-message-footer">22:42 · ✓</div>';
  const mainNavPreview=i.source_code!=="trailyo_events"?
    '<nav class="pt-post-nav-preview" aria-label="Кнопки после публикации"><a href="https://t.me/pt_afisha" target="_blank" rel="noopener noreferrer">🎭 АФИША</a><a href="https://t.me/pt_ryadom_chat" target="_blank" rel="noopener noreferrer">💬 ЧАТ</a></nav>':"";
-  const richBubble='<article class="pt-chat-post">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events",i.trailyo_event,img?.public_url||i.photo_url)+'</div>'+timestamp+mainNavPreview+'</article>';
+  const richBubble='<article class="pt-chat-post" style="--pt-category-accent:'+accent+'">'+image+'<div class="pt-chat-body">'+renderTelegramMessage(full,i.source_code==="trailyo_events",i.trailyo_event,img?.public_url||i.photo_url)+'</div>'+timestamp+mainNavPreview+'</article>';
  $("categoryTagPreview").textContent=tag||"Не определён — выпуск заблокирован";
  for(const [id,mode] of [["modePhone","phone"],["modeInstagram","instagram"],["modeArticle","article"]]){
   $(id).classList.toggle("selected",previewMode===mode);
@@ -903,7 +915,7 @@ function renderPreview(){
   $("previewHint").textContent=img?(i.source_code==="trailyo_events"?"Rich Message: фото и текст в одной публикации.":"Rich Message: фото, текст и навигационные кнопки. Кнопки прикрепляются после отправки в Telegram, обычно в течение минуты."):"Для полноценной публикации нужна утверждённая фотография.";
   if(full.length>28000)$("previewHint").textContent="⚠️ Текст длиннее 28000 символов — сократите его перед отправкой.";
  }else{
-  root.innerHTML='<article class="pt-article-view">'+
+  root.innerHTML='<article class="pt-article-view" style="--pt-category-accent:'+accent+'">'+
    '<div class="pmeta">🇵🇹 Португалия рядом · '+escapeHtml(catName)+'</div>'+
    '<h2 class="pt-editor-section" data-edit-field="headline">'+escapeHtml(f.headline_ru||"Заголовок")+'</h2>'+
    (img?'<img loading="lazy" src="'+escapeHtml(img.public_url)+'" alt="Иллюстрация" style="width:100%;border-radius:12px;aspect-ratio:16/9;object-fit:cover;margin:10px 0">':'<div class="imagePending">Фотография ещё не выбрана</div>')+
@@ -988,7 +1000,7 @@ async function list(){
  const picture=/^https:\/\//i.test(i.media_preview_url||"")?'<img loading="lazy" class="thumb" src="'+escapeHtml(i.media_preview_url)+'" alt="Иллюстрация к статье">':
  '<div class="thumb thumbPlaceholder" title="Иллюстрация пока не утверждена">'+(i.primary_category==="events"?"🎭":i.primary_category==="places"?"🌿":i.primary_category==="documents"?"📑":i.primary_category==="family"?"👨‍👩‍👧":i.primary_category==="life"?"🏡":"📰")+'</div>';
  const pub=(i.publications||[]).find(p=>["queued","scheduled","sending","failed"].includes(p.status));const when=i.scheduled_for||pub?.scheduled_for;
- return '<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+(i.intake_ready?"green":badge(i.editorial_status))+'">'+escapeHtml(i.item_status==="approved"&&i.editorial_status==="approved"?"Утверждено":i.intake_ready?"На приёмку":i.editorial_status==="approved"?"Ожидает согласования":(statuses[i.editorial_status||"candidate"]||"В подготовке"))+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at)+costLabel)+'</span></div><div class="articleHero">'+picture+'<div class="copy"><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong>'+(i.article_excerpt?'<div class="articleSummary">'+escapeHtml(i.article_excerpt)+'</div>':"")+(i.category_hashtag?'<div class="faint">'+escapeHtml(i.category_hashtag)+'</div>':"")+'</div></div><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div>'+(['queued','approved'].includes(activeStatus)?'<div class="meta" style="font-weight:700;color:#12666b" data-publication-id="'+escapeHtml(i.id)+'">'+(pub?.status==="failed"?'⚠ Ошибка Telegram: '+escapeHtml(pub.last_error||"отправка не прошла"):
+ return '<button class="articleRow '+(current?.article?.id===i.id?"active":"")+'" style="--pt-category-accent:'+categoryAccent(i.primary_category)+'" data-id="'+escapeHtml(i.id)+'"><div class="meta"><span class="pill '+(i.intake_ready?"green":badge(i.editorial_status))+'">'+escapeHtml(i.item_status==="approved"&&i.editorial_status==="approved"?"Утверждено":i.intake_ready?"На приёмку":i.editorial_status==="approved"?"Ожидает согласования":(statuses[i.editorial_status||"candidate"]||"В подготовке"))+'</span><span>'+escapeHtml(iso(i.source_published_at||i.discovered_at)+costLabel)+'</span></div><div class="articleHero">'+picture+'<div class="copy"><strong>'+escapeHtml(i.headline_ru||i.title_ru||i.title_original)+'</strong>'+(i.article_excerpt?'<div class="articleSummary">'+escapeHtml(i.article_excerpt)+'</div>':"")+(i.category_hashtag?'<div class="faint">'+escapeHtml(i.category_hashtag)+'</div>':"")+'</div></div><div class="meta"><span>'+escapeHtml(i.source_name)+'</span><span>'+escapeHtml(i.location_city||"")+'</span></div>'+(['queued','approved'].includes(activeStatus)?'<div class="meta" style="font-weight:700;color:#12666b" data-publication-id="'+escapeHtml(i.id)+'">'+(pub?.status==="failed"?'⚠ Ошибка Telegram: '+escapeHtml(pub.last_error||"отправка не прошла"):
  pub?'🕒 Запланировано: '+escapeHtml(when?lisbonSchedule(when):'уточняется…'):'🕒 Проверяем статус публикации…')+'</div>':'')+'</button>';
  }).join("")||"<p class='secondary'>В этой очереди пока пусто.</p>";
  document.querySelectorAll(".articleRow").forEach(x=>x.onclick=()=>selectArticle(x.dataset.id));
@@ -1770,5 +1782,5 @@ async function start(){
 
 start();
 </script>
-<script src="./instagram-cover-integration.js?v=20261123-photo-original4"></script>
+<script src="./instagram-cover-integration.js?v=20261124-category-stripes5"></script>
 </body></html>
