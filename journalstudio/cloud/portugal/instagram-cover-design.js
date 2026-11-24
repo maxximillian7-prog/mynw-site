@@ -75,21 +75,17 @@ function draw(canvas,photo,title,category,variant="editorial"){
  if(!w||!h)throw Error("Пустая фотография");
  const scale=Math.max(WIDTH/w,HEIGHT/h),rw=WIDTH/scale,rh=HEIGHT/scale;
  ctx.drawImage(photo,(w-rw)/2,(h-rh)/2,rw,rh,0,0,WIDTH,HEIGHT);
- // Mandatory category stripes: bold but compact; never dim the photograph.
- // Identical accent top/bottom, a thin light separator for contrast, no diamonds.
- ctx.fillStyle=categoryAccent;
- ctx.fillRect(0,0,WIDTH,24);
- ctx.fillRect(0,HEIGHT-24,WIDTH,24);
- ctx.fillStyle="rgba(255,255,255,.87)";
- ctx.fillRect(0,24,WIDTH,3);
- ctx.fillRect(0,HEIGHT-27,WIDTH,3);
+ // Keep the source photograph edge-to-edge. Category colors belong beside
+ // the editorial labels, not in full-width borders above/below the article.
  // Original photograph stays bright: no full-frame darkening,
  // gradients, vignettes or decorative diamonds.
  // A compact light editorial label keeps the name readable on any photo.
  rounded(ctx,58,47,636,150,17);
  ctx.fillStyle="rgba(255,255,255,.88)";ctx.fill();
  ctx.strokeStyle="rgba(18,67,68,.16)";ctx.lineWidth=1.5;ctx.stroke();
- ctx.fillStyle=categoryAccent;ctx.fillRect(78,67,9,108);
+ ctx.fillStyle=categoryAccent;
+ ctx.fillRect(78,67,8,108); // compact vertical category accent beside the heading
+ ctx.fillRect(106,122,88,6); // short horizontal accent under the heading
  ctx.textBaseline="alphabetic";
  ctx.font='700 27px "Manrope","Arial",sans-serif';ctx.fillStyle="#163A3D";
  ctx.letterSpacing="2px";ctx.fillText("ПОРТУГАЛИЯ / РЯДОМ",106,106);ctx.letterSpacing="0px";
