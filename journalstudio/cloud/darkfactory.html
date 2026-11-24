@@ -1690,10 +1690,10 @@ function renderScheduleQueue(){
   const job=(scheduleData.queue||[]).find(row=>row.id===id);
   if(!job||!job.destination.startsWith("instagram_"))throw Error("Не найдена публикация Instagram");
   const handle=job.destination==="instagram_ru"?"net_seryozno":"no.seriously.facts";
-  const permalink=prompt("Этот пост уже опубликован в @"+handle+"?\\n\\nВставьте прямую ссылку на него (instagram.com/"+handle+"/p/...). Это НЕ повторная отправка.");
+  const permalink=prompt("Этот пост уже опубликован в @"+handle+"?\n\nВставьте прямую ссылку на него (instagram.com/"+handle+"/p/...). Это НЕ повторная отправка.");
   if(permalink===null)return;
   if(!permalink.trim())throw Error("Нужна ссылка на реально опубликованный пост");
-  if(!confirm("Вы лично проверили публикацию в Instagram и подтверждаете, что это именно нужный материал?\\n\\nПосле подтверждения очередь будет помечена как опубликованная. Ничего повторно не отправляется."))return;
+  if(!confirm("Вы лично проверили публикацию в Instagram и подтверждаете, что это именно нужный материал?\n\nПосле подтверждения очередь будет помечена как опубликованная. Ничего повторно не отправляется."))return;
   await api("/schedule/queue/"+id+"/confirm-instagram","POST",{public_url:permalink.trim(),confirmed:true});
   await loadBufferPosts();
   await loadSchedule();
