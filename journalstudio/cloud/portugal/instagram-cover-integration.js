@@ -23,7 +23,7 @@ function attachedCover(i=current?.article,status="approved"){
  const matches=(current?.media||[]).filter(m=>m.generation_model===MODEL&&m.status===status&&m.public_url);
  const head=String(el("headline")?.value||i?.headline_ru||"").trim();
  return matches.find(m=>{
-  try{const p=JSON.parse(m.generation_prompt||"{}");return p.headline===head&&p.source_photo_url===i.photo_url&&p.variant===selection()&&p.design_version===3}
+  try{const p=JSON.parse(m.generation_prompt||"{}");return p.headline===head&&p.source_photo_url===i.photo_url&&p.variant===selection()&&p.design_version===5}
   catch{return false}
  })||null;
 }
@@ -65,7 +65,7 @@ async function refresh(){
  const expectedArticleId=i.id;
  const ready=attachedCover(i,"approved");
  const hasOriginal=Boolean(i.photo_url);
- if(ready&&el("headline")?.value?.trim()===i.headline_ru)note("✓ Обложка уже утверждена для Instagram. В Telegram остаётся оригинал.");
+ if(ready&&el("headline")?.value?.trim()===i.headline_ru)note("✓ Обложка с цветом рубрики уже утверждена для Instagram. В Telegram остаётся оригинал.");
  else if(hasOriginal)note("Отдельная обложка Instagram готовится к предпросмотру.");
  else note("Сначала выберите фото в разделе выше.",true);
  try{
@@ -121,7 +121,7 @@ async function save({approve=false}={}){
  if(!result||current?.article?.id!==original.id)throw Error("Материал изменился, откройте предпросмотр повторно");
  const url=window.PortugalInstagramCover.toJpeg(result.canvas);
  const response=await api("/api/instagram/cover",{method:"POST",body:{
-  item_id:original.id,headline:result.item.title,variant:selection(),design_version:3,data_url:url,
+  item_id:original.id,headline:result.item.title,variant:selection(),design_version:5,data_url:url,
  }});
  const d=await response.json();
  if(!d?.media_id)throw Error("Сервер не сохранил Instagram-обложку");
