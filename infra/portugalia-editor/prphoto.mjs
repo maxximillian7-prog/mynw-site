@@ -381,9 +381,9 @@ async function uploadInstagramCover(itemId,raw,headline,variant,designVersion){
   if(bytes.length>2_000_000||bytes.length<10_000||
      bytes[0]!==255||bytes[1]!==216||size?.w!==1080||size?.h!==1350)
      throw bad("Неверные размеры или формат Instagram-обложки",422);
-  const [i]=await db("SELECT i.status,i.photo_url,i.photo_rights,d.id draft_id,d.headline_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
+  const [i]=await db("SELECT i.status,i.photo_url,i.photo_rights,i.primary_category,d.id draft_id,d.headline_ru FROM pr_items i JOIN pr_story_drafts d ON d.item_id=i.id WHERE i.id=$1::uuid",[itemId]);
   if(!i||!["candidate","approved"].includes(i.status))throw bad("Редактирование недоступно",409);
-  if(Number(designVersion)!==3||String(headline||"").trim()!==String(i.headline_ru||"").trim()||!["editorial","noir","sunset"].includes(variant))throw bad("Заголовок или стиль изменились — обновите обложку",409);
+  if(Number(designVersion)!==5||String(headline||"").trim()!==String(i.headline_ru||"").trim()||!["editorial","noir","sunset"].includes(variant))throw bad("Заголовок или стиль изменились — обновите обложку",409);
   const [source]=await db("SELECT m.id,m.media_type,m.rights_verified,m.attribution,m.license_details FROM pr_media_assets m WHERE m.item_id=$1::uuid AND m.public_url=$2 AND m.rights_verified=true AND m.status IN ('candidate','approved') ORDER BY m.status='approved' DESC LIMIT 1",[itemId,i.photo_url]);
   if(!source||!["cc_licensed","owned","permission_confirmed"].includes(i.photo_rights))throw bad("Нужно фото с подтверждёнными правами",409);
   const uploaded=await db("SELECT count(*)::int n FROM pr_media_assets WHERE item_id=$1::uuid AND generation_model=$2 AND created_at>now()-interval '24 hours'",[itemId,IG_TYPO]);
@@ -392,14 +392,14 @@ async function uploadInstagramCover(itemId,raw,headline,variant,designVersion){
   const url=await putCover(key,bytes);
   const kind=source.media_type;
   const credit="Instagram typography overlay (1080x1350), source: "+String(source.attribution||"").slice(0,250);
-  const origin=JSON.stringify({headline:String(i.headline_ru||"").trim(),source_photo_url:i.photo_url,variant,design_version:3});
+  const origin=JSON.stringify({headline:String(i.headline_ru||"").trim(),source_photo_url:i.photo_url,variant,design_version:5,category:i.primary_category});
   const [asset]=await db("INSERT INTO pr_media_assets(item_id,story_id,media_type,generation_model,generation_prompt,storage_bucket,storage_key,public_url,attribution,license_details,rights_verified,illustration_label_required,status) VALUES($1::uuid,$2::uuid,$3,$4,$5,$6,$7,$8,$9,$10,true,$11,'candidate') RETURNING id",[itemId,i.draft_id,kind,IG_TYPO,origin,BKT,key,url,credit,String(source.license_details||"")+"\nDerived with exact title typography; original rights preserved.",kind==="generated_illustration"]);
   return {media_id:asset.id,image_url:url,needs_approval:true,instagram_only:true};
 }
 
 export default {async fetch(req){const origin=req.headers.get("origin")||"",ok=hosts.has(origin),u=new URL(req.url);
 if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":ok?origin:"null","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"}});
-if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:11,visual_policy:"PT_VISUAL_RULE_V2",anti_repetition_history_days:35,image_provider:"openai",image_model:AI_COVER_MODEL,openai_key_configured:Boolean(process.env.OPENAI_API_KEY),storage_configured:Boolean(process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3),medium_generation_configured:Boolean(process.env.OPENAI_API_KEY&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
+if(u.pathname==="/health")return result({ok:true,service:"prphoto",version:12,visual_policy:"PT_VISUAL_RULE_V2_CATEGORY_STRIPES",anti_repetition_history_days:35,image_provider:"openai",image_model:AI_COVER_MODEL,openai_key_configured:Boolean(process.env.OPENAI_API_KEY),storage_configured:Boolean(process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3),medium_generation_configured:Boolean(process.env.OPENAI_API_KEY&&process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY&&process.env.AWS_ENDPOINT_URL_S3)},200,ok?origin:"");
 if(!ok)return result({error:"Forbidden origin"},403);
 try{await auth(req);if(req.method==="GET"&&u.pathname==="/api/search"){const q=(u.searchParams.get("q")||"").trim();if(q.length<3||q.length>100)throw bad("Введите запрос 3–100 символов");return result(await searchAll(q),200,origin);}
 if(req.method==="POST"&&u.pathname==="/api/attach"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком длинный запрос");const body=JSON.parse(raw||"{}");return result(body.provider==="openverse"?await attachOpenverse(body.item_id,body.image_id):await attach(body.item_id,body.file_title),200,origin);}
