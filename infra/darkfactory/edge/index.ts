@@ -1,5 +1,6 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { Image } from "jsr:@matmen/imagescript@3.20.3";
 const ROOT=Deno.env.get("SUPABASE_URL")||"", KEY=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"", ANON=Deno.env.get("SUPABASE_ANON_KEY")||"";
 const H={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Access-Control-Allow-Origin":"https://mynw.app","Access-Control-Allow-Headers":"authorization,apikey,content-type,x-darkfactory-session","Access-Control-Allow-Methods":"GET,POST,PUT,PATCH,DELETE,OPTIONS","X-Content-Type-Options":"nosniff","Vary":"Origin"};
 const send=(code:number,data:unknown)=>new Response(JSON.stringify(data),{status:code,headers:H});
@@ -94,15 +95,14 @@ function similarity(a:string,b:string){
 }
 async function aiJson(system:string,query:string,tokens=3400){
  const key=Deno.env.get("OPENAI_API_KEY")?.trim();if(!key)throw Error("AI_UNAVAILABLE");
- const selected=Deno.env.get("DARKFACTORY_AI_MODEL")||"gpt-6.2-sol";
- const models=[selected];
- if(selected!=="gpt-4.1")models.push("gpt-4.1");
+ // Cost policy: use the selected GPT-6 text model and prohibit expensive fallback.
+ const models=["gpt-6-luna"];
  let lastStatus=0;
  for(const model of models){
   const isReasoning=/^gpt-[56]/.test(model);
   const params:any={model,response_format:{type:"json_object"},
    messages:[{role:"system",content:system},{role:"user",content:query}]};
-  if(isReasoning){params.reasoning_effort="low";params.max_completion_tokens=Math.ceil(tokens*1.75)}
+  if(isReasoning){params.reasoning_effort="none";params.max_completion_tokens=tokens}
   else{params.temperature=.92;params.max_tokens=tokens}
   const resp=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
    headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},
@@ -143,12 +143,12 @@ async function factCheck(v:any){
  }catch{return {ok:false,reason:"Fact-check model unavailable",evidence:[]}}
 }
 async function openaiBatch(){
- const histories=["octopus arm neurons partly independent","elephants name-like personalized calls","gecko feet stick using van der Waals forces","glass frogs have transparent skin and pack red blood cells into liver","mantis shrimp punch cavitation bubbles","bees can learn to distinguish human face images","dolphins signature whistles learned labels","sea slugs steal chloroplasts from algae","butterflies taste with feet","tardigrades survived short exposure to space vacuum","sea cucumbers eject internal organs and regrow them","some animals detect earth magnetic field","pistol shrimp snaps claw producing cavitation shock wave","hummingbirds enter torpor to conserve energy","deep sea fish create their own red light","some lizards reproduce by parthenogenesis","termite mound natural air regulation","some frogs carry eggs in their stomach","the triple point of water","ultrasonic vocalizations of bats","marine bioluminescence from chemical reactions","tropical insects disguise as leaves","ants can form living bridges","platypus detects electrical signals from prey","a real animal uses photosynthesis-assisted cells","plants can sense touch and fold leaves","moths use ultrasonic warning clicks","mudskippers breathe air outside water","squid change skin color with special cells","migrating birds sensing magnetic field"];
+ const histories=["immune system contains about 1.8 trillion cells weighing about 1.2 kg","human body emits ultraweak light invisible to eyes","intestinal lining is renewed every three to five days","human vision can detect single photons under laboratory conditions","Saturn average density is lower than water","Moon recedes Earth by 3.8 centimeters annually","Sun volume holds 1.3 million Earths","Jupiter has deep liquid hydrogen ocean","venus flytrap counts electrical impulses before closing and digestion","skunk cabbage flowers generate warmth and melt snow","wood frogs endure partial freezing and heartbeat interruption","archerfish distinguish human faces","water triple point with solid liquid gas simultaneously","ultrasonic standing waves levitate water droplets","some fungi build lightning-like electrical networks","snowflakes have complex air-driven shape variations","probability in one shuffled deck of cards is astronomically tiny","lunar regolith contains oxygen chemically bound to minerals","surface tension of water can float metal needles","birds use earth magnetic field to migrate","sea creatures use fluorescence to signal","gravity can bend starlight around galaxies","light takes eight minutes from Sun to Earth","a proton contains sea of quarks and gluons"]
  const offset=(new Date().getUTCDate()*3)%histories.length;
  const list=[...histories.slice(offset),...histories.slice(0,offset)];
  const recent=await db("darkfactory_items?select=title,hook&order=created_at.desc&limit=200");
  const avoid=recent.map((x:any)=>String(x.title||"")).filter(Boolean);
- const draft=await aiJson(DARK_WRITER,"Make ten distinct real jaw-dropping SCIENCE, NATURE, ANIMAL, SPACE OR EVERYDAY PHENOMENON facts, not historical events; use these leads as inspiration but find new astonishing topics when needed: "+JSON.stringify(list)+"; AVOID previously used headlines/stories: "+JSON.stringify(avoid.slice(0,150))+". Do not fabricate sources or claim certainty without evidence; image prompts must explicitly specify AI editorial illustration, not documentary photography.",10000);
+ const draft=await aiJson(DARK_WRITER,"Make TEN distinct, independently verifiable, truly astonishing facts with EXACT editorial category mix: 2 HUMAN BODY, 2 SPACE, 2 PHYSICS, 2 PLANTS, 1 ANIMALS, and 1 NUMBERS or EARTH. Prefer counterintuitive, spectacular but accurate findings, not vague trivia. Every fact must have a precise qualification and reputable real source; never invent citations or sensationalize interpretations. Rotate publication formats across card/photo_story/carousel/timeline/comparison/reel_story, and apply their format accent scheme: card coral #FF6659, carousel acid-yellow #D7FF38, photo_story cyan #38D5EC, comparison amber #FFBD45, timeline violet #B895F7, reel_story pink #F47DB9. Avoid exact repetition. Not historical events; use these leads only as inspiration: "+JSON.stringify(list)+"; AVOID previously used headlines/stories: "+JSON.stringify(avoid.slice(0,150))+". Do not fabricate sources or claim certainty without evidence; image prompts must explicitly specify AI editorial illustration, not documentary photography.",10000);
  if(!Array.isArray(draft.items))throw Error("No facts generated");
  const candidates=draft.items.slice(0,10).filter((v:any)=>!recent.some((x:any)=>String(x.title||"").toLowerCase()===String(v.title||"").toLowerCase()));
  const work=async(v:any,i:number)=>{
@@ -162,6 +162,29 @@ async function openaiBatch(){
   v.creative_notes="Fact verification: "+checked.reason;
   try{
    const row=clean(v);
+   // Restore the full narrative in all four public posts. AI's brief caption
+   // is a closing question, never a replacement for the verified story.
+   const completeCopy=(lang:"ru"|"en",network:"instagram"|"telegram"):string=>{
+    const en=lang==="en",title=String(en?row.title_en||row.title:row.title||"").trim();
+    const hook=String(en?row.hook_en||row.hook:row.hook||"").trim();
+    const body=String(en?row.body_en||row.body:row.body||"").trim();
+    const short=String(en?(network==="instagram"?row.caption_instagram_en:row.caption_telegram_en):
+      (network==="instagram"?row.caption_instagram:row.caption_telegram)||"").trim();
+    const limit=network==="instagram"?2200:3800;
+    if(body.length<200)throw Error("Missing full fact narrative for "+lang);
+    if(short.includes(body)&&short.length<=limit)return short;
+    const headline=network==="telegram"?"🤯 <b>"+title+"</b>":"🤯 "+title;
+    let full=[headline,hook,body].filter(Boolean).join("\n\n");
+    if(full.length>limit)full=[headline,body].join("\n\n");
+    if(full.length>limit)throw Error("Verified narrative over "+network+" limit");
+    if(short&&short.length<=300&&!full.includes(short)&&full.length+short.length+2<=limit)
+      full+="\n\n"+short;
+    return full;
+   };
+   row.caption_instagram=completeCopy("ru","instagram");
+   row.caption_instagram_en=completeCopy("en","instagram");
+   row.caption_telegram=completeCopy("ru","telegram");
+   row.caption_telegram_en=completeCopy("en","telegram");
    return {...row,source:"fact_research_v1",status_instagram:"review",status_telegram:"review",status_telegram_en:"review",fact_verification:v.fact_verification,evidence:v.evidence,visual_status:"pending",creative_notes:v.creative_notes};
   }catch(e){console.warn("Fact discarded",String(e));return null}
  };
@@ -173,6 +196,53 @@ async function openaiBatch(){
  if(!items.length)throw Error("No structurally valid facts");
  return items;
 }
+// Storage is reached via the Supabase/Cloudflare gateway from the Edge Runtime.
+// A transient 520 can occur between consecutive JPEG slide uploads, even for
+// files well below the 8 MiB bucket limit. Retry the SAME immutable object path
+// and verify existence after ambiguous outcomes; never create duplicate posts.
+async function uploadPublicSocialAsset(storagePath:string,data:Uint8Array,type:string):Promise<void>{
+ const objectUrl=ROOT+"/storage/v1/object/darkfactory-social/"+storagePath;
+ const publicUrl=ROOT+"/storage/v1/object/public/darkfactory-social/"+storagePath;
+ const transient=new Set([408,425,429,500,502,503,504,520,522,524]);
+ const alreadySaved=async():Promise<boolean>=>{
+  try{
+   const head=await fetch(publicUrl,{method:"HEAD",cache:"no-store",
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY},
+    signal:AbortSignal.timeout(6500)});
+   const contentLength=Number(head.headers.get("content-length"));
+   return head.ok&&contentLength===data.byteLength;
+  }catch{return false}
+ };
+ let lastStatus=0;
+ for(let attempt=1;attempt<=4;attempt++){
+  let uploaded:Response|null=null;
+  try{
+   uploaded=await fetch(objectUrl,{method:"POST",
+    headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":type,"x-upsert":"false"},
+    body:data,signal:AbortSignal.timeout(16000)});
+  }catch(err){
+   console.warn("darkfactory_media: storage attempt network error",attempt,String(err).slice(0,130));
+  }
+  if(uploaded?.ok)return;
+  lastStatus=uploaded?.status||0;
+  // A gateway 520 can hide a completed write. Only consider it saved when
+  // the immutable object is publicly retrievable with the expected byte size.
+  if((!uploaded||transient.has(lastStatus)||lastStatus===409)&&await alreadySaved())return;
+  if(uploaded&&!transient.has(lastStatus)){
+   console.error("darkfactory_media: non-retryable storage status",lastStatus,storagePath);
+   throw Error("Instagram/Telegram media storage error HTTP "+lastStatus+
+    ". Проверьте доступность хранилища и повторите сохранение медиа.");
+  }
+  if(attempt<4){
+   console.warn("darkfactory_media: transient storage failure",lastStatus,"attempt",attempt,storagePath);
+   await new Promise(resolve=>setTimeout(resolve,450*Math.pow(2,attempt-1)+Math.floor(Math.random()*150)));
+  }
+ }
+ throw Error("Временный сбой Supabase Storage"+
+  (lastStatus?" (HTTP "+lastStatus+")":" (соединение)")+
+  " после 4 попыток. Не отправлено в Buffer. Обновите страницу и повторите публикацию; предыдущие успешные публикации не дублируются.");
+}
+
 async function serviceRpc(name:string,payload:unknown):Promise<any>{
  const resp=await fetch(ROOT+"/rest/v1/rpc/"+name,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify(payload)});
  if(!resp.ok)throw Error("RPC "+name+" "+resp.status);
@@ -263,20 +333,46 @@ function sanitizeTGFull(text:string):string{
  return String(text||"").replace(/<\/?b>/gi,"").replace(/<[^>]*>/g,"")
   .replace(/https?:\/\/[^\s]+/gi,"").replace(/\r/g,"").trim();
 }
-async function tgPostOnePhotoFullText(token:string,chat:string,path:string,message:string){
+// A single full-length Telegram message with a 1600x1600 headline cover linked above the article.
+async function tgSquareAssetUrl(itemId:string,locale:string,sourcePath:string):Promise<string>{
+ if(!uuid(itemId)||!["ru","en"].includes(locale))throw Error("Invalid Telegram cover request");
+ const [asset]=await db("darkfactory_telegram_assets?select=*&item_id=eq."+itemId+"&locale=eq."+locale+"&limit=1");
+ if(!asset)throw Error("Квадратная Telegram-обложка ещё не подготовлена. Откройте предпросмотр и сохраните её.");
+ const [item]=await db("darkfactory_items?select=title,title_en,image_storage_path&id=eq."+itemId+"&limit=1");
+ const title=String((locale==="ru"?item?.title:item?.title_en||item?.title)||"").trim();
+ if(!item||asset.source_image_path!==sourcePath||asset.source_image_path!==item.image_storage_path||
+    asset.title_snapshot!==title||asset.width!==1600||asset.height!==1600)
+  throw Error("Квадратная Telegram-обложка устарела после изменения фото или заголовка. Подготовьте её заново.");
+ const stored=String(asset.storage_path||"");
+ if(!/^telegram-squares\/[a-f0-9-]{36}\/(ru|en)\/[a-f0-9-]{36}\.jpg$/i.test(stored))
+  throw Error("Invalid archived Telegram image path");
+ const url=ROOT+"/storage/v1/object/public/darkfactory-social/"+stored;
+ const head=await fetch(url,{method:"HEAD",signal:AbortSignal.timeout(10000)}).catch(()=>null);
+ if(!head?.ok)throw Error("Квадратное фото Telegram недоступно по публичной ссылке");
+ return url;
+}
+async function tgPostOnePhotoFullText(token:string,chat:string,path:string,message:string,locale:string,itemId:string){
  const plain=sanitizeTGFull(message);
  if(plain.length<80||plain.length>4000)throw Error("Telegram text must have 80–4000 characters");
- // Telegram's photo-caption limit is 1024. Longer stories are a photo followed by
- // one full-text reply; never truncate the story.
- const short=plain.length<=1000;
- const photo=await tgSendPhoto(token,chat,path,short?plain:"");
- if(short)return {message_id:photo.message_id,extra_message_id:null};
- // A separate reply is needed by Telegram for longer content. Do not hide this.
- const text=await tgRequest(token,"sendMessage",{
+ const squareUrl=await tgSquareAssetUrl(itemId,locale,path);
+ const posted=await tgRequest(token,"sendMessage",{
   chat_id:chat,text:plain,
-  reply_parameters:{message_id:photo.message_id,allow_sending_without_reply:true}
+  link_preview_options:{url:squareUrl,prefer_large_media:true,show_above_text:true,is_disabled:false}
  });
- return {message_id:photo.message_id,extra_message_id:text.message_id};
+ if(!posted?.message_id)throw Error("Telegram did not confirm the single-message publication");
+ return {message_id:posted.message_id,extra_message_id:null,preview_url:squareUrl};
+}
+// Confirmed deliveries from Telegram, Instagram and manual posts govern
+// the spacing between different facts. The four versions of the same fact
+// may share an identical timestamp.
+async function latestOtherFactPublication(itemId:string):Promise<string|null>{
+ const rows=await db("darkfactory_published_archive?select=published_at&item_id=neq."+itemId+
+  "&order=published_at.desc&limit=1");
+ return rows[0]?.published_at||null;
+}
+function latestPostTime(...times:(string|null|undefined)[]):string|null{
+ const values=times.filter((t):t is string=>Boolean(t)&&Number.isFinite(Date.parse(t as string)));
+ return values.length?values.reduce((a,b)=>Date.parse(a)>Date.parse(b)?a:b):null;
 }
 async function runScheduleTick(){
  const now=new Date();
@@ -287,6 +383,32 @@ async function runScheduleTick(){
  "&destination=in.(telegram_ru,telegram_en)&order=run_at.asc&limit=12");
  const results:any[]=[];let sent=0;
  for(const job of due){
+  // The due list is a snapshot. A previous iteration may have moved both
+  // translations together; never send a job whose live slot is now in the future.
+  const [live]=await db("darkfactory_publish_queue?select=status,run_at&id=eq."+job.id+"&limit=1");
+  if(!live||live.status!=="scheduled"||Date.parse(live.run_at)>Date.now())continue;
+  const pairDest=job.destination==="telegram_ru"?"telegram_en":"telegram_ru";
+  const [pair]=await db("darkfactory_publish_queue?select=id,status,run_at&item_id=eq."+
+   job.item_id+"&destination=eq."+pairDest+"&limit=1");
+  if(!pair || ["blocked","unknown","cancelled","sending"].includes(pair.status)){
+   const reason=!pair?"RU/EN companion is missing":
+    "RU/EN companion needs review ("+pair.status+"); this fact is held, others continue";
+   await db("darkfactory_publish_queue?id=eq."+job.id+"&status=eq.scheduled","PATCH",{
+    status:"blocked",error:reason,updated_at:new Date().toISOString()
+   });
+   results.push({id:job.id,status:"blocked_pair",reason});continue;
+  }
+  if(pair.status==="scheduled" &&
+     (Math.abs(Date.parse(pair.run_at)-Date.parse(live.run_at))>60000 || Date.parse(pair.run_at)>Date.now())){
+   // One bad slot must not make RU and EN publish different facts at the same hour.
+   // The database RPC now atomically moves the two queued Telegram translations.
+   try{
+    const after=new Date(Math.max(Date.now()+60000,Date.parse(pair.run_at),Date.parse(live.run_at))).toISOString();
+    const moved=await serviceRpc("darkfactory_reschedule_job",{p_queue_id:job.id,p_after:after});
+    results.push({id:job.id,status:"paired_rescheduled",run_at:moved.run_at});
+   }catch(e){results.push({id:job.id,status:"held_for_pair",reason:String(e).slice(0,130)})}
+   continue;
+  }
   const cfg=config.get(job.destination);if(!cfg)continue;
   const locale=job.destination==="telegram_ru"?"ru":"en";
   const [channel]=await db("darkfactory_telegram_channels?select=*&locale=eq."+locale+"&enabled=eq.true&limit=1");
@@ -299,7 +421,8 @@ async function runScheduleTick(){
   const recent=await db("darkfactory_publish_queue?select=sent_at,run_at,status&destination=eq."+job.destination+
    "&status=eq.sent&order=sent_at.desc&limit=150");
   const todaySent=recent.filter((p:any)=>p.sent_at&&localPostingParts(new Date(p.sent_at)).date===day).length;
-  const last=recent.find((p:any)=>p.sent_at)?.sent_at;
+  const last=latestPostTime(recent.find((p:any)=>p.sent_at)?.sent_at,
+   await latestOtherFactPublication(String(job.item_id)));
   const enoughGap=!last||Date.now()-new Date(last).getTime()>=Number(cfg.min_gap_minutes)*60000;
   if(!weekdayAllowed||excluded||!timeAllowed||todaySent>=Number(cfg.max_per_day)||!enoughGap){
    try{
@@ -310,15 +433,32 @@ async function runScheduleTick(){
    }catch(e){results.push({id:job.id,status:"hold",reason:String(e).slice(0,120)})}
    continue;
   }
-  const [item]=await db("darkfactory_items?select=id,fact_verification,visual_status,status_telegram,status_telegram_en,image_storage_path&id=eq."+job.item_id+"&limit=1");
-  if(!item||item.fact_verification!=="verified"||item.visual_status!=="ready"||
+  const [item]=await db("darkfactory_items?select=id,fact_verification,editorial_deferred,visual_status,status_telegram,status_telegram_en,image_storage_path&id=eq."+job.item_id+"&limit=1");
+  if(!item||item.editorial_deferred||item.fact_verification!=="verified"||item.visual_status!=="ready"||
    (locale==="ru"?item.status_telegram:item.status_telegram_en)!=="approved"||!job.media_path){
     await db("darkfactory_publish_queue?id=eq."+job.id+"&status=eq.scheduled","PATCH",{
      status:"cancelled",error:"Fact, approval or immutable media is no longer valid",updated_at:new Date().toISOString()
     });
     results.push({id:job.id,status:"cancelled"});continue;
   }
-  const claimed=await db("darkfactory_publish_queue?id=eq."+job.id+"&status=eq.scheduled","PATCH",{
+  // Preflight BOTH language covers before sending the first message in a pair.
+  // A missing or stale asset blocks just this fact, never unrelated queue rows.
+  try{
+   if(pair.status==="scheduled"){
+    await Promise.all(["ru","en"].map((l)=>
+     tgSquareAssetUrl(String(job.item_id),l,String(job.media_path))));
+   }else{
+    await tgSquareAssetUrl(String(job.item_id),locale,String(job.media_path));
+   }
+  }catch(err){
+   const reason=String(err instanceof Error?err.message:err).slice(0,250);
+   await db("darkfactory_publish_queue?item_id=eq."+job.item_id+
+    "&destination=in.(telegram_ru,telegram_en)&status=eq.scheduled","PATCH",{
+     status:"blocked",error:"Pair preflight: "+reason,updated_at:new Date().toISOString()
+    });
+   results.push({id:job.id,status:"blocked_pair_media",reason});continue;
+  }
+   const claimed=await db("darkfactory_publish_queue?id=eq."+job.id+"&status=eq.scheduled","PATCH",{
    status:"sending",attempts:Number(job.attempts||0)+1,locked_at:new Date().toISOString(),updated_at:new Date().toISOString()
   });
   if(!claimed.length)continue;
@@ -326,7 +466,7 @@ async function runScheduleTick(){
    const token=await tgToken(locale as Lang);
    const checked=await tgValidate(token,String(channel.channel_id));
    if(checked.channel_id!==String(channel.channel_id))throw Error("Channel mismatch");
-   const out=await tgPostOnePhotoFullText(token,String(channel.channel_id),String(job.media_path),String(job.snapshot_text));
+   const out=await tgPostOnePhotoFullText(token,String(channel.channel_id),String(job.media_path),String(job.snapshot_text),locale,String(job.item_id));
    const sentAt=new Date().toISOString();
    await db("darkfactory_publish_queue?id=eq."+job.id,"PATCH",{
     status:"sent",message_id:out.message_id,extra_message_id:out.extra_message_id,
@@ -382,7 +522,7 @@ async function bufferPreparePost(itemId:string,locale:"ru"|"en",mode:"shareNow"|
  if(!channel)throw Error("Instagram "+locale.toUpperCase()+" not connected to Buffer");
  const [fact]=await db("darkfactory_items?select=*&id=eq."+itemId+"&limit=1");
  if(!fact)throw Error("Fact not found");
- if(fact.fact_verification!=="verified"||fact.status_instagram!=="approved"||
+ if(fact.editorial_deferred||fact.fact_verification!=="verified"||fact.status_instagram!=="approved"||
   fact.visual_status!=="ready"||(fact.source_urls||[]).length<2)
   throw Error("Fact, media or Instagram approval is incomplete");
  if(fact.format_type==="reel_story")throw Error("Reels publication requires an actual video; only a cover preview exists");
@@ -475,7 +615,10 @@ async function reconcileBufferDeliveryStatus(){
     update.published_at=post.sentAt||new Date().toISOString();
     update.public_url=post.externalLink||null;
    }else if(post.status==="error"){
-    update.status="failed";update.error="Buffer reported an Instagram publication error; manual review required";
+    // Buffer may report an error even after Instagram made the post public.
+    // Preserve the Buffer ID and stop automatic retries until Instagram is checked.
+    update.status="unknown";
+    update.error="Buffer reports an error; verify Instagram before retrying";
    }
    if(post.dueAt&&post.status==="scheduled")update.due_at=post.dueAt;
    await db("darkfactory_buffer_posts?id=eq."+rec.id,"PATCH",update);
@@ -488,7 +631,7 @@ async function reconcileBufferDeliveryStatus(){
    }else if(post.status==="error"){
     await db("darkfactory_publish_queue?item_id=eq."+rec.item_id+
      "&destination=eq."+rec.destination+"&status=eq.submitted","PATCH",{
-       status:"blocked",error:"Buffer delivery failed; check Buffer account",
+       status:"unknown",error:"Buffer reports an error; check Instagram before retrying. The post may already be live.",
        updated_at:new Date().toISOString()
      });
     failed++;
@@ -519,7 +662,8 @@ async function runInstagramScheduleTick(){
   const older=await db("darkfactory_publish_queue?select=run_at,sent_at,status&destination=eq."+job.destination+
    "&status=in.(sent,submitted)&order=run_at.desc&limit=160");
   const processedToday=older.filter((x:any)=>localPostingParts(new Date(x.run_at)).date===p.date).length;
-  const latest=older[0]?.sent_at||older[0]?.run_at||null;
+  const latest=latestPostTime(older[0]?.sent_at||older[0]?.run_at||null,
+   await latestOtherFactPublication(String(job.item_id)));
   const gapEnough=!latest||Date.now()-new Date(latest).getTime()>=Number(cfg.min_gap_minutes)*60000;
   if(!allowed||processedToday>=Number(cfg.max_per_day)||!gapEnough){
    try{
@@ -532,9 +676,9 @@ async function runInstagramScheduleTick(){
   }
   const [channel]=await db("darkfactory_buffer_channels?select=channel_id&destination=eq."+job.destination+"&enabled=eq.true&limit=1");
   if(!channel){outcomes.push({id:job.id,status:"paused",reason:"Buffer channel disconnected"});continue}
-  const [fact]=await db("darkfactory_items?select=fact_verification,status_instagram,visual_status&limit=1&id=eq."+job.item_id);
+  const [fact]=await db("darkfactory_items?select=fact_verification,editorial_deferred,status_instagram,visual_status&limit=1&id=eq."+job.item_id);
   const media=await db("darkfactory_instagram_assets?select=id&item_id=eq."+job.item_id+"&locale=eq."+locale+"&limit=1");
-  if(!fact||fact.fact_verification!=="verified"||fact.status_instagram!=="approved"||fact.visual_status!=="ready"||!media.length){
+  if(!fact||fact.editorial_deferred||fact.fact_verification!=="verified"||fact.status_instagram!=="approved"||fact.visual_status!=="ready"||!media.length){
    await db("darkfactory_publish_queue?id=eq."+job.id+"&status=eq.scheduled","PATCH",{
     status:"blocked",error:"Instagram slide(s) or approval missing",updated_at:new Date().toISOString()
    });outcomes.push({id:job.id,status:"blocked"});continue;
@@ -616,6 +760,11 @@ Deno.serve(async(req:Request)=>{
   return send(200,{token,expires_at:expires});
  }
  await gate(id,req);
+ // Confirmed posts only: submitted Buffer work or unknown delivery is not published.
+ if(path==="/published"&&req.method==="GET"){
+  const entries=await db("darkfactory_published_archive?select=*&order=published_at.desc&limit=1000");
+  return send(200,{entries,count:entries.length,timezone:"Europe/Lisbon"});
+ }
  if(path==="/settings"&&req.method==="GET"){
   const [config]=await db("darkfactory_settings?select=auto_enabled,daily_limit,pending_limit,last_run_on&limit=1");
   return send(200,{settings:config||{},ai_enabled:Boolean(Deno.env.get("OPENAI_API_KEY"))});
@@ -673,23 +822,27 @@ Deno.serve(async(req:Request)=>{
  if(path==="/schedule"&&req.method==="GET"){
   const settings=await db("darkfactory_schedule_settings?select=*&order=destination");
   const queue=await db("darkfactory_publish_queue?select=*&order=run_at.asc&limit=300");
-  return send(200,{settings,queue,timezone:"Europe/Lisbon",quiet_hours:{start:"00:00",end:"08:00"},
+  const instant_deliveries=await db("darkfactory_instant_deliveries?select=item_id,destination,status,sent_at,message_id,started_at&order=started_at.desc&limit=200");
+  return send(200,{settings,queue,instant_deliveries,timezone:"Europe/Lisbon",quiet_hours:{start:"00:00",end:"08:00"},
     instagram_notice:"Instagram posting requires separate approved account integrations; queue is preview-only."});
  }
  const settingPath=path.match(/^\/schedule\/settings\/(telegram_ru|telegram_en|instagram_ru|instagram_en)$/);
  if(settingPath&&req.method==="PATCH"){
   await requireTelegramAdmin(id);
   const destination=settingPath[1],body=await req.json().catch(()=>({}));
+  const [previous]=await db("darkfactory_schedule_settings?select=enabled,active_start,active_end&destination=eq."+destination+"&limit=1");
+  if(!previous)return send(404,{error:"Настройки канала не найдены. Обновите журнал."});
+  const wasEnabled=previous.enabled===true;
   const patch:any={updated_at:new Date().toISOString()};
   if(typeof body.enabled==="boolean"){
   
-   if(body.enabled&&destination.startsWith("instagram_")){
+   if(body.enabled&&!wasEnabled&&destination.startsWith("instagram_")){
     const match=await db("darkfactory_buffer_channels?select=channel_id&destination=eq."+destination+"&enabled=eq.true&limit=1");
     if(!match.length)return send(409,{error:"Сначала привяжите отдельный Instagram к Buffer API"});
     const key=await serviceRpc("darkfactory_buffer_key_read",{});
     if(!key)return send(409,{error:"Buffer API key is not configured"});
    }
-   if(body.enabled&&destination.startsWith("telegram_")){
+   if(body.enabled&&!wasEnabled&&destination.startsWith("telegram_")){
     const locale=destination.slice(-2);
     const connected=await db("darkfactory_telegram_channels?select=channel_id&enabled=eq.true&locale=eq."+locale+"&limit=1");
     if(!connected.length)return send(409,{error:"Telegram channel is not connected"});
@@ -723,8 +876,12 @@ Deno.serve(async(req:Request)=>{
    patch.excluded_dates=dates;
   }
   if(typeof body.auto_queue==="boolean")patch.auto_queue=body.auto_queue;
+  const timeStart=String(patch.active_start||previous.active_start||"08:00").slice(0,5);
+  const timeEnd=String(patch.active_end||previous.active_end||"23:59").slice(0,5);
+  if(timeStart>=timeEnd)return send(400,{error:"Время окончания должно быть позже времени начала (Лиссабон)."});
   const [settings]=await db("darkfactory_schedule_settings?destination=eq."+destination,"PATCH",patch);
-  if(destination.startsWith("instagram_")&&patch.enabled===true){
+  if(!settings)return send(409,{error:"Сервер не подтвердил запись настроек. Повторите попытку."});
+  if(destination.startsWith("instagram_")&&patch.enabled===true&&!wasEnabled){
    // Previously approved entries may have been intentionally blocked while
    // the Instagram channel was disconnected. Unblock only this channel.
    const waiting=await db("darkfactory_publish_queue?select=item_id&destination=eq."+destination+"&status=eq.blocked");
@@ -748,6 +905,59 @@ Deno.serve(async(req:Request)=>{
   const moved=await serviceRpc("darkfactory_reschedule_job",{p_queue_id:moveQueue[1],p_after:new Date(after).toISOString()});
   return send(200,{entry:moved});
  }
+ // Resolve an ambiguous Buffer error only after the chief editor has verified
+ // the matching Instagram permalink. Never republish while status is uncertain.
+ const confirmedInstagram=path.match(/^\/schedule\/queue\/([a-f0-9-]{36})\/confirm-instagram$/i);
+ if(confirmedInstagram&&req.method==="POST"){
+  await requireTelegramAdmin(id);
+  const input=await req.json().catch(()=>({}));
+  if(input.confirmed!==true)return send(400,{error:"Подтвердите, что пост уже опубликован в Instagram"});
+  const [job]=await db("darkfactory_publish_queue?select=*&id=eq."+confirmedInstagram[1]+"&limit=1");
+  if(!job||!["instagram_ru","instagram_en"].includes(job.destination))
+   return send(404,{error:"Публикация Instagram не найдена"});
+  const handle=job.destination==="instagram_ru"?"net_seryozno":"no.seriously.facts";
+  let permalink:string;
+  try{
+   const url=new URL(String(input.public_url||"").trim());
+   if(url.protocol!=="https:"||!["instagram.com","www.instagram.com"].includes(url.hostname))
+    return send(400,{error:"Нужна ссылка на Instagram"});
+   const escapedHandle=handle.replaceAll(".","\\.");
+   const match=url.pathname.match(new RegExp("^/"+escapedHandle+"/(p|reel)/([A-Za-z0-9_-]+)/?$","i"));
+   if(!match)return send(400,{error:"Укажите ссылку на пост именно аккаунта @"+handle+" в формате instagram.com/"+handle+"/p/..."});
+   permalink="https://www.instagram.com/"+handle+"/"+match[1].toLowerCase()+"/"+match[2]+"/";
+  }catch{return send(400,{error:"Укажите корректную HTTPS-ссылку на Instagram"})}
+  if(job.status==="sent"){
+   const [existing]=await db("darkfactory_buffer_posts?select=public_url&buffer_post_id=eq."+job.buffer_post_id+"&limit=1");
+   return send(200,{already_confirmed:true,public_url:existing?.public_url||permalink});
+  }
+  if(!["blocked","unknown"].includes(job.status)||!job.buffer_post_id)
+   return send(409,{error:"Для этой публикации нет неоднозначного статуса Buffer, повторная отправка не требуется"});
+  const [record]=await db("darkfactory_buffer_posts?select=*&buffer_post_id=eq."+job.buffer_post_id+
+   "&item_id=eq."+job.item_id+"&destination=eq."+job.destination+"&limit=1");
+  if(!record||!["failed","unknown"].includes(record.status))
+   return send(409,{error:"Связанный Buffer-пост не найден или его статус изменился"});
+  const [fact]=await db("darkfactory_items?select=title&id=eq."+job.item_id+"&limit=1");
+  if(!fact)return send(404,{error:"Материал не найден"});
+  const publishTime=job.run_at||new Date().toISOString();
+  const nowTime=new Date().toISOString();
+  await db("darkfactory_published_archive?on_conflict=item_id,destination","POST",{
+   item_id:job.item_id,destination:job.destination,published_at:publishTime,
+   title_snapshot:fact.title,text_snapshot:job.snapshot_text||"",
+   external_post_id:job.buffer_post_id,public_url:permalink,
+   source_kind:"instagram_editor_confirmed"
+  },true);
+  await db("darkfactory_buffer_posts?id=eq."+record.id,"PATCH",{
+   status:"published",published_at:publishTime,public_url:permalink,error:null,
+   last_checked_at:nowTime,updated_at:nowTime
+  });
+  const updated=await db("darkfactory_publish_queue?id=eq."+job.id+
+   "&status=in.(blocked,unknown)","PATCH",{
+   status:"sent",sent_at:publishTime,error:null,updated_at:nowTime
+  });
+  if(!updated.length)return send(409,{error:"Статус очереди успел измениться; обновите экран"});
+  return send(200,{confirmed:true,entry:updated[0],public_url:permalink});
+ }
+
  const cancelQueue=path.match(/^\/schedule\/queue\/([a-f0-9-]{36})\/cancel$/i);
  if(cancelQueue&&req.method==="POST"){
   await requireTelegramAdmin(id);
@@ -756,6 +966,56 @@ Deno.serve(async(req:Request)=>{
   return send(200,{entry:row[0]});
  }
 
+ // Human editorial verification when source pages cannot be parsed by automated tools.
+ // No auto-publication, and editor attests to personally reviewing two independent links.
+ const manualVerify=path.match(/^\/items\/([a-f0-9-]{36})\/verify-editor$/i);
+ if(manualVerify&&req.method==="POST"){
+  await requireTelegramAdmin(id);
+  const body=await req.json().catch(()=>({}));
+  if(body.confirmed!==true)return send(400,{error:"Редактор должен явно подтвердить личную проверку источников"});
+  const [material]=await db("darkfactory_items?select=*&id=eq."+manualVerify[1]+"&limit=1");
+  if(!material)return send(404,{error:"Факт не найден"});
+  const links=(Array.isArray(material.source_urls)?material.source_urls:[]).filter(
+   (v:any)=>typeof v==="string"&&v.startsWith("https://")
+  );
+  if(links.length<2)return send(409,{error:"Для ручного подтверждения нужно минимум два HTTPS-источника"});
+  const sourceDomain=(address:string):string=>{
+   const u=new URL(address);
+   if(u.protocol!=="https:"||u.username||u.password)throw Error("Недопустимая ссылка на источник");
+   const host=u.hostname.toLowerCase().replace(/^www\./,"");
+   if(!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(host)||host.endsWith(".local"))
+    throw Error("Недопустимый адрес источника");
+   const parts=host.split(".");
+   const suffix=parts.slice(-2).join(".");
+   const multi=new Set(["co.uk","org.uk","ac.uk","gov.uk","com.au","org.au","co.nz","com.br"]);
+   return parts.slice(-(multi.has(suffix)?3:2)).join(".");
+  };
+  let domains:string[];
+  try{domains=links.map(sourceDomain)}
+  catch{return send(400,{error:"Источники должны содержать корректные HTTPS-ссылки на публичные сайты"});}
+  if(new Set(domains).size<2)return send(409,{error:"Два источника должны быть независимыми и находиться на разных доменах"});
+  const now=new Date().toISOString();
+  const reason=String(body.note||"Редактор лично сверил утверждение с двумя независимыми источниками").trim().slice(0,300);
+  const evidence=links.map((url:string,index:number)=>({
+   url,domain:domains[index],method:"manual_editorial_check",
+   checked_at:now,editor_confirmed:true
+  }));
+  const [saved]=await db("darkfactory_items?id=eq."+material.id,"PATCH",{
+   fact_verification:"verified",evidence,
+   creative_notes:("Manual editorial verification: "+reason).slice(0,600),
+   reviewed_by:id,reviewed_at:now,updated_at:now
+  });
+  await db("darkfactory_reviews","POST",{
+   item_id:material.id,actor_id:id,action:"fact_verified_manual",
+   changed_fields:["fact_verification","evidence"],
+   status_instagram:saved.status_instagram,status_telegram:saved.status_telegram,
+   snapshot:{method:"manual_editorial_check",note:reason,source_urls:links,
+    sources:domains,reviewed_at:now,published:false}
+  });
+  return send(200,{verified:true,status:"verified",method:"editor",item:saved,source_count:new Set(domains).size});
+ }
+
+ // Editorial fact check: only the actual two-source verification can set "verified".
  const verifyMatch=path.match(/^\/items\/([a-f0-9-]{36})\/recheck$/i);
  if(verifyMatch&&req.method==="POST"){
   await requireTelegramAdmin(id);
@@ -765,12 +1025,103 @@ Deno.serve(async(req:Request)=>{
   if(links.length<2)return send(409,{error:"Нужны два независимых источника для фактчекинга"});
   const result=await factCheck(material);
   const status=result.ok?"verified":"unverified";
-  await db("darkfactory_items?id=eq."+material.id,"PATCH",{
-   fact_verification:status,evidence:result.evidence,
-   creative_notes:"Fact check: "+result.reason,
-   updated_at:new Date().toISOString()
+  const now=new Date().toISOString();
+  const patch:any={fact_verification:status,evidence:result.evidence,
+   creative_notes:("Fact check: "+result.reason).slice(0,600),updated_at:now};
+  if(!result.ok){patch.status_instagram="review";patch.status_telegram="review";patch.status_telegram_en="review"}
+  const [saved]=await db("darkfactory_items?id=eq."+material.id,"PATCH",patch);
+  if(!result.ok)
+   await db("darkfactory_publish_queue?item_id=eq."+material.id+"&status=in.(scheduled,blocked)","PATCH",{
+    status:"cancelled",error:"Fact check did not confirm the claim",updated_at:now
+   });
+  await db("darkfactory_reviews","POST",{item_id:material.id,actor_id:id,
+   action:result.ok?"fact_verified":"fact_unverified",changed_fields:["fact_verification"],
+   status_instagram:saved?.status_instagram,status_telegram:saved?.status_telegram,
+   snapshot:{reason:result.reason,evidence:result.evidence,source_urls:links,verified:result.ok}});
+  return send(200,{verified:result.ok,status,reason:result.reason,evidence:result.evidence,item:saved});
+ }
+ // Explicitly flag an item as unconfirmed. It stays editable and cannot publish.
+ const unconfirmed=path.match(/^\/items\/([a-f0-9-]{36})\/unconfirmed$/i);
+ if(unconfirmed&&req.method==="POST"){
+  await requireTelegramAdmin(id);
+  const input=await req.json().catch(()=>({}));
+  const note=String(input.reason||"Редакция пока не подтвердила факт").trim().slice(0,350);
+  const [item]=await db("darkfactory_items?select=*&id=eq."+unconfirmed[1]+"&limit=1");
+  if(!item)return send(404,{error:"Факт не найден"});
+  const now=new Date().toISOString();
+  const [saved]=await db("darkfactory_items?id=eq."+item.id,"PATCH",{
+   fact_verification:"unverified",status_instagram:"review",
+   status_telegram:"review",status_telegram_en:"review",
+   creative_notes:("Fact held unconfirmed: "+note).slice(0,600),updated_at:now
   });
-  return send(200,{verified:result.ok,status,reason:result.reason,evidence:result.evidence});
+  await db("darkfactory_publish_queue?item_id=eq."+item.id+"&status=in.(scheduled,blocked)","PATCH",{
+   status:"cancelled",error:"Fact marked unconfirmed by editor",updated_at:now
+  });
+  await db("darkfactory_reviews","POST",{item_id:item.id,actor_id:id,action:"fact_unverified",
+   changed_fields:["fact_verification"],status_instagram:saved.status_instagram,
+   status_telegram:saved.status_telegram,snapshot:{reason:note,source_urls:item.source_urls||[]}});
+  return send(200,{unconfirmed:true,item:saved});
+ }
+ // A draft may be held for later regardless of current factual verification.
+ const deferred=path.match(/^\/items\/([a-f0-9-]{36})\/(defer|resume)$/i);
+ if(deferred&&req.method==="POST"){
+  await requireTelegramAdmin(id);
+  const [item]=await db("darkfactory_items?select=id,editorial_deferred&id=eq."+deferred[1]+"&limit=1");
+  if(!item)return send(404,{error:"Факт не найден"});
+  const hold=deferred[2]==="defer",now=new Date().toISOString();
+  const patch:any={editorial_deferred:hold,updated_at:now};
+  if(hold){
+   patch.editorial_deferred_at=now;
+   patch.status_instagram="review";patch.status_telegram="review";patch.status_telegram_en="review";
+  }
+  const [saved]=await db("darkfactory_items?id=eq."+item.id,"PATCH",patch);
+  if(hold)await db("darkfactory_publish_queue?item_id=eq."+item.id+"&status=in.(scheduled,blocked)","PATCH",{
+   status:"cancelled",error:"Publication deferred by editor",updated_at:now
+  });
+  await db("darkfactory_reviews","POST",{item_id:item.id,actor_id:id,
+   action:hold?"deferred":"resumed",changed_fields:["editorial_deferred"],
+   status_instagram:saved.status_instagram,status_telegram:saved.status_telegram,
+   snapshot:{editorial_deferred:hold,at:now}});
+  return send(200,{deferred:hold,item:saved});
+ }
+ // Confirm a chosen ORIGINAL photo, including one already set as current. This records
+ // explicit editorial approval without approving the entire article for publication.
+ const mediaApprove=path.match(/^\/items\/([a-f0-9-]{36})\/media-approve$/i);
+ if(mediaApprove&&req.method==="POST"){
+  await requireTelegramAdmin(id);
+  const body=await req.json().catch(()=>({}));
+  if(!uuid(body.version_id)||body.confirmed!==true)
+   return send(400,{error:"Укажите архивную версию и подтвердите выбор фотографии"});
+  const itemId=mediaApprove[1];
+  const [version]=await db("darkfactory_media_versions?select=id,item_id,storage_path,kind&item_id=eq."+
+   itemId+"&id=eq."+body.version_id+"&limit=1");
+  if(!version)return send(404,{error:"Версия фотографии не найдена в архиве этой статьи"});
+  const verified=await serviceRpc("darkfactory_media_exists",{p_path:version.storage_path});
+  if(verified!==true)return send(404,{error:"Исходное фото отсутствует в защищённом хранилище"});
+  const [old]=await db("darkfactory_items?select=id,image_storage_path,status_instagram,status_telegram,status_telegram_en&id=eq."+
+   itemId+"&limit=1");
+  if(!old)return send(404,{error:"Материал не найден"});
+  const changed=old.image_storage_path!==version.storage_path;
+  let item=old;
+  if(changed){
+   const now=new Date().toISOString();
+   await db("darkfactory_publish_queue?item_id=eq."+itemId+"&status=in.(scheduled,blocked)","PATCH",{
+    status:"cancelled",error:"Одобрена другая фотография, требуется повторная приёмка",updated_at:now
+   });
+   [item]=await db("darkfactory_items?id=eq."+itemId,"PATCH",{
+    image_storage_path:version.storage_path,visual_status:"ready",
+    status_instagram:"review",status_telegram:"review",status_telegram_en:"review",updated_at:now
+   });
+  }
+  const [review]=await db("darkfactory_reviews","POST",{
+   item_id:itemId,actor_id:id,action:"photo_approved",
+   changed_fields:changed?["image_storage_path","visual_status"]:["image_storage_path"],
+   status_instagram:item.status_instagram,status_telegram:item.status_telegram,
+   snapshot:{media_version_id:version.id,storage_path:version.storage_path,
+    kind:version.kind,approved:true,published:false,changed_photo:changed}
+  });
+  return send(200,{approved:true,selected:version.id,approval_at:review?.created_at||new Date().toISOString(),
+   changed_photo:changed,item});
  }
  const restoreMedia=path.match(/^\/items\/([a-f0-9-]{36})\/media-restore$/i);
  if(restoreMedia&&req.method==="POST"){
@@ -793,7 +1144,8 @@ Deno.serve(async(req:Request)=>{
   await requireTelegramAdmin(id);
   const [fact]=await db("darkfactory_items?select=*&id=eq."+approveMatch[1]+"&limit=1");
   if(!fact)return send(404,{error:"Material not found"});
-  if(fact.fact_verification!=="verified"||(fact.source_urls||[]).length<2)return send(409,{error:"Сначала проверьте факт и минимум два независимых источника"});
+  if(fact.editorial_deferred)return send(409,{error:"Публикация отложена. Сначала нажмите «Вернуть к публикации»"});
+   if(fact.fact_verification!=="verified"||(fact.source_urls||[]).length<2)return send(409,{error:"Сначала проверьте факт и минимум два независимых источника"});
   if(fact.visual_status!=="ready"||!fact.image_storage_path)return send(409,{error:"Сначала загрузите или сгенерируйте одно постоянное изображение"});
   if(String(fact.caption_instagram||"").length<100||String(fact.caption_instagram_en||"").length<100||
     String(fact.caption_telegram||"").length<100||String(fact.caption_telegram_en||"").length<100)return send(409,{error:"Подготовьте полные тексты RU и EN для обеих площадок"});
@@ -804,12 +1156,20 @@ Deno.serve(async(req:Request)=>{
    reviewed_by:id,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()
   });
   const cfg=await db("darkfactory_schedule_settings?select=destination,auto_queue&order=destination");
-  const queued:any[]=[];const errors:any[]=[];
+  const queued:any[]=[],errors:any[]=[],skipped:string[]=[];
   for(const destination of cfg.filter((x:any)=>x.auto_queue).map((x:any)=>x.destination)){
-   try{const added=await serviceRpc("darkfactory_queue_fact",{p_item_id:fact.id,p_destination:destination,p_after:new Date().toISOString()});queued.push(added)}
-   catch(e){errors.push({destination,error:String(e instanceof Error?e.message:e).slice(0,120)})}
+   try{
+    if(destination.startsWith("telegram_")){
+     const manual=await db("darkfactory_instant_deliveries?select=id&item_id=eq."+fact.id+"&destination=eq."+destination+"&limit=1");
+     if(manual.length){skipped.push(destination+" (already sent or requires review)");continue}
+    }else{
+     const posted=await db("darkfactory_buffer_posts?select=id&item_id=eq."+fact.id+"&destination=eq."+destination+"&limit=1");
+     if(posted.length){skipped.push(destination+" (already submitted to Buffer)");continue}
+    }
+    const added=await serviceRpc("darkfactory_queue_fact",{p_item_id:fact.id,p_destination:destination,p_after:new Date().toISOString()});queued.push(added);
+   }catch(e){errors.push({destination,error:String(e instanceof Error?e.message:e).slice(0,120)})}
   }
-  return send(errors.length?207:200,{approved:true,item_id:fact.id,queue:queued,errors});
+  return send(errors.length?207:200,{approved:true,item_id:fact.id,queue:queued,errors,skipped});
  }
  const signedMedia=path.match(/^\/items\/([a-f0-9-]{36})\/media$/i);
  if(signedMedia&&req.method==="GET"){
@@ -851,10 +1211,53 @@ Deno.serve(async(req:Request)=>{
   const media=await db("darkfactory_media_versions?select=id,storage_path,kind,created_at&item_id=eq."+fact.id+"&order=created_at.desc");
   return send(200,{saved:true,storage_path:storagePath,versions:media});
  }
+ // Existing photos live in a PRIVATE bucket. Sign each archived version for editorial
+ // thumbnails and full-size review; paths alone cannot be displayed by the browser.
+ const libraryPath=path==="/media-library"&&req.method==="GET";
  const mediaHistory=path.match(/^\/items\/([a-f0-9-]{36})\/media-history$/i);
- if(mediaHistory&&req.method==="GET"){
-  const media=await db("darkfactory_media_versions?select=id,storage_path,kind,created_at,byte_size&item_id=eq."+mediaHistory[1]+"&order=created_at.desc");
-  return send(200,{versions:media});
+ if(libraryPath||(mediaHistory&&req.method==="GET")){
+  const itemId=mediaHistory?.[1]||null;
+  const media=await db("darkfactory_media_versions?select=id,item_id,storage_path,kind,created_at,byte_size,content_type"+
+   (itemId?"&item_id=eq."+itemId:"")+"&order=created_at.desc&limit=120");
+  const facts=await db("darkfactory_items?select=id,title,title_en,image_storage_path"+
+   (itemId?"&id=eq."+itemId:"")+"&limit=1000");
+  const factById=new Map(facts.map((f:any)=>[f.id,f]));
+  const reviews=await db("darkfactory_reviews?select=item_id,snapshot,created_at"+
+   (itemId?"&item_id=eq."+itemId:"")+
+   "&action=eq.photo_approved&order=created_at.desc&limit=500");
+  const newestApproval=new Map<string,any>();
+  for(const row of reviews)if(!newestApproval.has(row.item_id))newestApproval.set(row.item_id,row);
+  const archive=await Promise.all(media.map(async(v:any)=>{
+   const fact:any=factById.get(v.item_id);
+   const goodPath=typeof v.storage_path==="string"&&
+    /^shocking-facts\/[a-f0-9-]{36}\/[a-f0-9-]{36}\.(jpg|jpeg|png|webp)$/i.test(v.storage_path)&&
+    v.storage_path.split("/")[1]===v.item_id;
+   let image_url:string|null=null;
+   if(goodPath){
+    try{
+     const link=await fetch(ROOT+"/storage/v1/object/sign/studio-private/"+v.storage_path,{
+      method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({expiresIn:1800}),signal:AbortSignal.timeout(12000)
+     });
+     if(link.ok){
+      const data=await link.json();
+      if(typeof data?.signedURL==="string"&&data.signedURL.startsWith("/object/sign/"))
+       image_url=ROOT+"/storage/v1"+data.signedURL;
+     }
+    }catch(err){console.warn("media archive signing failure",v.id,String(err).slice(0,100))}
+   }
+   return {id:v.id,item_id:v.item_id,kind:v.kind,created_at:v.created_at,
+    byte_size:v.byte_size,content_type:v.content_type,
+    title:fact?.title||"Без названия",title_en:fact?.title_en||"",
+    current:Boolean(fact&&fact.image_storage_path===v.storage_path),
+    approved:Boolean(newestApproval.get(v.item_id)?.snapshot?.media_version_id===v.id&&
+      fact&&fact.image_storage_path===v.storage_path),
+    approved_at:newestApproval.get(v.item_id)?.snapshot?.media_version_id===v.id?
+      newestApproval.get(v.item_id).created_at:null,
+    available:Boolean(image_url),image_url};
+  }));
+  return send(200,{versions:archive,total:archive.length,
+   scope:itemId?"article":"library",expires_in:1800});
  }
 
  // Immediate manual editorial override: sends ONLY the selected approved fact.
@@ -923,9 +1326,7 @@ Deno.serve(async(req:Request)=>{
   const png=data[0]===137&&data[1]===80&&data[2]===78&&data[3]===71;
   if(!(type==="image/jpeg"&&jpeg||type==="image/png"&&png))return send(422,{error:"Invalid file signature"});
   const path="social/"+instagramMedia[1]+"/"+instagramMedia[2]+"/"+crypto.randomUUID()+(jpeg?".jpg":".png");
-  const uploaded=await fetch(ROOT+"/storage/v1/object/darkfactory-social/"+path,{method:"POST",
-   headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":type,"x-upsert":"false"},body:data});
-  if(!uploaded.ok)throw Error("Instagram public media upload failed "+uploaded.status);
+  await uploadPublicSocialAsset(path,data,type);
 
   if(Number(instagramMedia[3])===1){
    // A new carousel replaces the old slide manifest, not the immutable files.
@@ -936,7 +1337,7 @@ Deno.serve(async(req:Request)=>{
      status_instagram:"review",updated_at:new Date().toISOString()
     });
     await db("darkfactory_publish_queue?item_id=eq."+instagramMedia[1]+
-     "&destination=in.(instagram_ru,instagram_en)&status=in.(scheduled,blocked)","PATCH",{
+     "&destination=eq.instagram_"+instagramMedia[2]+"&status=in.(scheduled,blocked)","PATCH",{
      status:"cancelled",error:"Instagram visual refreshed; reapproval needed",updated_at:new Date().toISOString()
     });
    }
@@ -965,6 +1366,76 @@ Deno.serve(async(req:Request)=>{
   return send(200,result);
  }
 
+ // Upload or inspect a square Telegram headline cover; private editor roles only.
+ const squareMedia=path.match(/^\/telegram\/items\/([a-f0-9-]{36})\/(ru|en)\/asset$/i);
+ if(squareMedia&&req.method==="PUT"){
+  await requireTelegramAdmin(id);
+  const itemId=squareMedia[1],locale=squareMedia[2];
+  const [fact]=await db("darkfactory_items?select=id,title,title_en,visual_status,image_storage_path&id=eq."+itemId+"&limit=1");
+  if(!fact||fact.visual_status!=="ready"||!fact.image_storage_path)
+   return send(409,{error:"Нужен исходный сохранённый снимок"});
+  if(String(req.headers.get("Content-Type")||"").split(";")[0].toLowerCase()!=="image/jpeg")
+   return send(415,{error:"Требуется JPEG 1600×1600"});
+  const bytes=new Uint8Array(await req.arrayBuffer());
+  if(bytes.length<1000||bytes.length>8*1024*1024||bytes[0]!==255||bytes[1]!==216||bytes[2]!==255)
+   return send(413,{error:"Недопустимый размер или формат JPEG"});
+  const decoded=await Image.decode(bytes).catch(()=>null);
+  if(!decoded||decoded.width!==1600||decoded.height!==1600)
+   return send(422,{error:"Квадратный Telegram-шаблон должен быть ровно 1600×1600"});
+  const imagePath="telegram-squares/"+itemId+"/"+locale+"/"+crypto.randomUUID()+".jpg";
+  await uploadPublicSocialAsset(imagePath,bytes,"image/jpeg");
+  const title=String((locale==="ru"?fact.title:fact.title_en||fact.title)||"").trim();
+  const publicUrl=ROOT+"/storage/v1/object/public/darkfactory-social/"+imagePath;
+  const [asset]=await db("darkfactory_telegram_assets?on_conflict=item_id,locale","POST",{
+   item_id:itemId,locale,storage_path:imagePath,image_url:publicUrl,source_image_path:fact.image_storage_path,
+   title_snapshot:title,width:1600,height:1600,updated_at:new Date().toISOString()
+  },true);
+  return send(200,{saved:true,asset:{locale:asset.locale,url:asset.image_url,width:1600,height:1600}});
+ }
+ if(squareMedia&&req.method==="GET"){
+  const [row]=await db("darkfactory_telegram_assets?select=*&item_id=eq."+squareMedia[1]+"&locale=eq."+squareMedia[2]+"&limit=1");
+  if(!row)return send(200,{ready:false});
+  const [fact]=await db("darkfactory_items?select=title,title_en,image_storage_path&id=eq."+squareMedia[1]+"&limit=1");
+  const title=String((squareMedia[2]==="ru"?fact?.title:fact?.title_en||fact?.title)||"").trim();
+  const ready=Boolean(fact&&row.source_image_path===fact.image_storage_path&&row.title_snapshot===title);
+  return send(200,{ready,url:ready?row.image_url:null,width:1600,height:1600});
+ }
+ // Previous 16:9 endpoint is deliberately retired to prevent old visuals.
+ const legacyWide=path.match(/^\/telegram\/items\/([a-f0-9-]{36})\/preview-wide$/i);
+ if(legacyWide&&req.method==="POST")
+  return send(410,{error:"Обновите редактор: Telegram теперь использует обложку 1:1 с заголовком."});
+
+ // Confirm exactly the previewed, already-archived photo and selected channel copies.
+ // Editors no longer need to mark the same saved photo as approved elsewhere.
+ const previewApproval=path.match(/^\/items\/([a-f0-9-]{36})\/approve-preview$/i);
+ if(previewApproval&&req.method==="POST"){
+  await requireTelegramAdmin(id);
+  const data=await req.json().catch(()=>({}));
+  const allowed=new Set(["telegram_ru","telegram_en","instagram_ru","instagram_en"]);
+  const destinations=Array.isArray(data.destinations)?[...new Set(data.destinations)]:[];
+  if(!destinations.length||destinations.some((d:any)=>!allowed.has(d)))
+   return send(400,{error:"Укажите хотя бы один допустимый канал"});
+  const [fact]=await db("darkfactory_items?select=*&id=eq."+previewApproval[1]+"&limit=1");
+  if(!fact)return send(404,{error:"Материал не найден"});
+  if(fact.editorial_deferred)return send(409,{error:"Материал отложен. Верните к публикации перед утверждением."});
+  if(fact.fact_verification!=="verified"||!Array.isArray(fact.source_urls)||fact.source_urls.length<2)
+   return send(409,{error:"Факт необходимо подтвердить по двум источникам до публикации"});
+  if(!fact.image_storage_path || await serviceRpc("darkfactory_media_exists",{p_path:fact.image_storage_path})!==true)
+   return send(409,{error:"Фото пока не сохранено в постоянном архиве"});
+  for(const dest of destinations){
+   const name=dest==="telegram_ru"?"caption_telegram":dest==="telegram_en"?"caption_telegram_en":
+    dest==="instagram_ru"?"caption_instagram":"caption_instagram_en";
+   const text=dest.startsWith("telegram_")?sanitizeTGFull(String(fact[name]||"")):String(fact[name]||"").trim();
+   if(text.length<80||text.length>(dest.startsWith("telegram_")?4000:2200))
+    return send(409,{error:"Текст для "+dest+" должен содержать 80–"+(dest.startsWith("telegram_")?4000:2200)+" символов"});
+  }
+  const updates:any={visual_status:"ready",reviewed_by:id,reviewed_at:new Date().toISOString(),
+   updated_at:new Date().toISOString()};
+  for(const dest of destinations)updates[dest==="telegram_ru"?"status_telegram":dest==="telegram_en"?"status_telegram_en":"status_instagram"]="approved";
+  const rows=await db("darkfactory_items?id=eq."+fact.id,"PATCH",updates);
+  return send(200,{approved:true,verified_media:true,destinations,item:rows[0]});
+ }
+
  const immediate=path.match(/^\/telegram\/items\/([a-f0-9-]{36})\/(ru|en)\/publish-now$/i);
  if(immediate&&req.method==="POST"){
   await requireTelegramAdmin(id);
@@ -973,6 +1444,7 @@ Deno.serve(async(req:Request)=>{
   if(!channel)return send(409,{error:"Подключение Telegram не подтверждено"});
   const [fact]=await db("darkfactory_items?select=*&id=eq."+itemId+"&limit=1");
   if(!fact)return send(404,{error:"Факт не найден"});
+  if(fact.editorial_deferred)return send(409,{error:"Материал отложен. Верните к публикации прежде чем отправлять пост."});
   if(fact.fact_verification!=="verified"||!Array.isArray(fact.source_urls)||fact.source_urls.length<2||
    fact.visual_status!=="ready"||!fact.image_storage_path||
    (locale==="ru"?fact.status_telegram:fact.status_telegram_en)!=="approved")
@@ -1007,7 +1479,7 @@ Deno.serve(async(req:Request)=>{
    const token=await tgToken(locale as Lang);
    const checked=await tgValidate(token,String(channel.channel_id));
    if(String(checked.channel_id)!==String(channel.channel_id))throw Error("Channel mismatch");
-   outcome=await tgPostOnePhotoFullText(token,String(channel.channel_id),fact.image_storage_path,body);
+   outcome=await tgPostOnePhotoFullText(token,String(channel.channel_id),fact.image_storage_path,body,locale,itemId);
    await db("darkfactory_instant_deliveries?id=eq."+claim[0].id,"PATCH",{
     status:"sent",message_id:outcome.message_id,extra_message_id:outcome.extra_message_id,
     sent_at:new Date().toISOString()
@@ -1033,11 +1505,15 @@ Deno.serve(async(req:Request)=>{
   const dest="telegram_"+publishRoute[2],itemId=publishRoute[1];
   const [channel]=await db("darkfactory_telegram_channels?select=enabled&locale=eq."+publishRoute[2]+"&enabled=eq.true&limit=1");
   if(!channel)return send(409,{error:"Channel not connected"});
+  const [fact]=await db("darkfactory_items?select=id,fact_verification,editorial_deferred,visual_status,status_telegram,status_telegram_en&id=eq."+itemId+"&limit=1");
+  if(!fact||fact.editorial_deferred||fact.fact_verification!=="verified"||fact.visual_status!=="ready"||
+   (publishRoute[2]==="ru"?fact.status_telegram:fact.status_telegram_en)!=="approved")
+   return send(409,{error:"Чтобы запланировать пост, верните его из «Отложено», подтвердите факт и утвердите Telegram-версию."});
   const queued=await serviceRpc("darkfactory_queue_fact",{p_item_id:itemId,p_destination:dest,p_after:new Date().toISOString()});
   return send(200,{queued:true,entry:queued,message:"Добавлено в очередь с соблюдением тихих часов и интервала"});
  }
  if(path==="/items"&&req.method==="GET"){
-  const rows=await db("darkfactory_items?select=*&order=created_at.desc&limit=200");
+  const rows=await db("darkfactory_items?select=*&order=created_at.desc&limit=1000");
   const signed=await Promise.all(rows.filter((x:any)=>x.image_storage_path).slice(0,40).map(async(x:any)=>{
    try{const res=await fetch(ROOT+"/storage/v1/object/sign/studio-private/"+x.image_storage_path,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({expiresIn:1800})});const a=res.ok?await res.json():{};return {id:x.id,url:a.signedURL?ROOT+"/storage/v1"+a.signedURL:null}}
    catch{return {id:x.id,url:null}}
@@ -1062,31 +1538,85 @@ Deno.serve(async(req:Request)=>{
 
  const imageMatch=path.match(/^\/items\/([a-f0-9-]{36})\/generate-image$/i);
  if(imageMatch&&req.method==="POST"){
-  const [record]=await db("darkfactory_items?select=id,title,title_en,body,visual_prompt,visual_prompt_en,image_storage_path,source,fact_verification,visual_status&id=eq."+imageMatch[1]+"&limit=1");
-  if(!record)return send(404,{error:"Material not found"});
-  if(record.fact_verification!=="verified")return send(409,{error:"Image generation requires verified facts"});
-  if(record.image_storage_path)return send(409,{error:"Image already exists; no paid regeneration without manual review"});
-  const count=await db("darkfactory_items?select=id&image_generated_at=gte."+new Date(Date.now()-86400000).toISOString()+"&limit=30");
-  if(count.length>=12)return send(429,{error:"Daily pilot image budget reached"});
-  const key=Deno.env.get("OPENAI_API_KEY");if(!key)return send(503,{error:"Image API is not configured"});
-  const model=Deno.env.get("DARKFACTORY_IMAGE_MODEL")||"gpt-image-2.5-flare";
-  const concept=String(record.visual_prompt_en||record.visual_prompt||record.title_en||record.title).slice(0,900);
-  const prompt="Create exactly ONE extremely high-quality cinematic editorial illustration for the fact magazine NO, SERIOUSLY?. Aspect ratio 4:5, professional photography-like lighting, cinematic historical recreation, rich physical textures, bold contrast and restrained colors; charcoal black shadows, neon-lime accent #C5F332, electric coral accent #FF6659. NO text, letters, logos, dates, watermarks, flags, posters, captions or UI, as all typography will be composited on the client. Subject: "+concept+". The image is an explicitly AI-generated illustration, NEVER claim this is an actual archive photograph. Avoid graphic injuries, sensationalized tragedy, recognizable real persons.";
+  await requireTelegramAdmin(id);
+  const [fact]=await db("darkfactory_items?select=*&id=eq."+imageMatch[1]+"&limit=1");
+  if(!fact)return send(404,{error:"Материал не найден"});
+  const reqBody=await req.json().catch(()=>({}));
+  const oldPath=String(fact.image_storage_path||"");
+  if(oldPath&&reqBody.replace_existing!==true)return send(409,{error:"Для платной перегенерации подтвердите замену фото"});
+  if(fact.visual_status==="generating"&&Date.now()-Date.parse(fact.updated_at)<8*60000)
+   return send(409,{error:"Изображение уже генерируется"});
+  if(fact.fact_verification==="disputed")return send(409,{error:"Факт спорный, исправьте его перед созданием изображения"});
+  // Paid media is normally created only after the editorial fact text was approved.
+  // An explicit editor may opt in to early generation; this action still requires admin authorization.
+  const editorialApproved=[fact.status_instagram,fact.status_telegram,fact.status_telegram_en].includes("approved");
+  if(!editorialApproved&&reqBody.confirm_preapproval_generation!==true)
+   return send(409,{error:"Сначала утвердите текст хотя бы для одной площадки. Для осознанной ранней генерации передайте confirm_preapproval_generation:true."});
+  // Manual resets must not rewrite or erase the history of generated media.
+  const [quota]=await db("darkfactory_settings?select=image_limit_reset_at&id=eq.true&limit=1");
+  const resetTime=quota?.image_limit_reset_at?Date.parse(quota.image_limit_reset_at):0;
+  const windowStart=new Date(Math.max(Date.now()-86400000,Number.isFinite(resetTime)?resetTime:0)).toISOString();
+  const cost=await db("darkfactory_items?select=id&image_generated_at=gte."+
+    encodeURIComponent(windowStart)+"&limit=30");
+  if(cost.length>=12)return send(429,{error:"Суточный лимит генераций изображений достигнут (12). Сброс не удаляет историю."});
+  const key=Deno.env.get("OPENAI_API_KEY")?.trim();
+  if(!key)return send(503,{error:"Не задан ключ Image API"});
+  const model="gpt-image-2.5-flare"; // The image policy forbids High and ignores legacy model overrides.
+  const concept=String(fact.visual_prompt_en||fact.visual_prompt||fact.title_en||fact.title).trim().slice(0,1400);
+  if(concept.length<16)return send(409,{error:"Сначала заполните промпт визуала"});
+  const accents:Record<string,string>={card:"#FF6659",carousel:"#D7FF38",photo_story:"#38D5EC",comparison:"#FFBD45",timeline:"#B895F7",reel_story:"#F47DB9"};
+  const palette="a tiny restrained "+(accents[String(fact.format_type)]||accents.card)+" practical-light accent matching the editorial publication format";
+  const prompt="ONE original premium science fact magazine illustration for NO, SERIOUSLY?! / НЕТ! СЕРЬЁЗНО?!; same unified established series style: cinematic photorealism, credible real-world physics, rich organic textures, deep charcoal-black shadows, bold yet elegant contrast, dark luxurious editorial atmosphere, restrained colours with "+palette+" practical-light accents. Centered iconic subject, dark text-safe negative space, full-bleed single scene. Composable by center cropping to both 4:5 Instagram and square Telegram covers. Fact scene: "+concept+". Absolutely NO words, letters, diagrams, posters, collages, logos, watermarks, typography, UI or fake archival evidence. Scientifically plausible details; no cartoon styling.";
+  const claimed=await db("darkfactory_items?id=eq."+fact.id+"&visual_status=eq."+encodeURIComponent(fact.visual_status),"PATCH",{
+   visual_status:"generating",image_generation_error:null,updated_at:new Date().toISOString()
+  });
+  if(!claimed.length)return send(409,{error:"Генерация уже запущена или состояние изменилось"});
   try{
-   const im=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",signal:AbortSignal.timeout(130000),headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({model,prompt,quality:"medium",size:"1024x1536",n:1,output_format:"webp",output_compression:75})});
-   if(!im.ok){const detail=(await im.text()).slice(0,220);throw Error("Image API "+im.status+" "+detail)}
-   const result=await im.json();const b64=result?.data?.[0]?.b64_json;if(typeof b64!=="string")throw Error("No image returned");
-   const binary=atob(b64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-   if(bytes.length>8388608)throw Error("Image exceeds 8MB");
-   const file="shocking-facts/"+record.id+"/"+crypto.randomUUID()+".webp";
-   const uploaded=await fetch(ROOT+"/storage/v1/object/studio-private/"+file,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"image/webp","x-upsert":"false"},body:bytes});
-   if(!uploaded.ok)throw Error("Private storage upload "+uploaded.status);
-   await db("darkfactory_media_versions","POST",{item_id:record.id,storage_path:file,kind:"generated",byte_size:bytes.length,content_type:"image/webp"}).catch((e:any)=>console.warn("media_version",String(e)));
-   const updated=await db("darkfactory_items?id=eq."+record.id,"PATCH",{image_storage_path:file,image_generated_at:new Date().toISOString(),visual_status:"ready",image_generation_error:null});
-   const sig=await fetch(ROOT+"/storage/v1/object/sign/studio-private/"+file,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({expiresIn:1800})});
+   const im=await fetch("https://api.openai.com/v1/images/generations",{
+    method:"POST",signal:AbortSignal.timeout(125000),
+    headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},
+    body:JSON.stringify({model,prompt,quality:"medium",size:"1024x1536",n:1,output_format:"webp",output_compression:75})
+   });
+   if(!im.ok)throw Error("Image API "+im.status+" "+(await im.text()).slice(0,180));
+   const result=await im.json(),b64=result?.data?.[0]?.b64_json;
+   if(typeof b64!=="string")throw Error("Image API did not return an image");
+   const binary=atob(b64),bytes=new Uint8Array(binary.length);
+   for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+   if(bytes.length<1000||bytes.length>8388608||String.fromCharCode(...bytes.slice(0,4))!=="RIFF")
+    throw Error("Image size or WebP format invalid");
+   const filename="shocking-facts/"+fact.id+"/"+crypto.randomUUID()+".webp";
+   const upload=await fetch(ROOT+"/storage/v1/object/studio-private/"+filename,{
+    method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"image/webp","x-upsert":"false"},
+    body:bytes,signal:AbortSignal.timeout(20000)
+   });
+   if(!upload.ok)throw Error("Private photo archive "+upload.status);
+   await db("darkfactory_media_versions","POST",{
+    item_id:fact.id,storage_path:filename,kind:"generated",byte_size:bytes.length,content_type:"image/webp",created_by:id
+   });
+   const stamp=new Date().toISOString();
+   const updated=await db("darkfactory_items?id=eq."+fact.id,"PATCH",{
+    image_storage_path:filename,image_generated_at:stamp,visual_status:"ready",image_generation_error:null,
+    status_instagram:"review",status_telegram:"review",status_telegram_en:"review",updated_at:stamp
+   });
+   if(oldPath)await db("darkfactory_publish_queue?item_id=eq."+fact.id+
+    "&status=in.(scheduled,blocked)","PATCH",{
+     status:"cancelled",error:"Photo regenerated; editorial reapproval required",updated_at:stamp
+    });
+   const sig=await fetch(ROOT+"/storage/v1/object/sign/studio-private/"+filename,{
+    method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({expiresIn:1800})
+   });
    const data=sig.ok?await sig.json():{};
-   return send(200,{item:updated[0],image_url:data.signedURL?ROOT+"/storage/v1"+data.signedURL:null});
-  }catch(e){const msg=String(e instanceof Error?e.message:e).slice(0,400);await db("darkfactory_items?id=eq."+record.id,"PATCH",{image_generation_error:msg,visual_status:"failed"}).catch(()=>{});return send(502,{error:msg})}
+   return send(200,{item:updated[0],image_url:data.signedURL?ROOT+"/storage/v1"+data.signedURL:null,
+    style_version:"seriously-format-accents-v3",regenerated:Boolean(oldPath)});
+  }catch(err){
+   const msg=String(err instanceof Error?err.message:err).slice(0,400);
+   await db("darkfactory_items?id=eq."+fact.id,"PATCH",{
+    visual_status:oldPath?"ready":"failed",image_generation_error:msg,
+    updated_at:new Date().toISOString()
+   }).catch(()=>{});
+   return send(502,{error:msg});
+  }
  }
 
  const matchRewrite=path.match(/^\/items\/([a-f0-9-]{36})\/rewrite$/i);
