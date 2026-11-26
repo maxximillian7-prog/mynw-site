@@ -510,20 +510,11 @@ async function refillInstagramQueue(){
  const count=await instagramCapacity();
  const report={ok:true,limit:BUFFER_PENDING_CAP,scheduled_count:count,reconciliation,interleave_reconciliation:interleaveReconciliation,existing_move:existingMove,action:"full"};
  if(count>=BUFFER_PENDING_CAP)return report;
- // Earlier editorial plans pre-populated UNIQUE target_time for every WAITING
- // replacement, although none was scheduled in Buffer. These soft holds block
- // overdue posts from claiming the next actual free slot. Release ONLY the
- // waiting + draft_created placeholders; scheduled/dispatching/review rows
- // and all remote Buffer IDs remain untouched. The ordinal preserves FIFO.
- const released=await sql(
-  "UPDATE public.pr_instagram_interleave_20261123 q "+
-  "SET target_time=NULL,updated_at=now() "+
-  "FROM public.pr_instagram_retrofit_20261123 r "+
-  "WHERE q.item_id=r.item_id AND q.replacement_buffer_post_id=r.replacement_buffer_post_id "+
-  "AND q.state='waiting' AND r.stage='draft_created' AND r.target_time IS NULL "+
-  "AND q.target_time IS NOT NULL RETURNING q.item_id"
- );
- report.soft_slots_released=released.length;
+ // Waiting rows retain their original editorial target_time as soft plans.
+ // A dedicated UNIQUE partial index protects only dispatching/scheduled real
+ // Buffer slots, so waiting placeholders cannot block overdue replacements.
+ // Never null out target_time: the database column is NOT NULL.
+ report.slot_policy="active_only_unique";
  // Current NEW approved articles always take priority, and keep exact original
  // 08/13/18/23 Lisbon slots. Only after those are staged, add old replacements.
  const wait=(await sql("SELECT w.* FROM public.pr_instagram_waitlist_4slots w JOIN public.pr_instagram_publications p ON p.id=w.publication_id WHERE w.state='waiting' AND p.buffer_post_id IS NULL ORDER BY w.requested_at LIMIT 1"))[0];
