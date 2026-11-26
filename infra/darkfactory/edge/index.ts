@@ -592,11 +592,13 @@ async function bufferPreparePost(itemId:string,locale:"ru"|"en",mode:"shareNow"|
 async function reconcileBufferDeliveryStatus(){
  const keyConfigured=await serviceRpc("darkfactory_buffer_key_read",{});
  if(!keyConfigured)return {checked:0,status:"not_connected"};
+ // Recheck uncertain Buffer deliveries read-only: Instagram may have actually
+ // published despite Buffer reporting an error. Never re-create the post.
  const records=await db("darkfactory_buffer_posts?select=id,item_id,destination,buffer_post_id,status,mode,due_at,last_checked_at"+
-  "&status=eq.submitted&order=created_at.asc&limit=60");
+  "&status=in.(submitted,unknown)&order=created_at.asc&limit=80");
  const now=Date.now(),pending=records.filter((p:any)=>{
   if(!p.buffer_post_id)return false;
-  if(p.last_checked_at&&now-Date.parse(p.last_checked_at)<15*60*1000)return false;
+  if(p.last_checked_at&&now-Date.parse(p.last_checked_at)<(p.status==="unknown"?6*3600000:15*60000))return false;
   // Do not repeatedly query far-future scheduled posts.
   if(p.mode==="customScheduled"&&p.due_at&&Date.parse(p.due_at)>now+6*3600000)return false;
   return true;
@@ -624,13 +626,13 @@ async function reconcileBufferDeliveryStatus(){
    await db("darkfactory_buffer_posts?id=eq."+rec.id,"PATCH",update);
    if(post.status==="sent"){
     await db("darkfactory_publish_queue?item_id=eq."+rec.item_id+
-     "&destination=eq."+rec.destination+"&status=eq.submitted","PATCH",{
+     "&destination=eq."+rec.destination+"&status=in.(submitted,unknown)","PATCH",{
        status:"sent",sent_at:update.published_at,updated_at:new Date().toISOString()
      });
     published++;
    }else if(post.status==="error"){
     await db("darkfactory_publish_queue?item_id=eq."+rec.item_id+
-     "&destination=eq."+rec.destination+"&status=eq.submitted","PATCH",{
+     "&destination=eq."+rec.destination+"&status=in.(submitted,unknown)","PATCH",{
        status:"unknown",error:"Buffer reports an error; check Instagram before retrying. The post may already be live.",
        updated_at:new Date().toISOString()
      });
