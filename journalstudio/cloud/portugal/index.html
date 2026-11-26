@@ -509,7 +509,17 @@ async function call(path,options={}){
  if(!r.ok)throw Error(d.error||"Ошибка редакционного сервера");
  return d;
 }
-function publicationSettings(){const mode=$("publicationMode").value;if(mode==="now")return {schedule_mode:"now"};if(mode==="default")return {schedule_mode:"default"};if(mode==="delay"){const mins=Number($("publicationDelay").value);return {schedule_mode:"delay",schedule_delay_minutes:mins,delay_minutes:mins}};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function instagramReadyPhoto(){
+function publicationSettings(){const mode=$("publicationMode").value;if(mode==="now")return {schedule_mode:"now"};if(mode==="default")return {schedule_mode:"default"};if(mode==="delay"){const mins=Number($("publicationDelay").value);return {schedule_mode:"delay",schedule_delay_minutes:mins,delay_minutes:mins}};const date=$("publicationDate").value,time=$("publicationTime").value;if(!date||!time)throw Error("Выберите дату и время");const target=date+"T"+time,guess=Date.parse(target+":00Z");if(!Number.isFinite(guess))throw Error("Некорректная дата");let utc=guess;for(let k=0;k<4;k++){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(utc));const v=n=>+parts.find(p=>p.type===n).value;utc+=guess-Date.UTC(v("year"),v("month")-1,v("day"),v("hour"),v("minute"),v("second"))}const check=new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Lisbon",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(utc)).replace(" ","T");if(check!==target)throw Error("Время недоступно из-за перехода на летнее время");if(utc<=Date.now())throw Error("Выберите будущее время");return {schedule_mode:"manual",scheduled_for:new Date(utc).toISOString(),publish_at:new Date(utc).toISOString()}}function instagramCandidatePhoto(){
+ // An owner may explicitly approve the ALREADY SELECTED source during IG sign-off,
+ // even if the article itself was approved earlier. Never switch the source or
+ // bypass verified rights, and never auto-approve unrelated gallery candidates.
+ const i=current?.article||{};
+ if(!["owned","cc_licensed","permission_confirmed"].includes(i.photo_rights))return null;
+ return (current?.media||[]).find(m=>m.public_url===i.photo_url&&m.status==="candidate"&&m.rights_verified===true&&
+   ["owned_original","licensed_original","generated_illustration"].includes(m.media_type)&&
+   (m.media_type!=="generated_illustration"||(m.illustration_label_required===true&&!!m.storage_key)))||null;
+}
+function instagramReadyPhoto(){
  const i=current?.article||{};
  return ["owned","cc_licensed","permission_confirmed"].includes(i.photo_rights)&&
   (current?.media||[]).some(m=>m.public_url===i.photo_url&&m.status==="approved"&&m.rights_verified===true&&
@@ -524,10 +534,10 @@ function updateApprovalButtons(){
  $("approveBtn").textContent=tgDone?(tgDone.status==="sent"?"✓ Telegram опубликован":"✓ Telegram уже в очереди"):
   mode==="now"?"⚡ Опубликовать в Telegram":"✓ Утвердить для Telegram";
  const igDone=["queued","published","publishing","preparing","container_created"].includes(ig.status)||["waiting","dispatching","scheduled"].includes(ig.waitlist_status);
- const ready=instagramReadyPhoto();
- $("approveInstagramBtn").disabled=unavailable||igDone||!ready;
+ const ready=instagramReadyPhoto(),candidate=instagramCandidatePhoto();
+ $("approveInstagramBtn").disabled=unavailable||igDone||(!ready&&!candidate);
  $("approveInstagramBtn").textContent=igDone?(ig.status==="published"?"✓ Instagram опубликован":ig.waitlist_status==="waiting"?"✓ Instagram в резерве Buffer":"✓ Instagram уже в очереди"):
-  !ready?"🖼 Сначала утвердите фото":mode==="now"?"⚡ Опубликовать в Instagram":"✓ Утвердить для Instagram";
+  !ready&&candidate?"✓ Утвердить фото и Instagram":!ready?"🖼 Сначала выберите фото с правами":mode==="now"?"⚡ Опубликовать в Instagram":"✓ Утвердить для Instagram";
 }
 function updatePublicationMode(){
  const mode=$("publicationMode").value;
@@ -601,18 +611,27 @@ function renderMedia(media){
  const area=$("mediaArea");const options=(media||[]).filter(m=>m.generation_model!=="pt_ryadom_instagram_typography_v1"&&m.public_url&&((m.rights_verified&&["licensed_original","owned_original","generated_illustration"].includes(m.media_type))||(m.media_type==="brand_generic"&&m.generation_model==="trailyo_existing_image_reference"&&current?.article?.source_code==="trailyo_events"))&&["candidate","approved"].includes(m.status));
  if(!options.length){area.innerHTML='<div class="imagePending">🖼 Фотографий для этой статьи пока нет. Воспользуйтесь поиском ниже.</div>';return;}
  const chosen=choosePreviewPhoto(),canChange=!!me?.user?.edit&&current?.article?.status==="candidate";
+ const canApproveExisting=!!me?.user?.approve&&current?.article?.status==="approved"&&
+  chosen?.status==="candidate"&&chosen?.public_url===current?.article?.photo_url&&
+  chosen?.rights_verified===true&&
+  ["owned_original","licensed_original","generated_illustration"].includes(chosen?.media_type)&&
+  (chosen?.media_type!=="generated_illustration"||(chosen?.illustration_label_required===true&&!!chosen?.storage_key));
  area.innerHTML='<div class="pt-photo-gallery">'+options.map(m=>{
   const active=chosen?.id===m.id;
   return '<button type="button" class="pt-photo-choice '+(active?"selected":"")+'" data-media-preview="'+escapeHtml(m.id)+'" aria-pressed="'+active+'" title="Показать в телефоне">'+
   '<img loading="lazy" src="'+escapeHtml(m.public_url)+'" alt="Вариант обложки">'+
   '<span>'+(m.generation_model==="trailyo_existing_image_reference"?"🎭 Фото Trailyo · ":m.media_type==='generated_illustration'?'📷 AI-изображение · ':'')+(m.status==="approved"?"✓ Утверждено":"● На проверке")+'</span></button>';
  }).join("")+'</div><div class="pt-photo-row"><span class="secondary">'+(chosen?chosen.status==="approved"?"✓ Выбрано утверждённое фото":"Выбрано фото-кандидат":"Выберите обложку")+'</span>'+
- (canChange&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
+ ((canChange||canApproveExisting)&&chosen?.status==="candidate"?'<button type="button" class="btn primary" id="applySelectedPhoto">✓ Утвердить выбранное</button>':"")+
  (canChange&&chosen?.status==="approved"&&chosen.public_url!==current?.article?.photo_url?'<button type="button" class="btn primary" id="setApprovedCover">✓ Сделать обложкой</button>':"")+
  '</div>'+(chosen?.public_url?'<div class="faint">'+(chosen.generation_model==="trailyo_existing_image_reference"?'Права на использование не проверены · ':'')+'<a href="'+escapeHtml(chosen.public_url)+'" target="_blank" rel="noopener noreferrer">Фото</a></div>':"");
  area.querySelectorAll("[data-media-preview]").forEach(button=>button.onclick=()=>{previewPhotoId=button.dataset.mediaPreview;renderMedia(current?.media);renderPreview();});
  const apply=$("applySelectedPhoto");
- if(apply)apply.onclick=()=>sendAction("approve_media",{media_id:choosePreviewPhoto()?.id});
+ if(apply)apply.onclick=async()=>{const selected=choosePreviewPhoto();if(!selected)return;
+  apply.disabled=true;
+  try{await sendAction("approve_media",{media_id:selected.id});}
+  finally{if(apply.isConnected)apply.disabled=false}
+ };
  const cover=$("setApprovedCover");
  if(cover)cover.onclick=async()=>{
   if(dirty){toast("Сначала сохраните текст статьи.",true);return}
@@ -1029,7 +1048,7 @@ async function approveAndQueue(target="telegram"){
  const id=current.article.id,note=$("note").value;
  const sendTg=target==="telegram",sendIg=target==="instagram";
  if(!sendTg&&!sendIg){toast("Неизвестная площадка",true);return}
- if(sendIg&&!instagramReadyPhoto()){toast("Для Instagram сначала выберите и утвердите изображение в галерее выше",true);return}
+ if(sendIg&&!instagramReadyPhoto()&&!instagramCandidatePhoto()){toast("Для Instagram сначала выберите изображение с подтверждёнными правами в галерее выше",true);return}
  let schedule;
  try{schedule=publicationSettings()}catch(e){toast(e.message,true);return}
  approvalPending=true;updateApprovalButtons();
@@ -1039,6 +1058,16 @@ async function approveAndQueue(target="telegram"){
    if(current.article.status==="approved")throw Error("Утверждённую статью сначала нужно вернуть к правкам");
    await call("/api/save",{method:"POST",body:{item_id:id,fields:gather()}});
    dirty=false;
+  }
+  // Explicit Instagram sign-off can finish approval of the source photo
+  // that is ALREADY selected in this article. It must not select another
+  // gallery image or change an already scheduled Telegram picture.
+  if(sendIg&&!instagramReadyPhoto()){
+   const selected=instagramCandidatePhoto();
+   if(!selected)throw Error("Сначала выберите фото с подтверждёнными правами");
+   await call("/api/action",{method:"POST",body:{item_id:id,action:"approve_media",media_id:selected.id}});
+   await refreshSelected();
+   if(!instagramReadyPhoto())throw Error("Фото утверждено, но сервер не подтвердил готовность. Обновите карточку.");
   }
   const latest=await call("/api/article?id="+encodeURIComponent(id));
   // Instagram uses its own approved 4:5 artwork; Telegram keeps original photo.
