@@ -264,7 +264,7 @@ async function reconcileInstagramPending(){
     await sql("UPDATE public.pr_instagram_publications SET status='queued',scheduled_for=$2::timestamptz,updated_at=now(),last_error=NULL WHERE id=$1::uuid AND status='failed' AND buffer_post_id=$3",[p.id,remote.dueAt,p.buffer_post_id]);
     result.repaired_failures++;
    }else{
-    const detail=String(remote?.error?.message||remote?.error?.rawError||"needs manual review").replace(/[\\r\\n]+/g," ").slice(0,200);
+    const detail=String(remote?.error?.message||remote?.error?.rawError||"needs manual review").replace(/[\r\n]+/g," ").slice(0,200);
     await sql("UPDATE public.pr_instagram_publications SET last_error=$2,updated_at=now() WHERE id=$1::uuid AND status='failed'",[p.id,"Buffer "+status+": "+detail]);
    }
    result.checked_failed++;
