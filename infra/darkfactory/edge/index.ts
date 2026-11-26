@@ -620,7 +620,7 @@ async function reconcileBufferDeliveryStatus(){
     // Buffer may report an error even after Instagram made the post public.
     // Preserve the Buffer ID and stop automatic retries until Instagram is checked.
     update.status="unknown";
-    const errorDetails=String(post.error?.message||post.error?.rawError||"delivery uncertain").replace(/[\\r\\n]/g," ").slice(0,230);
+    const errorDetails=String(post.error?.message||post.error?.rawError||"delivery uncertain").replace(/[\r\n]/g," ").slice(0,230);
     update.error="Buffer: "+errorDetails+"; verify Instagram before retrying";
    }
    if(post.dueAt&&post.status==="scheduled")update.due_at=post.dueAt;
