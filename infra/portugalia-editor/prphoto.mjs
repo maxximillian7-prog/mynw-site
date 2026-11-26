@@ -349,13 +349,26 @@ async function instagramSource(itemId){
   if(url.protocol!=="https:"||url.username||url.password||
     !["upload.wikimedia.org","thumb.wikimedia.org","images.unsplash.com","images.pexels.com","cdn.pixabay.com",store].includes(url.hostname))
     throw bad("Недопустимый источник фотографии",422);
-  const response=await fetch(url,{redirect:"error",signal:AbortSignal.timeout(22000)});
-  if(!response.ok)throw bad("Исходная фотография не загрузилась. Замените её в галерее.",422);
-  const mime=(response.headers.get("content-type")||"").split(";")[0];
-  if(!["image/jpeg","image/png","image/webp"].includes(mime))throw bad("Исходная фотография не JPEG/PNG/WebP",422);
-  const bytes=new Uint8Array(await response.arrayBuffer());
-  if(bytes.byteLength>9_000_000||bytes.byteLength<500)throw bad("Фото слишком большое или повреждено",413);
-  return {bytes,mime,source:row};
+  // External photo CDNs can intermittently time out while the media is
+  // already verified and the editor has approved the source. Retry the
+  // *same* validated URL once, with a bounded timeout, without changing
+  // the source photo, licensing or Instagram cover.
+  for(let attempt=0;attempt<2;attempt++){
+   try{
+    const response=await fetch(url,{redirect:"error",signal:AbortSignal.timeout(attempt?25000:16000)});
+    if(!response.ok)throw bad("Исходная фотография не загрузилась. Проверьте ссылку в галерее.",422);
+    const mime=(response.headers.get("content-type")||"").split(";")[0];
+    if(!["image/jpeg","image/png","image/webp"].includes(mime))throw bad("Исходная фотография не JPEG/PNG/WebP",422);
+    const bytes=new Uint8Array(await response.arrayBuffer());
+    if(bytes.byteLength>9_000_000||bytes.byteLength<500)throw bad("Фото слишком большое или повреждено",413);
+    return {bytes,mime,source:row};
+   }catch(e){
+    const timed=e?.name==="TimeoutError"||e?.name==="AbortError";
+    if(timed&&attempt===0)continue;
+    if(timed)throw bad("Источник фотографии не ответил вовремя. Обложка не потеряна; повторите предпросмотр.",504);
+    throw e;
+   }
+  }
 }
 function jpegDimensions(bytes){
   let p=2;
@@ -418,4 +431,8 @@ if(req.method==="POST"&&u.pathname==="/api/instagram/cover"){
 }
 if(req.method==="POST"&&u.pathname==="/api/generate"){const raw=await req.text();if(raw.length>1500)throw bad("Слишком большой запрос");const b=JSON.parse(raw||"{}");if(b.quality&&b.quality!=="medium")throw bad("Сейчас поддерживается качество Medium");return result(await generateMediumCover(b.item_id),200,origin);}
 return result({error:"Not found"},404,origin);
-}catch(e){return result({error:String(e.message||e).slice(0,200)},e.status||500,origin);}}};
+}catch(e){
+ const timed=e?.name==="TimeoutError"||e?.name==="AbortError";
+ const msg=timed?"Истекло время ответа внешнего сервиса. Проверьте галерею — уже сохранённые изображения не потеряны.":String(e.message||e).slice(0,200);
+ return result({error:msg},timed?504:e.status||500,origin);
+}}};
