@@ -825,7 +825,7 @@ async function refreshInstagramState(id){
   current.instagram=result.instagram;
   const status=result.instagram?.status;
   const reserved=["waiting","dispatching"].includes(result.instagram?.waitlist_status);
-  const statusLabel=reserved?"одобрено, в резерве Buffer до свободного слота":status==="published"?"опубликовано":status==="queued"?"запланировано в Buffer":status==="awaiting_media"?"нужно утвердить фото":status==="awaiting_approval"?"готово к отправке":status==="failed"?"предыдущая отправка не удалась":status==="draft"?"готово к отправке":"ещё не запланировано";
+  const statusLabel=reserved?"одобрено, в резерве Buffer до свободного слота":status==="published"?"опубликовано":status==="queued"?"запланировано в Buffer":status==="awaiting_media"?"нужно подготовить и утвердить отдельную Instagram-обложку":status==="awaiting_approval"?"готово к отправке":status==="failed"?"предыдущая отправка не удалась":status==="draft"?"готово к отправке":"ещё не запланировано";
   const link=String(result.instagram?.public_url||"");
   const igTime=result.instagram?.scheduled_for;
   const tgTime=(current?.publications||[]).find(p=>p.destination_code==="main"&&["queued","scheduled"].includes(p.status))?.scheduled_for;
