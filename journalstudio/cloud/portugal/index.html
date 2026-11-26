@@ -1048,6 +1048,15 @@ async function approveAndQueue(target="telegram"){
  const id=current.article.id,note=$("note").value;
  const sendTg=target==="telegram",sendIg=target==="instagram";
  if(!sendTg&&!sendIg){toast("Неизвестная площадка",true);return}
+ // The thumbnail the editor is PREVIEWING may be different from the image
+ // actually assigned to the article. Never silently approve and post a
+ // different image; require an explicit acknowledgement in that case.
+ if(sendIg&&previewPhotoId){
+  const preview=(current.media||[]).find(m=>m.id===previewPhotoId);
+  if(preview?.public_url&&preview.public_url!==current.article.photo_url&&
+     preview.generation_model!=="pt_ryadom_instagram_typography_v1"&&
+     !confirm("Сейчас открыт предпросмотр другого изображения. Instagram-обложка будет создана из основного фото статьи (не из этого предпросмотра). Продолжить?"))return;
+ }
  if(sendIg&&!instagramReadyPhoto()&&!instagramCandidatePhoto()){toast("Для Instagram сначала выберите изображение с подтверждёнными правами в галерее выше",true);return}
  let schedule;
  try{schedule=publicationSettings()}catch(e){toast(e.message,true);return}
