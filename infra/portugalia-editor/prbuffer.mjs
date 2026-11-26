@@ -12,7 +12,15 @@ async function sql(query,params=[]){
  method:"POST",headers:{"content-type":"application/json","Neon-Connection-String":process.env.DATABASE_URL},
  body:JSON.stringify({query,params}),signal:AbortSignal.timeout(16000)});
  const d=await r.json().catch(()=>({}));
- if(!r.ok)throw fail("Ошибка Neon SQL "+r.status,503);
+ if(!r.ok){
+  // Surface the safe PostgreSQL error and the failing SQL prefix in server logs
+  // (never log connection strings, API keys or query parameter values).
+  const cause=typeof d.error==="object"?(d.error?.message||d.error?.detail||JSON.stringify(d.error)):
+   (d.error||d.message||d.detail||r.statusText);
+  const msg=String(cause||"unknown").slice(0,250);
+  console.error("PR_NEON_SQL_DETAIL",JSON.stringify({status:r.status,query:String(query).replace(/\\s+/g," ").slice(0,160),message:msg}));
+  throw fail("Ошибка Neon SQL "+r.status+": "+msg.slice(0,130),503);
+ }
  return d.rows??d;
 }
 async function identity(request){
