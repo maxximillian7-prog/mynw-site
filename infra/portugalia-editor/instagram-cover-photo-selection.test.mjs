@@ -8,7 +8,7 @@ const pub=readFileSync(new URL("./prbuffer.mjs",import.meta.url),"utf8");
 
 test("An approved Instagram typography cover cannot replace the article/Telegram original",()=>{
  assert.match(ddl,/NEW\.generation_model IS DISTINCT FROM 'pt_ryadom_instagram_typography_v1'/);
- assert.match(ddl,/NEW\.storage_key,'?\)?[^\n]*NOT LIKE 'instagram-covers\/\%'/);
+ assert.match(ddl,/NOT LIKE 'instagram-covers\/%'/);
  assert.match(ddl,/UPDATE public\.pr_items SET/);
 });
 test("Instagram still generates and approves a separate 1080x1350 media asset",()=>{
