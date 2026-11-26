@@ -224,7 +224,7 @@ async function bufferPostStatus(id){
 async function reconcileInstagramPending(){
  // Capacity must reflect Buffer's real SENT/ERROR states, not stale DB queue.
  const rows=await sql("SELECT id,buffer_post_id,scheduled_for FROM public.pr_instagram_publications WHERE status='queued' AND buffer_post_id IS NOT NULL AND scheduled_for<now()+interval '8 minutes' ORDER BY scheduled_for LIMIT 12");
- const result={published:0,failed:0};
+ const result={published:0,failed:0,repaired_failures:0,checked_failed:0};
  for(const p of rows)try{
   const remote=await bufferPostStatus(p.buffer_post_id);
   if(String(remote?.status||"").toLowerCase()==="sent"){
@@ -246,6 +246,32 @@ async function reconcileInstagramPending(){
    result.failed++;
   }
  }catch(e){console.error("IG_REPOST_RECONCILE",String(e.message||e).slice(0,130))}
+ // A Buffer error is not proof that Instagram failed: sometimes the post
+ // was actually published. Check the *existing* remote Buffer ID, never
+ // create a duplicate. Rate limit checks and rotate through stale failures.
+ const uncertain=await sql(
+  "SELECT id,buffer_post_id FROM public.pr_instagram_publications "+
+  "WHERE status='failed' AND buffer_post_id IS NOT NULL "+
+  "AND updated_at<now()-interval '30 minutes' ORDER BY updated_at LIMIT 4");
+ for(const p of uncertain){
+  try{
+   const remote=await bufferPostStatus(p.buffer_post_id);
+   const status=String(remote?.status||"").toLowerCase();
+   if(status==="sent"){
+    await sql("UPDATE public.pr_instagram_publications SET status='published',published_at=COALESCE($2::timestamptz,now()),updated_at=now(),last_error=NULL WHERE id=$1::uuid AND status='failed' AND buffer_post_id=$3",[p.id,remote.sentAt||null,p.buffer_post_id]);
+    result.repaired_failures++;
+   }else if(isBufferQueued(status)&&remote.dueAt&&Date.parse(remote.dueAt)>Date.now()+60000){
+    await sql("UPDATE public.pr_instagram_publications SET status='queued',scheduled_for=$2::timestamptz,updated_at=now(),last_error=NULL WHERE id=$1::uuid AND status='failed' AND buffer_post_id=$3",[p.id,remote.dueAt,p.buffer_post_id]);
+    result.repaired_failures++;
+   }else{
+    const detail=String(remote?.error?.message||remote?.error?.rawError||"needs manual review").replace(/[\\r\\n]+/g," ").slice(0,200);
+    await sql("UPDATE public.pr_instagram_publications SET last_error=$2,updated_at=now() WHERE id=$1::uuid AND status='failed'",[p.id,"Buffer "+status+": "+detail]);
+   }
+   result.checked_failed++;
+  }catch(e){
+   console.error("IG_FAILED_RECONCILE",String(e?.message||e).slice(0,150));
+  }
+ }
  return result;
 }
 async function scheduleRetrofitDraft(row,due){
@@ -521,7 +547,7 @@ async function refillInstagramQueue(){
  // A spam-flagged or failed article remains isolated in needs_review:
  // never let it disable unrelated old drafts.
  const old=(await sql(
- "SELECT q.item_id,q.ordinal,q.replacement_buffer_post_id,q.target_time AS interleave_due,r.cover_url,r.carousel_urls,r.caption,"+
+ "SELECT q.item_id,q.ordinal,q.attempts,q.replacement_buffer_post_id,q.target_time AS interleave_due,r.cover_url,r.carousel_urls,r.caption,"+
  "EXISTS(SELECT 1 FROM public.pr_media_assets m JOIN public.pr_items i ON i.id=m.item_id WHERE m.item_id=q.item_id AND m.public_url=i.photo_url AND m.status='approved' AND m.media_type='generated_illustration') AS is_ai "+
  "FROM public.pr_instagram_interleave_20261123 q "+
  "JOIN public.pr_instagram_retrofit_20261123 r ON r.item_id=q.item_id AND r.replacement_buffer_post_id=q.replacement_buffer_post_id "+
@@ -567,11 +593,14 @@ async function refillInstagramQueue(){
     await sql("UPDATE public.pr_instagram_interleave_20261123 SET state='scheduled',scheduled_at=now(),last_error=NULL,updated_at=now() WHERE item_id=$1::uuid AND state='dispatching'",[id]);
     return {...report,action:"scheduled_old_reconciled",source,item_id:id,dueAt:due};
    }
-   // A confirmed unchanged draft is safe to leave in draft; an ambiguous
-   // remote status blocks further old replacements but not new articles.
+   // Only short transient failures should be retried automatically.
+   // A permanent Buffer rejection must not block all 38 later articles.
    const safelyDraft=remote&&String(remote.status||"").toLowerCase()==="draft";
-   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage=$2,last_error=$3,updated_at=now() WHERE item_id=$1::uuid AND stage='dispatching'",[id,safelyDraft?"draft_created":"needs_review",error]);
-   await sql("UPDATE public.pr_instagram_interleave_20261123 SET state=$2,last_error=$3,updated_at=now() WHERE item_id=$1::uuid AND state='dispatching'",[id,safelyDraft?"waiting":"needs_review",error]);
+   const temporary=/\\b(429|502|503|504|rate limit|timeout|temporar|network|ECONNRESET)\\b/i.test(error);
+   const mayRetry=Boolean(safelyDraft&&temporary&&Number(old.attempts||0)<2);
+   const nextState=mayRetry?"waiting":"needs_review";
+   await sql("UPDATE public.pr_instagram_retrofit_20261123 SET stage=$2,last_error=$3,updated_at=now() WHERE item_id=$1::uuid AND stage='dispatching'",[id,mayRetry?"draft_created":"needs_review",error]);
+   await sql("UPDATE public.pr_instagram_interleave_20261123 SET state=$2,last_error=$3,updated_at=now() WHERE item_id=$1::uuid AND state='dispatching'",[id,nextState,error]);
   }
   return {...report,action:"needs_review_or_retry_later",source,item_id:id,error};
  }
