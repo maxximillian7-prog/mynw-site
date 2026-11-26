@@ -595,10 +595,10 @@ async function reconcileBufferDeliveryStatus(){
  // Recheck uncertain Buffer deliveries read-only: Instagram may have actually
  // published despite Buffer reporting an error. Never re-create the post.
  const records=await db("darkfactory_buffer_posts?select=id,item_id,destination,buffer_post_id,status,mode,due_at,last_checked_at"+
-  "&status=in.(submitted,unknown)&order=created_at.asc&limit=80");
+  "&status=in.(submitted,unknown,failed)&order=created_at.asc&limit=80");
  const now=Date.now(),pending=records.filter((p:any)=>{
   if(!p.buffer_post_id)return false;
-  if(p.last_checked_at&&now-Date.parse(p.last_checked_at)<(p.status==="unknown"?6*3600000:15*60000))return false;
+  if(p.last_checked_at&&now-Date.parse(p.last_checked_at)<(["unknown","failed"].includes(p.status)?6*3600000:15*60000))return false;
   // Do not repeatedly query far-future scheduled posts.
   if(p.mode==="customScheduled"&&p.due_at&&Date.parse(p.due_at)>now+6*3600000)return false;
   return true;
@@ -607,7 +607,7 @@ async function reconcileBufferDeliveryStatus(){
  for(const rec of pending){
   try{
    const result=await bufferRequest(
-    "query GetPost($input:PostInput!){post(input:$input){id status sentAt dueAt externalLink}}",
+    "query GetPost($input:PostInput!){post(input:$input){id status sentAt dueAt externalLink error{message rawError supportUrl}}}",
     {input:{id:rec.buffer_post_id}});
    const post=result.post;
    if(!post||post.id!==rec.buffer_post_id)throw Error("Buffer did not return the expected post");
@@ -620,20 +620,21 @@ async function reconcileBufferDeliveryStatus(){
     // Buffer may report an error even after Instagram made the post public.
     // Preserve the Buffer ID and stop automatic retries until Instagram is checked.
     update.status="unknown";
-    update.error="Buffer reports an error; verify Instagram before retrying";
+    const errorDetails=String(post.error?.message||post.error?.rawError||"delivery uncertain").replace(/[\\r\\n]/g," ").slice(0,230);
+    update.error="Buffer: "+errorDetails+"; verify Instagram before retrying";
    }
    if(post.dueAt&&post.status==="scheduled")update.due_at=post.dueAt;
    await db("darkfactory_buffer_posts?id=eq."+rec.id,"PATCH",update);
    if(post.status==="sent"){
     await db("darkfactory_publish_queue?item_id=eq."+rec.item_id+
-     "&destination=eq."+rec.destination+"&status=in.(submitted,unknown)","PATCH",{
+     "&destination=eq."+rec.destination+"&status=in.(submitted,unknown,blocked)","PATCH",{
        status:"sent",sent_at:update.published_at,updated_at:new Date().toISOString()
      });
     published++;
    }else if(post.status==="error"){
     await db("darkfactory_publish_queue?item_id=eq."+rec.item_id+
-     "&destination=eq."+rec.destination+"&status=in.(submitted,unknown)","PATCH",{
-       status:"unknown",error:"Buffer reports an error; check Instagram before retrying. The post may already be live.",
+     "&destination=eq."+rec.destination+"&status=in.(submitted,unknown,blocked)","PATCH",{
+       status:"unknown",error:update.error+"; the post may already be live.",
        updated_at:new Date().toISOString()
      });
     failed++;
