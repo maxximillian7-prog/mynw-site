@@ -229,6 +229,25 @@ async function publish(post){
   body:JSON.stringify(body),signal:AbortSignal.timeout(45000)
  });
  const data=await response.json().catch(()=>({}));
+ // Telegram HTTP 400 explicitly rejects the complete first message.
+ // Preserve the already approved article and event details. If external
+ // photo fetch fails, retry once without the photo block. Never auto-retry
+ // a timeout or HTTP 5xx (posting outcome would be ambiguous).
+ if(response.status===400&&/failed to get HTTP URL content/i.test(String(data.description||""))){
+  const textBlocks=blocks.filter(b=>b.type!=="photo");
+  if(textBlocks.length<2)throw Error("No approved text-only fallback");
+  const retryBody={...body,rich_message:{blocks:textBlocks}};
+  const fallback=await fetch("https://api.telegram.org/bot"+token+"/sendRichMessage",{
+   method:"POST",headers:{"content-type":"application/json"},
+   body:JSON.stringify(retryBody),signal:AbortSignal.timeout(45000)
+  });
+  const recovered=await fallback.json().catch(()=>({}));
+  if(fallback.ok&&recovered.ok===true&&recovered.result?.message_id){
+   console.log("PR_TELEGRAM_TEXT_ONLY_FALLBACK",post.post_id,post.destination_code);
+   return recovered.result.message_id;
+  }
+  throw Error("Telegram text-only fallback "+fallback.status+": "+safe(recovered.description||"unknown error"));
+ }
  if(!response.ok||data.ok!==true||!data.result?.message_id)
   throw Error("Telegram rich message "+response.status+": "+safe(data.description||"unknown error"));
  return data.result.message_id;
